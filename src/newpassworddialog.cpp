@@ -1,0 +1,381 @@
+#include "newpassworddialog.h"
+#include "ui_newpassworddialog.h"
+#include "passwordDialog.h"
+#include "passwordGenerator.h"
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QTableWidgetItem>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QList>
+#include <QMessageBox>
+#include <QMenu>
+#include "multilinedelegate.h"
+#include "integerdelegate.h"
+#include <QPushButton>
+#include "settings.h"
+
+NewPasswordDialog::NewPasswordDialog(QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::NewPasswordDialog)
+{
+    ui->setupUi(this);
+
+    ui->pushButtonGenerate->setText(tr("&Generate Password"));
+
+    // Existing context menu setup...
+    ui->tableWidgetNotes->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tableWidgetNotes, &QTableWidget::customContextMenuRequested,
+            this, &NewPasswordDialog::onNotesContextMenu);
+
+    // 🔑 Install the multi-line delegate
+    ui->tableWidgetNotes->setItemDelegate(new MultiLineDelegate(ui->tableWidgetNotes));
+
+    // Optional: enable word wrap in the table itself
+    ui->tableWidgetNotes->setWordWrap(true);
+    ui->tableWidgetNotes->horizontalHeader()->setStretchLastSection(true);
+
+
+    ui->tableWidgetCredentials->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tableWidgetCredentials, &QTableWidget::customContextMenuRequested,
+            this, &NewPasswordDialog::onCredentialsContextMenu);
+
+    ui->tableWidgetCredentials->setItemDelegateForColumn(3, new IntegerDelegate(ui->tableWidgetCredentials));
+
+    ui->listWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+
+    // Example: connect signals from widgets to a slot that checks conditions
+    connect(ui->lineEditAppName, &QLineEdit::textChanged,
+            this, &NewPasswordDialog::validateForm);
+    connect(ui->tableWidgetCredentials, &QTableWidget::itemChanged,
+            this, &NewPasswordDialog::validateForm);
+    connect(ui->tableWidgetNotes, &QTableWidget::itemChanged,
+            this, &NewPasswordDialog::validateForm);
+
+    connect(ui->tableWidgetCredentials->model(), &QAbstractItemModel::rowsInserted,
+            this, &NewPasswordDialog::validateForm);
+    connect(ui->tableWidgetCredentials->model(), &QAbstractItemModel::rowsRemoved,
+            this, &NewPasswordDialog::validateForm);
+
+    connect(ui->listWidget, &QListWidget::itemChanged,
+            this, &NewPasswordDialog::validateForm);
+
+
+}
+
+void NewPasswordDialog::openPassword()
+{
+    ui->lineEditAppName->setText(this->AppName);
+    ui->lineEditPublicAppName->setText(this->PublicAppName);
+    ui->lineEditDescription->setText(this->Description);
+    ui->lineEditURL->setText(this->URL);
+}
+
+void NewPasswordDialog::openCredentials(QString username,
+                                        QString password,
+                                        QString secretOptCode,
+                                        int length)
+{
+    // Ensure the table has the right number of columns
+    if (ui->tableWidgetCredentials->columnCount() < 4) {
+        ui->tableWidgetCredentials->setColumnCount(4);
+        ui->tableWidgetCredentials->setHorizontalHeaderLabels(
+            {"Username", "Password", "Secret Code", "Length"});
+    }
+
+    // Add a new row at the bottom
+    int row = ui->tableWidgetCredentials->rowCount();
+    ui->tableWidgetCredentials->insertRow(row);
+
+    // Populate cells
+    ui->tableWidgetCredentials->setItem(row, 0, new QTableWidgetItem(username));
+    ui->tableWidgetCredentials->setItem(row, 1, new QTableWidgetItem(password));
+    ui->tableWidgetCredentials->setItem(row, 2, new QTableWidgetItem(secretOptCode));
+    ui->tableWidgetCredentials->setItem(row, 3, new QTableWidgetItem(QString::number(length)));
+
+    // Optional: adjust column widths
+    ui->tableWidgetCredentials->resizeColumnsToContents();
+}
+
+void NewPasswordDialog::openNote(QString note)
+{
+    // Ensure the table has exactly 1 column
+    if (ui->tableWidgetNotes->columnCount() != 1) {
+        ui->tableWidgetNotes->setColumnCount(1);
+        ui->tableWidgetNotes->setHorizontalHeaderLabels({"Note"});
+    }
+
+    // Add a new row at the bottom
+    int row = ui->tableWidgetNotes->rowCount();
+    ui->tableWidgetNotes->insertRow(row);
+
+    // Populate the single cell with the note text
+    ui->tableWidgetNotes->setItem(row, 0, new QTableWidgetItem(note));
+
+    // Optional: adjust column width
+    ui->tableWidgetNotes->resizeColumnsToContents();
+}
+
+
+
+void NewPasswordDialog::onCredentialsContextMenu(const QPoint &pos)
+{
+    QMenu menu(this);
+
+    QAction *addRowAction    = menu.addAction("Add New Credential");
+    QAction *deleteRowAction = menu.addAction("Delete Selected Credential");
+
+    QAction *selectedAction = menu.exec(ui->tableWidgetCredentials->viewport()->mapToGlobal(pos));
+
+    if (selectedAction == addRowAction) {
+        int row = ui->tableWidgetCredentials->rowCount();
+        ui->tableWidgetCredentials->insertRow(row);
+
+        for (int col = 0; col < ui->tableWidgetCredentials->columnCount(); ++col) {
+            if (col == 3) {   // column 4 (index 3)
+                QTableWidgetItem *intItem = new QTableWidgetItem();
+                intItem->setFlags(intItem->flags() | Qt::ItemIsEditable);
+                intItem->setData(Qt::EditRole, 6); // default value
+                ui->tableWidgetCredentials->setItem(row, col, intItem);
+            } else {
+                QTableWidgetItem *item = new QTableWidgetItem("");
+                item->setFlags(item->flags() | Qt::ItemIsEditable);
+                ui->tableWidgetCredentials->setItem(row, col, item);
+            }
+        }
+
+        ui->tableWidgetCredentials->setCurrentCell(row, 0);
+        ui->tableWidgetCredentials->editItem(ui->tableWidgetCredentials->item(row, 0));
+    }
+    else if (selectedAction == deleteRowAction) {
+        // 🔑 Ensure the row under the cursor is selected
+        QModelIndex index = ui->tableWidgetCredentials->indexAt(pos);
+        if (index.isValid()) {
+            ui->tableWidgetCredentials->selectRow(index.row());
+            ui->tableWidgetCredentials->removeRow(index.row());
+        }
+    }
+}
+
+
+
+NewPasswordDialog::~NewPasswordDialog()
+{
+    delete ui;
+}
+
+void NewPasswordDialog::onNotesContextMenu(const QPoint &pos)
+{
+    QMenu menu(this);
+
+    QAction *addRowAction = menu.addAction("Add New Note");
+    QAction *deleteRowAction = menu.addAction("Delete Selected Note");
+
+    QAction *selectedAction = menu.exec(ui->tableWidgetNotes->viewport()->mapToGlobal(pos));
+
+    if (selectedAction == addRowAction) {
+        int row = ui->tableWidgetNotes->rowCount();
+        ui->tableWidgetNotes->insertRow(row);
+
+        // 🔑 Create editable items for each column
+        for (int col = 0; col < ui->tableWidgetNotes->columnCount(); ++col) {
+            QTableWidgetItem *item = new QTableWidgetItem("");
+            item->setFlags(item->flags() | Qt::ItemIsEditable);
+            ui->tableWidgetNotes->setItem(row, col, item);
+        }
+
+        // 🔑 Immediately start editing the first cell with your QTextEdit delegate
+        ui->tableWidgetNotes->setCurrentCell(row, 0);
+        ui->tableWidgetNotes->editItem(ui->tableWidgetNotes->item(row, 0));
+    }
+    else if (selectedAction == deleteRowAction) {
+        int row = ui->tableWidgetNotes->currentRow();
+        if (row >= 0) {
+            ui->tableWidgetNotes->removeRow(row);
+        }
+    }
+}
+
+
+void NewPasswordDialog::setKeys(const QList<KeyEntry> &keys)
+{
+    m_keys = keys;
+    ui->listWidget->clear();
+
+    for (const auto &entry : keys) {
+        // Show both label and key in the text
+        QString displayText = entry.label + " (" + entry.key + ")";
+        QListWidgetItem *item = new QListWidgetItem(displayText);
+
+        // Add a checkbox
+        item->setCheckState(Qt::Unchecked);
+
+        // Store the actual key in item data for easy retrieval later
+        item->setData(Qt::UserRole, entry.key);
+
+        ui->listWidget->addItem(item);
+    }
+}
+
+
+QByteArray NewPasswordDialog::toJson() const
+{
+    QJsonObject root;
+    root["url"] = ui->lineEditURL->text();
+    root["description"] = ui->lineEditDescription->text();
+    root["private_name"] = ui->lineEditAppName->text();
+
+    // --- Credentials ---
+    QJsonArray credsArray;
+    int credsRowCount = ui->tableWidgetCredentials->rowCount();
+
+    for (int row = 0; row < credsRowCount; ++row) {
+        QJsonObject cred;
+
+        QTableWidgetItem *usernameItem = ui->tableWidgetCredentials->item(row, 0);
+        QTableWidgetItem *passwordItem = ui->tableWidgetCredentials->item(row, 1);
+        QTableWidgetItem *secretItem   = ui->tableWidgetCredentials->item(row, 2);
+        QTableWidgetItem *lengthItem   = ui->tableWidgetCredentials->item(row, 3);
+
+        if (!usernameItem || !passwordItem || !secretItem || !lengthItem)
+            continue; // skip incomplete rows
+
+        cred["username"]      = usernameItem->text();
+        cred["password"]      = passwordItem->text();
+        cred["secretOptCode"] = secretItem->text();
+        cred["length"]        = lengthItem->text().toInt();
+
+        credsArray.append(cred);
+    }
+    root["credentials"] = credsArray;
+
+    // --- Notes ---
+    QJsonArray notesArray;
+    int notesRowCount = ui->tableWidgetNotes->rowCount();
+
+    for (int row = 0; row < notesRowCount; ++row) {
+        QTableWidgetItem *contentItem = ui->tableWidgetNotes->item(row, 0);
+        if (!contentItem)
+            continue; // skip empty rows
+
+        QJsonObject note;
+        note["content"] = contentItem->text();
+        notesArray.append(note);
+    }
+    root["notes"] = notesArray;
+
+    // --- Finalize ---
+    QJsonDocument doc(root);
+    return doc.toJson(QJsonDocument::Indented);
+}
+
+
+QStringList NewPasswordDialog::getAllKeys() const
+{
+    QStringList keys;
+    for (int i = 0; i < ui->listWidget->count(); ++i) {
+        QListWidgetItem *item = ui->listWidget->item(i);
+        keys << item->data(Qt::UserRole).toString();
+    }
+    return keys;
+}
+
+QStringList NewPasswordDialog::getCheckedKeys() const
+{
+    QStringList keys;
+    for (int i = 0; i < ui->listWidget->count(); ++i) {
+        QListWidgetItem *item = ui->listWidget->item(i);
+        if (item->checkState() == Qt::Checked) {
+            keys << item->data(Qt::UserRole).toString();
+        }
+    }
+    return keys;
+}
+
+
+
+void NewPasswordDialog::on_buttonBox_accepted()
+{
+    // Check that at least one item in listWidget is checked
+    bool anyChecked = false;
+    for (int i = 0; i < ui->listWidget->count(); ++i) {
+        QListWidgetItem *item = ui->listWidget->item(i);
+        if (item->checkState() == Qt::Checked) {
+            anyChecked = true;
+            break;
+        }
+    }
+
+    if (!anyChecked) {
+        QMessageBox::warning(this,
+                             tr("Missing selection"),
+                             tr("Please check at least one key before continuing."));
+        // prevent dialog from accepting
+        return;
+    }
+
+    // If we get here, at least one item is checked
+    this->Description = ui->lineEditDescription->text().trimmed();
+    this->URL = ui->lineEditURL->text().trimmed();
+    this->AppName = ui->lineEditAppName->text().trimmed();
+    this->PublicAppName = ui->lineEditPublicAppName->text().trimmed();
+    accept(); // explicitly accept the dialog
+}
+
+void NewPasswordDialog::validateForm()
+{
+    // Condition 1: App name must not be empty
+    if (ui->lineEditAppName->text().trimmed().isEmpty()) {
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+        return;
+    }
+
+    // Condition 2: At least one credential row
+    if (ui->tableWidgetCredentials->rowCount() == 0) {
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+        return;
+    }
+
+    // Condition 3: At least one checked item in listWidget
+    bool hasChecked = false;
+    for (int i = 0; i < ui->listWidget->count(); ++i) {
+        QListWidgetItem *item = ui->listWidget->item(i);
+        if (item->checkState() == Qt::Checked) {
+            hasChecked = true;
+            break;
+        }
+    }
+    if (!hasChecked) {
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+        return;
+    }
+
+    // Add other conditions here, each with an early return if failed...
+
+    // If all conditions passed, enable OK
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+}
+
+void NewPasswordDialog::on_lineEditPublicAppName_editingFinished()
+{
+    const QString publicName = ui->lineEditPublicAppName->text().trimmed();
+    if (publicName.isEmpty())
+        return;
+
+    if (ui->lineEditAppName->text().trimmed().isEmpty())
+        ui->lineEditAppName->setText(publicName);
+
+    if (ui->lineEditDescription->text().trimmed().isEmpty())
+        ui->lineEditDescription->setText(publicName);
+}
+
+
+void NewPasswordDialog::on_pushButtonGenerate_clicked()
+{
+    QStringList wordList = passwordGenerator::loadWordList(Settings::getWordListFile());
+    PasswordDialog::showPasswordGenerator(this, tr("Generate Password"), wordList);
+}
+

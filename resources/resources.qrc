@@ -1,0 +1,48 @@
+<RCC>
+    <qresource prefix="/">
+        <file>splash.png</file>
+        <file>place.png</file>
+        <file>place_alive.png</file>
+        <file>password.png</file>
+        <file>appicon.ico</file>
+        <file>files/passwords.conf</file>
+        <file>files/passwords</file>
+        <file>files/passwords.desktop</file>
+        <file>files/style.css</file>
+        <file>files/wordlist.rc</file>
+        <file>pngs/gplv3-with-text-136x68.png</file>
+    </qresource>
+    <qresource prefix="/menus">
+        <file>glyphs/password_24dp_1F1F1F.svg</file>
+        <file>glyphs/encrypted_add_circle_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/encrypted_minus_circle_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/passkey_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/folder_open_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/folder_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/history_2_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/local_fire_department_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/bookmark_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/lock_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/qt.svg</file>
+        <file>glyphs/settings_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/exit_to_app_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/database_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/delete_forever_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/edit_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/lock_open_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/footprint_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/create_new_folder_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/folder_delete_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/refresh_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/encrypted_off_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/encrypted_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/info_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/export_notes_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/file_json_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/bookmark_manager_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/loupe_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/favorite_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/help_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,28 @@
+QTreeWidget::item:selected {
+    background-color: #0064b9;
+    color: white;
+}
+
+QTableView::item:selected {
+    background-color: #0064b9;
+    color: white;
+}
+
+QMenuBar::item:selected {
+    background-color: #0064b9;
+    color: white;
+}
+
+QMenuBar::item:pressed {
+    background-color: #0064b9;
+    color: white;
+}
+
+QMenu::item:selected {
+    background-color: #0064b9;
+    color: white;
+}
+
+QLineEdit {
+    background-color: white;
+}
