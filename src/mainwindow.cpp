@@ -2065,12 +2065,7 @@ void MainWindow::on_actionKey_List_triggered()
 
     // Hook up help
     connect(helpBtn, &QPushButton::clicked, this, [=]() {
-        QMessageBox::information(dlg,
-                                 tr("Key Help"),
-                                 tr("This dialog lists keys linked from your GPG keyring.\n\n"
-                                    "Use 'Link Key' to add a new key by ID.\n"
-                                    "Use 'Delete' to remove a selected key.\n"
-                                    "Remember: keys are referenced only, not stored here."));
+        launchHelperProcess("keys");
     });
 
     connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::accept);
