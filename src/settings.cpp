@@ -179,7 +179,7 @@ int Settings::getHelpPort()
     QString configFile = configDir + "/" + CONFIG_FILENAME;   // use the constant here
     QSettings settings(configFile, QSettings::IniFormat);
     settings.beginGroup("Help");
-    int val = settings.value("Port", 5936).toInt();
+    int val = settings.value("Port", 1280).toInt();
     settings.endGroup();
     return val;
 }

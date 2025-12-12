@@ -4870,7 +4870,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     QMainWindow::keyPressEvent(event);
 }
 
-void MainWindow::on_actionOnline_Documentation_triggered()
+void MainWindow::launchHelperProcess(const QString &page)
 {
     QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation)
     + QDir::separator()
@@ -4878,27 +4878,34 @@ void MainWindow::on_actionOnline_Documentation_triggered()
         + QCoreApplication::applicationVersion();
     QDir().mkpath(tempDir);
 
-    // Path to executable in same directory as the app
     QString exePath = QCoreApplication::applicationDirPath() + QDir::separator()
                       + QStringLiteral("pwdhlp")
-                      + QStringLiteral(
-    #if defined(Q_OS_WIN)
-                              ".exe"
-    #else
-                              ""
-    #endif
-    );
+#if defined(Q_OS_WIN)
+                      + QStringLiteral(".exe")
+#endif
+        ;
 
-    // Arguments
     QStringList args;
     args << "--webdir" << tempDir
          << "--port"   << QString::number(Settings::getHelpPort());
 
-    // Start process
+    if (!page.isEmpty()) {
+        args << "--page" << page;
+    }
+
     if (!QProcess::startDetached(exePath, args)) {
-        QMessageBox::warning(this, ui->actionOnline_Documentation->text(),
+        QMessageBox::warning(this, tr("Error"),
                              QString("Failed to start: %1").arg(exePath));
     }
 }
 
+void MainWindow::on_actionOnline_Documentation_triggered()
+{
+    launchHelperProcess(QString());
+}
+
+void MainWindow::on_actionDonate_triggered()
+{
+    launchHelperProcess("donate");
+}
 

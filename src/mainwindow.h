@@ -164,6 +164,8 @@ private slots:
 
     void on_actionOnline_Documentation_triggered();
 
+    void on_actionDonate_triggered();
+
 private:
     Ui::MainWindow *ui;
     QByteArray intToBytes(quint64 counter);
@@ -194,6 +196,7 @@ private:
     void parseJsonFile(const QByteArray &jsonData, QString filename);
     void parseJsonCredit(const QByteArray &jsonData);
     void createCategory(const QString& categoryName = QString());
+    void launchHelperProcess(const QString &page);
 
     // Mode-specific UI population
     void populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui);
