@@ -4872,15 +4872,32 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::on_actionOnline_Documentation_triggered()
 {
-    const QUrl url = QUrl::fromUserInput("https://github.com/sysal1280/passwords/wiki");
+    QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation)
+    + QDir::separator()
+        + QCoreApplication::applicationName()
+        + QCoreApplication::applicationVersion();
+    QDir().mkpath(tempDir);
 
-    if (!url.isValid()) {
-        qWarning() << "Invalid URL:" << url;
-        return;
-    }
+    // Path to executable in same directory as the app
+    QString exePath = QCoreApplication::applicationDirPath() + QDir::separator()
+                      + QStringLiteral("pwdhlp")
+                      + QStringLiteral(
+    #if defined(Q_OS_WIN)
+                              ".exe"
+    #else
+                              ""
+    #endif
+    );
 
-    if (!QDesktopServices::openUrl(url)) {
-        qWarning() << "Failed to open URL:" << url;
+    // Arguments
+    QStringList args;
+    args << "--webdir" << tempDir
+         << "--port"   << QString::number(Settings::getHelpPort());
+
+    // Start process
+    if (!QProcess::startDetached(exePath, args)) {
+        QMessageBox::warning(this, ui->actionOnline_Documentation->text(),
+                             QString("Failed to start: %1").arg(exePath));
     }
 }
 

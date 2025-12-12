@@ -71,7 +71,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     /*
      * Setup tab labels
      */
-    QStringList labels = { tr("General"), tr("Passwords"), tr("Bookmarks") };
+    QStringList labels = { tr("General"), tr("Passwords"), tr("Bookmarks"), tr("Help")  };
     for (int i = 0; i < labels.size(); ++i) {
         ui->tabWidget->setTabText(i, labels.at(i));
     }
@@ -123,7 +123,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     widgetMap.insert("Passwords/WordList", ui->comboBoxWordList);
     widgetMap.insert("Search/MaxRecentResults", ui->spinBoxRecent);
     widgetMap.insert("Search/MaxPopularResults", ui->spinBoxPopular);
-
+    widgetMap.insert("Help/Port", ui->spinBoxHelpPort);
 
     /*
      * Range settings for spinboxes

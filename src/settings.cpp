@@ -173,6 +173,17 @@ int Settings::getGeneratedPasswordLength()
     return val;
 }
 
+int Settings::getHelpPort()
+{
+    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QString configFile = configDir + "/" + CONFIG_FILENAME;   // use the constant here
+    QSettings settings(configFile, QSettings::IniFormat);
+    settings.beginGroup("Help");
+    int val = settings.value("Port", 5936).toInt();
+    settings.endGroup();
+    return val;
+}
+
 int Settings::getMaxRecentResults()
 {
     QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
@@ -183,6 +194,7 @@ int Settings::getMaxRecentResults()
     settings.endGroup();
     return val;
 }
+
 int Settings::getMaxPopularResults()
 {
     QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
@@ -231,7 +243,6 @@ bool Settings::getAskClose()
     return truthy.contains(val);
 }
 
-
 void Settings::setGeneratedPasswordLength(int i)
 {
     // build config dir
@@ -248,7 +259,6 @@ void Settings::setGeneratedPasswordLength(int i)
     settings.setValue("GeneratedPasswordLength", i);
     settings.endGroup();
 }
-
 
 QString Settings::getDefaultDbPath(QWidget* parent)
 {
@@ -290,7 +300,6 @@ QString Settings::getDefaultDbPath(QWidget* parent)
 
     return "";
 }
-
 
 // Save MainWindow geometry/state
 void Settings::saveMainWindowState(QMainWindow *window)
@@ -342,7 +351,6 @@ void Settings::saveSplitterState(QSplitter *splitter, const QString &name)
     settings.sync();
 }
 
-
 // Restore splitter state
 void Settings::restoreSplitterState(QSplitter *splitter, const QString &name)
 {
@@ -354,7 +362,6 @@ void Settings::restoreSplitterState(QSplitter *splitter, const QString &name)
     splitter->restoreState(settings.value(name).toByteArray());
     settings.endGroup();
 }
-
 
 bool Settings::createUserDesktopFile()
 {
@@ -472,4 +479,3 @@ bool Settings::verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent)
 
     return false; // no match
 }
-

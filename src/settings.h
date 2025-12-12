@@ -46,6 +46,7 @@ public:
     static void restoreSplitterState(QSplitter *splitter, const QString &name);
     static bool createUserDesktopFile();
     static bool verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent);
+    static int getHelpPort();
 
 private:
     QString configDir;
