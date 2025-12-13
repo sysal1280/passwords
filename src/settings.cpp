@@ -347,7 +347,6 @@ void Settings::saveSplitterState(QSplitter *splitter, const QString &name)
 {
     if (!splitter)
     {
-        qDebug() << "no splitter";
         return;
     }
 
