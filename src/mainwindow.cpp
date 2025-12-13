@@ -2078,7 +2078,7 @@ void MainWindow::on_actionKey_List_triggered()
 
     // Hook up help
     connect(helpBtn, &QPushButton::clicked, this, [=]() {
-        launchHelperProcess("ug/keys");
+        launchHelperProcess("keys");
     });
 
     connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::accept);
