@@ -21,7 +21,7 @@
    <item row="1" column="0" colspan="2">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Authenticate As</string>
+      <string>Authenticate As:</string>
      </property>
     </widget>
    </item>
@@ -73,7 +73,7 @@
    <item row="0" column="0" colspan="2">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>To login, copy the challenge and provide your response</string>
+      <string>To login, copy the challenge and provide your response.</string>
      </property>
     </widget>
    </item>
