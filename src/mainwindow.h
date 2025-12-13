@@ -46,6 +46,7 @@ public:
     static QByteArray base32Decode(const QString &base32);
     void initDb();
     void openDatabase(const QString &fileName = QString());
+    static void launchHelperProcess(const QString &page);
 
     QList<KeyEntry> fetchKeys() const;
 
@@ -196,7 +197,7 @@ private:
     void parseJsonFile(const QByteArray &jsonData, QString filename);
     void parseJsonCredit(const QByteArray &jsonData);
     void createCategory(const QString& categoryName = QString());
-    void launchHelperProcess(const QString &page);
+
 
     // Mode-specific UI population
     void populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui);

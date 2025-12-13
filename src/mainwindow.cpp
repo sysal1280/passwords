@@ -2065,7 +2065,7 @@ void MainWindow::on_actionKey_List_triggered()
 
     // Hook up help
     connect(helpBtn, &QPushButton::clicked, this, [=]() {
-        launchHelperProcess("keys");
+        launchHelperProcess("ug/keys");
     });
 
     connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::accept);
@@ -4889,7 +4889,7 @@ void MainWindow::launchHelperProcess(const QString &page)
     }
 
     if (!QProcess::startDetached(exePath, args)) {
-        QMessageBox::warning(this, tr("Error"),
+        QMessageBox::warning(nullptr, tr("Error"),
                              QString("Failed to start: %1").arg(exePath));
     }
 }

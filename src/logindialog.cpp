@@ -19,6 +19,7 @@
 
 #include "logindialog.h"
 #include "ui_logindialog.h"
+#include "mainwindow.h"
 #include "settings.h"
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -76,8 +77,7 @@ LoginDialog::LoginDialog(QWidget *parent)
     disconnect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     connect(ui->buttonBox, &QDialogButtonBox::helpRequested, this, [=]() {
-        QMessageBox::information(this, tr("Help"),
-                                 tr("This is where you show help text or open documentation."));
+        MainWindow::launchHelperProcess("ug/challenge-response");
     });
 
     connect(ui->buttonBox, &QDialogButtonBox::clicked,

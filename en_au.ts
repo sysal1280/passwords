@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_AU">
+<TS version="2.1">
 <context>
     <name>LoginDialog</name>
     <message>
@@ -331,7 +331,7 @@ Please select a wordlist from Preferences → Passwords tab.</source>
         <location filename="build/Desktop_Qt_6_9_3-Debug/password_autogen/include/ui_mainwindow.h" line="302"/>
         <location filename="build/Desktop_Qt_6_9_3-Release/password_autogen/include/ui_mainwindow.h" line="302"/>
         <source>System Information</source>
-        <translation>Fred</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="ui/mainwindow.ui" line="345"/>
