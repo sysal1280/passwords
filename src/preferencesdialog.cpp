@@ -124,6 +124,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     widgetMap.insert("Search/MaxRecentResults", ui->spinBoxRecent);
     widgetMap.insert("Search/MaxPopularResults", ui->spinBoxPopular);
     widgetMap.insert("Help/Port", ui->spinBoxHelpPort);
+    widgetMap.insert("Help/CloseServer", ui->checkBoxCloseHelpServer);
+
 
     /*
      * Range settings for spinboxes

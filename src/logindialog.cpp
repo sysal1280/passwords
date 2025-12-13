@@ -77,13 +77,13 @@ LoginDialog::LoginDialog(QWidget *parent)
     disconnect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     connect(ui->buttonBox, &QDialogButtonBox::helpRequested, this, [=]() {
-        MainWindow::launchHelperProcess("challenge-response");
+        if (auto mw = qobject_cast<MainWindow*>(parentWidget())) {
+            mw->launchHelperProcess("keys");
+        }
     });
 
     connect(ui->buttonBox, &QDialogButtonBox::clicked,
             this, &LoginDialog::onButtonBoxClicked);
-
-
 }
 
 LoginDialog::~LoginDialog()

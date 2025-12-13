@@ -133,6 +133,20 @@ bool Settings::getBackupDatabase()
     return truthy.contains(val);
 }
 
+bool Settings::getCloseHelpServer()
+{
+    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QString configFile = configDir + "/" + CONFIG_FILENAME;
+    QSettings settings(configFile, QSettings::IniFormat);
+    settings.beginGroup("Help");
+    QString val = settings.value("CloseServer", "yes").toString().trimmed().toLower();
+    settings.endGroup();
+
+    // Accept common truthy values
+    static const QSet<QString> truthy = {"1", "true", "yes", "on"};
+    return truthy.contains(val);
+}
+
 bool Settings::getDragDropPrompt()
 {
     QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);

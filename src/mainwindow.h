@@ -13,6 +13,7 @@
 #include "keyentry.h"
 #include <QSplitter>
 #include "settings.h"
+#include <QProcess>
 
 namespace Ui {
 class MainWindow;
@@ -46,7 +47,7 @@ public:
     static QByteArray base32Decode(const QString &base32);
     void initDb();
     void openDatabase(const QString &fileName = QString());
-    static void launchHelperProcess(const QString &page);
+    void launchHelperProcess(const QString &page);
 
     QList<KeyEntry> fetchKeys() const;
 
@@ -180,6 +181,8 @@ private:
     QTimer *alignedTimer = nullptr;
     QIcon closedIcon;
     QIcon openIcon;
+
+    QProcess *helperProcess = nullptr;
 
     void setActionIcon(QAction *action, const QString &iconPath);
 

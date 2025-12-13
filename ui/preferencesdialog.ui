@@ -27,7 +27,7 @@
    <item row="1" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -352,16 +352,6 @@
           <string>Help Port</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_14">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>To work in secure environments the user guide is served locally.</string>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
            <layout class="QGridLayout" name="gridLayout_13">
             <item row="0" column="0">
@@ -383,6 +373,16 @@
             </item>
            </layout>
           </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>To work in secure environments the user guide is served locally.</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="1">
            <spacer name="horizontalSpacer_3">
             <property name="orientation">
@@ -395,6 +395,13 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="checkBoxCloseHelpServer">
+            <property name="text">
+             <string>Close Help Server when this program closes</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

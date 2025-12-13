@@ -41,6 +41,7 @@ public:
     static QString getPathSeparator();
     static bool getDragDropPrompt();
     static QString getWordListFile();
+    static bool getCloseHelpServer();
 
     static void saveSplitterState(QSplitter *splitter, const QString &name);
     static void restoreSplitterState(QSplitter *splitter, const QString &name);

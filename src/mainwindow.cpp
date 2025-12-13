@@ -205,6 +205,19 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    if (Settings::getCloseHelpServer()) {
+        if (helperProcess) {
+            // Disconnect error handler so no spurious popup
+            disconnect(helperProcess, &QProcess::errorOccurred, nullptr, nullptr);
+            if (helperProcess->state() != QProcess::NotRunning) {
+                helperProcess->terminate();
+                if (!helperProcess->waitForFinished(2000)) {
+                    helperProcess->kill();
+                }
+            }
+        }
+    }
+
     if (Settings::getAskClose()) {
         auto reply = QMessageBox::question(this,
                                            tr("Confirm Exit"),
@@ -4868,10 +4881,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 void MainWindow::launchHelperProcess(const QString &page)
 {
     QApplication::setOverrideCursor(Qt::BusyCursor);
+
     QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation)
-    + QDir::separator()
-        + QCoreApplication::applicationName()
-        + QCoreApplication::applicationVersion();
+                      + QDir::separator()
+                      + QCoreApplication::applicationName()
+                      + QCoreApplication::applicationVersion();
     QDir().mkpath(tempDir);
 
     QString exePath = QCoreApplication::applicationDirPath() + QDir::separator()
@@ -4889,10 +4903,27 @@ void MainWindow::launchHelperProcess(const QString &page)
         args << "--page" << page;
     }
 
-    if (!QProcess::startDetached(exePath, args)) {
-        QMessageBox::warning(nullptr, tr("Error"),
-                             QString("Failed to start: %1").arg(exePath));
+    if (!helperProcess || helperProcess->state() == QProcess::NotRunning) {
+        // First time: track the process
+        helperProcess = new QProcess(this);
+        helperProcess->setProgram(exePath);
+        helperProcess->setArguments(args);
+
+        connect(helperProcess, &QProcess::errorOccurred, this,
+                [this, exePath](QProcess::ProcessError error){
+                    if (helperProcess->state() == QProcess::Starting &&
+                        error == QProcess::FailedToStart) {
+                        QMessageBox::warning(nullptr, tr("Error"),
+                                             QString("Failed to start: %1").arg(exePath));
+                    }
+                });
+
+        helperProcess->start();
+    } else {
+        // Already running: just launch another instance detached
+        QProcess::startDetached(exePath, args);
     }
+
     QApplication::restoreOverrideCursor();
 }
 
