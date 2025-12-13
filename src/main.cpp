@@ -258,6 +258,10 @@ Ensure it is accessible in your PATH.
      */
     QTimer::singleShot(500, [w, splash]() {
         w->show();
+        w->activateWindow();
+        w->raise();
+        QApplication::processEvents(QEventLoop::AllEvents, 100);
+
         w->setEnabled(false);
 
         QApplication::restoreOverrideCursor();

@@ -187,6 +187,9 @@
    <property name="text">
     <string>Encrypt message</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+E, Ctrl+M</string>
+   </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
@@ -194,6 +197,9 @@
   <action name="actionDecrypt_message">
    <property name="text">
     <string>Decrypt message</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D, Ctrl+M</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -235,6 +241,9 @@
    <property name="text">
     <string>Key List</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+K</string>
+   </property>
   </action>
   <action name="actionClose">
    <property name="text">
@@ -253,15 +262,24 @@
    <property name="text">
     <string>Encrypt File</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+E, Ctrl+F</string>
+   </property>
   </action>
   <action name="actionDecrypt_File">
    <property name="text">
     <string>Decrypt File</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+D, Ctrl+F</string>
+   </property>
   </action>
   <action name="actionOpen_Database">
    <property name="text">
     <string>Open Database</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -380,6 +398,9 @@
   <action name="actionOnline_Documentation">
    <property name="text">
     <string>User Guide</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
  </widget>
