@@ -258,10 +258,6 @@ Ensure it is accessible in your PATH.
      */
     QTimer::singleShot(500, [w, splash]() {
         w->show();
-        w->activateWindow();
-        w->raise();
-        QApplication::processEvents(QEventLoop::AllEvents, 100);
-
         w->setEnabled(false);
 
         QApplication::restoreOverrideCursor();
@@ -272,6 +268,7 @@ Ensure it is accessible in your PATH.
 
         if (Settings::getLoginPreference()) {
             LoginDialog login(w);
+            login.move(w->geometry().center() - login.rect().center());
             login.setModal(true);
 
             if (!login.hasKeys() || login.exec() == QDialog::Accepted) {
