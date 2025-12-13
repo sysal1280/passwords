@@ -77,7 +77,7 @@ LoginDialog::LoginDialog(QWidget *parent)
     disconnect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     connect(ui->buttonBox, &QDialogButtonBox::helpRequested, this, [=]() {
-        MainWindow::launchHelperProcess("ug/challenge-response");
+        MainWindow::launchHelperProcess("challenge-response");
     });
 
     connect(ui->buttonBox, &QDialogButtonBox::clicked,

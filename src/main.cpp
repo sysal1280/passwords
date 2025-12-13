@@ -256,8 +256,12 @@ Ensure it is accessible in your PATH.
     /*
      * Show main window with slight delay and handle login preference
      */
-    QTimer::singleShot(250, [w, splash]() {
+    QTimer::singleShot(500, [w, splash]() {
         w->show();
+        w->activateWindow();
+        w->raise();
+        QApplication::processEvents(QEventLoop::AllEvents, 100);
+
         w->setEnabled(false);
 
         QApplication::restoreOverrideCursor();

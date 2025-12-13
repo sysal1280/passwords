@@ -4867,6 +4867,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::launchHelperProcess(const QString &page)
 {
+    QApplication::setOverrideCursor(Qt::BusyCursor);
     QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation)
     + QDir::separator()
         + QCoreApplication::applicationName()
@@ -4892,6 +4893,7 @@ void MainWindow::launchHelperProcess(const QString &page)
         QMessageBox::warning(nullptr, tr("Error"),
                              QString("Failed to start: %1").arg(exePath));
     }
+    QApplication::restoreOverrideCursor();
 }
 
 void MainWindow::on_actionOnline_Documentation_triggered()
