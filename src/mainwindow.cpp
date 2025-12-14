@@ -2000,6 +2000,23 @@ void MainWindow::on_actionKey_List_triggered()
         QString keyId = QInputDialog::getText(dlg, "Import Key", "Enter GPG Key ID:", QLineEdit::Normal, "", &ok);
         if (!ok || keyId.isEmpty()) return;
 
+        // Duplicate Key check
+        bool duplicate = false;
+        for (int r = 0; r < table->rowCount(); ++r) {
+            QTableWidgetItem *nameItem = table->item(r, 0);
+            QTableWidgetItem *keyItem  = table->item(r, 1);
+            if                 (keyItem  && keyItem->text()  == keyId) {
+                duplicate = true;
+                break;
+            }
+        }
+        if (duplicate) {
+            QMessageBox::warning(this,
+                                 ui->actionKey_List->text(),
+                                 tr("This key ID or label is already in the list."));
+            return;
+        }
+
         QString name = QInputDialog::getText(dlg, "Import Key", "Enter Name:", QLineEdit::Normal, "", &ok);
         if (!ok || name.isEmpty()) return;
 
@@ -2014,6 +2031,7 @@ void MainWindow::on_actionKey_List_triggered()
             insert.bindValue(":label", name);
             if (!insert.exec()) {
                 qWarning() << "Failed to insert key:" << insert.lastError().text();
+                QMessageBox::critical(this,ui->actionKey_List->text(),insert.lastError().text());
                 return;
             }
             }
