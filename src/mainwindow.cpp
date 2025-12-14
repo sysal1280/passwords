@@ -554,7 +554,6 @@ void MainWindow::on_actionNew_Password_triggered()
 
         QString tempFile = baseDir + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".asc";
 
-
         QStringList args;
         for (const QString &key : std::as_const(selectedKeys)) {
             args << "--recipient" << key;
@@ -592,32 +591,33 @@ void MainWindow::on_actionNew_Password_triggered()
         QFile outFile(tempFile);
         if (!outFile.exists() || !outFile.open(QIODevice::ReadOnly)) {
             qDebug() << "Encrypted file not found or failed to open:" << tempFile;
+            QFile::remove(tempFile);
             return;
         }
 
         {
             QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE","sqlNewPassword");
 
-        int categoryId = ui->treeWidget->currentItem()->data(0,Qt::UserRole).toInt();
-        QString publicAppName = dlg.PublicAppName;
-        QByteArray data = outFile.readAll();
+            int categoryId = ui->treeWidget->currentItem()->data(0,Qt::UserRole).toInt();
+            QString publicAppName = dlg.PublicAppName;
+            QByteArray data = outFile.readAll();
 
-        db.setDatabaseName(qApp->property("dbFile").toString());
-        if (!db.open()) {
-            qDebug() << "Failed to open database:" << db.lastError().text();
-            return;
-        }
+            db.setDatabaseName(qApp->property("dbFile").toString());
+            if (!db.open()) {
+                qDebug() << "Failed to open database:" << db.lastError().text();
+                return;
+            }
 
-        // --- Transaction start ---
-        if (!db.transaction()) {
-            qDebug() << "Failed to start transaction:" << db.lastError().text();
-            return;
-        }
-        bool success = true;
+            // --- Transaction start ---
+            if (!db.transaction()) {
+                qDebug() << "Failed to start transaction:" << db.lastError().text();
+                return;
+            }
+            bool success = true;
 
-        // Insert application
-        QSqlQuery query(db);
-        query.prepare(R"(
+            // Insert application
+            QSqlQuery query(db);
+            query.prepare(R"(
                 INSERT INTO application (category_id, application_name, data, created)
                 VALUES (:category_id, :application_name, :data, :created))");
 
@@ -652,11 +652,19 @@ void MainWindow::on_actionNew_Password_triggered()
                 }
             }
 
-            // Tokenize and hash
+            // Tokenize and hash search terms
             if (success) {
-                QStringList tokens = publicAppName.toLower().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+                // Normalize: lowercase, replace any non-letter/digit with a space
+                QString normalized = publicAppName.toLower();
+                normalized.replace(QRegularExpression("[^\\p{L}\\p{N}]+"), " ");
+                normalized = normalized.trimmed();
+
+                // Split on whitespace
+                QStringList tokens = normalized.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+
                 for (const QString &token : std::as_const(tokens)) {
-                    QByteArray hash = QCryptographicHash::hash(token.toUtf8(), QCryptographicHash::Sha256).toHex();
+                    QByteArray hash = QCryptographicHash::hash(token.toUtf8(),
+                                                               QCryptographicHash::Sha256).toHex();
                     QSqlQuery insertToken(db);
                     insertToken.prepare("INSERT INTO application_tokens (application_id, token_hash) VALUES (?, ?)");
                     insertToken.addBindValue(appId);
@@ -668,6 +676,7 @@ void MainWindow::on_actionNew_Password_triggered()
                     }
                 }
             }
+
 
             // Commit or rollback
             if (success) {
@@ -688,7 +697,7 @@ void MainWindow::on_actionNew_Password_triggered()
             outFile.close();
             outFile.remove();
 
-            }
+        }
         QSqlDatabase::removeDatabase("sqlNewPassword");
     }
 }
@@ -3988,6 +3997,47 @@ void MainWindow::on_actionEdit_Password_triggered()
                             }
                         }
 
+                        // 🔹 Refresh tokens
+                        if (ok) {
+                            int appId = item->data(0, Qt::UserRole).toInt();
+
+                            // Delete old tokens
+                            QSqlQuery deleteTokens(db);
+                            deleteTokens.prepare("DELETE FROM application_tokens WHERE application_id = ?");
+                            deleteTokens.addBindValue(appId);
+                            if (!deleteTokens.exec()) {
+                                qDebug() << "Token delete failed:" << deleteTokens.lastError().text();
+                                ok = false;
+                            }
+
+                            // Insert new tokens
+                            if (ok) {
+                                int appId = item->data(0, Qt::UserRole).toInt();
+
+                                // Normalize: lowercase, replace any non-letter/digit with a space, then collapse spaces
+                                QString normalized = dlg.PublicAppName.toLower();
+                                normalized.replace(QRegularExpression("[^\\p{L}\\p{N}]+"), " ");
+                                normalized = normalized.trimmed();
+
+                                // Split on whitespace
+                                QStringList tokens = normalized.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+
+                                for (const QString &token : std::as_const(tokens)) {
+                                    QByteArray hash = QCryptographicHash::hash(token.toUtf8(), QCryptographicHash::Sha256).toHex();
+                                    QSqlQuery insertToken(db);
+                                    insertToken.prepare("INSERT INTO application_tokens (application_id, token_hash) VALUES (?, ?)");
+                                    insertToken.addBindValue(appId);
+                                    insertToken.addBindValue(QString(hash));
+                                    if (!insertToken.exec()) {
+                                        qDebug() << "Token insert failed:" << insertToken.lastError().text();
+                                        ok = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                        }
+
                         // Commit or rollback
                         if (ok) {
                             if (!db.commit())
@@ -4002,8 +4052,6 @@ void MainWindow::on_actionEdit_Password_triggered()
                     QSqlDatabase::removeDatabase("sqlEditPassword");
                 }
             }
-
-
             decrypted_data.fill(0);
         }
     });
