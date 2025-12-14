@@ -87,13 +87,11 @@ private slots:
     void on_actionRecent_triggered();
     void on_actionEdit_Password_triggered();
     void on_actionPreferences_triggered();
-    void on_actionSystem_Information_triggered();
     void on_actionExport_Password_triggered();
     void on_actionImport_triggered();
     void on_actionRename_triggered();
     void on_actionAdd_Search_triggered();
     void on_actionOnline_Documentation_triggered();
-    void on_actionDonate_triggered();
 
     // Tree widget handlers
     void on_treeWidget_itemActivated(QTreeWidgetItem *item, int column);

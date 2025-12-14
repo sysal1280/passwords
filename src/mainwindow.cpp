@@ -198,6 +198,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->menuBookmarks, &QMenu::aboutToShow,
             this, &MainWindow::populateBookmarksMenu);
 
+
+    connect(ui->actionDonate, &QAction::triggered,
+            this, [this]() {
+                launchHelperProcess("donate");
+            });
+
+    connect(ui->actionSystem_Information, &QAction::triggered,
+            this, [this]() {
+                SystemInfoDialog dlg(this);  // pass parent if needed
+                dlg.exec();
+            });
+
+
     // ui->treeWidget_2->setStyleSheet(
     //     "QTreeWidget::item { padding-top: 6px; padding-bottom: 6px; }"
     //     );
@@ -4212,13 +4225,6 @@ void MainWindow::on_actionPreferences_triggered()
 }
 
 
-void MainWindow::on_actionSystem_Information_triggered()
-{
-    SystemInfoDialog dlg;
-    dlg.exec();
-}
-
-
 void MainWindow::on_actionExport_Password_triggered()
 {
     QTreeWidgetItem *item = ui->treeWidget_2->currentItem();
@@ -4716,7 +4722,8 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
             }
 
             // --- Tokenize ---
-            QStringList tokens = publicAppName.toLower().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+            static const QRegularExpression whitespaceRe("\\s+");
+            QStringList tokens = publicAppName.toLower().split(whitespaceRe, Qt::SkipEmptyParts);
             bool tokenOk = true;
             for (const QString &token : std::as_const(tokens)) {
                 QByteArray hash = QCryptographicHash::hash(token.toUtf8(), QCryptographicHash::Sha256).toHex();
@@ -4745,10 +4752,6 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
                                   tr("Commit failed:\n%1").arg(db.lastError().text()));
             db.rollback();
         } else {
-            QString summary = tr("Imported: %1\nSkipped: %2")
-            .arg(QString::number(importedCount),
-                 QString::number(skippedCount));
-
             QMessageBox msgBox(this);
             msgBox.setIcon(QMessageBox::Information);
             msgBox.setWindowTitle(tr("Import Complete"));
@@ -4763,7 +4766,6 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
                     .arg(skippedCount)
                 );
             msgBox.exec();
-
         }
 
         db.close();
@@ -4809,9 +4811,11 @@ void MainWindow::createCategory(const QString& categoryName /* = QString() */)
     }
 
     // Validate name
-    QRegularExpression re("^[\\w\\-\\s]{1,64}$");
+    static const QRegularExpression re("^[\\w\\-\\s]{1,64}$");
+
     if (!re.match(text).hasMatch()) {
-        QMessageBox::warning(this, tr("Invalid Name"),
+        QMessageBox::warning(this,
+                             tr("Invalid Name"),
                              tr("Category name contains invalid characters or is too long."));
         return;
     }
@@ -4904,12 +4908,14 @@ void MainWindow::on_actionRename_triggered()
         return; // cancelled or unchanged
     }
 
-    // Validate
-    QRegularExpression re("^[\\w\\-\\s]{1,64}$");
+    //validate
+    static const QRegularExpression re("^[\\w\\-\\s]{1,64}$");
     if (!re.match(text).hasMatch()) {
-        QMessageBox::warning(this, tr("Invalid Name"), tr("Category name contains invalid characters or is too long."));
+        QMessageBox::warning(this, tr("Invalid Name"),
+                             tr("Category name contains invalid characters or is too long."));
         return;
     }
+
 
     // Duplicate check among siblings
     QTreeWidgetItem* parentItem = item->parent();
@@ -4994,13 +5000,16 @@ void MainWindow::on_actionAdd_Search_triggered()
     btnLayout->addWidget(cancelBtn);
     layout->addLayout(btnLayout);
 
-    connect(addBtn, &QPushButton::clicked, [&]() {
-        QString text = lineEdit->text().trimmed();
-        if (!text.isEmpty()) {
-            listWidget->addItem(text);
-            lineEdit->clear();
-        }
-    });
+    connect(addBtn, &QPushButton::clicked,
+            addBtn,   // context object
+            [lineEdit, listWidget]() {
+                QString text = lineEdit->text().trimmed();
+                if (!text.isEmpty()) {
+                    listWidget->addItem(text);
+                    lineEdit->clear();
+                }
+            });
+
     connect(cancelBtn, &QPushButton::clicked, &dlg, &QDialog::reject);
     connect(okBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
 
@@ -5017,7 +5026,8 @@ void MainWindow::on_actionAdd_Search_triggered()
         bool success = true;
         for (int i = 0; i < listWidget->count(); ++i) {
             QString term = listWidget->item(i)->text();
-            QStringList tokens = term.toLower().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+            static const QRegularExpression whitespaceRe("\\s+");
+            QStringList tokens = term.toLower().split(whitespaceRe, Qt::SkipEmptyParts);
             for (const QString &token : std::as_const(tokens)) {
                 QByteArray hash = QCryptographicHash::hash(token.toUtf8(), QCryptographicHash::Sha256).toHex();
                 QSqlQuery insertToken(db);
@@ -5127,10 +5137,5 @@ void MainWindow::launchHelperProcess(const QString &page)
 void MainWindow::on_actionOnline_Documentation_triggered()
 {
     launchHelperProcess(QString());
-}
-
-void MainWindow::on_actionDonate_triggered()
-{
-    launchHelperProcess("donate");
 }
 
