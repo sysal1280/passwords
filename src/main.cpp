@@ -257,7 +257,7 @@ Ensure it is accessible in your PATH.
     /*
      * Show main window with slight delay and handle login preference
      */
-    QTimer::singleShot(500, [w, splash]() {
+    QTimer::singleShot(500, w, [w, splash]() {
         w->show();
         w->activateWindow();
         w->raise();

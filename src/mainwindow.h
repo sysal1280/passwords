@@ -83,7 +83,6 @@ private slots:
     void on_actionDelete_Category_triggered();
     void on_actionEdit_Password_triggered();
     void on_actionExport_Password_triggered();
-    void on_actionImport_triggered();
     void on_actionAdd_Search_triggered();
 
     // Tree widget handlers

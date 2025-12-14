@@ -234,6 +234,24 @@ MainWindow::MainWindow(QWidget *parent)
                 setBookmark(checked);
             });
 
+
+    connect(ui->actionImport, &QAction::triggered,
+            this, [this]() {
+
+                QString fileName = QFileDialog::getOpenFileName(
+                    this,
+                    tr("Select JSON File to Import"),
+                    QDir::homePath(),
+                    tr("JSON Files (*.json)")
+                    );
+
+                if (fileName.isEmpty()) {
+                    return; // user cancelled
+                }
+
+                importApplicationsFromFile(fileName);
+            });
+
     connect(ui->actionPreferences, &QAction::triggered,
             this, [this]() {
 
@@ -4813,24 +4831,6 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
     if (current) {
         this->openCategory(current, 0);
     }
-}
-
-
-
-void MainWindow::on_actionImport_triggered()
-{
-    QString fileName = QFileDialog::getOpenFileName(
-        this,
-        tr("Select JSON File to Import"),
-        QDir::homePath(),                // starting directory
-        tr("JSON Files (*.json)")        // filter
-        );
-
-    if (fileName.isEmpty()) {
-        return; // user cancelled
-    }
-
-    importApplicationsFromFile(fileName);
 }
 
 void MainWindow::createCategory(const QString& categoryName /* = QString() */)
