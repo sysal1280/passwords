@@ -2922,28 +2922,44 @@ void MainWindow::openDatabase(const QString &fileName)
         db.setDatabaseName(fileName);
 
         if (!db.open()) {
-            QMessageBox::warning(this, tr("Error"), db.lastError().text());
+            QMessageBox::warning(this, tr("Error"), tr("Failed to open database: %1").arg(db.lastError().text()));
             return;
         }
 
+        // Ensure foreign keys are enforced
+        QSqlQuery pragma(db);
+        pragma.exec("PRAGMA foreign_keys = ON");
+
         QSqlQuery query(db);
-        if (query.exec("SELECT app_info.value FROM app_info WHERE app_info.key = 'app_signature'")) {
-            if (query.first()) {
-                qApp->setProperty("dbFile", fileName);
-                init();
-            } else {
-                qApp->setProperty("dbFile", QString());
-                QMessageBox::warning(this, tr("Error"), tr("This is not a valid passwords database file."));
-                return;
-            }
-        } else {
-            qApp->setProperty("dbFile", QString());
+
+        // First check if app_info table exists
+        if (!query.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='app_info'")) {
             QMessageBox::warning(this, tr("Error"), tr("This is not a valid passwords database file."));
             return;
         }
-    }
+        if (!query.next()) {
+            QMessageBox::warning(this, tr("Error"), tr("This file is a SQLite database but not a valid passwords database."));
+            return;
+        }
 
+        // Now check for the signature
+        if (!query.exec("SELECT value FROM app_info WHERE key='app_signature'")) {
+            QMessageBox::warning(this, tr("Error"), tr("Failed to query app_info: %1").arg(query.lastError().text()));
+            return;
+        }
+        if (query.next() && query.value(0).toString() == "passwords") {
+            qApp->setProperty("dbFile", fileName);
+            init();
+        } else {
+            qApp->setProperty("dbFile", QString());
+            QMessageBox::warning(this, tr("Error"), tr("This database is missing an app_signature value."));
+            return;
+        }
+
+        db.close();
+    }
     QSqlDatabase::removeDatabase(connName);
+
 
     /*
      * Create a backup of the database file, overwriting if it exists
