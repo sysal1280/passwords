@@ -4178,6 +4178,12 @@ void MainWindow::on_actionEdit_Password_triggered()
                     }
                     QSqlDatabase::removeDatabase("sqlEditPassword");
                 }
+                //refresh the view
+                //any rename shows immediately
+                QTreeWidgetItem *current = ui->treeWidget->currentItem();
+                if (current) {
+                    this->on_treeWidget_itemActivated(current, 0);
+                }
             }
             decrypted_data.fill(0);
         }
