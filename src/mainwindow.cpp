@@ -547,7 +547,14 @@ void MainWindow::on_actionNew_Password_triggered()
     if (dlg.exec() == QDialog::Accepted) {
         QStringList selectedKeys = dlg.getCheckedKeys();
 
-        QString tempFile = QDir::tempPath() + "/aa.asc";
+        QString baseDir = "/dev/shm";
+        if (!QFileInfo::exists(baseDir) || !QFileInfo(baseDir).isWritable()) {
+            baseDir = QDir::tempPath();
+        }
+
+        QString tempFile = baseDir + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".asc";
+
+
         QStringList args;
         for (const QString &key : std::as_const(selectedKeys)) {
             args << "--recipient" << key;
@@ -560,24 +567,26 @@ void MainWindow::on_actionNew_Password_triggered()
         process.start("gpg", args);
         if (!process.waitForStarted()) {
             qDebug() << "Failed to start GPG process.";
+            QMessageBox::critical(this,ui->actionNew_Password->text(),tr("Failed to start GPG process."));
             return;
         }
 
         QByteArray jsonData = dlg.toJson();
-        qDebug().noquote() << "Unencrypted JSON:\n" << QString::fromUtf8(jsonData);
-
         process.write(jsonData);
         process.waitForBytesWritten();
         process.closeWriteChannel();
 
         if (!process.waitForFinished()) {
-            qDebug() << "GPG process did not finish correctly.";
+            QMessageBox::critical(this,ui->actionNew_Password->text(),tr("GPG process did not finish correctly."));
+            qCritical() << "GPG process did not finish correctly.";
             return;
         }
 
         QByteArray errors = process.readAllStandardError();
         if (!errors.isEmpty()) {
-            qDebug().noquote() << "GPG Errors:\n" << QString::fromUtf8(errors);
+            qCritical().noquote() << "GPG Errors:\n" << QString::fromUtf8(errors);
+            QMessageBox::critical(this,ui->actionNew_Password->text(),QString::fromUtf8(errors));
+            return;
         }
 
         QFile outFile(tempFile);
@@ -586,32 +595,29 @@ void MainWindow::on_actionNew_Password_triggered()
             return;
         }
 
-        QByteArray encrypted = outFile.readAll();
-        outFile.close();
-
-        QFile d(tempFile);
-        if (d.open(QIODevice::ReadOnly)) {
-            int categoryId = ui->treeWidget->currentItem()->data(0,Qt::UserRole).toInt();
-            QString publicAppName = dlg.PublicAppName;
-            QByteArray data = d.readAll();
-
+        {
             QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE","sqlNewPassword");
-            db.setDatabaseName(qApp->property("dbFile").toString());
-            if (!db.open()) {
-                qDebug() << "Failed to open database:" << db.lastError().text();
-                return;
-            }
 
-            // --- Transaction start ---
-            if (!db.transaction()) {
-                qDebug() << "Failed to start transaction:" << db.lastError().text();
-                return;
-            }
-            bool success = true;
+        int categoryId = ui->treeWidget->currentItem()->data(0,Qt::UserRole).toInt();
+        QString publicAppName = dlg.PublicAppName;
+        QByteArray data = outFile.readAll();
 
-            // Insert application
-            QSqlQuery query(db);
-            query.prepare(R"(
+        db.setDatabaseName(qApp->property("dbFile").toString());
+        if (!db.open()) {
+            qDebug() << "Failed to open database:" << db.lastError().text();
+            return;
+        }
+
+        // --- Transaction start ---
+        if (!db.transaction()) {
+            qDebug() << "Failed to start transaction:" << db.lastError().text();
+            return;
+        }
+        bool success = true;
+
+        // Insert application
+        QSqlQuery query(db);
+        query.prepare(R"(
                 INSERT INTO application (category_id, application_name, data, created)
                 VALUES (:category_id, :application_name, :data, :created))");
 
@@ -670,8 +676,8 @@ void MainWindow::on_actionNew_Password_triggered()
                     db.rollback();
                 } else {
                     qDebug() << "Transaction committed successfully.";
-                    if (ui->treeWidget->selectedItems().first()) {
-                        on_treeWidget_itemActivated(ui->treeWidget->selectedItems().first(),0);
+                    if (!ui->treeWidget->selectedItems().isEmpty()) {
+                        on_treeWidget_itemActivated(ui->treeWidget->selectedItems().first(), 0);
                     }
                 }
             } else {
@@ -679,11 +685,11 @@ void MainWindow::on_actionNew_Password_triggered()
                 qDebug() << "Transaction rolled back due to errors.";
             }
 
-            d.close();
-            d.remove();
-        } else {
-            qDebug() << "Failed to open file!";
-        }
+            outFile.close();
+            outFile.remove();
+
+            }
+        QSqlDatabase::removeDatabase("sqlNewPassword");
     }
 }
 
