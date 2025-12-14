@@ -224,6 +224,80 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::close);
 
 
+    connect(ui->treeWidget,
+            &QTreeWidget::itemActivated,
+            this,
+            &MainWindow::openCategory);
+
+    connect(ui->actionBookmark, &QAction::toggled,
+            this, [this](bool checked) {
+                setBookmark(checked);
+            });
+
+    connect(ui->actionPreferences, &QAction::triggered,
+            this, [this]() {
+
+                auto *pd = new PreferencesDialog(this);
+                pd->setWindowTitle(ui->actionPreferences->text());
+                pd->adjustSize();
+                pd->setFixedSize(pd->size());
+                pd->setWindowFlags(pd->windowFlags() & ~Qt::WindowMaximizeButtonHint);
+                pd->exec();
+            });
+
+    connect(ui->actionRecent, &QAction::triggered,
+            this, &MainWindow::searchRecent);
+
+    connect(ui->actionPopular, &QAction::triggered,
+            this, &MainWindow::searchPopular);
+
+
+
+    connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested,
+            this, [this](const QPoint &pos)
+            {
+                QMenu menu;
+                QPoint globalPos = ui->treeWidget->viewport()->mapToGlobal(pos);
+
+                const bool hasDb = !qApp->property("dbFile").toString().trimmed().isEmpty();
+                const bool hasSelection = !ui->treeWidget->selectedItems().isEmpty();
+
+                if (!hasSelection)
+                {
+                    if (hasDb)
+                    {
+                        menu.addAction(ui->actionNew_Category);
+                    }
+                    else
+                    {
+                        QAction *d = new QAction("No database open", &menu);
+                        d->setEnabled(false);
+                        menu.addAction(d);
+                    }
+                }
+                else
+                {
+                    if (hasDb)
+                    {
+                        menu.addAction(ui->actionNew_Category);
+                        menu.addAction(ui->actionNew_Password);
+                        menu.addAction(ui->actionRename);
+                        menu.addAction(ui->actionDelete_Category);
+                        menu.addAction(ui->actionImport);
+                        menu.addAction(ui->actionRefresh_Categories);
+                    }
+                    else
+                    {
+                        QAction *d = new QAction("No database open", &menu);
+                        d->setEnabled(false);
+                        menu.addAction(d);
+                    }
+                }
+
+                menu.exec(globalPos);
+            });
+
+
     // ui->treeWidget_2->setStyleSheet(
     //     "QTreeWidget::item { padding-top: 6px; padding-bottom: 6px; }"
     //     );
@@ -390,7 +464,7 @@ void MainWindow::loadCategories()
             QTreeWidgetItem *firstItem = ui->treeWidget->topLevelItem(0);
             ui->treeWidget->setCurrentItem(firstItem);
             firstItem->setSelected(true);
-            on_treeWidget_itemActivated(firstItem, 0);
+            openCategory(firstItem, 0);
         }
 
         db.close();
@@ -843,7 +917,7 @@ void MainWindow::on_actionNew_Password_triggered()
                 } else {
                     qDebug() << "Transaction committed successfully.";
                     if (!ui->treeWidget->selectedItems().isEmpty()) {
-                        on_treeWidget_itemActivated(ui->treeWidget->selectedItems().first(), 0);
+                        openCategory(ui->treeWidget->selectedItems().first(), 0);
                     }
                 }
             } else {
@@ -961,8 +1035,7 @@ void MainWindow::on_actionNew_Category_triggered()
     QSqlDatabase::removeDatabase(connName);
 }
 
-
-void MainWindow::on_treeWidget_itemActivated(QTreeWidgetItem *item, int column) {
+void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
     QString connName = QUuid::createUuid().toString();
     clearScrollArea();
 
@@ -998,21 +1071,7 @@ void MainWindow::on_treeWidget_itemActivated(QTreeWidgetItem *item, int column) 
         // Process each row of the query result and create tree items
         while (query.next()) {
             QTreeWidgetItem* newItem = nullptr;
-
-             newItem = makeItemFromApplication(query);
-
-            // // Delegate schema-specific logic to helpers based on the mode
-            // if (mode == "application") {
-            //     newItem = makeItemFromApplication(query);
-            // } else if (mode == "note") {
-            //     newItem = makeItemFromNote(query);
-            // } else if (mode == "file") {
-            //     newItem = makeItemFromFile(query);
-            // } else if (mode == "credit") {
-            //     newItem = makeItemFromCredit(query);
-            // }
-
-            // If an item is created, add it to the tree widget
+            newItem = makeItemFromApplication(query);
             if (newItem) {
                 ui->treeWidget_2->addTopLevelItem(newItem);
             }
@@ -1029,6 +1088,61 @@ void MainWindow::on_treeWidget_itemActivated(QTreeWidgetItem *item, int column) 
     // Reset openedCredentialID
     openedCredentialID = -1;
 }
+
+
+// void MainWindow::on_treeWidget_itemActivated(QTreeWidgetItem *item, int column) {
+//     QString connName = QUuid::createUuid().toString();
+//     clearScrollArea();
+
+//     qDebug() << item->data(0,Qt::UserRole).toInt() << "userrole id";
+
+//     // Block signals and clear the second tree widget
+//     ui->treeWidget_2->blockSignals(true);
+//     ui->treeWidget_2->clear();
+
+//     // Create the database connection
+//     {
+//         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+//         db.setDatabaseName(qApp->property("dbFile").toString());
+
+//         if (!db.open()) {
+//             qDebug() << "Failed to open database:" << db.lastError().text();
+//             ui->treeWidget_2->blockSignals(false); // Unblock signals on error
+//             return;
+//         }
+
+//         // Prepare and execute the query
+//         QSqlQuery query(db);
+//         query.prepare(QString("SELECT * FROM application WHERE category_id = :id ORDER BY id"));
+//         query.bindValue(":id", item->data(0,Qt::UserRole).toInt());
+
+//         if (!query.exec()) {
+//             db.close();
+//             QSqlDatabase::removeDatabase(connName);
+//             ui->treeWidget_2->blockSignals(false);
+//             return;
+//         }
+
+//         // Process each row of the query result and create tree items
+//         while (query.next()) {
+//             QTreeWidgetItem* newItem = nullptr;
+//              newItem = makeItemFromApplication(query);
+//             if (newItem) {
+//                 ui->treeWidget_2->addTopLevelItem(newItem);
+//             }
+//         }
+
+//         // Clean up
+//         db.close();
+//     }
+//     QSqlDatabase::removeDatabase(connName);
+
+//     // Unblock signals after processing is complete
+//     ui->treeWidget_2->blockSignals(false);
+
+//     // Reset openedCredentialID
+//     openedCredentialID = -1;
+// }
 
 
 
@@ -3109,7 +3223,7 @@ void MainWindow::selectInTreeWidgets(int categoryId, int appId)
         if (item->data(0, Qt::UserRole).toInt() == categoryId) {
             ui->treeWidget->setCurrentItem(item);
             ui->treeWidget->scrollToItem(item);
-            on_treeWidget_itemActivated(item, 0); // column index doesn't matter here
+            openCategory(item, 0); // column index doesn't matter here
 
             QTreeWidgetItemIterator it2(ui->treeWidget_2);
             while (*it2) {
@@ -3317,7 +3431,7 @@ void MainWindow::search(int appId)
     ui->treeWidget->scrollToItem(categoryItem);
 
     // 4. Load the category into treeWidget_2
-    on_treeWidget_itemActivated(categoryItem, 0);
+    openCategory(categoryItem, 0);
 
     // 5. Find and highlight the app in treeWidget_2
     for (int j = 0; j < ui->treeWidget_2->topLevelItemCount(); ++j) {
@@ -3433,7 +3547,7 @@ void MainWindow::initDb()
 
 }
 
-void MainWindow::on_actionBookmark_triggered(bool checked)
+void MainWindow::setBookmark(bool checked)
 {
     auto selected = ui->treeWidget_2->selectedItems();
     if (selected.isEmpty()) {
@@ -3597,42 +3711,6 @@ void MainWindow::on_actionDelete_Category_triggered()
     QSqlDatabase::removeDatabase(connName);
 }
 
-
-void MainWindow::on_treeWidget_customContextMenuRequested(const QPoint &pos)
-{
-    QMenu menu;
-    QPoint globalPos = ui->treeWidget->viewport()->mapToGlobal(pos);
-
-    if (Q_UNLIKELY(ui->treeWidget->selectedItems().isEmpty()))
-    {
-        if (!qApp->property("dbFile").toString().isEmpty())
-        menu.addAction(ui->actionNew_Category);
-        else
-        {
-            QAction *d = new QAction("No database open", &menu);
-            d->setEnabled(false);
-            menu.addAction(d);
-        }
-    } else
-    {
-        if (Q_LIKELY(!qApp->property("dbFile").toString().trimmed().isEmpty())) {
-            menu.addAction(ui->actionNew_Category);
-            menu.addAction(ui->actionNew_Password);
-            menu.addAction(ui->actionRename);
-            menu.addAction(ui->actionDelete_Category);
-            menu.addAction(ui->actionImport);
-            menu.addAction(ui->actionRefresh_Categories);
-        } else {
-            QAction *d = new QAction("No database open", &menu);
-            d->setEnabled(false);
-            menu.addAction(d);
-        }
-
-    }
-    menu.exec(globalPos);
-}
-
-
 void MainWindow::searchPopular()
 {
     QString connName = QUuid::createUuid().toString();
@@ -3746,12 +3824,6 @@ void MainWindow::searchPopular()
             selectInTreeWidgets(categoryId, appId);
         }
     }
-}
-
-
-void MainWindow::on_actionPopular_triggered()
-{
-    searchPopular();
 }
 
 void MainWindow::searchRecent()
@@ -3918,12 +3990,6 @@ QString MainWindow::buildCategoryPath(int categoryId, const QString &appKey, QSq
     }
 
     return parts.join(Settings::getPathSeparator());
-}
-
-
-void MainWindow::on_actionRecent_triggered()
-{
-    searchRecent();
 }
 
 void MainWindow::on_actionEdit_Password_triggered()
@@ -4161,7 +4227,7 @@ void MainWindow::on_actionEdit_Password_triggered()
                 //any rename shows immediately
                 QTreeWidgetItem *current = ui->treeWidget->currentItem();
                 if (current) {
-                    this->on_treeWidget_itemActivated(current, 0);
+                    this->openCategory(current, 0);
                 }
             }
             decrypted_data.fill(0);
@@ -4193,18 +4259,6 @@ void MainWindow::on_actionEdit_Password_triggered()
 
     gpg->start("gpg", QStringList() << "--decrypt");
 }
-
-
-void MainWindow::on_actionPreferences_triggered()
-{
-    PreferencesDialog *pd = new PreferencesDialog(this);
-    pd->setWindowTitle(ui->actionPreferences->text());
-    pd->adjustSize();
-    pd->setFixedSize(pd->size());
-    pd->setWindowFlags(pd->windowFlags() & ~Qt::WindowMaximizeButtonHint);
-    pd->exec();
-}
-
 
 void MainWindow::on_actionExport_Password_triggered()
 {
@@ -4757,7 +4811,7 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
     // imported passwords show immediately
     QTreeWidgetItem *current = ui->treeWidget->currentItem();
     if (current) {
-        this->on_treeWidget_itemActivated(current, 0);
+        this->openCategory(current, 0);
     }
 }
 

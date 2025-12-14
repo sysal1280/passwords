@@ -78,21 +78,17 @@ private slots:
     void on_actionEncrypt_File_triggered();
     void on_actionDecrypt_File_triggered();
     void on_actionOpen_Database_triggered();
-    void on_actionBookmark_triggered(bool checked);
+
     void on_actionDelete_Password_triggered();
     void on_actionDelete_Category_triggered();
-    void on_actionPopular_triggered();
-    void on_actionRecent_triggered();
     void on_actionEdit_Password_triggered();
-    void on_actionPreferences_triggered();
     void on_actionExport_Password_triggered();
     void on_actionImport_triggered();
     void on_actionAdd_Search_triggered();
 
     // Tree widget handlers
-    void on_treeWidget_itemActivated(QTreeWidgetItem *item, int column);
+
     void on_treeWidget_2_itemActivated(QTreeWidgetItem *item, int column);
-    void on_treeWidget_customContextMenuRequested(const QPoint &pos);
     void on_treeWidget_2_customContextMenuRequested(const QPoint &pos);
 
     // Other slots
@@ -149,6 +145,9 @@ private:
     void importApplicationsFromFile(const QString &filePath);
     void renameCategory();
     void showAboutDlg();
+
+    void openCategory(QTreeWidgetItem *item, int column);
+    void setBookmark(bool checked);
 
     // Members
     static const QMap<QString, QString> headerMap;
