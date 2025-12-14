@@ -245,59 +245,98 @@ void MainWindow::setActionIcon(QAction *action, const QString &iconPath) {
     action->setIcon(QIcon(iconPath));
 }
 
+
 void MainWindow::loadCategories()
 {
-    const QString connectionName = QUuid::createUuid().toString();
+    const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     {
-        // Create and open a fresh connection in a local scope
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (!db.open()) {
-            qDebug() << "Failed to open database:" << db.lastError().text();
+            qCritical() << "Failed to open database:" << db.lastError().text();
             QSqlDatabase::removeDatabase(connectionName);
             return;
         }
+
+        // Ensure foreign keys are enforced
+        QSqlQuery pragma(db);
+        pragma.exec("PRAGMA foreign_keys = ON");
 
         ui->treeWidget->blockSignals(true);
         ui->treeWidget->clear();
 
         QMap<int, QTreeWidgetItem*> itemMap;
+        QVector<QPair<int,int>> links; // (id, parentId)
 
+        // First pass: create all items and add them as top-level
         {
             QSqlQuery query(db);
             if (!query.exec("SELECT id, parent_id, text FROM categories ORDER BY id")) {
                 qDebug() << "Query failed:" << query.lastError().text();
-                return; // db will be closed when it goes out of scope
+                return;
             }
 
-            // First pass: create items
             while (query.next()) {
                 int id = query.value(0).toInt();
-                int parentId = query.value(1).toInt();
+                int parentId = query.value(1).isNull() ? 0 : query.value(1).toInt();
                 QString text = DataObfuscator::deobfuscate(query.value(2).toString(), appKey);
 
                 QTreeWidgetItem* item = new QTreeWidgetItem();
                 item->setText(0, text);
                 item->setData(0, Qt::UserRole, id);
                 item->setIcon(0, closedIcon);
+
                 itemMap[id] = item;
-                if (parentId == 0) {
-                    ui->treeWidget->addTopLevelItem(item);
-                }
+                ui->treeWidget->addTopLevelItem(item);
+
+                links.push_back({id, parentId});
+            }
+        }
+
+        // Helper: detect if 'ancestor' is an ancestor of 'node'
+        auto isAncestorOf = [](QTreeWidgetItem* ancestor, QTreeWidgetItem* node) {
+            for (QTreeWidgetItem* p = node->parent(); p != nullptr; p = p->parent()) {
+                if (p == ancestor) return true;
+            }
+            return false;
+        };
+
+        // Second pass: attempt safe re-parenting
+        for (const auto& link : links) {
+            int id = link.first;
+            int parentId = link.second;
+
+            QTreeWidgetItem* item   = itemMap.value(id, nullptr);
+            if (!item) continue;
+
+            if (parentId == 0) continue; // no parent
+
+            QTreeWidgetItem* parent = itemMap.value(parentId, nullptr);
+            if (!parent) {
+                qWarning() << "Orphan category id" << id << "parent" << parentId << "not found; leaving as top-level.";
+                continue;
             }
 
-            // Second pass: link children
-            if (query.first()) {
-                do {
-                    int id = query.value(0).toInt();
-                    int parentId = query.value(1).toInt();
-                    if (parentId != 0 && itemMap.contains(parentId)) {
-                        itemMap[parentId]->addChild(itemMap[id]);
-                    }
-                } while (query.next());
+            if (parentId == id) {
+                qWarning() << "Self-parent detected for id" << id << "; skipping re-parent.";
+                continue;
             }
-        } // query destroyed here
+
+            if (isAncestorOf(item, parent)) {
+                qWarning() << "Cycle detected while linking id" << id << "-> parent" << parentId << "; skipping.";
+                continue;
+            }
+
+            // Move from top-level to parent
+            if (item->parent()) {
+                item->parent()->removeChild(item);
+            } else {
+                int idx = ui->treeWidget->indexOfTopLevelItem(item);
+                if (idx >= 0) ui->treeWidget->takeTopLevelItem(idx);
+            }
+            parent->addChild(item);
+        }
 
         ui->treeWidget->blockSignals(false);
 
@@ -325,11 +364,97 @@ void MainWindow::loadCategories()
         }
 
         db.close();
-    } // db destroyed here
+    }
 
-    // Now it’s safe to remove the connection
     QSqlDatabase::removeDatabase(connectionName);
 }
+
+
+// void MainWindow::loadCategories()
+// {
+//     const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+//     {
+//         // Create and open a fresh connection in a local scope
+//         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+//         db.setDatabaseName(qApp->property("dbFile").toString());
+//         if (!db.open()) {
+//             qCritical() << "Failed to open database:" << db.lastError().text();
+//             QSqlDatabase::removeDatabase(connectionName);
+//             return;
+//         }
+
+//         ui->treeWidget->blockSignals(true);
+//         ui->treeWidget->clear();
+
+//         QMap<int, QTreeWidgetItem*> itemMap;
+
+//         {
+//             QSqlQuery query(db);
+//             if (!query.exec("SELECT id, parent_id, text FROM categories ORDER BY id")) {
+//                 qDebug() << "Query failed:" << query.lastError().text();
+//                 return; // db will be closed when it goes out of scope
+//             }
+
+//             // First pass: create items
+//             while (query.next()) {
+//                 int id = query.value(0).toInt();
+//                 int parentId = query.value(1).toInt();
+//                 QString text = DataObfuscator::deobfuscate(query.value(2).toString(), appKey);
+
+//                 QTreeWidgetItem* item = new QTreeWidgetItem();
+//                 item->setText(0, text);
+//                 item->setData(0, Qt::UserRole, id);
+//                 item->setIcon(0, closedIcon);
+//                 itemMap[id] = item;
+//                 if (parentId == 0) {
+//                     ui->treeWidget->addTopLevelItem(item);
+//                 }
+//             }
+
+//             // Second pass: link children
+//             if (query.first()) {
+//                 do {
+//                     int id = query.value(0).toInt();
+//                     int parentId = query.value(1).toInt();
+//                     if (parentId != 0 && itemMap.contains(parentId)) {
+//                         itemMap[parentId]->addChild(itemMap[id]);
+//                     }
+//                 } while (query.next());
+//             }
+//         } // query destroyed here
+
+//         ui->treeWidget->blockSignals(false);
+
+//         // Reconnect expand/collapse handlers
+//         QObject::disconnect(ui->treeWidget, &QTreeWidget::itemExpanded, nullptr, nullptr);
+//         QObject::disconnect(ui->treeWidget, &QTreeWidget::itemCollapsed, nullptr, nullptr);
+
+//         connect(ui->treeWidget, &QTreeWidget::itemExpanded, this, [=](QTreeWidgetItem *item){
+//             if (item->childCount() > 0) {
+//                 item->setIcon(0, QIcon(":/menus/glyphs/folder_open_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+//             }
+//         });
+//         connect(ui->treeWidget, &QTreeWidget::itemCollapsed, this, [=](QTreeWidgetItem *item){
+//             if (item->childCount() > 0) {
+//                 item->setIcon(0, QIcon(":/menus/glyphs/folder_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+//             }
+//         });
+
+//         // Select first item
+//         if (ui->treeWidget->topLevelItemCount() > 0) {
+//             QTreeWidgetItem *firstItem = ui->treeWidget->topLevelItem(0);
+//             ui->treeWidget->setCurrentItem(firstItem);
+//             firstItem->setSelected(true);
+//             on_treeWidget_itemActivated(firstItem, 0);
+//         }
+
+//         db.close();
+//     } // db destroyed here
+
+//     // Now it’s safe to remove the connection
+//     QSqlDatabase::removeDatabase(connectionName);
+// }
 
 
 
@@ -3431,6 +3556,8 @@ void MainWindow::on_actionDelete_Password_triggered()
             }
 
             // proceed with delete
+            QSqlQuery pragma(db);
+            pragma.exec("PRAGMA foreign_keys = ON;");
 
             QSqlQuery query(db);
             query.prepare("DELETE FROM application WHERE id = :id");
