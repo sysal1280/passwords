@@ -70,7 +70,6 @@ private slots:
     void on_actionShow_Password_toggled(bool arg1);
     void on_actionShow_debug_messages_triggered(bool checked);
     void on_actionKey_List_triggered();
-    void on_actionClose_triggered();
     void on_actionAudit_Log_triggered();
     void on_actionRefresh_Categories_triggered();
     void on_actionGenerate_Password_triggered();
@@ -89,7 +88,6 @@ private slots:
     void on_actionExport_Password_triggered();
     void on_actionImport_triggered();
     void on_actionAdd_Search_triggered();
-    void on_actionOnline_Documentation_triggered();
 
     // Tree widget handlers
     void on_treeWidget_itemActivated(QTreeWidgetItem *item, int column);
@@ -142,14 +140,10 @@ private:
     void parseJson(const QByteArray &jsonData);
     void parseJsonNote(const QByteArray &jsonData);
     void parseJsonFile(const QByteArray &jsonData, QString filename);
-    void parseJsonCredit(const QByteArray &jsonData);
 
     // JSON population
     void populateFromJson(const QByteArray &jsonData, Ui::MainWindow *ui);
     void populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui);
-    void populateFromJsonNote(const QByteArray &jsonData, Ui::MainWindow *ui);
-    void populateFromJsonFile(const QByteArray &jsonData, Ui::MainWindow *ui);
-    void populateFromJsonCredit(const QByteArray &jsonData, Ui::MainWindow *ui);
 
     void createCategory(const QString& categoryName = QString());
     void importApplicationsFromFile(const QString &filePath);

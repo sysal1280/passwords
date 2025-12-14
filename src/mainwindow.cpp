@@ -198,6 +198,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->menuBookmarks, &QMenu::aboutToShow,
             this, &MainWindow::populateBookmarksMenu);
 
+    connect(ui->actionOnline_Documentation, &QAction::triggered,
+            this, [this]() {
+                launchHelperProcess("");
+            });
 
     connect(ui->actionDonate, &QAction::triggered,
             this, [this]() {
@@ -215,6 +219,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionAbout, &QAction::triggered,
             this, &MainWindow::showAboutDlg);
+
+    connect(ui->actionClose, &QAction::triggered,
+            this, &MainWindow::close);
 
 
     // ui->treeWidget_2->setStyleSheet(
@@ -804,11 +811,13 @@ void MainWindow::on_actionNew_Password_triggered()
             if (success) {
                 // Normalize: lowercase, replace any non-letter/digit with a space
                 QString normalized = publicAppName.toLower();
-                normalized.replace(QRegularExpression("[^\\p{L}\\p{N}]+"), " ");
+                static const QRegularExpression nonWordChars("[^\\p{L}\\p{N}]+");
+                normalized.replace(nonWordChars, " ");
                 normalized = normalized.trimmed();
 
                 // Split on whitespace
-                QStringList tokens = normalized.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+                static const QRegularExpression whitespaceRe("\\s+");
+                QStringList tokens = normalized.split(whitespaceRe, Qt::SkipEmptyParts);
 
                 for (const QString &token : std::as_const(tokens)) {
                     QByteArray hash = QCryptographicHash::hash(token.toUtf8(),
@@ -886,11 +895,14 @@ void MainWindow::on_actionNew_Category_triggered()
         return;
     }
 
-    QRegularExpression re("^[\\w\\-\\s]{1,64}$");
-    if (!re.match(text).hasMatch()) {
-        QMessageBox::warning(this, tr("Invalid Name"), tr("Category name contains invalid characters or is too long."));
+    static const QRegularExpression categoryNameRe("^[\\w\\-\\s]{1,64}$");
+    if (!categoryNameRe.match(text).hasMatch()) {
+        QMessageBox::warning(this,
+                             tr("Invalid Name"),
+                             tr("Category name contains invalid characters or is too long."));
         return;
     }
+
 
     QTreeWidgetItem* parentItem = ui->treeWidget->currentItem();
     QVariant parentId = QVariant(QMetaType(QMetaType::Int)); // NULL by default
@@ -1366,12 +1378,10 @@ void MainWindow::populateFromJson(const QByteArray &jsonData, Ui::MainWindow *ui
             clipboard->setText(usernameEdit->text());
 
             // Clear clipboard after 15 seconds
-            QTimer::singleShot(15000, [clipboard]() {
-                // Option 1: clear completely
+            QTimer::singleShot(15000, qApp, [clipboard]() {
                 clipboard->clear();
-
-                // Option 2: replace with harmless text
-                // clipboard->setText("");
+                clipboard->setText("");
+                qDebug() << "clipboard cleared";
             });
         });
 
@@ -1404,14 +1414,12 @@ void MainWindow::populateFromJson(const QByteArray &jsonData, Ui::MainWindow *ui
             clipboard->setText(passwordEdit->text());
 
             // Clear clipboard after 15 seconds
-            QTimer::singleShot(15000, [clipboard]() {
-                // Option 1: clear completely
+            QTimer::singleShot(15000, qApp, [clipboard]() {
                 clipboard->clear();
-
-                // Option 2: replace with harmless text
-                 clipboard->setText("");
+                clipboard->setText("");
                 qDebug() << "clipboard cleared";
             });
+
         });
 
         // OTP Code (optional)
@@ -1670,7 +1678,11 @@ void MainWindow::updateCountdown()
 void MainWindow::updateFields()
 {
     qDebug() << "BB";
-    for (QLineEdit *edit : ui->scrollArea->widget()->findChildren<QLineEdit*>()) {
+
+    // Store the result in a local variable first
+    const QList<QLineEdit*> edits = ui->scrollArea->widget()->findChildren<QLineEdit*>();
+
+    for (QLineEdit *edit : edits) {
         if (edit->objectName().startsWith("otpEdit")) {
             // Decode once and cache it
             if (!edit->placeholderText().isEmpty() && !edit->property("secret").isValid()) {
@@ -1681,7 +1693,7 @@ void MainWindow::updateFields()
             // Use cached secret if available
             if (edit->property("secret").isValid()) {
                 QByteArray secret = edit->property("secret").toByteArray();
-                QString newValue = generateTOTP(secret,edit->property("otpLength").toInt());
+                QString newValue = generateTOTP(secret, edit->property("otpLength").toInt());
 
                 if (edit->text() != newValue) {
                     edit->setText(newValue);
@@ -1747,14 +1759,20 @@ QString MainWindow::generateTOTP(const QByteArray &secret, int digits, int step)
 QByteArray MainWindow::base32Decode(const QString &base32) {
     static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
     QByteArray result;
-    int buffer = 0, bitsLeft = 0;
+    int buffer = 0;
+    int bitsLeft = 0;
 
-    for (QChar c : base32.toUpper()) {
-        if (c == '=')
+    // Compute toUpper() once and store in a local variable
+    const QString upper = base32.toUpper();
+
+    for (QChar c : upper) {
+        if (c == '=') {
             break;
+        }
         const char *p = strchr(alphabet, c.toLatin1());
-        if (!p)
+        if (!p) {
             continue; // skip invalid chars
+        }
 
         int val = p - alphabet;
         buffer = (buffer << 5) | val;
@@ -1774,7 +1792,8 @@ void MainWindow::on_actionShow_Password_toggled(bool arg1)
 
     // Find the QLineEdit this action is attached to
     QLineEdit *edit = nullptr;
-    for (QObject *obj : action->associatedObjects()) {
+    const QList<QObject*> associated = action->associatedObjects();
+    for (QObject *obj : associated) {
         if ((edit = qobject_cast<QLineEdit*>(obj))) {
             break;
         }
@@ -1904,9 +1923,6 @@ QTreeWidgetItem* MainWindow::makeItemFromCredit(QSqlQuery& query) {
 }
 
 void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui) {
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    QJsonObject obj = doc.object();
-
         parseJson(jsonData);
         populateFromJson(jsonData,ui);
 
@@ -1971,15 +1987,6 @@ void MainWindow::parseJsonNote(const QByteArray &jsonData) {
         gridLayout->addItem(verticalSpacer, 2, 0, 1, -1);
 }
 
-void MainWindow::populateFromJsonNote(const QByteArray &jsonData, Ui::MainWindow *ui) {
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    QJsonObject obj = doc.object();
-
-   // ui->lineEditTitle->setText(obj.value("title").toString("Untitled"));
-    //ui->textEditBody->setPlainText(obj.value("body").toString());
-}
-
-
 void MainWindow::parseJsonFile(const QByteArray &jsonData, QString filename)
     {
         // Show a save file dialog with suggested filename
@@ -2009,33 +2016,6 @@ void MainWindow::parseJsonFile(const QByteArray &jsonData, QString filename)
         QMessageBox::information(this, tr("Success"),
                                  tr("File saved successfully:\n%1").arg(selectedPath));
     }
-
-void MainWindow::populateFromJsonFile(const QByteArray &jsonData, Ui::MainWindow *ui) {
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    QJsonObject obj = doc.object();
-
-    //ui->lineEditFilename->setText(obj.value("filename").toString());
-    //ui->lineEditPath->setText(obj.value("path").toString());
-}
-
-void MainWindow::parseJsonCredit(const QByteArray &jsonData) {
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    QJsonObject obj = doc.object();
-
-    QString cardNumber = obj.value("cardNumber").toString();
-    QString expiry     = obj.value("expiry").toString();
-
-    qDebug() << "Credit card:" << cardNumber << "Expiry:" << expiry;
-}
-
-void MainWindow::populateFromJsonCredit(const QByteArray &jsonData, Ui::MainWindow *ui) {
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    QJsonObject obj = doc.object();
-
-    //ui->lineEditCardNumber->setText(obj.value("cardNumber").toString());
-   // ui->lineEditExpiry->setText(obj.value("expiry").toString());
-}
-
 
 void MainWindow::on_actionKey_List_triggered()
 {
@@ -2225,13 +2205,6 @@ void MainWindow::on_actionKey_List_triggered()
     dlg->setLayout(layout);
     dlg->resize(400, 300);
     dlg->exec();
-}
-
-
-
-void MainWindow::on_actionClose_triggered()
-{
-    this->close();
 }
 
 
@@ -5141,9 +5114,3 @@ void MainWindow::launchHelperProcess(const QString &page)
 
     QApplication::restoreOverrideCursor();
 }
-
-void MainWindow::on_actionOnline_Documentation_triggered()
-{
-    launchHelperProcess(QString());
-}
-
