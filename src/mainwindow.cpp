@@ -1118,7 +1118,7 @@ void MainWindow::on_treeWidget_2_itemActivated(QTreeWidgetItem *item, int column
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     // --- Step 0: Map mode to table/column names ---
-    QString viewTable, idColumn, credTable, credForeignKey;
+    QString viewTable, idColumn, credTable;
 
     viewTable      = "application_views";
     idColumn       = "application_id";

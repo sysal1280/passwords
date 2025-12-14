@@ -30,6 +30,8 @@ private:
     int errorCount = 0;
     void generateResponse();
     void tryResponse();
+    void checkHelperFiles();
+
 };
 
 #endif // LOGINDIALOG_H

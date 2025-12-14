@@ -114,6 +114,7 @@ LoginDialog::LoginDialog(QWidget *parent)
                 ui->lineEdit->setFocus();
             });
 
+    checkHelperFiles();
 }
 
 LoginDialog::~LoginDialog()
@@ -262,6 +263,24 @@ void LoginDialog::showEvent(QShowEvent *event) {
     }
 }
 
+void LoginDialog::checkHelperFiles()
+{
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString pwdhlpExe = appDir + "/pwdhlp.exe";
+    QString pwdhlpNoExt = appDir + "/pwdhlp";
+    QString pwdhlpRcc = appDir + "/pwdhlp.rcc";
 
+    // Check existence of help system
+    bool exeExists = QFile::exists(pwdhlpExe) || QFile::exists(pwdhlpNoExt);
+    bool rccExists = QFile::exists(pwdhlpRcc);
+
+    // If missing, disable Help button
+    if (!(exeExists && rccExists)) {
+        QPushButton *helpButton = ui->buttonBox->button(QDialogButtonBox::Help);
+        if (helpButton) {
+            helpButton->setEnabled(false);
+        }
+    }
+}
 
 
