@@ -234,7 +234,8 @@ Ensure it is accessible in your PATH.
         if (!dbPath.isEmpty()) {
             // Call member methods on MainWindow
             w->initDb();
-            w->openDatabase(dbPath);
+            if (!w->openDatabase(dbPath))
+                return 0;
             dbOpened = true;
         }
     } else {

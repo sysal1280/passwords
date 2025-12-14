@@ -2913,72 +2913,69 @@ void MainWindow::on_actionOpen_Database_triggered()
         openDatabase(fileName);
 }
 
-void MainWindow::openDatabase(const QString &fileName)
+bool MainWindow::openDatabase(const QString &fileName)
 {
     QString connName = QUuid::createUuid().toString();
+
+    bool ok = false; // assume failure
 
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(fileName);
 
         if (!db.open()) {
-            QMessageBox::warning(this, tr("Error"), tr("Failed to open database: %1").arg(db.lastError().text()));
-            return;
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("Failed to open database: %1").arg(db.lastError().text()));
+            QSqlDatabase::removeDatabase(connName);
+            return false;
         }
 
-        // Ensure foreign keys are enforced
-        QSqlQuery pragma(db);
-        pragma.exec("PRAGMA foreign_keys = ON");
+        QSqlQuery(db).exec("PRAGMA foreign_keys = ON");
 
         QSqlQuery query(db);
-
-        // First check if app_info table exists
-        if (!query.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='app_info'")) {
-            QMessageBox::warning(this, tr("Error"), tr("This is not a valid passwords database file."));
-            return;
-        }
-        if (!query.next()) {
-            QMessageBox::warning(this, tr("Error"), tr("This file is a SQLite database but not a valid passwords database."));
-            return;
+        if (!query.exec("SELECT key, value FROM app_info WHERE key IN ('app_signature','schema_version')")) {
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("This is not a valid passwords database (missing app_info)."));
+            db.close();
+            QSqlDatabase::removeDatabase(connName);
+            return false;
         }
 
-        // Now check for the signature
-        if (!query.exec("SELECT value FROM app_info WHERE key='app_signature'")) {
-            QMessageBox::warning(this, tr("Error"), tr("Failed to query app_info: %1").arg(query.lastError().text()));
-            return;
+        QString signature, schemaVersion;
+        while (query.next()) {
+            const QString key = query.value(0).toString();
+            const QString val = query.value(1).toString();
+            if (key == "app_signature") signature = val;
+            else if (key == "schema_version") schemaVersion = val;
         }
-        if (query.next() && query.value(0).toString() == "passwords") {
+
+        if (signature == "passwords" && schemaVersion == "1") {
             qApp->setProperty("dbFile", fileName);
             init();
+            ok = true;
         } else {
             qApp->setProperty("dbFile", QString());
-            QMessageBox::warning(this, tr("Error"), tr("This database is missing an app_signature value."));
-            return;
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("This database is not a valid passwords database (bad signature or schema version)."));
+            ok = false;
         }
 
         db.close();
     }
     QSqlDatabase::removeDatabase(connName);
 
-
-    /*
-     * Create a backup of the database file, overwriting if it exists
-    */
-    if (Settings::getBackupDatabase()) {
+    // Backup only if database was valid
+    if (ok && Settings::getBackupDatabase()) {
         QFileInfo fi(fileName);
-
-        // Ensure backups directory exists (same parent as original file)
         QString backupDirPath = fi.absolutePath() + "/backups";
         QDir backupDir(backupDirPath);
         if (!backupDir.exists()) {
             backupDir.mkpath(".");
         }
 
-        // Build backup filename: <basename>_<timestamp>
         QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
         QString backupPath = backupDirPath + "/" + fi.completeBaseName() + "_" + timestamp;
 
-        // Copy the file
         if (!QFile::copy(fileName, backupPath)) {
             qWarning().noquote()
             << tr("Failed to create backup at %1:").arg(backupDirPath)
@@ -2988,6 +2985,7 @@ void MainWindow::openDatabase(const QString &fileName)
         }
     }
 
+    return ok;
 }
 
 

@@ -46,7 +46,7 @@ public:
 
     static QByteArray base32Decode(const QString &base32);
     void initDb();
-    void openDatabase(const QString &fileName = QString());
+    bool openDatabase(const QString &fileName = QString());
     void launchHelperProcess(const QString &page);
 
     QList<KeyEntry> fetchKeys() const;
