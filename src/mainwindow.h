@@ -64,7 +64,6 @@ protected:
 
 private slots:
     // Actions
-    void on_actionAbout_triggered();
     void on_actionAbout_Qt_triggered();
     void on_actionNew_Password_triggered();
     void on_actionNew_Category_triggered();
@@ -89,7 +88,6 @@ private slots:
     void on_actionPreferences_triggered();
     void on_actionExport_Password_triggered();
     void on_actionImport_triggered();
-    void on_actionRename_triggered();
     void on_actionAdd_Search_triggered();
     void on_actionOnline_Documentation_triggered();
 
@@ -142,7 +140,6 @@ private:
 
     // JSON parsing
     void parseJson(const QByteArray &jsonData);
-    void parseJsonApplication(const QByteArray &jsonData);
     void parseJsonNote(const QByteArray &jsonData);
     void parseJsonFile(const QByteArray &jsonData, QString filename);
     void parseJsonCredit(const QByteArray &jsonData);
@@ -156,6 +153,8 @@ private:
 
     void createCategory(const QString& categoryName = QString());
     void importApplicationsFromFile(const QString &filePath);
+    void renameCategory();
+    void showAboutDlg();
 
     // Members
     static const QMap<QString, QString> headerMap;

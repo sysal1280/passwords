@@ -210,6 +210,12 @@ MainWindow::MainWindow(QWidget *parent)
                 dlg.exec();
             });
 
+    connect(ui->actionRename, &QAction::triggered,
+            this, &MainWindow::renameCategory);
+
+    connect(ui->actionAbout, &QAction::triggered,
+            this, &MainWindow::showAboutDlg);
+
 
     // ui->treeWidget_2->setStyleSheet(
     //     "QTreeWidget::item { padding-top: 6px; padding-bottom: 6px; }"
@@ -534,7 +540,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_actionAbout_triggered()
+void MainWindow::showAboutDlg()
 {
     QDialog dlg(this);
     dlg.setWindowTitle(tr("About %1").arg(QCoreApplication::applicationName()));
@@ -1156,7 +1162,7 @@ void MainWindow::on_treeWidget_2_itemActivated(QTreeWidgetItem *item, int column
                 QMessageBox::information(this,"Decrypted",decrypted_data);
             }
 
-            parseJsonApplication(decrypted_data);
+            //parseJsonApplication(decrypted_data);
             populateFromJsonApplication(decrypted_data, ui);
 
             // if (mode == "application") {
@@ -1848,7 +1854,6 @@ QTreeWidgetItem* MainWindow::makeItemFromApplication(QSqlQuery& query) {
     int id       = query.value(0).toInt();
     //int parentId = query.value(1).toInt();
     QString name = DataObfuscator::deobfuscate(query.value(2).toString(),appKey);
-    QString url  = query.value(3).toString();
 
     //qDebug() << Q_FUNC_INFO << id << parentId << name << url;
 
@@ -1896,14 +1901,6 @@ QTreeWidgetItem* MainWindow::makeItemFromCredit(QSqlQuery& query) {
     item->setText(1, QString::number(id));
     item->setData(0, Qt::UserRole, parentId);
     return item;
-}
-
-void MainWindow::parseJsonApplication(const QByteArray &jsonData) {
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    QJsonObject obj = doc.object();
-
-    //int length = obj.value("length").toInt(6); // default 6
-    QString url = obj.value("url").toString();
 }
 
 void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui) {
@@ -2996,7 +2993,9 @@ void MainWindow::search(const QString &text)
         }
 
         // Tokenize and normalize search text
-        QStringList words = text.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+        static const QRegularExpression whitespaceRe("\\s+");
+        QStringList words = text.split(whitespaceRe, Qt::SkipEmptyParts);
+
         if (words.isEmpty()) {
             qDebug() << "No search terms provided.";
             return;
@@ -3526,14 +3525,18 @@ void MainWindow::on_actionDelete_Password_triggered()
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     layout.addWidget(&buttonBox);
 
-    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, [&]() {
-        if (lineEdit.text() == confirmationKeyword) {
-            dialog.accept();
-        } else {
-            QMessageBox::warning(&dialog, "Incorrect Confirmation",
-                                 "You must type \"" + confirmationKeyword + "\" exactly to proceed.");
-        }
-    });
+    QObject::connect(&buttonBox, &QDialogButtonBox::accepted,
+                     &dialog,   // context object
+                     [&]() {
+                         if (lineEdit.text() == confirmationKeyword) {
+                             dialog.accept();
+                         } else {
+                             QMessageBox::warning(&dialog,
+                                                  "Incorrect Confirmation",
+                                                  "You must type \"" + confirmationKeyword + "\" exactly to proceed.");
+                         }
+                     });
+
     QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
     // Show dialog and check result
@@ -4062,8 +4065,10 @@ void MainWindow::on_actionEdit_Password_triggered()
 
                 QString tempFile = QDir::tempPath() + "/edit.asc";
                 QStringList args;
-                for (const QString &key : dlg.getCheckedKeys())
+                const QStringList keys = dlg.getCheckedKeys();
+                for (const QString &key : keys) {
                     args << "--recipient" << key;
+                }
                 args << "--encrypt" << "--armor" << "--output" << tempFile;
 
                 QProcess enc;
@@ -4140,12 +4145,15 @@ void MainWindow::on_actionEdit_Password_triggered()
                                 int appId = item->data(0, Qt::UserRole).toInt();
 
                                 // Normalize: lowercase, replace any non-letter/digit with a space, then collapse spaces
+                                static const QRegularExpression nonAlphaNum("[^\\p{L}\\p{N}]+");
+
                                 QString normalized = dlg.PublicAppName.toLower();
-                                normalized.replace(QRegularExpression("[^\\p{L}\\p{N}]+"), " ");
+                                normalized.replace(nonAlphaNum, " ");
                                 normalized = normalized.trimmed();
 
                                 // Split on whitespace
-                                QStringList tokens = normalized.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+                                static const QRegularExpression whitespaceRe("\\s+");
+                                QStringList tokens = normalized.split(whitespaceRe, Qt::SkipEmptyParts);
 
                                 for (const QString &token : std::as_const(tokens)) {
                                     QByteArray hash = QCryptographicHash::hash(token.toUtf8(), QCryptographicHash::Sha256).toHex();
@@ -4885,7 +4893,7 @@ void MainWindow::createCategory(const QString& categoryName /* = QString() */)
 }
 
 
-void MainWindow::on_actionRename_triggered()
+void MainWindow::renameCategory()
 {
     QTreeWidgetItem* item = ui->treeWidget->currentItem();
     if (!item) {
