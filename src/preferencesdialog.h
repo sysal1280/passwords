@@ -20,7 +20,9 @@ public:
     void saveSettings();
 
 private slots:
-    void on_pushButton_clicked();    
+    void on_pushButton_clicked();
+
+    void on_buttonBox_helpRequested();
 
 private:
     Ui::PreferencesDialog *ui;

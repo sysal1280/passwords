@@ -20,6 +20,7 @@
 
 #include "preferencesdialog.h"
 #include "ui_preferencesdialog.h"
+#include "mainwindow.h"
 #include "settings.h"
 #include <QDesktopServices>
 #include <QMessageBox>
@@ -345,3 +346,11 @@ void PreferencesDialog::onBackupCheckStateChanged(int state)
         }
     }
 }
+
+void PreferencesDialog::on_buttonBox_helpRequested()
+{
+    if (auto mw = qobject_cast<MainWindow*>(parentWidget())) {
+        mw->launchHelperProcess("preferences");
+    }
+}
+

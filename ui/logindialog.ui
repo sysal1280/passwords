@@ -53,7 +53,7 @@
       <item row="0" column="0">
        <widget class="QLineEdit" name="lineEdit">
         <property name="placeholderText">
-         <string>Enter decrypted response here</string>
+         <string>Decrypted response</string>
         </property>
        </widget>
       </item>

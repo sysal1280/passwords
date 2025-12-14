@@ -214,7 +214,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
                 if (!helperProcess->waitForFinished(2000)) {
                     helperProcess->kill();
                 }
+                qInfo() << "Closed help server.";
             }
+        } else
+        {
+            qInfo() << "Could not find a help server to close.";
         }
     }
 
@@ -4784,6 +4788,13 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
         db.close();
     }
     QSqlDatabase::removeDatabase(connName);
+
+    //refresh the view
+    // imported passwords show immediately
+    QTreeWidgetItem *current = ui->treeWidget->currentItem();
+    if (current) {
+        this->on_treeWidget_itemActivated(current, 0);
+    }
 }
 
 
