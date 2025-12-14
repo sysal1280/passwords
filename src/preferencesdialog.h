@@ -20,9 +20,6 @@ public:
     void saveSettings();
 
 private slots:
-    void on_pushButton_clicked();
-
-    void on_buttonBox_helpRequested();
 
 private:
     Ui::PreferencesDialog *ui;
@@ -31,6 +28,8 @@ private:
     void restoreButtonClicked(QAbstractButton *button);
     void restoreDefaults();
     void onBackupCheckStateChanged(int state);
+    void openBackupDir();
+    void handleHelpRequested();
 
 };
 

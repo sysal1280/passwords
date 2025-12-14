@@ -28,7 +28,7 @@
 #include <QStandardPaths>
 #include "settings.h"
 #include <QUuid>
-#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/QtConcurrentRun>
 #include <QFutureWatcher>
 #include <QFileInfo>
 

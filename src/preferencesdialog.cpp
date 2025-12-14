@@ -143,6 +143,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
             ui->pushButton, &QPushButton::setEnabled);
     connect(ui->checkBoxBackupDB, &QCheckBox::checkStateChanged,
             this, &PreferencesDialog::onBackupCheckStateChanged);
+    connect(ui->pushButton, &QPushButton::clicked,
+            this, &PreferencesDialog::openBackupDir);
+    connect(ui->buttonBox, &QDialogButtonBox::helpRequested,
+            this, &PreferencesDialog::handleHelpRequested);
+
 
 }
 
@@ -223,7 +228,7 @@ PreferencesDialog::~PreferencesDialog()
     delete ui;
 }
 
-void PreferencesDialog::on_pushButton_clicked()
+void PreferencesDialog::openBackupDir()
 {
     QString settingsPath = Settings::getDefaultDbPath(this);
     if (settingsPath.isEmpty()) {
@@ -347,7 +352,7 @@ void PreferencesDialog::onBackupCheckStateChanged(int state)
     }
 }
 
-void PreferencesDialog::on_buttonBox_helpRequested()
+void PreferencesDialog::handleHelpRequested()
 {
     if (auto mw = qobject_cast<MainWindow*>(parentWidget())) {
         mw->launchHelperProcess("preferences");

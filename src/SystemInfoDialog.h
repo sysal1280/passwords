@@ -75,8 +75,10 @@ private:
         // Environment variables
         report += tr("Environment:\n");
         auto env = QProcessEnvironment::systemEnvironment();
-        for (const auto &key : env.keys())
+        const QStringList keys = env.keys();
+        for (const QString &key : keys) {
             report += QString("  %1=\"%2\"\n").arg(key, env.value(key));
+        }
 
         // Library paths
         report += tr("\nLibrary info:\n");

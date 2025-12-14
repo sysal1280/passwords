@@ -111,7 +111,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeWidget_2->setWatermarkText("No Passwords");
 
     //setup glyphs
-    QMap<QAction*, QString> actionIcons = {
+    QHash<QAction*, QString> actionIcons = {
         { ui->actionGenerate_Password,     ":/menus/glyphs/password_24dp_1F1F1F.svg" },
         { ui->actionEncrypt_message,       ":/menus/glyphs/encrypted_add_circle_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionDecrypt_message,       ":/menus/glyphs/encrypted_minus_circle_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
@@ -466,7 +466,7 @@ void MainWindow::loadCategories()
 
 
 void MainWindow::saveTreeToDb(QTreeWidget* tree, QSqlDatabase& db) {
-    QSqlQuery clearQuery(db);
+    //QSqlQuery clearQuery(db);
 
     for (int i = 0; i < tree->topLevelItemCount(); ++i) {
         QTreeWidgetItem* item = tree->topLevelItem(i);
@@ -954,7 +954,7 @@ void MainWindow::on_treeWidget_itemActivated(QTreeWidgetItem *item, int column) 
 
         // Prepare and execute the query
         QSqlQuery query(db);
-        query.prepare(QString("SELECT * FROM %1 WHERE category_id = :id ORDER BY id").arg(mode));
+        query.prepare(QString("SELECT * FROM application WHERE category_id = :id ORDER BY id"));
         query.bindValue(":id", item->data(0,Qt::UserRole).toInt());
 
         if (!query.exec()) {
@@ -968,16 +968,18 @@ void MainWindow::on_treeWidget_itemActivated(QTreeWidgetItem *item, int column) 
         while (query.next()) {
             QTreeWidgetItem* newItem = nullptr;
 
-            // Delegate schema-specific logic to helpers based on the mode
-            if (mode == "application") {
-                newItem = makeItemFromApplication(query);
-            } else if (mode == "note") {
-                newItem = makeItemFromNote(query);
-            } else if (mode == "file") {
-                newItem = makeItemFromFile(query);
-            } else if (mode == "credit") {
-                newItem = makeItemFromCredit(query);
-            }
+             newItem = makeItemFromApplication(query);
+
+            // // Delegate schema-specific logic to helpers based on the mode
+            // if (mode == "application") {
+            //     newItem = makeItemFromApplication(query);
+            // } else if (mode == "note") {
+            //     newItem = makeItemFromNote(query);
+            // } else if (mode == "file") {
+            //     newItem = makeItemFromFile(query);
+            // } else if (mode == "credit") {
+            //     newItem = makeItemFromCredit(query);
+            // }
 
             // If an item is created, add it to the tree widget
             if (newItem) {
@@ -1082,36 +1084,14 @@ void MainWindow::on_treeWidget_2_itemActivated(QTreeWidgetItem *item, int column
         killGpgAgent();
     }
 
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     // --- Step 0: Map mode to table/column names ---
     QString viewTable, idColumn, credTable, credForeignKey;
 
-    if (mode == "application") {
-        viewTable      = "application_views";
-        idColumn       = "application_id";
-        credTable      = "application";
-        credForeignKey = "id";
-    } else if (mode == "note") {
-        viewTable      = "note_views";
-        idColumn       = "note_id";
-        credTable      = "note";
-        credForeignKey = "id";
-    } else if (mode == "file") {
-        viewTable      = "file_views";
-        idColumn       = "file_id";
-        credTable      = "file";
-        credForeignKey = "id";
-    } else if (mode == "credit") {
-        viewTable      = "credit_views";
-        idColumn       = "credit_id";
-        credTable      = "credit_credentials";
-        credForeignKey = "credit_id";
-    } else {
-        QMessageBox::warning(this, "Error", "Unsupported mode: " + mode);
-        QApplication::restoreOverrideCursor();
-        return;
-    }
+    viewTable      = "application_views";
+    idColumn       = "application_id";
+    credTable      = "application";
 
     // --- Step 1: Retrieve encrypted data ---
     ui->statusbar->showMessage("Reading database..");
@@ -1123,8 +1103,7 @@ void MainWindow::on_treeWidget_2_itemActivated(QTreeWidgetItem *item, int column
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (db.open()) {
             QSqlQuery query(db);
-            query.prepare(QString("SELECT data FROM %1 WHERE %2 = :id")
-                              .arg(credTable, credForeignKey));
+            query.prepare(QString("SELECT data FROM application WHERE id = :id"));
             query.bindValue(":id", parentId);
             if (query.exec() && query.first()) {
                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
@@ -1164,18 +1143,21 @@ void MainWindow::on_treeWidget_2_itemActivated(QTreeWidgetItem *item, int column
                 QMessageBox::information(this,"Decrypted",decrypted_data);
             }
 
-            if (mode == "application") {
-                parseJsonApplication(decrypted_data);
-                populateFromJsonApplication(decrypted_data, ui);
-            } else if (mode == "note") {
-                parseJsonNote(decrypted_data);
-            } else if (mode == "file") {
-                parseJsonFile(decrypted_data, ui->treeWidget_2->currentItem()->text(0));
-                populateFromJsonFile(decrypted_data, ui);
-            } else if (mode == "credit") {
-                parseJsonCredit(decrypted_data);
-                populateFromJsonCredit(decrypted_data, ui);
-            }
+            parseJsonApplication(decrypted_data);
+            populateFromJsonApplication(decrypted_data, ui);
+
+            // if (mode == "application") {
+            //     parseJsonApplication(decrypted_data);
+            //     populateFromJsonApplication(decrypted_data, ui);
+            // } else if (mode == "note") {
+            //     parseJsonNote(decrypted_data);
+            // } else if (mode == "file") {
+            //     parseJsonFile(decrypted_data, ui->treeWidget_2->currentItem()->text(0));
+            //     populateFromJsonFile(decrypted_data, ui);
+            // } else if (mode == "credit") {
+            //     parseJsonCredit(decrypted_data);
+            //     populateFromJsonCredit(decrypted_data, ui);
+            // }
             decrypted_data.fill(0);
         }
     });
@@ -1848,21 +1830,6 @@ void MainWindow::on_actionShow_debug_messages_triggered(bool checked)
     qDebug() << "showDebugMessages" << showDebugMessages;
 }
 
-void MainWindow::changeModes(QString mode)
-{
-    this->mode = mode;
-
-    if (headerMap.contains(mode)) {
-        ui->treeWidget_2->headerItem()->setText(0, headerMap.value(mode));
-    }
-
-    // Get the currently selected item in treeWidget
-    QTreeWidgetItem *currentItem = ui->treeWidget->currentItem();
-    if (currentItem) {
-        // Call the slot manually with column 0 (or whichever column makes sense)
-        on_treeWidget_itemActivated(currentItem, 0);
-    }
-}
 
 QTreeWidgetItem* MainWindow::makeItemFromApplication(QSqlQuery& query) {
     int id       = query.value(0).toInt();
@@ -1884,7 +1851,7 @@ QTreeWidgetItem* MainWindow::makeItemFromNote(QSqlQuery& query) {
     int id       = query.value(0).toInt();
     int parentId = query.value(1).toInt();
     QString title = query.value(2).toString();
-    QString body  = query.value(3).toString();
+    //QString body  = query.value(3).toString();
 
     auto* item = new QTreeWidgetItem();
     item->setText(0, title);
@@ -1909,7 +1876,7 @@ QTreeWidgetItem* MainWindow::makeItemFromCredit(QSqlQuery& query) {
     int id       = query.value(0).toInt();
     int parentId = query.value(1).toInt();
     QString title = query.value(2).toString();
-    QString body  = query.value(3).toString();
+    //QString body  = query.value(3).toString();
 
     auto* item = new QTreeWidgetItem();
     item->setText(0, title);
@@ -2915,9 +2882,7 @@ void MainWindow::on_actionOpen_Database_triggered()
 
 bool MainWindow::openDatabase(const QString &fileName)
 {
-    QString connName = QUuid::createUuid().toString();
-
-    bool ok = false; // assume failure
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
@@ -2949,15 +2914,18 @@ bool MainWindow::openDatabase(const QString &fileName)
             else if (key == "schema_version") schemaVersion = val;
         }
 
-        if (signature == "passwords" && schemaVersion == "1") {
+        if (signature == MainWindow::APP_SIGNATURE &&
+            schemaVersion == MainWindow::SCHEMA_VERSION) {
             qApp->setProperty("dbFile", fileName);
             init();
-            ok = true;
         } else {
             qApp->setProperty("dbFile", QString());
             QMessageBox::critical(this, tr("Error"),
-                                  tr("This database is not a valid passwords database (bad signature or schema version)."));
-            ok = false;
+                                  tr("This database is not a valid passwords database.\n"
+                                     "It may also belong to a different version of this program (invalid signature or schema version)."));
+            db.close();
+            QSqlDatabase::removeDatabase(connName);
+            return false;
         }
 
         db.close();
@@ -2965,7 +2933,7 @@ bool MainWindow::openDatabase(const QString &fileName)
     QSqlDatabase::removeDatabase(connName);
 
     // Backup only if database was valid
-    if (ok && Settings::getBackupDatabase()) {
+    if (Settings::getBackupDatabase()) {
         QFileInfo fi(fileName);
         QString backupDirPath = fi.absolutePath() + "/backups";
         QDir backupDir(backupDirPath);
@@ -2985,9 +2953,8 @@ bool MainWindow::openDatabase(const QString &fileName)
         }
     }
 
-    return ok;
+    return true;
 }
-
 
 void MainWindow::init()
 {
