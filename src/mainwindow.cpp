@@ -1554,14 +1554,22 @@ void MainWindow::populateFromJson(const QByteArray &jsonData, Ui::MainWindow *ui
 
         });
 
-        // OTP Code (optional)
+        // OTP Code (optional)       
         QLabel* otpLabel = new QLabel("OTP Code");
         QLineEdit* otpEdit = new QLineEdit();
-        otpEdit->setText(otp);
-        otpEdit->setPlaceholderText(otp);
+        otpEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
+        otpEdit->setText(formatOtp(otp));
+        otpEdit->setPlaceholderText(formatOtp(otp));
         otpEdit->setObjectName("otpEdit"+QString::number(row));
         otpEdit->setProperty("otpLength",otpLength);
         otpEdit->setReadOnly(true);
+
+        QAction *copyOTPAction = new QAction(tr("Copy OTP"), passwordEdit);
+        connect(copyOTPAction, &QAction::triggered, this, [otpEdit]() {
+            QClipboard *clipboard = QGuiApplication::clipboard();
+            clipboard->setText(otpEdit->text().remove("-").trimmed());
+        });
+        otpEdit->addAction(copyOTPAction);
 
         // Add to grid: 6 widgets per row
         gridLayout->addWidget(usernameLabel, row, 0);
@@ -1828,7 +1836,7 @@ void MainWindow::updateFields()
                 QString newValue = generateTOTP(secret, edit->property("otpLength").toInt());
 
                 if (edit->text() != newValue) {
-                    edit->setText(newValue);
+                    edit->setText(formatOtp(newValue));
                 }
             } else {
                 edit->setText("NA");
@@ -5168,3 +5176,39 @@ void MainWindow::launchHelperProcess(const QString &page)
 
     QApplication::restoreOverrideCursor();
 }
+
+QString MainWindow::formatOtp(const QString& otp)
+{
+    int len = otp.length();
+    QString formatted;
+
+    if (len == 0)
+        return formatted;
+
+    int firstGroupSize;
+
+    if (len % 2 == 0) {
+        // Even length: split into two equal halves
+        firstGroupSize = len / 2;      // e.g. 6 -> 3, 8 -> 4
+    } else {
+        // Odd length: make first group the remainder when divided by 3
+        int rem = len % 3;             // 1 or 2, or 0
+        firstGroupSize = (rem == 0) ? 3 : rem;
+    }
+
+    // Add first group
+    formatted = otp.left(firstGroupSize);
+
+    int index = firstGroupSize;
+
+    // Add remaining groups of 3 with '-' separators
+    while (index < len) {
+        formatted += "-";
+        int chunkSize = qMin(3, len - index);
+        formatted += otp.mid(index, chunkSize);
+        index += chunkSize;
+    }
+
+    return formatted;
+}
+

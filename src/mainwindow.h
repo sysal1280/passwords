@@ -148,6 +148,8 @@ private:
     void openCategory(QTreeWidgetItem *item, int column);
     void setBookmark(bool checked);
 
+    QString formatOtp(const QString& otp);
+
     // Members
     static const QMap<QString, QString> headerMap;
     QSplitter *vSplitter = nullptr;
