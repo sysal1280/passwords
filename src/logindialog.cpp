@@ -39,6 +39,9 @@ LoginDialog::LoginDialog(QWidget *parent)
     this->setWindowTitle(tr("Login"));
     ui->textEdit->setReadOnly(true);
 
+    QPushButton *okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    okButton->setEnabled(false); // disable initially
+
     QString connectionName = QUuid::createUuid().toString();
         // create a scoped database object
         {
@@ -62,7 +65,7 @@ LoginDialog::LoginDialog(QWidget *parent)
                     // --- activate first entry and update clipboard ---
                     if (ui->comboBoxLogin->count() > 0) {
                         ui->comboBoxLogin->setCurrentIndex(0);
-                        on_comboBoxLogin_currentIndexChanged(0);
+                        generateResponse();
                     }
                 }
                 db.close();
@@ -82,8 +85,35 @@ LoginDialog::LoginDialog(QWidget *parent)
         }
     });
 
-    connect(ui->buttonBox, &QDialogButtonBox::clicked,
-            this, &LoginDialog::onButtonBoxClicked);
+    connect(ui->comboBoxLogin, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int index) {
+                if (index > -1) {
+                    generateResponse();
+                }
+            });
+
+    connect(ui->buttonBox->button(QDialogButtonBox::Ok), &QPushButton::clicked,
+            this, [this]() {
+                tryResponse();
+            });
+
+    connect(ui->buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked,
+            this, [this]() {
+                reject();
+            });
+
+    connect(ui->lineEdit, &QLineEdit::textChanged,
+            this, [okButton](const QString &text) {
+                okButton->setEnabled(!text.trimmed().isEmpty());
+            });
+
+    // Hook up textEdit's textChanged signal
+    connect(ui->textEdit, &QTextEdit::textChanged,
+            this, [this]() {
+                ui->textEdit->selectAll();
+                ui->lineEdit->setFocus();
+            });
+
 }
 
 LoginDialog::~LoginDialog()
@@ -91,11 +121,8 @@ LoginDialog::~LoginDialog()
     delete ui;
 }
 
-void LoginDialog::on_comboBoxLogin_currentIndexChanged(int index)
+void LoginDialog::generateResponse()
 {
-    if (index <= -1)
-        return;
-
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     const QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
@@ -202,9 +229,9 @@ void LoginDialog::on_comboBoxLogin_currentIndexChanged(int index)
     QApplication::restoreOverrideCursor();
 }
 
-void LoginDialog::onButtonBoxClicked(QAbstractButton *button)
+void LoginDialog::tryResponse()
 {
-    if (ui->buttonBox->buttonRole(button) == QDialogButtonBox::AcceptRole) {
+
         QByteArray enteredBytes = ui->lineEdit->text().toUtf8();
         QByteArray enteredHash = QCryptographicHash::hash(enteredBytes, QCryptographicHash::Sha512);
         std::fill(enteredBytes.begin(), enteredBytes.end(), '\0');
@@ -221,13 +248,8 @@ void LoginDialog::onButtonBoxClicked(QAbstractButton *button)
                 errorCount++;
             }
         }
-    } else if (ui->buttonBox->buttonRole(button) == QDialogButtonBox::RejectRole) {
-        reject();
-    } else if (ui->buttonBox->buttonRole(button) == QDialogButtonBox::HelpRole) {
-        // Do nothing here – helpRequested() will be emitted and handled
-    }
-}
 
+}
 
 bool LoginDialog::hasKeys() const {
     return ui->comboBoxLogin->count() > 0;
@@ -240,9 +262,6 @@ void LoginDialog::showEvent(QShowEvent *event) {
     }
 }
 
-void LoginDialog::on_textEdit_textChanged()
-{
-    ui->textEdit->selectAll();
-    ui->lineEdit->setFocus();
-}
+
+
 

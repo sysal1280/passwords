@@ -75,6 +75,9 @@
      <property name="text">
       <string>To login, copy the challenge and provide your response.</string>
      </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
   </layout>

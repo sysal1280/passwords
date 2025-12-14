@@ -22,19 +22,14 @@ public:
 
 
 private slots:
-    void on_comboBoxLogin_currentIndexChanged(int index);
-
-    void onButtonBoxClicked(QAbstractButton *button);
-
     void showEvent(QShowEvent *event) ;
-
-    void on_textEdit_textChanged();
 
 private:
     Ui::LoginDialog *ui;
     QByteArray responseHash;
     int errorCount = 0;
-
+    void generateResponse();
+    void tryResponse();
 };
 
 #endif // LOGINDIALOG_H

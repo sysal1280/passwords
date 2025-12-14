@@ -20,31 +20,25 @@ public:
     QByteArray toJson() const;
     void setKeys(const QList<KeyEntry> &keys);
     QStringList getAllKeys() const;
-    QStringList getCheckedKeys() const; // optional if you want only checked
+    QStringList getCheckedKeys() const;
     QString URL;
     QString Description;
     QString AppName;
     QString PublicAppName;
 
     void openPassword();
-
     void openCredentials(QString username, QString password, QString secretOptCode, int length);
-
     void openNote(QString note);
 
 private slots:
-    void on_buttonBox_accepted();
     void onNotesContextMenu(const QPoint &pos);
     void onCredentialsContextMenu(const QPoint &pos);
     void validateForm();
 
-    void on_lineEditPublicAppName_editingFinished();
-
-    void on_pushButtonGenerate_clicked();
-
 private:
     Ui::NewPasswordDialog *ui;
     QList<KeyEntry> m_keys;
+    void suggestFields();
 };
 
 #endif // NEWPASSWORDDIALOG_H

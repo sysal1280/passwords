@@ -63,6 +63,45 @@ NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     connect(ui->listWidget, &QListWidget::itemChanged,
             this, &NewPasswordDialog::validateForm);
 
+    connect(ui->lineEditPublicAppName, &QLineEdit::editingFinished,
+            this, &NewPasswordDialog::suggestFields);
+
+    connect(ui->pushButtonGenerate, &QPushButton::clicked,
+            this, [this]() {
+                QStringList wordList = passwordGenerator::loadWordList(Settings::getWordListFile());
+                PasswordDialog::showPasswordGenerator(this, tr("Generate Password"), wordList);
+            });
+
+
+    // In your NewPasswordDialog constructor or setup code
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, [this]() {
+        // Check that at least one item in listWidget is checked
+        bool anyChecked = false;
+        for (int i = 0; i < ui->listWidget->count(); ++i) {
+            QListWidgetItem *item = ui->listWidget->item(i);
+            if (item->checkState() == Qt::Checked) {
+                anyChecked = true;
+                break;
+            }
+        }
+
+        if (!anyChecked) {
+            QMessageBox::warning(this,
+                                 tr("Missing selection"),
+                                 tr("Please check at least one key before continuing."));
+            // prevent dialog from accepting
+            return; // don't call accept()
+        }
+
+        // If we get here, at least one item is checked
+        this->Description    = ui->lineEditDescription->text().trimmed();
+        this->URL            = ui->lineEditURL->text().trimmed();
+        this->AppName        = ui->lineEditAppName->text().trimmed();
+        this->PublicAppName  = ui->lineEditPublicAppName->text().trimmed();
+
+        accept(); // explicitly accept the dialog
+    });
+
 
 }
 
@@ -295,36 +334,6 @@ QStringList NewPasswordDialog::getCheckedKeys() const
     return keys;
 }
 
-
-
-void NewPasswordDialog::on_buttonBox_accepted()
-{
-    // Check that at least one item in listWidget is checked
-    bool anyChecked = false;
-    for (int i = 0; i < ui->listWidget->count(); ++i) {
-        QListWidgetItem *item = ui->listWidget->item(i);
-        if (item->checkState() == Qt::Checked) {
-            anyChecked = true;
-            break;
-        }
-    }
-
-    if (!anyChecked) {
-        QMessageBox::warning(this,
-                             tr("Missing selection"),
-                             tr("Please check at least one key before continuing."));
-        // prevent dialog from accepting
-        return;
-    }
-
-    // If we get here, at least one item is checked
-    this->Description = ui->lineEditDescription->text().trimmed();
-    this->URL = ui->lineEditURL->text().trimmed();
-    this->AppName = ui->lineEditAppName->text().trimmed();
-    this->PublicAppName = ui->lineEditPublicAppName->text().trimmed();
-    accept(); // explicitly accept the dialog
-}
-
 void NewPasswordDialog::validateForm()
 {
     // Condition 1: App name must not be empty
@@ -359,7 +368,7 @@ void NewPasswordDialog::validateForm()
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
 }
 
-void NewPasswordDialog::on_lineEditPublicAppName_editingFinished()
+void NewPasswordDialog::suggestFields()
 {
     const QString publicName = ui->lineEditPublicAppName->text().trimmed();
     if (publicName.isEmpty())
@@ -370,12 +379,5 @@ void NewPasswordDialog::on_lineEditPublicAppName_editingFinished()
 
     if (ui->lineEditDescription->text().trimmed().isEmpty())
         ui->lineEditDescription->setText(publicName);
-}
-
-
-void NewPasswordDialog::on_pushButtonGenerate_clicked()
-{
-    QStringList wordList = passwordGenerator::loadWordList(Settings::getWordListFile());
-    PasswordDialog::showPasswordGenerator(this, tr("Generate Password"), wordList);
 }
 
