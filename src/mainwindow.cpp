@@ -1498,18 +1498,13 @@ void MainWindow::populateFromJson(const QByteArray &jsonData, Ui::MainWindow *ui
         usernameEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
         usernameEdit->setReadOnly(true);
 
-        // Create the action
         QAction *copyUsernameAction = new QAction(tr("Copy Username"), usernameEdit);
         copyUsernameAction->setStatusTip("Username ony remains in clipboard for 15 seconds");
-        // Add it to the line edit’s context menu
         usernameEdit->addAction(copyUsernameAction);
 
-        // Connect it to a slot or lambda
         connect(copyUsernameAction, &QAction::triggered, this, [usernameEdit]() {
             QClipboard *clipboard = QGuiApplication::clipboard();
             clipboard->setText(usernameEdit->text());
-
-            // Clear clipboard after 15 seconds
             QTimer::singleShot(15000, qApp, [clipboard]() {
                 clipboard->clear();
                 clipboard->setText("");
@@ -1533,28 +1528,21 @@ void MainWindow::populateFromJson(const QByteArray &jsonData, Ui::MainWindow *ui
             passwordEdit->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
         });
 
-
-        // Create the action
         QAction *copyPasswordAction = new QAction(tr("Copy Password"), passwordEdit);
         copyPasswordAction->setStatusTip("Password ony remains in clipboard for 15 seconds");
-        // Add it to the line edit’s context menu
         passwordEdit->addAction(copyPasswordAction);
 
-        // Connect it to a slot or lambda
         connect(copyPasswordAction, &QAction::triggered, this, [passwordEdit]() {
             QClipboard *clipboard = QGuiApplication::clipboard();
             clipboard->setText(passwordEdit->text());
-
-            // Clear clipboard after 15 seconds
             QTimer::singleShot(15000, qApp, [clipboard]() {
                 clipboard->clear();
                 clipboard->setText("");
                 qDebug() << "clipboard cleared";
             });
-
         });
 
-        // OTP Code (optional)       
+        // OTP Code (optional)
         QLabel* otpLabel = new QLabel("OTP Code");
         QLineEdit* otpEdit = new QLineEdit();
         otpEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -1571,16 +1559,19 @@ void MainWindow::populateFromJson(const QByteArray &jsonData, Ui::MainWindow *ui
         });
         otpEdit->addAction(copyOTPAction);
 
-        // Add to grid: 6 widgets per row
-        gridLayout->addWidget(usernameLabel, row, 0);
-        gridLayout->addWidget(usernameEdit,  row, 1);
-        gridLayout->addWidget(passwordLabel, row, 2);
-        gridLayout->addWidget(passwordEdit,  row, 3);
-        gridLayout->addWidget(otpLabel,      row, 4);
-        gridLayout->addWidget(otpEdit,       row, 5);
+        // Add to grid: labels in one row, edits in the next row
+        gridLayout->addWidget(usernameLabel, row,     0);
+        gridLayout->addWidget(passwordLabel, row,     1);
+        gridLayout->addWidget(otpLabel,      row,     2);
 
-        ++row;
+        gridLayout->addWidget(usernameEdit,  row + 1, 0);
+        gridLayout->addWidget(passwordEdit,  row + 1, 1);
+        gridLayout->addWidget(otpEdit,       row + 1, 2);
+
+        // Advance row counter by 2
+        row += 2;
     }
+
 
 
     // --- Notes section ---
