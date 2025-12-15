@@ -171,3 +171,27 @@ bool isStrong(const QString &str)
 
     return false;
 }
+
+bool hasUltimateTrust(const QString &keyId)
+{
+    QProcess gpg;
+    gpg.start("gpg", {"--list-keys", "--with-colons", keyId});
+    if (!gpg.waitForFinished(5000))
+        return false;
+
+    if (gpg.exitStatus() != QProcess::NormalExit || gpg.exitCode() != 0)
+        return false;
+
+    const QString output = gpg.readAllStandardOutput();
+    const QStringList lines = output.split('\n');
+    for (const QString &line : lines) {
+        if (line.startsWith("pub:")) {
+            const QStringList fields = line.split(':');
+            if (fields.size() > 1 && fields.at(1) == "u")
+                return true;
+        }
+    }
+    return false;
+}
+
+

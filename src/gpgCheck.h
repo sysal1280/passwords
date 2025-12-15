@@ -6,6 +6,8 @@
 void checkGpgKeys(QWidget* parent = nullptr);
 bool isToolAvailable(const QString &toolName);
 bool isStrong(const QString &str);
+bool hasUltimateTrust(const QString &keyId);
+
 static QStringList checkKeysWithGpg(const QStringList &keys);
 
 #endif // GPGCHECK_H

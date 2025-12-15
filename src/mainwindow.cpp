@@ -152,7 +152,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionClose->setMenuRole(QAction::QuitRole);
     ui->actionPreferences->setMenuRole(QAction::PreferencesRole);
 
-
     // OTP countdown widgets (progress bar + label)
     countdownProgress = new QProgressBar(this);
     countdownProgress->setRange(0, 30);
@@ -2246,6 +2245,26 @@ void MainWindow::on_actionKey_List_triggered()
             QMessageBox::warning(this,
                                  ui->actionKey_List->text(),
                                  tr("This key ID or label is already in the list."));
+            return;
+        }
+
+
+        if (!hasUltimateTrust(keyId)) {
+            QMessageBox msgBox(this);
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.setWindowTitle("Key");
+            msgBox.setText("The key does not have ultimate trust.\nUntrusted keys cannot encrypt passwords.");
+
+            // Add standard OK button
+            msgBox.setStandardButtons(QMessageBox::Ok);
+
+            // Add a custom Help button
+            QPushButton *helpButton = msgBox.addButton(QMessageBox::Help);
+            QObject::connect(helpButton, &QPushButton::clicked, this, [this]() {
+                launchHelperProcess("ultimate-trust");
+            });
+
+            msgBox.exec();
             return;
         }
 
