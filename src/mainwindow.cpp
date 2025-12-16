@@ -184,6 +184,13 @@ MainWindow::MainWindow(QWidget *parent)
                 }
             });
 
+    connect(ui->actionEdit_Password, &QAction::triggered,
+            this, [this]() {
+                if (auto item = ui->treeWidget_2->currentItem()) {
+                    editPassword(item);
+                }
+            });
+
     // Line edit search
     connect(ui->lineEdit, &QLineEdit::returnPressed,
             this, [this]() {
@@ -3910,9 +3917,9 @@ QString MainWindow::buildCategoryPath(int categoryId, const QString &appKey, QSq
     return parts.join(Settings::getPathSeparator());
 }
 
-void MainWindow::on_actionEdit_Password_triggered()
+void MainWindow::editPassword(QTreeWidgetItem *item)
 {
-    QTreeWidgetItem *item = ui->treeWidget_2->currentItem();
+    //QTreeWidgetItem *item = ui->treeWidget_2->currentItem();
     if (!item) return;
 
     if (Settings::getKillGpgAgent()) {

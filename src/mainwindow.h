@@ -81,7 +81,6 @@ private slots:
 
     void on_actionDelete_Password_triggered();
     void on_actionDelete_Category_triggered();
-    void on_actionEdit_Password_triggered();
     void on_actionExport_Password_triggered();
     void on_actionAdd_Search_triggered();
 
@@ -140,6 +139,7 @@ private:
     QString formatOtp(const QString& otp);
 
     void openPassword(QTreeWidgetItem *item);
+    void editPassword(QTreeWidgetItem *item);
 
     void showPasswordsContextMenu(const QPoint &pos);
 
