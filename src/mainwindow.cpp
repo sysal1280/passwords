@@ -1979,7 +1979,9 @@ void MainWindow::on_treeWidget_2_customContextMenuRequested(const QPoint &pos)
 
             bool isBookmarked = (query.exec() && query.next());
             ui->actionBookmark->setCheckable(true);
+            ui->actionBookmark->blockSignals(true);
             ui->actionBookmark->setChecked(isBookmarked);
+             ui->actionBookmark->blockSignals(false);
         }
         db.close();
 
@@ -3616,7 +3618,7 @@ void MainWindow::setBookmark(bool checked)
         }
 
         if (!query.exec()) {
-            QMessageBox::critical(this, "Bookmark", query.lastError().databaseText());
+            QMessageBox::critical(this, ui->actionBookmark->text(), query.lastError().databaseText());
         }
 
         //this->populateBookmarksMenu();
