@@ -85,11 +85,6 @@ private slots:
     void on_actionExport_Password_triggered();
     void on_actionAdd_Search_triggered();
 
-    // Tree widget handlers
-
-    void on_treeWidget_2_itemActivated(QTreeWidgetItem *item, int column);
-    void on_treeWidget_2_customContextMenuRequested(const QPoint &pos);
-
     // Other slots
     void loadCategories();
     void clearScrollArea();
@@ -149,6 +144,10 @@ private:
     void setBookmark(bool checked);
 
     QString formatOtp(const QString& otp);
+
+    void openPassword(QTreeWidgetItem *item);
+
+    void showPasswordsContextMenu(const QPoint &pos);
 
     // Members
     static const QMap<QString, QString> headerMap;

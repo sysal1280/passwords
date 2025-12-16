@@ -180,7 +180,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionOpen_Password, &QAction::triggered,
             this, [this]() {
                 if (auto item = ui->treeWidget_2->currentItem()) {
-                    on_treeWidget_2_itemActivated(item, 0);
+                    openPassword(item);
                 }
             });
 
@@ -223,6 +223,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionClose, &QAction::triggered,
             this, &MainWindow::close);
 
+    connect(ui->treeWidget_2,
+            &QTreeWidget::customContextMenuRequested,
+            this,
+            &MainWindow::showPasswordsContextMenu);
+
 
     connect(ui->treeWidget,
             &QTreeWidget::itemActivated,
@@ -262,6 +267,12 @@ MainWindow::MainWindow(QWidget *parent)
                 pd->setWindowFlags(pd->windowFlags() & ~Qt::WindowMaximizeButtonHint);
                 pd->exec();
             });
+
+    connect(ui->treeWidget_2,
+            &QTreeWidget::itemActivated,
+            this,
+            [this](QTreeWidgetItem *item, int){ openPassword(item); });
+
 
     connect(ui->actionRecent, &QAction::triggered,
             this, &MainWindow::searchRecent);
@@ -954,7 +965,7 @@ void MainWindow::on_actionNew_Password_triggered()
 
 QList<KeyEntry> MainWindow::fetchKeys() const
 {
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QList<KeyEntry> keys;
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE",connName);
@@ -1012,7 +1023,7 @@ void MainWindow::on_actionNew_Category_triggered()
     }
 
     // DB connection
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
     db.setDatabaseName(qApp->property("dbFile").toString());
 
@@ -1054,7 +1065,7 @@ void MainWindow::on_actionNew_Category_triggered()
 }
 
 void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     clearScrollArea();
 
     qDebug() << item->data(0,Qt::UserRole).toInt() << "userrole id";
@@ -1109,7 +1120,7 @@ void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
 
 
 // void MainWindow::on_treeWidget_itemActivated(QTreeWidgetItem *item, int column) {
-//     QString connName = QUuid::createUuid().toString();
+//     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 //     clearScrollArea();
 
 //     qDebug() << item->data(0,Qt::UserRole).toInt() << "userrole id";
@@ -1221,16 +1232,13 @@ void MainWindow::clearScrollArea()
 
     connect(imageLabel, &DropLabel::itemDropped,
             this, [this](QTreeWidgetItem *item){
-                on_treeWidget_2_itemActivated(item, 0); // supply a column yourself
+                openPassword(item); // supply a column yourself
             });
 
     openedCredentialID = -1;
 }
 
-
-
-
-void MainWindow::on_treeWidget_2_itemActivated(QTreeWidgetItem *item, int column)
+void MainWindow::openPassword(QTreeWidgetItem *item)
 {
     int parentId = item->data(0, Qt::UserRole).toInt();
 
@@ -1372,8 +1380,6 @@ void MainWindow::on_treeWidget_2_itemActivated(QTreeWidgetItem *item, int column
 
     gpg->start("gpg", QStringList() << "--decrypt");
 }
-
-
 
 void MainWindow::parseJson(const QByteArray &jsonData)
 {
@@ -1931,63 +1937,79 @@ void MainWindow::on_actionShow_Password_toggled(bool arg1)
     edit->setEchoMode(arg1 ? QLineEdit::Normal : QLineEdit::Password);
 }
 
-void MainWindow::on_treeWidget_2_customContextMenuRequested(const QPoint &pos)
+void MainWindow::showPasswordsContextMenu(const QPoint &pos)
 {
-    auto selected = ui->treeWidget_2->selectedItems();
-    if (selected.isEmpty()) return;
+    // 1. Selection check
+    const auto selectedItems = ui->treeWidget_2->selectedItems();
+    if (selectedItems.isEmpty())
+        return;
 
-    QPoint globalPos = ui->treeWidget_2->viewport()->mapToGlobal(pos);
+    QTreeWidgetItem *item = selectedItems.first();
+    const int selectedId = item->data(0, Qt::UserRole).toInt();
+
+    // 2. Prepare menu
     QMenu menu;
+    const QPoint globalPos = ui->treeWidget_2->viewport()->mapToGlobal(pos);
 
-    int selectedId = selected.first()->data(0,Qt::UserRole).toInt();
-    qDebug() << openedCredentialID << selectedId;
-
+    // 2a. Open / Close Password action
     if (openedCredentialID == selectedId) {
-        QAction *actionCloseCredential = new QAction("Close Password", &menu);
-        actionCloseCredential->setIcon(QPixmap(":/menus/glyphs/lock_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
-        menu.addAction(actionCloseCredential);
+        auto *actionCloseCredential = new QAction(tr("Close Password"), &menu);
+        actionCloseCredential->setIcon(
+            QIcon(":/menus/glyphs/lock_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
         connect(actionCloseCredential, &QAction::triggered,
                 this, &MainWindow::clearScrollArea);
+
+        menu.addAction(actionCloseCredential);
         menu.setDefaultAction(actionCloseCredential);
     } else {
         menu.addAction(ui->actionOpen_Password);
         menu.setDefaultAction(ui->actionOpen_Password);
     }
 
+    // 2b. Core actions
     menu.addAction(ui->actionEdit_Password);
     menu.addAction(ui->actionExport_Password);
     menu.addAction(ui->actionAdd_Search);
     menu.addAction(ui->actionDelete_Password);
-     menu.addSeparator();
-    menu.addAction(ui->actionBookmark);
     menu.addSeparator();
-    menu.addAction(ui->actionAudit_Log);
 
-    // --- Bookmark check ---
-    QString connName = QUuid::createUuid().toString();
-    {
-
+    // 3. Bookmark state (DB lookup + action setup)
+        QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+        {
         db.setDatabaseName(qApp->property("dbFile").toString());
+
+        bool isBookmarked = false;
+
         if (db.open()) {
             QSqlQuery query(db);
-            query.prepare("SELECT 1 FROM favourite WHERE username = :username AND application_id = :id");
-            query.bindValue(":username", this->userName);
-            query.bindValue(":id", selectedId);
+            query.setForwardOnly(true);
+            query.prepare(QStringLiteral(
+                "SELECT 1 FROM favourite "
+                "WHERE username = :username AND application_id = :id"));
+            query.bindValue(QStringLiteral(":username"), this->userName);
+            query.bindValue(QStringLiteral(":id"), selectedId);
 
-            bool isBookmarked = (query.exec() && query.next());
-            ui->actionBookmark->setCheckable(true);
-            ui->actionBookmark->blockSignals(true);
-            ui->actionBookmark->setChecked(isBookmarked);
-             ui->actionBookmark->blockSignals(false);
+            isBookmarked = (query.exec() && query.next());
+            db.close();
+        } else {
+            db.close();
         }
-        db.close();
 
+        ui->actionBookmark->setCheckable(true);
+        ui->actionBookmark->blockSignals(true);
+        ui->actionBookmark->setChecked(isBookmarked);
+        ui->actionBookmark->blockSignals(false);
     }
     QSqlDatabase::removeDatabase(connName);
 
-    // ----------------------
+    menu.addAction(ui->actionBookmark);
+    menu.addSeparator();
 
+    // 4. Audit log
+    menu.addAction(ui->actionAudit_Log);
+
+    // 5. Show menu
     menu.exec(globalPos);
 }
 
@@ -2392,7 +2414,7 @@ void MainWindow::on_actionAudit_Log_triggered()
 
     // Populate from DB
     int appId = ui->treeWidget_2->currentItem()->data(0, Qt::UserRole).toInt();
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
     db.setDatabaseName(qApp->property("dbFile").toString());
     if (!db.open()) {
@@ -3104,7 +3126,7 @@ void MainWindow::init()
 
 void MainWindow::search(const QString &text)
 {
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QList<SearchResult> results;
 
     {
@@ -3298,7 +3320,7 @@ QString MainWindow::buildItemPath(QTreeWidgetItem *item) const
 
 void MainWindow::populateBookmarksMenu()
 {
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
@@ -3373,6 +3395,12 @@ void MainWindow::populateBookmarksMenu()
             // Clicking runs your search by ID
             connect(action, &QAction::triggered, this, [this, appId]() {
                 this->search(appId);
+
+                const auto items = ui->treeWidget_2->selectedItems();
+                if (items.isEmpty())
+                    return;  // nothing selected, nothing to open
+
+                openPassword(items.first());
             });
 
             ui->menuBookmarks->addAction(action);
@@ -3383,19 +3411,13 @@ void MainWindow::populateBookmarksMenu()
     QSqlDatabase::removeDatabase(connName);
 }
 
-
-
 // Helper: recursively search all children for a categoryId
 QTreeWidgetItem* MainWindow::findCategoryItemRecursive(QTreeWidgetItem *item, int categoryId)
 {
     if (!item) return nullptr;
 
     int idFromName = item->data(0,Qt::UserRole).toInt();
-    qDebug() << "Checking item text(0):" << item->text(0)
-             << "mapped id:" << idFromName;
-
     if (idFromName == categoryId) {
-        qDebug() << "Match found!";
         return item;
     }
 
@@ -3411,7 +3433,7 @@ QTreeWidgetItem* MainWindow::findCategoryItemRecursive(QTreeWidgetItem *item, in
 void MainWindow::search(int appId)
 {
     // 1. Query DB for categoryId
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     int categoryId = -1;
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
@@ -3493,7 +3515,7 @@ void MainWindow::initDb()
     /*
      * One time DB tasks and their initilizations goes here.
      */
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
@@ -3592,7 +3614,7 @@ void MainWindow::setBookmark(bool checked)
     }
 
     int id = selected.first()->data(0,Qt::UserRole).toInt();
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
@@ -3665,7 +3687,7 @@ void MainWindow::on_actionDelete_Password_triggered()
     // Show dialog and check result
     if (dialog.exec() == QDialog::Accepted) {
         // Perform the deletion here
-        QString connName = QUuid::createUuid().toString();
+        QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
         {
             QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
             db.setDatabaseName(qApp->property("dbFile").toString());
@@ -3702,7 +3724,7 @@ void MainWindow::on_actionDelete_Password_triggered()
 
 void MainWindow::on_actionDelete_Category_triggered()
 {
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
@@ -3749,7 +3771,7 @@ void MainWindow::on_actionDelete_Category_triggered()
 
 void MainWindow::searchPopular()
 {
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QList<SearchResult> results;
 
     {
@@ -3864,7 +3886,7 @@ void MainWindow::searchPopular()
 
 void MainWindow::searchRecent()
 {
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QList<SearchResult> results;
 
     {
@@ -4037,7 +4059,7 @@ void MainWindow::on_actionEdit_Password_triggered()
         killGpgAgent();
     }
 
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QByteArray data;
 
     // --- Step 1: Retrieve encrypted data from DB ---
@@ -4320,7 +4342,7 @@ void MainWindow::on_actionExport_Password_triggered()
         killGpgAgent();
     }
 
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QByteArray data;
 
     // --- Step 1: Retrieve encrypted data from DB ---
@@ -4459,7 +4481,7 @@ void MainWindow::moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targ
     }
 
     // --- Step 1: Update DB ---
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
@@ -4591,7 +4613,7 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
     }
 
     // 5) DB connection + transaction (best-effort)
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
@@ -4915,7 +4937,7 @@ void MainWindow::createCategory(const QString& categoryName /* = QString() */)
     //
     // 5. Insert into DB
     //
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
@@ -5008,7 +5030,7 @@ void MainWindow::renameCategory()
     }
 
     // DB connection
-    QString connName = QUuid::createUuid().toString();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
@@ -5093,7 +5115,7 @@ void MainWindow::on_actionAdd_Search_triggered()
     connect(okBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
 
     if (dlg.exec() == QDialog::Accepted) {
-        QString connName = QUuid::createUuid().toString();
+        QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (!db.open()) {
@@ -5215,36 +5237,40 @@ void MainWindow::launchHelperProcess(const QString &page)
 
 QString MainWindow::formatOtp(const QString& otp)
 {
-    int len = otp.length();
-    QString formatted;
-
+    const int len = otp.length();
     if (len == 0)
-        return formatted;
+        return QString();
 
-    int firstGroupSize;
+    QString formatted;
+    formatted.reserve(len + len / 3); // small extra space for dashes
+
+    QStringView view{otp};
+
+    int firstGroupSize = 0;
 
     if (len % 2 == 0) {
         // Even length: split into two equal halves
         firstGroupSize = len / 2;      // e.g. 6 -> 3, 8 -> 4
     } else {
         // Odd length: make first group the remainder when divided by 3
-        int rem = len % 3;             // 1 or 2, or 0
+        const int rem = len % 3;       // 1 or 2, or 0
         firstGroupSize = (rem == 0) ? 3 : rem;
     }
 
     // Add first group
-    formatted = otp.left(firstGroupSize);
-
-    int index = firstGroupSize;
+    formatted = view.left(firstGroupSize).toString();
 
     // Add remaining groups of 3 with '-' separators
+    int index = firstGroupSize;
     while (index < len) {
-        formatted += "-";
-        int chunkSize = qMin(3, len - index);
-        formatted += otp.mid(index, chunkSize);
+        formatted += '-';
+        const int chunkSize = qMin(3, len - index);
+
+        // Use QStringView::mid here – no QString::mid(), no clazy warning
+        formatted += view.mid(index, chunkSize);
+
         index += chunkSize;
     }
 
     return formatted;
 }
-
