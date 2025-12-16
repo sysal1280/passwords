@@ -1411,7 +1411,11 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 
     QString labelText;
     if (!name.isEmpty() && !description.isEmpty()) {
-        labelText = name + ", " + description;
+        if (name == description) {
+            labelText = name;  // avoid duplicate
+        } else {
+            labelText = name + ", " + description;
+        }
     } else if (!name.isEmpty()) {
         labelText = name;
     } else if (!description.isEmpty()) {
@@ -3585,12 +3589,12 @@ void MainWindow::on_actionDelete_Category_triggered()
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (!db.open()) {
-            QMessageBox::critical(this, "Database Error", db.lastError().text());
+            QMessageBox::critical(this, ui->actionDelete_Category->text(), db.lastError().text());
             return;
         }
 
         if (!Settings::verifyDeleteAllowed(db, this)) {
-            QMessageBox::warning(this, tr("Error"), tr("Delete not permitted."));
+            QMessageBox::warning(this, ui->actionDelete_Category->text(), tr("Delete not permitted."));
             return; // bail out early
         }
 
@@ -3609,11 +3613,11 @@ void MainWindow::on_actionDelete_Category_triggered()
             if (err.nativeErrorCode() == "1811" ||
                 err.databaseText().contains("FOREIGN KEY constraint failed")) {
                 QMessageBox::warning(this,
-                                     "",
-                                     "This category cannot be deleted because items are still assigned to it.");
+                                     ui->actionDelete_Category->text(),
+                                     tr("This category cannot be deleted because items are still assigned to it."));
             } else {
                 QMessageBox::critical(this,
-                                      "",
+                                      ui->actionDelete_Category->text(),
                                       err.text());
             }
         } else {
@@ -3634,7 +3638,7 @@ void MainWindow::searchPopular()
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (!db.open()) {
-            QMessageBox::critical(this, "", db.lastError().text());
+            QMessageBox::critical(this, ui->actionPopular->text(), db.lastError().text());
             return;
         }
 
@@ -3653,7 +3657,7 @@ void MainWindow::searchPopular()
 
         QSqlQuery query(db);
         if (!query.exec(sql)) {
-            qDebug() << "Popular query failed:" << query.lastError().text();
+            qCritical() << "Popular query failed:" << query.lastError().text();
             return;
         }
 
@@ -3749,7 +3753,7 @@ void MainWindow::searchRecent()
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (!db.open()) {
-            QMessageBox::critical(this, "", db.lastError().text());
+            QMessageBox::critical(this, ui->actionRecent->text(), db.lastError().text());
             return;
         }
 
@@ -3919,7 +3923,7 @@ void MainWindow::on_actionEdit_Password_triggered()
     QByteArray data;
 
     // --- Step 1: Retrieve encrypted data from DB ---
-    ui->statusbar->showMessage("Reading database..");
+    ui->statusbar->showMessage(tr("Reading database.."));
     QApplication::processEvents();
 
     {
@@ -3945,7 +3949,7 @@ void MainWindow::on_actionEdit_Password_triggered()
     ui->statusbar->clearMessage();
 
     // --- Step 2: Decrypt asynchronously ---
-    ui->statusbar->showMessage("Decrypting data..");
+    ui->statusbar->showMessage(tr("Decrypting data.."));
     QApplication::processEvents();
 
     QProcess *gpg = new QProcess(this);
@@ -4152,7 +4156,7 @@ void MainWindow::on_actionEdit_Password_triggered()
     connect(gpg, &QProcess::readyReadStandardError, this, [this, gpg]() {
         QByteArray errors = gpg->readAllStandardError();
         if (!errors.isEmpty()) {
-            ui->statusbar->showMessage(QString::fromUtf8(errors));
+            ui->statusbar->showMessage(QString::fromUtf8(errors),10000);
             qDebug().noquote() << "GPG stderr:" << errors;
         }
     });
@@ -4202,7 +4206,7 @@ void MainWindow::on_actionExport_Password_triggered()
     QByteArray data;
 
     // --- Step 1: Retrieve encrypted data from DB ---
-    ui->statusbar->showMessage("Reading database..");
+    ui->statusbar->showMessage(tr("Reading database.."));
     QApplication::processEvents();
 
     {
@@ -4228,7 +4232,7 @@ void MainWindow::on_actionExport_Password_triggered()
     ui->statusbar->clearMessage();
 
     // --- Step 2: Decrypt asynchronously ---
-    ui->statusbar->showMessage("Decrypting data..");
+    ui->statusbar->showMessage(tr("Decrypting data.."));
     QApplication::processEvents();
 
     QProcess *gpg = new QProcess(this);
@@ -4264,11 +4268,11 @@ void MainWindow::on_actionExport_Password_triggered()
                 if (outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
                     outFile.write(decrypted_data);
                     outFile.close();
-                    QMessageBox::information(this, "Export Complete",
-                                             "Decrypted JSON saved to:\n" + fileName);
+                    QMessageBox::information(this, ui->actionExport_Password->text(),
+                                             tr("Decrypted JSON saved to:\n") + fileName);
                 } else {
-                    QMessageBox::critical(this, "Error",
-                                          "Could not open file for writing:\n" + fileName);
+                    QMessageBox::critical(this, ui->actionExport_Password->text(),
+                                          tr("Could not open file for writing:\n") + fileName);
                 }
             }
 
@@ -5077,8 +5081,8 @@ void MainWindow::launchHelperProcess(const QString &page)
                 [this, exePath](QProcess::ProcessError error){
                     if (helperProcess->state() == QProcess::Starting &&
                         error == QProcess::FailedToStart) {
-                        QMessageBox::warning(nullptr, tr("Error"),
-                                             QString("Failed to start: %1").arg(exePath));
+                        QMessageBox::warning(nullptr, tr("Help"),
+                                             QString(tr("Failed to start: %1")).arg(exePath));
                     }
                 });
 
