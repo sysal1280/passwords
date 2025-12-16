@@ -1363,10 +1363,7 @@ void MainWindow::on_treeWidget_2_itemActivated(QTreeWidgetItem *item, int column
                     }
                     QSqlDatabase::removeDatabase(connName);
 
-                } else {
-                    openedCredentialID = -1;
                 }
-
                 gpg->deleteLater();
                 QApplication::restoreOverrideCursor();
                 QApplication::processEvents();
@@ -4284,9 +4281,7 @@ void MainWindow::on_actionEdit_Password_triggered()
     // Handle completion
     connect(gpg, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this, [this, gpg, item](int exitCode, QProcess::ExitStatus status) {
-                if (status != QProcess::NormalExit || exitCode != 0) {
-                    openedCredentialID = -1;
-                } else {
+                if (status == QProcess::NormalExit && exitCode == 0) {
                     openedCredentialID = item->text(1).toInt();
                 }
                 gpg->deleteLater();
@@ -4416,9 +4411,7 @@ void MainWindow::on_actionExport_Password_triggered()
     // Handle completion
     connect(gpg, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this, [this, gpg, item](int exitCode, QProcess::ExitStatus status) {
-                if (status != QProcess::NormalExit || exitCode != 0) {
-                    openedCredentialID = -1;
-                } else {
+                if (status == QProcess::NormalExit && exitCode == 0) {
                     openedCredentialID = item->text(1).toInt();
                 }
                 gpg->deleteLater();
