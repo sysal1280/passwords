@@ -5,6 +5,7 @@
 #include "passwordDialog.h"
 #include "settings.h"
 #include "gpgCheck.h"
+#include "categorydialog.h"
 #include "preferencesdialog.h"
 #include "DataObfuscator.h"
 #include "SystemInfoDialog.h"
@@ -4849,18 +4850,33 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
 void MainWindow::createCategory(const QString& categoryName /* = QString() */)
 {
     QString text = categoryName.trimmed();
+    bool forceTopLevel = false;
 
-    // Prompt if no name provided
+    //
+    // 1. Show dialog if no name was passed in
+    //
     if (text.isEmpty()) {
-        text = QInputDialog::getText(this, tr("Category"), tr("Create a new category:")).trimmed();
-        if (text.isEmpty()) {
-            return;
+        int existingCount = 0;
+        if (ui->treeWidget->topLevelItemCount() > 0 &&
+            ui->treeWidget->currentItem() != nullptr)
+        {
+            existingCount = ui->treeWidget->topLevelItemCount();
         }
+        CategoryDialog dlg(this,existingCount);
+        if (dlg.exec() != QDialog::Accepted)
+            return;
+
+        text = dlg.categoryName();
+        if (text.isEmpty())
+            return;
+
+        forceTopLevel = dlg.isTopLevel();
     }
 
-    // Validate name
+    //
+    // 2. Validate name
+    //
     static const QRegularExpression re("^[\\w\\-\\s]{1,64}$");
-
     if (!re.match(text).hasMatch()) {
         QMessageBox::warning(this,
                              tr("Invalid Name"),
@@ -4868,15 +4884,26 @@ void MainWindow::createCategory(const QString& categoryName /* = QString() */)
         return;
     }
 
-    // Determine parent item and id
-    QTreeWidgetItem* parentItem = ui->treeWidget->currentItem();
-    QVariant parentId = QVariant(QMetaType(QMetaType::Int)); // NULL by default
-    if (parentItem) {
-        parentId = parentItem->data(0, Qt::UserRole); // parent’s DB id
+    //
+    // 3. Determine parent item and parent_id
+    //
+    QTreeWidgetItem* parentItem = nullptr;
+    QVariant parentId;   // NULL by default → top-level
+
+    if (!forceTopLevel) {
+        parentItem = ui->treeWidget->currentItem();
+        if (parentItem) {
+            parentId = parentItem->data(0, Qt::UserRole);
+        }
     }
 
-    // Duplicate check in UI
-    QTreeWidgetItem* scope = parentItem ? parentItem : ui->treeWidget->invisibleRootItem();
+    //
+    // 4. Duplicate check among siblings
+    //
+    QTreeWidgetItem* scope = parentItem
+                                 ? parentItem
+                                 : ui->treeWidget->invisibleRootItem();
+
     for (int i = 0; i < scope->childCount(); ++i) {
         if (scope->child(i)->text(0) == text) {
             QMessageBox::warning(this, tr("Duplicate"),
@@ -4885,50 +4912,54 @@ void MainWindow::createCategory(const QString& categoryName /* = QString() */)
         }
     }
 
-    // DB connection
+    //
+    // 5. Insert into DB
+    //
     QString connName = QUuid::createUuid().toString();
     {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
-    db.setDatabaseName(qApp->property("dbFile").toString());
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+        db.setDatabaseName(qApp->property("dbFile").toString());
 
-    if (!db.open()) {
-        QMessageBox::critical(this, tr("Database Error"),
-                              tr("Failed to open database:\n%1").arg(db.lastError().text()));
-        QSqlDatabase::removeDatabase(connName);
-        return;
-    }
+        if (!db.open()) {
+            QMessageBox::critical(this, tr("Database Error"),
+                                  tr("Failed to open database:\n%1").arg(db.lastError().text()));
+            QSqlDatabase::removeDatabase(connName);
+            return;
+        }
 
-    // Insert into DB
-    QSqlQuery query(db);
-    query.prepare("INSERT INTO categories (parent_id, text) VALUES (:parent_id, :text)");
-    query.bindValue(":parent_id", parentId); // NULL if top-level
-    query.bindValue(":text", DataObfuscator::obfuscate(text, this->appKey));
+        QSqlQuery query(db);
+        query.prepare("INSERT INTO categories (parent_id, text) VALUES (:parent_id, :text)");
+        query.bindValue(":parent_id", parentId);  // NULL for top-level
+        query.bindValue(":text", DataObfuscator::obfuscate(text, this->appKey));
 
-    if (!query.exec()) {
-        QMessageBox::critical(this, tr("Database Error"),
-                              tr("Insert failed:\n%1").arg(query.lastError().text()));
+        if (!query.exec()) {
+            QMessageBox::critical(this, tr("Database Error"),
+                                  tr("Insert failed:\n%1").arg(query.lastError().text()));
+            db.close();
+            QSqlDatabase::removeDatabase(connName);
+            return;
+        }
+
+        int newId = query.lastInsertId().toInt();
+
+        //
+        // 6. Create tree item
+        //
+        QTreeWidgetItem* newItem = new QTreeWidgetItem();
+        newItem->setText(0, text);
+        newItem->setIcon(0, QIcon(":/menus/glyphs/folder_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+        newItem->setData(0, Qt::UserRole, newId);
+
+        if (parentItem) {
+            parentItem->addChild(newItem);
+            parentItem->setExpanded(true);
+        } else {
+            ui->treeWidget->addTopLevelItem(newItem);
+        }
+
         db.close();
-        QSqlDatabase::removeDatabase(connName);
-        return;
     }
 
-    int newId = query.lastInsertId().toInt();
-
-    // Create tree item with its OWN id
-    QTreeWidgetItem* newItem = new QTreeWidgetItem();
-    newItem->setText(0, text);
-    newItem->setIcon(0, QIcon(":/menus/glyphs/folder_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
-    newItem->setData(0, Qt::UserRole, newId);
-
-    if (parentItem) {
-        parentItem->addChild(newItem);
-        parentItem->setExpanded(true);
-    } else {
-        ui->treeWidget->addTopLevelItem(newItem);
-    }
-
-    db.close();
-    }
     QSqlDatabase::removeDatabase(connName);
 }
 
