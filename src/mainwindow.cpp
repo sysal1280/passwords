@@ -1414,7 +1414,7 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         if (name == description) {
             labelText = name;  // avoid duplicate
         } else {
-            labelText = name + ", " + description;
+            labelText = name + "\n" + description;
         }
     } else if (!name.isEmpty()) {
         labelText = name;
