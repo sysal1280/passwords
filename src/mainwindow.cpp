@@ -3060,7 +3060,7 @@ void MainWindow::search(const QString &text)
     QSqlDatabase::removeDatabase(connName);
 
     if (results.isEmpty()) {
-        QMessageBox::information(this, "Search", "No matches found.");
+        QMessageBox::information(this, tr("Search"), tr("No matches found."));
         ui->lineEdit->setFocus();
         ui->lineEdit->selectAll();
         return;
@@ -3317,7 +3317,7 @@ void MainWindow::search(int appId)
     QSqlDatabase::removeDatabase(connName);
 
     if (categoryId == -1) {
-        QMessageBox::information(this, "Search", "Application not found in database.");
+        QMessageBox::information(this, tr("Search"), tr("Password not found in database."));
         return;
     }
 
@@ -3342,7 +3342,7 @@ void MainWindow::search(int appId)
     }
 
     if (!categoryItem) {
-        QMessageBox::information(this, "Search", "Category not found in tree.");
+        QMessageBox::information(this, tr("Search"), tr("Category not found in tree."));
         return;
     }
 
@@ -3365,13 +3365,8 @@ void MainWindow::search(int appId)
         }
     }
 
-    QMessageBox::information(this, "Search", "Application not found in category.");
+    QMessageBox::information(this, tr("Search"), tr("Password not found in category."));
 }
-
-
-
-
-
 
 void MainWindow::initDb()
 {
@@ -3383,7 +3378,7 @@ void MainWindow::initDb()
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (!db.open()) {
-            QMessageBox::critical(this, "", db.lastError().text());
+            QMessageBox::critical(this, QApplication::applicationName(), db.lastError().text());
             return;
         }
 
@@ -3433,7 +3428,7 @@ void MainWindow::initDb()
         } else if (query.next()) {
             this->appKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
         } else {
-            qDebug() << tr("No app_key found in app_info table.");
+            qCritical() << "No app_key found in app_info table.";
         }
     }
     QSqlDatabase::removeDatabase(connName);
@@ -3472,7 +3467,7 @@ void MainWindow::setBookmark(bool checked)
 {
     auto selected = ui->treeWidget_2->selectedItems();
     if (selected.isEmpty()) {
-        QMessageBox::warning(this, "Bookmark", "No item selected.");
+        QMessageBox::warning(this, ui->actionBookmark->text(), tr("No item selected."));
         return;
     }
 
@@ -3503,8 +3498,6 @@ void MainWindow::setBookmark(bool checked)
         if (!query.exec()) {
             QMessageBox::critical(this, ui->actionBookmark->text(), query.lastError().databaseText());
         }
-
-        //this->populateBookmarksMenu();
     }
 
     QSqlDatabase::removeDatabase(connName);
@@ -3515,7 +3508,7 @@ void MainWindow::setBookmark(bool checked)
 void MainWindow::on_actionDelete_Password_triggered()
 {
     // The keyword the user must type to confirm
-    const QString confirmationKeyword = "DELETE";
+    const QString confirmationKeyword = tr("DELETE");
 
     // Build a dialog
     QDialog dialog(this);
@@ -3540,8 +3533,8 @@ void MainWindow::on_actionDelete_Password_triggered()
                              dialog.accept();
                          } else {
                              QMessageBox::warning(&dialog,
-                                                  "Incorrect Confirmation",
-                                                  "You must type \"" + confirmationKeyword + "\" exactly to proceed.");
+                                                  ui->actionDelete_Password->text(),
+                                                  tr("You must type \"") + confirmationKeyword + tr("\" exactly to proceed."));
                          }
                      });
 
