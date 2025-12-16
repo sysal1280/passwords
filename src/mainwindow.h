@@ -127,7 +127,6 @@ private:
     QTreeWidgetItem* makeItemFromCredit(QSqlQuery& query);
 
     // JSON population
-    void populateFromJson(const QByteArray &jsonData, Ui::MainWindow *ui);
     void populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui);
 
     void createCategory(const QString& categoryName = QString());

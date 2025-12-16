@@ -3068,6 +3068,10 @@ void MainWindow::search(const QString &text)
 
     if (results.size() == 1) {
         selectInTreeWidgets(results.first().categoryId, results.first().id);
+        const auto items = ui->treeWidget_2->selectedItems();
+        if (items.isEmpty())
+            return;  // nothing selected, nothing to open
+        openPassword(items.first());
     } else {
         QDialog dlg(this);
         dlg.setWindowTitle(tr("Search Results"));
@@ -3122,6 +3126,10 @@ void MainWindow::search(const QString &text)
                 int appId      = item->data(Qt::UserRole).toInt();
                 int categoryId = item->data(Qt::UserRole + 1).toInt();
                 selectInTreeWidgets(categoryId, appId);
+                const auto items = ui->treeWidget_2->selectedItems();
+                if (items.isEmpty())
+                    return;  // nothing selected, nothing to open
+                openPassword(items.first());
             }
         }
     }
@@ -3251,7 +3259,6 @@ void MainWindow::populateBookmarksMenu()
             // Clicking runs your search by ID
             connect(action, &QAction::triggered, this, [this, appId]() {
                 this->search(appId);
-
                 const auto items = ui->treeWidget_2->selectedItems();
                 if (items.isEmpty())
                     return;  // nothing selected, nothing to open
