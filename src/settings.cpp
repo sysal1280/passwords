@@ -172,7 +172,6 @@ bool Settings::getKillGpgAgent()
 
     // Accept common truthy values
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
-    qDebug() << "GPG KILLER IS" << truthy.contains(val);
     return truthy.contains(val);
 }
 

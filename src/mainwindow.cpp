@@ -1794,7 +1794,6 @@ void MainWindow::setupAlignedTimer()
 
 void MainWindow::updateCountdown()
 {
-    qDebug() << "AA";
     QTime now = QTime::currentTime();
     int sec = now.second();
 
@@ -1811,8 +1810,6 @@ void MainWindow::updateCountdown()
 
 void MainWindow::updateFields()
 {
-    qDebug() << "BB";
-
     // Store the result in a local variable first
     const QList<QLineEdit*> edits = ui->scrollArea->widget()->findChildren<QLineEdit*>();
 
