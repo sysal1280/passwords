@@ -1317,18 +1317,6 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
             //parseJsonApplication(decrypted_data);
             populateFromJsonApplication(decrypted_data, ui);
 
-            // if (mode == "application") {
-            //     parseJsonApplication(decrypted_data);
-            //     populateFromJsonApplication(decrypted_data, ui);
-            // } else if (mode == "note") {
-            //     parseJsonNote(decrypted_data);
-            // } else if (mode == "file") {
-            //     parseJsonFile(decrypted_data, ui->treeWidget_2->currentItem()->text(0));
-            //     populateFromJsonFile(decrypted_data, ui);
-            // } else if (mode == "credit") {
-            //     parseJsonCredit(decrypted_data);
-            //     populateFromJsonCredit(decrypted_data, ui);
-            // }
             decrypted_data.fill(0);
         }
     });
@@ -1381,42 +1369,8 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
     gpg->start("gpg", QStringList() << "--decrypt");
 }
 
-void MainWindow::parseJson(const QByteArray &jsonData)
-{
-    // Parse JSON from QByteArray
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
 
-    if (parseError.error != QJsonParseError::NoError) {
-        qWarning() << "JSON parse error:" << parseError.errorString();
-        return;
-    }
-
-    // Root object
-    QJsonObject root = doc.object();
-
-    // Read simple fields
-    QString url = root.value("url").toString();
-    QString description = root.value("description").toString();
-
-    qDebug() << "URL:" << url;
-    qDebug() << "Description:" << description;
-
-    // Read credentials array
-    QJsonArray credentials = root.value("credentials").toArray();
-    for (const QJsonValue &val : std::as_const(credentials)) {
-        QJsonObject credObj = val.toObject();
-        QString username = credObj.value("username").toString();
-        QString password = credObj.value("password").toString();
-        QString secretOptCode = credObj.value("secretOptCode").toString();
-
-        qDebug() << "User:" << username
-                 << "Password:" << password
-                 << "Secret Code:" << secretOptCode;
-    }
-}
-
-void MainWindow::populateFromJson(const QByteArray &jsonData, Ui::MainWindow *ui) {
+void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui) {
     // Ensure scrollArea has a widget
     if (!ui->scrollArea->widget()) {
         QWidget *container = new QWidget;
@@ -2070,19 +2024,6 @@ QTreeWidgetItem* MainWindow::makeItemFromCredit(QSqlQuery& query) {
     item->setData(0, Qt::UserRole, parentId);
     return item;
 }
-
-void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui) {
-        parseJson(jsonData);
-        populateFromJson(jsonData,ui);
-
-        QApplication::restoreOverrideCursor();
-        QApplication::processEvents();
-
-        if (Settings::getKillGpgAgent()) {
-            killGpgAgent();
-        }
-}
-
 
 void MainWindow::parseJsonNote(const QByteArray &jsonData) {
     QJsonDocument doc = QJsonDocument::fromJson(jsonData);
