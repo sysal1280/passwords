@@ -126,9 +126,6 @@ private:
     QTreeWidgetItem* makeItemFromFile(QSqlQuery& query);
     QTreeWidgetItem* makeItemFromCredit(QSqlQuery& query);
 
-    void parseJsonNote(const QByteArray &jsonData);
-    void parseJsonFile(const QByteArray &jsonData, QString filename);
-
     // JSON population
     void populateFromJson(const QByteArray &jsonData, Ui::MainWindow *ui);
     void populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui);
