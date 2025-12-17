@@ -55,7 +55,6 @@ const QMap<QString, QString> MainWindow::headerMap = {
     { "credit",      "Credit Cards" }
 };
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -191,6 +190,13 @@ MainWindow::MainWindow(QWidget *parent)
                 }
             });
 
+    connect(ui->actionExport_Password, &QAction::triggered,
+            this, [this]() {
+                if (auto item = ui->treeWidget_2->currentItem()) {
+                    exportPassword(item);
+                }
+            });
+
     // Line edit search
     connect(ui->lineEdit, &QLineEdit::returnPressed,
             this, [this]() {
@@ -278,8 +284,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->treeWidget_2,
             &QTreeWidget::itemActivated,
             this,
-            [this](QTreeWidgetItem *item, int){ openPassword(item); });
-
+            &MainWindow::openPassword);
 
     connect(ui->actionRecent, &QAction::triggered,
             this, &MainWindow::searchRecent);
@@ -1238,8 +1243,12 @@ void MainWindow::clearScrollArea()
     gridLayout->addWidget(imageLabel, 0, 0);
 
     connect(imageLabel, &DropLabel::itemDropped,
-            this, [this](QTreeWidgetItem *item){
-                openPassword(item); // supply a column yourself
+            this, [this](QTreeWidgetItem *item) {
+                if (!item) return;
+                if (Settings::getKillGpgAgent()) {
+                    killGpgAgent();
+                }
+                openPassword(item);
             });
 
     openedCredentialID = -1;
@@ -1247,6 +1256,10 @@ void MainWindow::clearScrollArea()
 
 void MainWindow::openPassword(QTreeWidgetItem *item)
 {
+    if (Settings::getKillGpgAgent()) {
+        killGpgAgent();
+    }
+
     int parentId = item->data(0, Qt::UserRole).toInt();
 
     if (openedCredentialID == parentId)
@@ -1257,10 +1270,6 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QApplication::processEvents();
-
-    if (Settings::getKillGpgAgent()) {
-        killGpgAgent();
-    }
 
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
@@ -4107,9 +4116,8 @@ connect(gpg,
     gpg->start("gpg", QStringList() << "--decrypt");
 }
 
-void MainWindow::on_actionExport_Password_triggered()
+void MainWindow::exportPassword(QTreeWidgetItem *item)
 {
-    QTreeWidgetItem *item = ui->treeWidget_2->currentItem();
     if (!item) return;
 
     // --- WARNING prompt ---
@@ -4123,30 +4131,23 @@ void MainWindow::on_actionExport_Password_triggered()
         QMessageBox::Yes | QMessageBox::No,
         QMessageBox::No
         );
-
-
-    if (reply != QMessageBox::Yes) {
-        return; // user chose No
-    }
+    if (reply != QMessageBox::Yes) return;
 
     if (Settings::getKillGpgAgent()) {
         killGpgAgent();
     }
 
+    // --- Step 1: Retrieve encrypted data from DB ---
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QByteArray data;
-
-    // --- Step 1: Retrieve encrypted data from DB ---
     ui->statusbar->showMessage(tr("Reading database.."));
-    QApplication::processEvents();
-
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (db.open()) {
             QSqlQuery query(db);
             query.prepare("SELECT data FROM application WHERE id = :id");
-            query.bindValue(":id", item->data(0,Qt::UserRole).toInt());
+            query.bindValue(":id", item->data(0, Qt::UserRole).toInt());
             if (query.exec() && query.first()) {
                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
                 if (showDebugMessages) {
@@ -4166,6 +4167,7 @@ void MainWindow::on_actionExport_Password_triggered()
     ui->statusbar->showMessage(tr("Decrypting data.."));
     QApplication::processEvents();
 
+    auto decBuffer = QSharedPointer<QByteArray>::create();
     QProcess *gpg = new QProcess(this);
     gpg->setProcessChannelMode(QProcess::SeparateChannels);
 
@@ -4175,45 +4177,10 @@ void MainWindow::on_actionExport_Password_triggered()
         gpg->closeWriteChannel();
     });
 
-    // Handle stdout (decrypted JSON)
-    connect(gpg, &QProcess::readyReadStandardOutput, this, [this, gpg, item]() {
-        QByteArray decrypted_data = gpg->readAllStandardOutput();
-        if (!decrypted_data.isEmpty()) {
-            ui->statusbar->clearMessage();
-
-            // Build suggested filename: <item text>_<date>.json
-            QString baseName = item->text(0); // column 0 usually holds the display name
-            QString dateStr  = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
-            QString suggestedName = QDir::homePath() + "/" + baseName + "_" + dateStr + ".json";
-
-            // Prompt user with Save As dialog, using suggestedName as default
-            QString fileName = QFileDialog::getSaveFileName(
-                this,
-                tr("Save Decrypted JSON"),
-                suggestedName,
-                tr("JSON Files (*.json);;All Files (*)")
-                );
-
-            if (!fileName.isEmpty()) {
-                QFile outFile(fileName);
-                if (outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                    outFile.write(decrypted_data);
-                    outFile.close();
-                    QMessageBox::information(this, ui->actionExport_Password->text(),
-                                             tr("Decrypted JSON saved to:\n") + fileName);
-                } else {
-                    QMessageBox::critical(this, ui->actionExport_Password->text(),
-                                          tr("Could not open file for writing:\n") + fileName);
-                }
-            }
-
-            decrypted_data.fill(0);
-        }
+    connect(gpg, &QProcess::readyReadStandardOutput, this, [gpg, decBuffer]() {
+        decBuffer->append(gpg->readAllStandardOutput());
     });
 
-
-
-    // Handle stderr
     connect(gpg, &QProcess::readyReadStandardError, this, [this, gpg]() {
         QByteArray errors = gpg->readAllStandardError();
         if (!errors.isEmpty()) {
@@ -4222,21 +4189,51 @@ void MainWindow::on_actionExport_Password_triggered()
         }
     });
 
-    // Handle completion
-    connect(gpg, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-            this, [this, gpg, item](int exitCode, QProcess::ExitStatus status) {
+    connect(gpg,
+            QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this,
+            [this, gpg, item, decBuffer](int exitCode, QProcess::ExitStatus status) {
                 if (status == QProcess::NormalExit && exitCode == 0) {
+                    QByteArray decrypted_data = *decBuffer;
+                    if (!decrypted_data.isEmpty()) {
+                        ui->statusbar->clearMessage();
+
+                        // Build suggested filename: <item text>_<date>.json
+                        QString baseName = item->text(0);
+                        QString dateStr  = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+                        QString suggestedName = QDir::homePath() + "/" + baseName + "_" + dateStr + ".json";
+
+                        QString fileName = QFileDialog::getSaveFileName(
+                            this,
+                            tr("Save Decrypted JSON"),
+                            suggestedName,
+                            tr("JSON Files (*.json);;All Files (*)")
+                            );
+
+                        if (!fileName.isEmpty()) {
+                            QFile outFile(fileName);
+                            if (outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                                outFile.write(decrypted_data);
+                                outFile.close();
+                                QMessageBox::information(this, ui->actionExport_Password->text(),
+                                                         tr("Decrypted JSON saved to:\n") + fileName);
+                            } else {
+                                QMessageBox::critical(this, ui->actionExport_Password->text(),
+                                                      tr("Could not open file for writing:\n") + fileName);
+                            }
+                        }
+
+                        decrypted_data.fill(0);
+                    }
                     openedCredentialID = item->text(1).toInt();
                 }
                 gpg->deleteLater();
-
                 QApplication::restoreOverrideCursor();
                 QApplication::processEvents();
             });
 
     gpg->start("gpg", QStringList() << "--decrypt");
 }
-
 
 QString getItemPath(QTreeWidgetItem *item, int column = 0)
 {
