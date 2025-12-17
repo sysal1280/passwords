@@ -176,6 +176,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(autoCloseTimer, &QTimer::timeout,
             this, &MainWindow::clearScrollArea);
 
+
+    connect(ui->actionOpen_Database, &QAction::triggered,
+            this, [this]() {
+                QString fileName = QFileDialog::getOpenFileName(
+                    this,
+                    ui->actionOpen_Database->text(),
+                    QString(),
+                    tr("Password Database (*.pwd)")
+                    );
+                if (!fileName.isEmpty())
+                    openDatabase(fileName);
+            });
+
     connect(ui->actionNew_Password, &QAction::triggered,
             this, [this]() {
                 if (auto item = ui->treeWidget->currentItem()) {
@@ -2826,19 +2839,6 @@ void MainWindow::on_actionDecrypt_File_triggered()
             });
 
     process->start("gpg", args);
-}
-
-void MainWindow::on_actionOpen_Database_triggered()
-{
-    // Prompt user
-    QString fileName = QFileDialog::getOpenFileName(
-        this,
-        ui->actionOpen_Database->text(),
-        "",
-        "Password Database (*.pwd)"
-        );
-    if (!fileName.isEmpty())
-        openDatabase(fileName);
 }
 
 bool MainWindow::openDatabase(const QString &fileName)

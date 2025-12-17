@@ -66,7 +66,6 @@ private slots:
     // Actions
     void on_actionEncrypt_File_triggered();
     void on_actionDecrypt_File_triggered();
-    void on_actionOpen_Database_triggered();
 
     // Other slots
     void loadCategories();
