@@ -34,6 +34,7 @@ public:
         inputLayout->setContentsMargins(0, 0, 0, 0);
 
         m_inputEdit = new QLineEdit(this);
+        m_inputEdit->setReadOnly(true);
         auto *browseBtn = new QPushButton(tr("Browse..."), this);
 
         inputLayout->addWidget(m_inputEdit);

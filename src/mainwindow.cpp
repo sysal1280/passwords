@@ -239,6 +239,9 @@ MainWindow::MainWindow(QWidget *parent)
                     );
             });
 
+    connect(ui->actionEncrypt_File, &QAction::triggered,
+            this, &MainWindow::encryptFile);
+
 
     connect(ui->actionRefresh_Categories, &QAction::triggered,
             this, &MainWindow::loadCategories);
@@ -2671,7 +2674,7 @@ void MainWindow::decryptMessage()
 
 
 
-void MainWindow::on_actionEncrypt_File_triggered()
+void MainWindow::encryptFile()
 {
     /*
      * Encrypt File Dialog (GPG symmetric, binary output)
@@ -2801,6 +2804,14 @@ void MainWindow::on_actionEncrypt_File_triggered()
             });
 
     process->start("gpg", args);
+    if (process->state() == QProcess::NotRunning) {
+        QFile::remove(tempFile);
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Failed to start gpg process."));
+        process->deleteLater();
+        return;
+    }
+
 }
 
 
