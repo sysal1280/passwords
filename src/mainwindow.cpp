@@ -1420,7 +1420,7 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         QLineEdit* passwordEdit = new QLineEdit();
         passwordEdit->setText(password);
         passwordEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
-        passwordEdit->setEchoMode(QLineEdit::Password);
+        passwordEdit->setEchoMode(Settings::getEchoMode());
         passwordEdit->setReadOnly(true);
 
         QAction *showPasswordAction = new QAction(tr("Show Password"), passwordEdit);
@@ -1428,7 +1428,7 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         passwordEdit->addAction(showPasswordAction);
 
         connect(showPasswordAction, &QAction::toggled, this, [passwordEdit](bool checked) {
-            passwordEdit->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
+            passwordEdit->setEchoMode(checked ? QLineEdit::Normal : Settings::getEchoMode());
         });
 
         QAction *copyPasswordAction = new QAction(tr("Copy Password"), passwordEdit);
@@ -2347,12 +2347,12 @@ void MainWindow::encryptMessage()
 
     QLabel *passLabel1 = new QLabel("Password:", dlg);
     QLineEdit *passEdit1 = new QLineEdit(dlg);
-    passEdit1->setEchoMode(QLineEdit::Password);
+    passEdit1->setEchoMode(Settings::getEchoMode());
     passEdit1->setPlaceholderText("Enter password");
 
     QLabel *passLabel2 = new QLabel("Confirm:", dlg);
     QLineEdit *passEdit2 = new QLineEdit(dlg);
-    passEdit2->setEchoMode(QLineEdit::Password);
+    passEdit2->setEchoMode(Settings::getEchoMode());
     passEdit2->setPlaceholderText("Re-enter password");
 
     QPushButton *generateBtn = new QPushButton("Generate Password", dlg);
@@ -2551,7 +2551,7 @@ void MainWindow::decryptMessage()
     QHBoxLayout *passLayout = new QHBoxLayout;
     QLabel *passLabel = new QLabel("Password:", dlg);
     QLineEdit *passEdit = new QLineEdit(dlg);
-    passEdit->setEchoMode(QLineEdit::Password);
+    passEdit->setEchoMode(Settings::getEchoMode());
     passEdit->setPlaceholderText("Enter password");
 
     QPushButton *decryptBtn = new QPushButton("&Decrypt", dlg);
