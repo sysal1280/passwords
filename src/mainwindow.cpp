@@ -4,6 +4,7 @@
 #include "droplabel.h"
 #include "passwordDialog.h"
 #include "settings.h"
+#include "encryptfiledialog.h"
 #include "gpgCheck.h"
 #include "categorydialog.h"
 #include "preferencesdialog.h"
@@ -2675,73 +2676,38 @@ void MainWindow::on_actionEncrypt_File_triggered()
     /*
      * Encrypt File Dialog (GPG symmetric, binary output)
      * Uses --pinentry-mode loopback and a temporary passphrase file.
+     * Single dialog for file selection + password (with confirmation).
      */
 
-    // Prompt for file
-    QString inputFile = QFileDialog::getOpenFileName(
-        this,
-        tr("Select File to Encrypt"),
-        QString(),
-        tr("All Files (*)")
-        );
-    if (inputFile.isEmpty())
+    EncryptFileDialog dlg(this);
+    if (dlg.exec() != QDialog::Accepted)
         return; // user cancelled
 
-    // Prompt for password
-    QDialog passDlg(this);
-    passDlg.setWindowTitle("Enter Password");
-    QVBoxLayout *layout = new QVBoxLayout(&passDlg);
-
-    QLabel *label = new QLabel("Enter password to encrypt the file:", &passDlg);
-    layout->addWidget(label);
-
-    QLineEdit *passEdit = new QLineEdit(&passDlg);
-    passEdit->setEchoMode(QLineEdit::Password);
-    layout->addWidget(passEdit);
-
-    QHBoxLayout *btnLayout = new QHBoxLayout();
-    QPushButton *okBtn = new QPushButton("&OK", &passDlg);
-    QPushButton *cancelBtn = new QPushButton("&Cancel", &passDlg);
-    btnLayout->addStretch();
-    btnLayout->addWidget(okBtn);
-    btnLayout->addWidget(cancelBtn);
-    layout->addLayout(btnLayout);
-
-    connect(okBtn, &QPushButton::clicked, &passDlg, &QDialog::accept);
-    connect(cancelBtn, &QPushButton::clicked, &passDlg, &QDialog::reject);
-
-    if (passDlg.exec() != QDialog::Accepted)
-        return; // user cancelled
-
-    QString password = passEdit->text();
-    if (password.isEmpty()) {
-        QMessageBox::warning(this, "No Password", "You must enter a password.");
-        return;
-    }
-
-    // Prepare output file name
-    QString outputFile = inputFile + ".gpg";
-
+    QString inputFile  = dlg.inputFile();
+    QString outputFile = dlg.outputFile();
+    QString password   = dlg.password();
+    bool asciiArmor = dlg.asciiArmor();
 
     // Warn if output already exists
     if (QFileInfo::exists(outputFile)) {
         QMessageBox::StandardButton reply =
             QMessageBox::question(
                 this,
-                "Overwrite File?",
-                QString("The file \"%1\" already exists.\n"
-                        "Do you want to overwrite it?")
+                tr("Overwrite File?"),
+                tr("The file \"%1\" already exists.\n"
+                   "Do you want to overwrite it?")
                     .arg(outputFile),
                 QMessageBox::Yes | QMessageBox::No,
                 QMessageBox::No
                 );
 
         if (reply != QMessageBox::Yes)
-            return; // user chose not to overwrite
+            return;
     }
 
-    ui->statusbar->showMessage(QString("Encrypting %1 in the background...").arg(inputFile));
-
+    ui->statusbar->showMessage(
+        tr("Encrypting %1 in the background...").arg(inputFile)
+        );
 
     // Decide base dir for temp file
     QString baseDir = "/dev/shm";
@@ -2757,15 +2723,20 @@ void MainWindow::on_actionEncrypt_File_triggered()
     // Create and write passphrase file
     QFile file(tempFile);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        QMessageBox::critical(this, "Error",
-                              "Failed to create temporary passphrase file:\n" + tempFile);
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Failed to create temporary passphrase file:\n%1")
+                                  .arg(tempFile));
         return;
     }
 
     // Restrict permissions to owner read/write (0600)
-    file.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+    if (!file.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner)) {
+        file.remove();
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Failed to set secure permissions on temporary passphrase file."));
+        return;
+    }
 
-    // Write passphrase
     file.write(password.toUtf8());
     file.flush();
     file.close();
@@ -2773,8 +2744,9 @@ void MainWindow::on_actionEncrypt_File_triggered()
     // Sanity check: verify the file exists and is readable BEFORE starting gpg
     QFileInfo fi(tempFile);
     if (!fi.exists() || !fi.isReadable()) {
-        QMessageBox::critical(this, "Error",
-                              "Temporary passphrase file is not readable by this process:\n" + tempFile);
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Temporary passphrase file is not readable by this process:\n%1")
+                                  .arg(tempFile));
         QFile::remove(tempFile);
         return;
     }
@@ -2787,8 +2759,12 @@ void MainWindow::on_actionEncrypt_File_triggered()
          << "--yes"
          << "--pinentry-mode" << "loopback"
          << "--symmetric"
-         << "--passphrase-file" << tempFile
-         << "-o" << outputFile
+         << "--passphrase-file" << tempFile;
+
+    if (asciiArmor)
+        args << "--armor";
+
+    args << "-o" << outputFile
          << inputFile;
 
     // Handle completion (success or failure)
@@ -2796,16 +2772,16 @@ void MainWindow::on_actionEncrypt_File_triggered()
             QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this,
             [this, process, outputFile, tempFile](int exitCode, QProcess::ExitStatus status) {
-                // Ensure temp file is removed once gpg has exited
                 QFile::remove(tempFile);
 
                 QString err = process->readAllStandardError();
                 if (status == QProcess::NormalExit && exitCode == 0) {
-                    QMessageBox::information(this, "Success",
-                                             "File encrypted successfully:\n" + outputFile);
+                    QMessageBox::information(this, tr("Success"),
+                                             tr("File encrypted successfully:\n%1")
+                                                 .arg(outputFile));
                 } else {
-                    QMessageBox::critical(this, "Error",
-                                          "Encryption failed:\n" + err);
+                    QMessageBox::critical(this, tr("Error"),
+                                          tr("Encryption failed:\n%1").arg(err));
                 }
                 process->deleteLater();
             });
@@ -2815,11 +2791,16 @@ void MainWindow::on_actionEncrypt_File_triggered()
             this,
             [this, process, tempFile](QProcess::ProcessError error) {
                 QFile::remove(tempFile);
-                QMessageBox::critical(this, "Error",
-                                      "Failed to start gpg process (process error code "
-                                          + QString::number(error) + ").");
+                QMessageBox::critical(
+                    this,
+                    tr("Error"),
+                    tr("Failed to start gpg process (process error code %1).")
+                        .arg(QString::number(error))
+                    );
                 process->deleteLater();
             });
+
+    process->start("gpg", args);
 }
 
 

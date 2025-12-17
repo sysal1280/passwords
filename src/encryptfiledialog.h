@@ -1,0 +1,191 @@
+#include <QLineEdit>
+#include <QObject>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QMessageBox>
+#include <QDialog>
+#include <QFormLayout>
+#include <QFileDialog>
+#include <QDialogButtonBox>
+#include <QCheckBox>
+#include <mainwindow.h>
+
+class EncryptFileDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit EncryptFileDialog(QWidget *parent = nullptr)
+        : QDialog(parent)
+    {
+        setWindowTitle(tr("Encrypt File"));
+
+        auto *mainLayout = new QVBoxLayout(this);
+
+        // --- Form layout for aligned fields ---
+        auto *form = new QFormLayout();
+        form->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+        // Input file row
+        auto *inputRow = new QWidget(this);
+        auto *inputLayout = new QHBoxLayout(inputRow);
+        inputLayout->setContentsMargins(0, 0, 0, 0);
+
+        m_inputEdit = new QLineEdit(this);
+        auto *browseBtn = new QPushButton(tr("Browse..."), this);
+
+        inputLayout->addWidget(m_inputEdit);
+        inputLayout->addWidget(browseBtn);
+
+        form->addRow(tr("Input file:"), inputRow);
+
+        // Output file row
+        m_outputEdit = new QLineEdit(this);
+        form->addRow(tr("Output file:"), m_outputEdit);
+
+        // Password rows
+        m_passEdit = new QLineEdit(this);
+        m_passConfirmEdit = new QLineEdit(this);
+
+        m_passEdit->setEchoMode(QLineEdit::Password);
+        m_passEdit->setPlaceholderText(tr("Password"));
+        m_passConfirmEdit->setEchoMode(QLineEdit::Password);
+        m_passConfirmEdit->setPlaceholderText(tr("Password again"));
+
+        form->addRow(tr("Password:"), m_passEdit);
+        form->addRow(tr("Password:"), m_passConfirmEdit);
+
+        // ASCII armor checkbox
+        m_asciiCheck = new QCheckBox(this);
+        m_asciiCheck->setChecked(false);
+        form->addRow(tr("ASCII armor:"), m_asciiCheck);
+
+        mainLayout->addLayout(form);
+
+        // --- Buttons (OK, Cancel, Help) ---
+        auto *btnBox = new QDialogButtonBox(
+            QDialogButtonBox::Ok |
+                QDialogButtonBox::Cancel |
+                QDialogButtonBox::Help,
+            Qt::Horizontal,
+            this
+            );
+        mainLayout->addWidget(btnBox);
+
+        // Connections
+        connect(browseBtn, &QPushButton::clicked,
+                this, &EncryptFileDialog::onBrowse);
+
+        connect(btnBox, &QDialogButtonBox::accepted,
+                this, &EncryptFileDialog::validateAndAccept);
+
+        connect(btnBox, &QDialogButtonBox::rejected,
+                this, &QDialog::reject);
+
+        // --- Help button connection ---
+        connect(btnBox->button(QDialogButtonBox::Help), &QPushButton::clicked,
+                this, [this]() {
+
+                    // Parent should be MainWindow
+                    MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
+                    if (!mw) {
+                        QMessageBox::warning(
+                            this,
+                            tr("Help Error"),
+                            tr("Help system unavailable: parent window is not MainWindow.")
+                            );
+                        return;
+                    }
+
+                    mw->launchHelperProcess("encrypt-file");
+                });
+
+        // Resize relative to parent
+        if (parent) {
+            int w = parent->width() * 3 / 4;
+            resize(w, sizeHint().height());
+        }
+    }
+
+    QString inputFile() const { return m_inputEdit->text(); }
+    QString outputFile() const { return m_outputEdit->text(); }
+    QString password()  const { return m_passEdit->text(); }
+    bool asciiArmor() const { return m_asciiCheck->isChecked(); }
+
+private slots:
+    void onBrowse()
+    {
+        QString file = QFileDialog::getOpenFileName(
+            this,
+            tr("Select File to Encrypt"),
+            QString(),
+            tr("All Files (*)")
+            );
+        if (file.isEmpty())
+            return;
+
+        m_inputEdit->setText(file);
+
+        // Auto-suggest output file
+        if (m_outputEdit->text().isEmpty() ||
+            m_outputEdit->text() == m_lastSuggestedOutput) {
+
+            QString suggested = file + (m_asciiCheck->isChecked() ? ".asc" : ".gpg");
+            m_outputEdit->setText(suggested);
+            m_lastSuggestedOutput = suggested;
+        }
+    }
+
+    void validateAndAccept()
+    {
+        QString in  = m_inputEdit->text().trimmed();
+        QString out = m_outputEdit->text().trimmed();
+        QString p1  = m_passEdit->text();
+        QString p2  = m_passConfirmEdit->text();
+
+        if (in.isEmpty()) {
+            QMessageBox::warning(this, tr("Missing Input"),
+                                 tr("Please select an input file."));
+            return;
+        }
+
+        if (!QFileInfo::exists(in)) {
+            QMessageBox::warning(this, tr("Invalid Input"),
+                                 tr("The selected input file does not exist."));
+            return;
+        }
+
+        if (out.isEmpty()) {
+            QMessageBox::warning(this, tr("Missing Output"),
+                                 tr("Please specify an output file."));
+            return;
+        }
+
+        if (p1.isEmpty()) {
+            QMessageBox::warning(this, tr("No Password"),
+                                 tr("You must enter a password."));
+            return;
+        }
+
+        if (p1 != p2) {
+            QMessageBox::warning(this, tr("Password Mismatch"),
+                                 tr("The passwords do not match. Please re-enter them."));
+            m_passEdit->clear();
+            m_passConfirmEdit->clear();
+            m_passEdit->setFocus();
+            return;
+        }
+
+        accept();
+    }
+
+private:
+    QLineEdit *m_inputEdit = nullptr;
+    QLineEdit *m_outputEdit = nullptr;
+    QLineEdit *m_passEdit = nullptr;
+    QLineEdit *m_passConfirmEdit = nullptr;
+    QCheckBox *m_asciiCheck = nullptr;
+    QString m_lastSuggestedOutput;
+};
