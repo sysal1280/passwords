@@ -64,7 +64,6 @@ protected:
 
 private slots:
     // Actions
-    void on_actionShow_debug_messages_triggered(bool checked);
     void on_actionEncrypt_message_triggered();
     void on_actionDecrypt_message_triggered();
     void on_actionEncrypt_File_triggered();

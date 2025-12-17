@@ -319,6 +319,11 @@ MainWindow::MainWindow(QWidget *parent)
                 setBookmark(checked);
             });
 
+    connect(ui->actionShow_debug_messages, &QAction::toggled,
+            this, [this](bool checked) {
+                showDebugMessages = checked;
+                qDebug() << "showDebugMessages" << showDebugMessages;
+            });
 
     connect(ui->actionImport, &QAction::triggered,
             this, [this]() {
@@ -1863,13 +1868,6 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
 
     // 5. Show menu
     menu.exec(globalPos);
-}
-
-
-void MainWindow::on_actionShow_debug_messages_triggered(bool checked)
-{
-    showDebugMessages = checked;
-    qDebug() << "showDebugMessages" << showDebugMessages;
 }
 
 
