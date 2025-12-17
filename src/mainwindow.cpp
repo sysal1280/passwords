@@ -216,6 +216,16 @@ MainWindow::MainWindow(QWidget *parent)
                 createCategory();  // calls with default QString()
             });
 
+    connect(ui->actionGenerate_Password, &QAction::triggered,
+            this, [this]() {
+                PasswordDialog::showPasswordGenerator(
+                    this,
+                    ui->actionGenerate_Password->text(),
+                    {} // ignored, wordlist is loaded internally
+                    );
+            });
+
+
     connect(ui->actionRefresh_Categories, &QAction::triggered,
             this, &MainWindow::loadCategories);
 
@@ -238,6 +248,18 @@ MainWindow::MainWindow(QWidget *parent)
                     deleteCategory(item);
                 }
             });
+
+    connect(ui->actionDelete_Password, &QAction::triggered,
+            this, [this]() {
+                if (auto item = ui->treeWidget_2->currentItem()) {
+                    deletePassword(item);
+                } else {
+                    QMessageBox::warning(this,
+                                         ui->actionDelete_Password->text(),
+                                         tr("No password selected."));
+                }
+            });
+
 
     // Line edit search
     connect(ui->lineEdit, &QLineEdit::returnPressed,
@@ -268,6 +290,9 @@ MainWindow::MainWindow(QWidget *parent)
                 SystemInfoDialog dlg(this);  // pass parent if needed
                 dlg.exec();
             });
+
+    connect(ui->actionAbout_Qt, &QAction::triggered,
+            qApp, &QApplication::aboutQt);
 
     connect(ui->actionRename, &QAction::triggered,
             this, &MainWindow::renameCategory);
@@ -1761,23 +1786,7 @@ QByteArray MainWindow::base32Decode(const QString &base32) {
     return result;
 }
 
-void MainWindow::on_actionShow_Password_toggled(bool arg1)
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action) return;
 
-    // Find the QLineEdit this action is attached to
-    QLineEdit *edit = nullptr;
-    const QList<QObject*> associated = action->associatedObjects();
-    for (QObject *obj : associated) {
-        if ((edit = qobject_cast<QLineEdit*>(obj))) {
-            break;
-        }
-    }
-    if (!edit) return;
-
-    edit->setEchoMode(arg1 ? QLineEdit::Normal : QLineEdit::Password);
-}
 
 void MainWindow::showPasswordsContextMenu(const QPoint &pos)
 {
@@ -2022,7 +2031,7 @@ void MainWindow::keyList()
 
         QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &inputDlg, &QDialog::accept);
         QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &inputDlg, &QDialog::reject);
-        inputDlg.resize(dlg->width()/2, inputDlg.sizeHint().height());
+        inputDlg.setFixedSize(dlg->width()/2, inputDlg.sizeHint().height());
 
 
         if (inputDlg.exec() == QDialog::Accepted) {
@@ -2284,16 +2293,6 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
     dlg->exec();
 }
 
-void MainWindow::on_actionGenerate_Password_triggered()
-{
-    // Just delegate to the reusable dialog
-    PasswordDialog::showPasswordGenerator(
-        this,
-        ui->actionGenerate_Password->text(),
-        {} // we ignore this parameter; the function loads the wordlist itself
-        );
-}
-
 void MainWindow::on_actionEncrypt_message_triggered()
 {
     /*
@@ -2371,12 +2370,11 @@ void MainWindow::on_actionEncrypt_message_triggered()
 
     // Generate password action
     connect(generateBtn, &QPushButton::clicked, this, [this, passEdit1, passEdit2]() {
-        // Launch your existing generator dialog
-        this->on_actionGenerate_Password_triggered();
-
-        // Optional: if you want to auto-fill the generated password into both fields,
-        // you can modify on_actionGenerate_Password_triggered() to return the string
-        // and then set passEdit1->setText(pwd); passEdit2->setText(pwd);
+        PasswordDialog::showPasswordGenerator(
+            this,
+            ui->actionGenerate_Password->text(),
+            {} // ignored, wordlist is loaded internally
+            );
     });
 
     // Encrypt action
@@ -3066,13 +3064,6 @@ void MainWindow::selectInTreeWidgets(int categoryId, int appId)
     }
 }
 
-
-void MainWindow::on_actionAbout_Qt_triggered()
-{
-    QApplication::aboutQt();
-}
-
-
 QString MainWindow::buildItemPath(QTreeWidgetItem *item) const
 {
     QStringList parts;
@@ -3408,7 +3399,7 @@ void MainWindow::setBookmark(bool checked)
 
 
 
-void MainWindow::on_actionDelete_Password_triggered()
+void MainWindow::deletePassword(QTreeWidgetItem *item)
 {
     // The keyword the user must type to confirm
     const QString confirmationKeyword = tr("DELETE");
@@ -3466,13 +3457,22 @@ void MainWindow::on_actionDelete_Password_triggered()
 
             QSqlQuery query(db);
             query.prepare("DELETE FROM application WHERE id = :id");
-            query.bindValue(":id",ui->treeWidget_2->selectedItems().first()->data(0,Qt::UserRole).toInt());
+            query.bindValue(":id",item->data(0,Qt::UserRole).toInt());
             if (!query.exec())
             {
                 QMessageBox::critical(this,"",query.lastError().text());
             } else
             {
-                delete ui->treeWidget_2->selectedItems().first();
+                QTreeWidgetItem *parent = item->parent();
+                if (parent) {
+                    parent->removeChild(item);   // detach from parent
+                } else {
+                    int index = ui->treeWidget_2->indexOfTopLevelItem(item);
+                    if (index != -1) {
+                        ui->treeWidget_2->takeTopLevelItem(index);  // detach from top-level (the case with the current version)
+                    }
+                }
+                delete item;
             }
         }
         QSqlDatabase::removeDatabase(connName);
