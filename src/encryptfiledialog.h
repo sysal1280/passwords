@@ -105,7 +105,7 @@ public:
         // Resize relative to parent
         if (parent) {
             int w = parent->width() * 3 / 4;
-            resize(w, sizeHint().height());
+            resize(w, sizeHint().height()+20);
         }
     }
 
