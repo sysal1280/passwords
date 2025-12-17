@@ -4013,21 +4013,16 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
                 dlg.openCredentials(username, password, secretOpt, length);
             }
 
-
-            // --- Traverse notes ---
-            QJsonArray notes = obj.value("notes").toArray();
-            for (const QJsonValue &val : std::as_const(notes)) {
-                QJsonObject noteObj = val.toObject();
-                QString body  = noteObj.value("content").toString();
-                dlg.openNote(body);
-            }
-
-
-
             if (dlg.exec() == QDialog::Accepted) {
                 QByteArray newJson = dlg.toJson();
 
-                QString tempFile = QDir::tempPath() + "/edit.asc";
+                QString baseDir = "/dev/shm";
+                if (!QFileInfo::exists(baseDir) || !QFileInfo(baseDir).isWritable()) {
+                    baseDir = QDir::tempPath();
+                }
+
+                QString tempFile = baseDir + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".asc";
+
                 QStringList args;
                 const QStringList keys = dlg.getCheckedKeys();
                 for (const QString &key : keys) {
