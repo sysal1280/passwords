@@ -175,7 +175,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(autoCloseTimer, &QTimer::timeout,
             this, &MainWindow::clearScrollArea);
 
-    // Action triggers
+    connect(ui->actionNew_Password, &QAction::triggered,
+            this, [this]() {
+                if (auto item = ui->treeWidget->currentItem()) {
+                    newPassword();
+                }
+            });
+
     connect(ui->actionOpen_Password, &QAction::triggered,
             this, [this]() {
                 if (auto item = ui->treeWidget_2->currentItem()) {
@@ -194,6 +200,39 @@ MainWindow::MainWindow(QWidget *parent)
             this, [this]() {
                 if (auto item = ui->treeWidget_2->currentItem()) {
                     exportPassword(item);
+                }
+            });
+
+    connect(ui->actionAudit_Log, &QAction::triggered,
+            this, [this]() {
+                if (auto item = ui->treeWidget_2->currentItem()) {
+                    showAuditLog(item);
+                }
+            });
+
+    connect(ui->actionNew_Category, &QAction::triggered,
+            this, [this]() {
+                createCategory();  // calls with default QString()
+            });
+
+    connect(ui->actionRefresh_Categories, &QAction::triggered,
+            this, &MainWindow::loadCategories);
+
+    connect(ui->actionAdd_Search, &QAction::triggered,
+            this, [this]() {
+                if (auto item = ui->treeWidget_2->currentItem()) {
+                    addSearchTerms(item);
+                } else {
+                    QMessageBox::warning(this, tr("Add Search Term"),
+                                         tr("No application selected."));
+                }
+            });
+
+
+    connect(ui->actionDelete_Category, &QAction::triggered,
+            this, [this]() {
+                if (auto item = ui->treeWidget->currentItem()) {
+                    deleteCategory(item);
                 }
             });
 
@@ -514,101 +553,7 @@ void MainWindow::loadCategories()
     QSqlDatabase::removeDatabase(connectionName);
 }
 
-
-// void MainWindow::loadCategories()
-// {
-//     const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-
-//     {
-//         // Create and open a fresh connection in a local scope
-//         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
-//         db.setDatabaseName(qApp->property("dbFile").toString());
-//         if (!db.open()) {
-//             qCritical() << "Failed to open database:" << db.lastError().text();
-//             QSqlDatabase::removeDatabase(connectionName);
-//             return;
-//         }
-
-//         ui->treeWidget->blockSignals(true);
-//         ui->treeWidget->clear();
-
-//         QMap<int, QTreeWidgetItem*> itemMap;
-
-//         {
-//             QSqlQuery query(db);
-//             if (!query.exec("SELECT id, parent_id, text FROM categories ORDER BY id")) {
-//                 qDebug() << "Query failed:" << query.lastError().text();
-//                 return; // db will be closed when it goes out of scope
-//             }
-
-//             // First pass: create items
-//             while (query.next()) {
-//                 int id = query.value(0).toInt();
-//                 int parentId = query.value(1).toInt();
-//                 QString text = DataObfuscator::deobfuscate(query.value(2).toString(), appKey);
-
-//                 QTreeWidgetItem* item = new QTreeWidgetItem();
-//                 item->setText(0, text);
-//                 item->setData(0, Qt::UserRole, id);
-//                 item->setIcon(0, closedIcon);
-//                 itemMap[id] = item;
-//                 if (parentId == 0) {
-//                     ui->treeWidget->addTopLevelItem(item);
-//                 }
-//             }
-
-//             // Second pass: link children
-//             if (query.first()) {
-//                 do {
-//                     int id = query.value(0).toInt();
-//                     int parentId = query.value(1).toInt();
-//                     if (parentId != 0 && itemMap.contains(parentId)) {
-//                         itemMap[parentId]->addChild(itemMap[id]);
-//                     }
-//                 } while (query.next());
-//             }
-//         } // query destroyed here
-
-//         ui->treeWidget->blockSignals(false);
-
-//         // Reconnect expand/collapse handlers
-//         QObject::disconnect(ui->treeWidget, &QTreeWidget::itemExpanded, nullptr, nullptr);
-//         QObject::disconnect(ui->treeWidget, &QTreeWidget::itemCollapsed, nullptr, nullptr);
-
-//         connect(ui->treeWidget, &QTreeWidget::itemExpanded, this, [=](QTreeWidgetItem *item){
-//             if (item->childCount() > 0) {
-//                 item->setIcon(0, QIcon(":/menus/glyphs/folder_open_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
-//             }
-//         });
-//         connect(ui->treeWidget, &QTreeWidget::itemCollapsed, this, [=](QTreeWidgetItem *item){
-//             if (item->childCount() > 0) {
-//                 item->setIcon(0, QIcon(":/menus/glyphs/folder_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
-//             }
-//         });
-
-//         // Select first item
-//         if (ui->treeWidget->topLevelItemCount() > 0) {
-//             QTreeWidgetItem *firstItem = ui->treeWidget->topLevelItem(0);
-//             ui->treeWidget->setCurrentItem(firstItem);
-//             firstItem->setSelected(true);
-//             on_treeWidget_itemActivated(firstItem, 0);
-//         }
-
-//         db.close();
-//     } // db destroyed here
-
-//     // Now it’s safe to remove the connection
-//     QSqlDatabase::removeDatabase(connectionName);
-// }
-
-
-
-
-
-
 void MainWindow::saveTreeToDb(QTreeWidget* tree, QSqlDatabase& db) {
-    //QSqlQuery clearQuery(db);
-
     for (int i = 0; i < tree->topLevelItemCount(); ++i) {
         QTreeWidgetItem* item = tree->topLevelItem(i);
         saveItemToDb(item, db, QVariant()); // No parent for top-level
@@ -635,6 +580,7 @@ void MainWindow::saveItemToDb(QTreeWidgetItem* item, QSqlDatabase& db, const QVa
     // Retrieve ID whether inserted or already existing
     QVariant id;
     QSqlQuery getId(db);
+    getId.setForwardOnly(true);
     getId.prepare("SELECT id FROM categories WHERE parent_id = ? AND text = ?");
     getId.addBindValue(normalizedParentId);
     getId.addBindValue(DataObfuscator::obfuscate(itemText,appKey));
@@ -654,8 +600,6 @@ void MainWindow::saveItemToDb(QTreeWidgetItem* item, QSqlDatabase& db, const QVa
         saveItemToDb(item->child(i), db, id);
     }
 }
-
-
 
 MainWindow::~MainWindow()
 {
@@ -806,7 +750,7 @@ void MainWindow::showAboutDlg()
 }
 
 
-void MainWindow::on_actionNew_Password_triggered()
+void MainWindow::newPassword()
 {
     NewPasswordDialog dlg(this);
     dlg.setWindowTitle(ui->actionNew_Password->text());
@@ -998,82 +942,6 @@ QList<KeyEntry> MainWindow::fetchKeys() const
     }
     QSqlDatabase::removeDatabase(connName);
     return keys;
-}
-
-void MainWindow::on_actionNew_Category_triggered()
-{
-    createCategory();
-    return;
-    QString text = QInputDialog::getText(this, tr("Category"), tr("Create a new category:")).trimmed();
-    if (text.isEmpty()) {
-
-        return;
-    }
-
-    static const QRegularExpression categoryNameRe("^[\\w\\-\\s]{1,64}$");
-    if (!categoryNameRe.match(text).hasMatch()) {
-        QMessageBox::warning(this,
-                             tr("Invalid Name"),
-                             tr("Category name contains invalid characters or is too long."));
-        return;
-    }
-
-
-    QTreeWidgetItem* parentItem = ui->treeWidget->currentItem();
-    QVariant parentId = QVariant(QMetaType(QMetaType::Int)); // NULL by default
-    if (parentItem) {
-        parentId = parentItem->data(0, Qt::UserRole); // parent’s DB id
-    }
-
-    // Duplicate check in UI
-    QTreeWidgetItem* scope = parentItem ? parentItem : ui->treeWidget->invisibleRootItem();
-    for (int i = 0; i < scope->childCount(); ++i) {
-        if (scope->child(i)->text(0) == text) {
-            QMessageBox::warning(this, tr("Duplicate"), tr("A category with this name already exists here."));
-            return;
-        }
-    }
-
-    // DB connection
-    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
-    db.setDatabaseName(qApp->property("dbFile").toString());
-
-    if (!db.open()) {
-        QMessageBox::critical(this, tr("Database Error"), tr("Failed to open database:\n%1").arg(db.lastError().text()));
-        QSqlDatabase::removeDatabase(connName);
-        return;
-    }
-
-    QSqlQuery query(db);
-    query.prepare("INSERT INTO categories (parent_id, text) VALUES (:parent_id, :text)");
-    query.bindValue(":parent_id", parentId); // NULL if top-level
-    query.bindValue(":text", DataObfuscator::obfuscate(text,this->appKey));
-
-    if (!query.exec()) {
-        QMessageBox::critical(this, tr("Database Error"), tr("Insert failed:\n%1").arg(query.lastError().text()));
-        db.close();
-        QSqlDatabase::removeDatabase(connName);
-        return;
-    }
-
-    int newId = query.lastInsertId().toInt();
-
-    // Create tree item with its OWN id
-    QTreeWidgetItem* newItem = new QTreeWidgetItem();
-    newItem->setText(0, text);
-    newItem->setIcon(0, QIcon(":/menus/glyphs/folder_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
-    newItem->setData(0, Qt::UserRole, newId); // <-- store record’s id here
-
-    if (parentItem) {
-        parentItem->addChild(newItem);
-        parentItem->setExpanded(true);
-    } else {
-        ui->treeWidget->addTopLevelItem(newItem);
-    }
-
-    db.close();
-    QSqlDatabase::removeDatabase(connName);
 }
 
 void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
@@ -2257,7 +2125,7 @@ void MainWindow::on_actionKey_List_triggered()
 }
 
 
-void MainWindow::on_actionAudit_Log_triggered()
+void MainWindow::showAuditLog(QTreeWidgetItem *item)
 {
     /*
      * Password Audit Log
@@ -2290,7 +2158,7 @@ void MainWindow::on_actionAudit_Log_triggered()
     table->verticalHeader()->setDefaultSectionSize(20);
 
     // Populate from DB
-    int appId = ui->treeWidget_2->currentItem()->data(0, Qt::UserRole).toInt();
+    int appId = item->data(0, Qt::UserRole).toInt();
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
     db.setDatabaseName(qApp->property("dbFile").toString());
@@ -2393,14 +2261,6 @@ void MainWindow::on_actionAudit_Log_triggered()
     dlg->resize(700, 400);
     dlg->exec();
 }
-
-
-
-void MainWindow::on_actionRefresh_Categories_triggered()
-{
-    this->loadCategories();
-}
-
 
 void MainWindow::on_actionGenerate_Password_triggered()
 {
@@ -3599,7 +3459,7 @@ void MainWindow::on_actionDelete_Password_triggered()
 
 
 
-void MainWindow::on_actionDelete_Category_triggered()
+void MainWindow::deleteCategory(QTreeWidgetItem *item)
 {
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     {
@@ -4248,54 +4108,64 @@ QString getItemPath(QTreeWidgetItem *item, int column = 0)
 
 void MainWindow::moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targetItem) {
     if (!sourceItem || !targetItem) {
-        qDebug() << "Invalid source or target item, ignoring drop";
+        qWarning() << "Invalid source or target item, ignoring drop action.";
         return;
     }
 
-    int appId       = sourceItem->data(0, Qt::UserRole).toInt();
-    int newCategory = targetItem->data(0, Qt::UserRole).toInt();
+    const int appId       = sourceItem->data(0, Qt::UserRole).toInt();
+    const int newCategory = targetItem->data(0, Qt::UserRole).toInt();
 
-    qDebug() << "Moving application" << appId << "to category" << newCategory;
+    if (appId <= 0 || newCategory <= 0) {
+        qWarning() << "Invalid IDs, aborting move.";
+        return;
+    }
 
-    // --- Step 0: Optional prompt ---
     if (Settings::getDragDropPrompt()) {
-        QString msg = tr("Move entry \"%1\" to category \"%2\"?\n").arg(sourceItem->text(0), targetItem->text(0));
+        const QString msg = tr("Move entry \"%1\" to category \"%2\"?")
+        .arg(sourceItem->text(0), targetItem->text(0));
         if (QMessageBox::question(this, tr("Confirm Move"), msg,
                                   QMessageBox::Yes | QMessageBox::No,
                                   QMessageBox::No) != QMessageBox::Yes) {
-            qDebug() << "User cancelled drag-drop move";
             return;
         }
     }
 
-    // --- Step 1: Update DB ---
-    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    const QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
-        if (db.open()) {
+        if (!db.open()) {
+            QMessageBox::critical(this, tr("Database Error"),
+                                  tr("Could not open database:\n%1").arg(db.lastError().text()));
+        } else {
             QSqlQuery query(db);
             query.prepare("UPDATE application SET category_id = :cat WHERE id = :id");
             query.bindValue(":cat", newCategory);
             query.bindValue(":id", appId);
-            if (query.exec()) {
-                // --- Step 2: Update UI ---
-                auto selected = ui->treeWidget_2->selectedItems().first();
-                if (selected) delete selected;
-                delete sourceItem;
-            } else {
-                qDebug() << "Update failed:" << query.lastError().text();
+
+            if (!query.exec()) {
                 QMessageBox::critical(this, tr("Database Error"),
-                                      tr("Could not update category:\n%1")
-                                          .arg(query.lastError().text()));
+                                      tr("Could not update category:\n%1").arg(query.lastError().text()));
+            } else {
+                QTreeWidget *tree = ui->treeWidget_2;
+                if (tree) {
+                    auto sel = tree->selectedItems();
+                    if (!sel.isEmpty()) {
+                        QTreeWidgetItem *selected = sel.first();
+                        if (selected && selected != sourceItem) {
+                            delete selected;   // remove the original
+                        }
+                    }
+                }
+                delete sourceItem; // clean up the copy
+                if (tree) tree->update();
             }
             db.close();
-        } else {
-            qDebug() << "DB open failed:" << db.lastError().text();
         }
     }
     QSqlDatabase::removeDatabase(connName);
 }
+
 
 void MainWindow::importApplicationsFromFile(const QString &filePath)
 {
@@ -4851,14 +4721,9 @@ void MainWindow::renameCategory()
 
 
 
-void MainWindow::on_actionAdd_Search_triggered()
+void MainWindow::addSearchTerms(QTreeWidgetItem *item)
 {
     // Find the currently selected application in your tree
-    QTreeWidgetItem *item = ui->treeWidget_2->currentItem();
-    if (!item) {
-        QMessageBox::warning(this, tr("Add Search Term"), tr("No application selected."));
-        return;
-    }
 
     int appId = item->data(0, Qt::UserRole).toInt();
     if (appId <= 0) {
@@ -4899,8 +4764,18 @@ void MainWindow::on_actionAdd_Search_triggered()
                 }
             });
 
+
+    connect(okBtn, &QPushButton::clicked,
+            &dlg, [lineEdit, listWidget, &dlg]() {
+                QString text = lineEdit->text().trimmed();
+                if (!text.isEmpty()) {
+                    listWidget->addItem(text);
+                    lineEdit->clear();
+                }
+                dlg.accept();
+            });
+
     connect(cancelBtn, &QPushButton::clicked, &dlg, &QDialog::reject);
-    connect(okBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
 
     if (dlg.exec() == QDialog::Accepted) {
         QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);

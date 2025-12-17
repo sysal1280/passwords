@@ -65,23 +65,17 @@ protected:
 private slots:
     // Actions
     void on_actionAbout_Qt_triggered();
-    void on_actionNew_Password_triggered();
-    void on_actionNew_Category_triggered();
     void on_actionShow_Password_toggled(bool arg1);
     void on_actionShow_debug_messages_triggered(bool checked);
     void on_actionKey_List_triggered();
-    void on_actionAudit_Log_triggered();
-    void on_actionRefresh_Categories_triggered();
     void on_actionGenerate_Password_triggered();
     void on_actionEncrypt_message_triggered();
     void on_actionDecrypt_message_triggered();
     void on_actionEncrypt_File_triggered();
     void on_actionDecrypt_File_triggered();
     void on_actionOpen_Database_triggered();
-
     void on_actionDelete_Password_triggered();
-    void on_actionDelete_Category_triggered();
-    void on_actionAdd_Search_triggered();
+
 
     // Other slots
     void loadCategories();
@@ -137,9 +131,13 @@ private:
 
     QString formatOtp(const QString& otp);
 
+    void newPassword();
     void openPassword(QTreeWidgetItem *item);
     void editPassword(QTreeWidgetItem *item);
     void exportPassword(QTreeWidgetItem *item);
+    void showAuditLog(QTreeWidgetItem *item);
+    void deleteCategory(QTreeWidgetItem *item);
+    void addSearchTerms(QTreeWidgetItem *item);
 
     void showPasswordsContextMenu(const QPoint &pos);
 
