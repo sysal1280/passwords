@@ -18,6 +18,7 @@
 #include <QTreeWidgetItem>
 #include <QInputDialog>
 #include <QWidget>
+#include <QFormLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -2001,73 +2002,87 @@ void MainWindow::keyList()
 
     // Hook up import
     connect(importBtn, &QPushButton::clicked, this, [=]() {
-        bool ok;
-        QString keyId = QInputDialog::getText(dlg, "Import Key", "Enter GPG Key ID:", QLineEdit::Normal, "", &ok);
-        if (!ok || keyId.isEmpty()) return;
+        QDialog inputDlg(dlg);
+        inputDlg.setWindowTitle(tr("Link Key"));
 
-        // Duplicate Key check
-        bool duplicate = false;
-        for (int r = 0; r < table->rowCount(); ++r) {
-            QTableWidgetItem *nameItem = table->item(r, 0);
-            QTableWidgetItem *keyItem  = table->item(r, 1);
-            if                 (keyItem  && keyItem->text()  == keyId) {
-                duplicate = true;
-                break;
-            }
-        }
-        if (duplicate) {
-            QMessageBox::warning(this,
-                                 ui->actionKey_List->text(),
-                                 tr("This key ID or label is already in the list."));
-            return;
-        }
+        QFormLayout form(&inputDlg);
+
+        QLineEdit *keyEdit  = new QLineEdit(&inputDlg);
+        QLineEdit *nameEdit = new QLineEdit(&inputDlg);
+
+        keyEdit->setPlaceholderText(tr("Enter GPG Key ID"));
+        nameEdit->setPlaceholderText(tr("Enter label/name"));
+
+        form.addRow(tr("GPG Key ID:"), keyEdit);
+        form.addRow(tr("Name:"), nameEdit);
+
+        QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                                   Qt::Horizontal, &inputDlg);
+        form.addRow(&buttonBox);
+
+        QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &inputDlg, &QDialog::accept);
+        QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &inputDlg, &QDialog::reject);
+        inputDlg.resize(dlg->width()/2, inputDlg.sizeHint().height());
 
 
-        if (!hasUltimateTrust(keyId)) {
-            QMessageBox msgBox(this);
-            msgBox.setIcon(QMessageBox::Critical);
-            msgBox.setWindowTitle("Key");
-            msgBox.setText("The key does not have ultimate trust.\nUntrusted keys cannot encrypt passwords.");
+        if (inputDlg.exec() == QDialog::Accepted) {
+            QString keyId = keyEdit->text().trimmed();
+            QString name  = nameEdit->text().trimmed();
 
-            // Add standard OK button
-            msgBox.setStandardButtons(QMessageBox::Ok);
-
-            // Add a custom Help button
-            QPushButton *helpButton = msgBox.addButton(QMessageBox::Help);
-            QObject::connect(helpButton, &QPushButton::clicked, this, [this]() {
-                launchHelperProcess("ultimate-trust");
-            });
-
-            msgBox.exec();
-            return;
-        }
-
-        QString name = QInputDialog::getText(dlg, "Import Key", "Enter Name:", QLineEdit::Normal, "", &ok);
-        if (!ok || name.isEmpty()) return;
-
-        {
-            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "insertkeys");
-            db.setDatabaseName(qApp->property("dbFile").toString());
-            if (db.open())
-            {
-            QSqlQuery insert(db);
-            insert.prepare("INSERT INTO keys (label, key) VALUES (:label, :key)");
-            insert.bindValue(":key", keyId);
-            insert.bindValue(":label", name);
-            if (!insert.exec()) {
-                qWarning() << "Failed to insert key:" << insert.lastError().text();
-                QMessageBox::critical(this,ui->actionKey_List->text(),insert.lastError().text());
+            if (keyId.isEmpty() || name.isEmpty()) {
+                QMessageBox::warning(dlg, tr("Invalid Input"),
+                                     tr("Both key ID and name are required."));
                 return;
             }
-            }
-        }
-        QSqlDatabase::removeDatabase("insertkeys");
 
-        // Update table dynamically
-        int row = table->rowCount();
-        table->insertRow(row);
-        table->setItem(row, 0, new QTableWidgetItem(name));
-        table->setItem(row, 1, new QTableWidgetItem(keyId));
+            // Duplicate check
+            for (int r = 0; r < table->rowCount(); ++r) {
+                if (table->item(r, 1) && table->item(r, 1)->text() == keyId) {
+                    QMessageBox::warning(dlg, tr("Duplicate Key"),
+                                         tr("This key ID is already in the list."));
+                    return;
+                }
+            }
+
+            // Trust check
+            if (!hasUltimateTrust(keyId)) {
+                QMessageBox msgBox(dlg);
+                msgBox.setIcon(QMessageBox::Critical);
+                msgBox.setWindowTitle(tr("Key"));
+                msgBox.setText(tr("The key does not have ultimate trust.\n"
+                                  "Untrusted keys cannot encrypt passwords."));
+                msgBox.setStandardButtons(QMessageBox::Ok);
+                QPushButton *helpButton = msgBox.addButton(QMessageBox::Help);
+                connect(helpButton, &QPushButton::clicked, this, [this]() {
+                    launchHelperProcess("ultimate-trust");
+                });
+                msgBox.exec();
+                return;
+            }
+
+            // Insert into DB
+            {
+                QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "insertkeys");
+                db.setDatabaseName(qApp->property("dbFile").toString());
+                if (db.open()) {
+                    QSqlQuery insert(db);
+                    insert.prepare("INSERT INTO keys (label, key) VALUES (:label, :key)");
+                    insert.bindValue(":label", name);
+                    insert.bindValue(":key", keyId);
+                    if (!insert.exec()) {
+                        QMessageBox::critical(dlg, tr("Error"), insert.lastError().text());
+                        return;
+                    }
+                }
+            }
+            QSqlDatabase::removeDatabase("insertkeys");
+
+            // Update table dynamically
+            int row = table->rowCount();
+            table->insertRow(row);
+            table->setItem(row, 0, new QTableWidgetItem(name));
+            table->setItem(row, 1, new QTableWidgetItem(keyId));
+        }
     });
 
     // Hook up delete
