@@ -368,6 +368,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionEncrypt_message, &QAction::triggered,
             this, &MainWindow::encryptMessage);
 
+    connect(ui->actionDecrypt_message, &QAction::triggered,
+            this, &MainWindow::decryptMessage);
+
 
     connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested,
             this, [this](const QPoint &pos)
@@ -2515,7 +2518,7 @@ void MainWindow::encryptMessage()
     dlg->exec();
 }
 
-void MainWindow::on_actionDecrypt_message_triggered()
+void MainWindow::decryptMessage()
 {
     /*
      * Decrypt Message Dialog (GPG symmetric, ASCII-armored)
@@ -2552,14 +2555,10 @@ void MainWindow::on_actionDecrypt_message_triggered()
 
     passLayout->addWidget(passLabel);
     passLayout->addWidget(passEdit);
-
-    // Add stretch here to push the button to the far right
     passLayout->addStretch();
-
     passLayout->addWidget(decryptBtn);
 
     layout->addLayout(passLayout);
-
 
     // Decrypted output
     QTextEdit *decryptedTextEdit = new QTextEdit(dlg);
@@ -2572,6 +2571,7 @@ void MainWindow::on_actionDecrypt_message_triggered()
     buttonLayout->addStretch();
     QPushButton *copyBtn  = new QPushButton("Copy", dlg);
     QPushButton *closeBtn = new QPushButton("&Close", dlg);
+    copyBtn->setEnabled(false); // initially disabled
     buttonLayout->addWidget(copyBtn);
     buttonLayout->addWidget(closeBtn);
     layout->addLayout(buttonLayout);
@@ -2626,16 +2626,27 @@ void MainWindow::on_actionDecrypt_message_triggered()
                 }
             });
 
+    // Enable/disable Copy button based on decrypted text presence
+    connect(decryptedTextEdit, &QTextEdit::textChanged, this,
+            [decryptedTextEdit, copyBtn]() {
+                copyBtn->setEnabled(!decryptedTextEdit->toPlainText().isEmpty());
+            });
+
+    connect(encryptedInputEdit, &QTextEdit::textChanged, this,
+            [encryptedInputEdit, decryptedTextEdit]() {
+                if (encryptedInputEdit->toPlainText().isEmpty()) {
+                    decryptedTextEdit->clear();
+                }
+            });
+
     // Copy action
     connect(copyBtn, &QPushButton::clicked, this,
-            [decryptedTextEdit]() {
+            [decryptedTextEdit, dlg]() {
                 const QString text = decryptedTextEdit->toPlainText();
                 if (!text.isEmpty()) {
                     QClipboard *clipboard = QGuiApplication::clipboard();
                     clipboard->setText(text);
-                    QMessageBox::information(nullptr, "Copied", "Decrypted text copied to clipboard.");
-                } else {
-                    QMessageBox::warning(nullptr, "No Text", "There is no decrypted text to copy.");
+                    QMessageBox::information(dlg, "Copied", "Decrypted text copied to clipboard.");
                 }
             });
 
@@ -2643,6 +2654,7 @@ void MainWindow::on_actionDecrypt_message_triggered()
     dlg->resize(700, 500);
     dlg->exec();
 }
+
 
 
 void MainWindow::on_actionEncrypt_File_triggered()
