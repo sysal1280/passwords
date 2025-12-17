@@ -186,6 +186,18 @@ int Settings::getGeneratedPasswordLength()
     return val;
 }
 
+QLineEdit::EchoMode Settings::getEchoMode()
+{
+    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QString configFile = configDir + "/" + CONFIG_FILENAME;
+    QSettings settings(configFile, QSettings::IniFormat);
+    settings.beginGroup("General");
+    int val = settings.value("EchoMode", QLineEdit::Password).toInt();
+    settings.endGroup();
+    return static_cast<QLineEdit::EchoMode>(val);
+}
+
+
 int Settings::getHelpPort()
 {
     QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);

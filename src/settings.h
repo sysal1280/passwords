@@ -9,6 +9,7 @@
 #include <QMainWindow>
 #include <QSplitter>
 #include <QSqlDatabase>
+#include <QLineEdit>
 
 /**
  * @brief Settings class wraps QSettings to store/retrieve application preferences.
@@ -48,6 +49,7 @@ public:
     static bool createUserDesktopFile();
     static bool verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent);
     static int getHelpPort();
+    static QLineEdit::EchoMode getEchoMode();
 
 private:
     QString configDir;

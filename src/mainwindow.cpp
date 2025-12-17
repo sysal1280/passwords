@@ -2815,14 +2815,14 @@ void MainWindow::decryptFile()
         );
     if (inputFile.isEmpty())
         return;
-
+    qDebug() << "EchoMode is" << Settings::getEchoMode();
     // Prompt for password
     QDialog passDlg(this);
     passDlg.setWindowTitle("Enter Password");
     QVBoxLayout layout(&passDlg);
     QLabel label("Enter password to decrypt the file:", &passDlg);
     QLineEdit passEdit(&passDlg);
-    passEdit.setEchoMode(QLineEdit::Password);
+    passEdit.setEchoMode(Settings::getEchoMode());
     QPushButton okBtn("&OK", &passDlg);
     QPushButton cancelBtn("&Cancel", &passDlg);
 

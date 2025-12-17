@@ -109,6 +109,13 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     ui->labelOrchidStreetWords->setOpenExternalLinks(true);
 
 
+    ui->comboBoxEchoMode->addItem(tr("Normal"), QLineEdit::Normal);
+    ui->comboBoxEchoMode->addItem(tr("No Echo"), QLineEdit::NoEcho);
+    ui->comboBoxEchoMode->addItem(tr("Password"), QLineEdit::Password);
+    ui->comboBoxEchoMode->addItem(tr("Password Echo On Edit"), QLineEdit::PasswordEchoOnEdit);
+
+
+
     /*
      * Build the settings map
      */
@@ -126,6 +133,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     widgetMap.insert("Search/MaxPopularResults", ui->spinBoxPopular);
     widgetMap.insert("Help/Port", ui->spinBoxHelpPort);
     widgetMap.insert("Help/CloseServer", ui->checkBoxCloseHelpServer);
+    widgetMap.insert("General/EchoMode", ui->comboBoxEchoMode);
+
 
 
     /*
@@ -266,11 +275,20 @@ void PreferencesDialog::loadSettings()
         } else if (auto spin = qobject_cast<QSpinBox*>(w)) {
             spin->setValue(val.isValid() ? val.toInt() : spin->value());
         } else if (auto combo = qobject_cast<QComboBox*>(w)) {
-            // Load by text instead of index
-            const QString savedText = val.toString();
-            int idx = combo->findText(savedText);
-            if (idx >= 0)
-                combo->setCurrentIndex(idx);
+            const QVariant val = s.value(key);
+            if (key == "General/EchoMode") {
+                // stored as int
+                int savedVal = val.isValid() ? val.toInt() : QLineEdit::Password;
+                int idx = combo->findData(savedVal);
+                if (idx >= 0)
+                    combo->setCurrentIndex(idx);
+            } else {
+                // existing text‑based logic
+                const QString savedText = val.toString();
+                int idx = combo->findText(savedText);
+                if (idx >= 0)
+                    combo->setCurrentIndex(idx);
+            }
         }
     }
 
@@ -290,9 +308,12 @@ void PreferencesDialog::saveSettings()
             s.setValue(it.key(), check->isChecked());
         else if (auto spin = qobject_cast<QSpinBox*>(w))
             s.setValue(it.key(), spin->value());
-        else if (auto combo = qobject_cast<QComboBox*>(w))
-            // Save the text instead of the index
-            s.setValue(it.key(), combo->currentText());
+        else if (auto combo = qobject_cast<QComboBox*>(w)) {
+            if (it.key() == "General/EchoMode")
+                s.setValue(it.key(), combo->currentData().toInt());
+            else
+                s.setValue(it.key(), combo->currentText());
+        }
     }
 
     if (!ui->checkBoxBackupDB->isChecked())
