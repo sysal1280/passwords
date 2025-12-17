@@ -228,6 +228,8 @@ MainWindow::MainWindow(QWidget *parent)
                 }
             });
 
+    connect(ui->actionKey_List, &QAction::triggered,
+            this, &MainWindow::keyList);
 
     connect(ui->actionDelete_Category, &QAction::triggered,
             this, [this]() {
@@ -1914,7 +1916,7 @@ QTreeWidgetItem* MainWindow::makeItemFromCredit(QSqlQuery& query) {
     return item;
 }
 
-void MainWindow::on_actionKey_List_triggered()
+void MainWindow::keyList()
 {
     const QString dbFile = qApp->property("dbFile").toString();
     if (Q_UNLIKELY(dbFile.isEmpty())) {
@@ -1925,6 +1927,7 @@ void MainWindow::on_actionKey_List_triggered()
 
     // Create dialog
     QDialog *dlg = new QDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->setWindowTitle(ui->actionKey_List->text());
     dlg->setWindowFlags(dlg->windowFlags() & ~Qt::WindowMaximizeButtonHint);
 
@@ -1960,7 +1963,11 @@ void MainWindow::on_actionKey_List_triggered()
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "fetchkeys");
         db.setDatabaseName(dbFile);
-        db.open();
+        if (!db.open())
+        {
+            qCritical() << db.lastError().databaseText();
+            return;
+        }
 
         QSqlQuery query(db);
         if (query.exec("SELECT label, key FROM keys")) {
@@ -3333,7 +3340,7 @@ void MainWindow::initDb()
 
         if (reply == QMessageBox::Yes) {
             // Open the key setup dialog/action immediately
-            on_actionKey_List_triggered();
+            keyList();
         } else {
             QMessageBox::information(this,
                                      tr("Keys Required"),

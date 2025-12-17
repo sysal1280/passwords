@@ -67,7 +67,6 @@ private slots:
     void on_actionAbout_Qt_triggered();
     void on_actionShow_Password_toggled(bool arg1);
     void on_actionShow_debug_messages_triggered(bool checked);
-    void on_actionKey_List_triggered();
     void on_actionGenerate_Password_triggered();
     void on_actionEncrypt_message_triggered();
     void on_actionDecrypt_message_triggered();
@@ -138,6 +137,7 @@ private:
     void showAuditLog(QTreeWidgetItem *item);
     void deleteCategory(QTreeWidgetItem *item);
     void addSearchTerms(QTreeWidgetItem *item);
+    void keyList();
 
     void showPasswordsContextMenu(const QPoint &pos);
 
