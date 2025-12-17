@@ -2345,25 +2345,23 @@ void MainWindow::encryptMessage()
 
     layout->addLayout(passLayout);
 
-    // Encrypt button row (aligned right)
-    QHBoxLayout *encryptLayout = new QHBoxLayout;
-    encryptLayout->addStretch();
-    QPushButton *encryptBtn = new QPushButton("&Encrypt", dlg);
-    encryptLayout->addWidget(encryptBtn);
-    layout->addLayout(encryptLayout);
-
     // Encrypted output
     QTextEdit *encryptedTextEdit = new QTextEdit(dlg);
     encryptedTextEdit->setReadOnly(true);
     encryptedTextEdit->setPlaceholderText("Encrypted text will appear here...");
     layout->addWidget(encryptedTextEdit);
 
-    // Copy + Close buttons side by side
+    // Encrypt + Copy + Save + Close buttons side by side at bottom
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
-    QPushButton *copyBtn  = new QPushButton("Copy", dlg);
-    QPushButton *closeBtn = new QPushButton("&Close", dlg);
+    QPushButton *encryptBtn = new QPushButton("&Encrypt", dlg);
+    QPushButton *copyBtn    = new QPushButton("Copy", dlg);
+    QPushButton *saveBtn    = new QPushButton("&Save", dlg);
+    QPushButton *closeBtn   = new QPushButton("&Close", dlg);
+    saveBtn->setEnabled(false);  // disabled until text is present
+    buttonLayout->addWidget(encryptBtn);
     buttonLayout->addWidget(copyBtn);
+    buttonLayout->addWidget(saveBtn);
     buttonLayout->addWidget(closeBtn);
     layout->addLayout(buttonLayout);
 
@@ -2471,6 +2469,44 @@ void MainWindow::encryptMessage()
                     QMessageBox::information(nullptr, "Copied", "Encrypted text copied to clipboard.");
                 } else {
                     QMessageBox::warning(nullptr, "No Text", "There is no encrypted text to copy.");
+                }
+            });
+
+      connect(plainTextEdit, &QTextEdit::textChanged, this,
+            [plainTextEdit, encryptedTextEdit]() {
+                if (plainTextEdit->toPlainText().isEmpty()) {
+                    encryptedTextEdit->clear();
+                }
+            });
+
+    // Enable Save only when encrypted text is present
+    connect(encryptedTextEdit, &QTextEdit::textChanged, this,
+            [encryptedTextEdit, saveBtn]() {
+                saveBtn->setEnabled(!encryptedTextEdit->toPlainText().isEmpty());
+            });
+
+    // Save action
+    connect(saveBtn, &QPushButton::clicked, this,
+            [encryptedTextEdit, dlg]() {
+                const QString text = encryptedTextEdit->toPlainText();
+                if (text.isEmpty()) return;
+
+                QString fileName = QFileDialog::getSaveFileName(
+                    dlg,
+                    QObject::tr("Save Encrypted Text"),
+                    QString(),
+                    QObject::tr("ASCII-armored Files (*.asc);;Text Files (*.txt);;All Files (*)")
+                    );
+                if (!fileName.isEmpty()) {
+                    QFile file(fileName);
+                    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                        QTextStream out(&file);
+                        out << text;
+                        file.close();
+                        QMessageBox::information(dlg, "Saved", "Encrypted text saved successfully.");
+                    } else {
+                        QMessageBox::critical(dlg, "Error", "Could not save file.");
+                    }
                 }
             });
 
