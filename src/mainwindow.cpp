@@ -365,6 +365,9 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::searchPopular);
 
 
+    connect(ui->actionEncrypt_message, &QAction::triggered,
+            this, &MainWindow::encryptMessage);
+
 
     connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested,
             this, [this](const QPoint &pos)
@@ -2291,7 +2294,7 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
     dlg->exec();
 }
 
-void MainWindow::on_actionEncrypt_message_triggered()
+void MainWindow::encryptMessage()
 {
     /*
      * Encrypt Message Dialog (GPG symmetric, ASCII-armored)

@@ -64,7 +64,6 @@ protected:
 
 private slots:
     // Actions
-    void on_actionEncrypt_message_triggered();
     void on_actionDecrypt_message_triggered();
     void on_actionEncrypt_File_triggered();
     void on_actionDecrypt_File_triggered();
@@ -133,6 +132,7 @@ private:
     void addSearchTerms(QTreeWidgetItem *item);
     void keyList();
     void deletePassword(QTreeWidgetItem *item);
+    void encryptMessage();
 
     void showPasswordsContextMenu(const QPoint &pos);
 
