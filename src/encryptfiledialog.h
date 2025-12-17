@@ -45,6 +45,7 @@ public:
 
         // Output file row
         m_outputEdit = new QLineEdit(this);
+        m_outputEdit->setReadOnly(true);
         form->addRow(tr("Output file:"), m_outputEdit);
 
         // Password rows
@@ -63,6 +64,9 @@ public:
         m_asciiCheck = new QCheckBox(this);
         m_asciiCheck->setChecked(false);
         form->addRow(tr("ASCII armor:"), m_asciiCheck);
+
+        connect(m_asciiCheck, &QCheckBox::toggled,
+                this, &EncryptFileDialog::onAsciiToggled);
 
         mainLayout->addLayout(form);
 
@@ -188,6 +192,31 @@ private slots:
 
         accept();
     }
+
+    void onAsciiToggled(bool checked)
+    {
+        QString inFile = m_inputEdit->text().trimmed();
+        if (inFile.isEmpty())
+            return;
+
+        QString currentOut = m_outputEdit->text().trimmed();
+
+        // Strip any existing .gpg or .asc extension
+        QString base = currentOut;
+        if (base.endsWith(".gpg", Qt::CaseInsensitive))
+            base.chop(4);
+        else if (base.endsWith(".asc", Qt::CaseInsensitive))
+            base.chop(4);
+        else if (base == m_lastSuggestedOutput) {
+            // fallback to input file if output was auto-suggested
+            base = inFile;
+        }
+
+        QString suggested = base + (checked ? ".asc" : ".gpg");
+        m_outputEdit->setText(suggested);
+        m_lastSuggestedOutput = suggested;
+    }
+
 
 private:
     QLineEdit *m_inputEdit = nullptr;

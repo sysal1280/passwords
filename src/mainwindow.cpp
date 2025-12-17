@@ -242,6 +242,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionEncrypt_File, &QAction::triggered,
             this, &MainWindow::encryptFile);
 
+    connect(ui->actionDecrypt_File, &QAction::triggered,
+            this, &MainWindow::decryptFile);
 
     connect(ui->actionRefresh_Categories, &QAction::triggered,
             this, &MainWindow::loadCategories);
@@ -2751,8 +2753,10 @@ void MainWindow::encryptFile()
     if (asciiArmor)
         args << "--armor";
 
-    args << "-o" << outputFile
-         << inputFile;
+    //args << "-o" << outputFile
+       args << QFileInfo(inputFile).fileName();
+
+       process->setWorkingDirectory(QFileInfo(inputFile).absolutePath());
 
     // Handle completion (success or failure)
     connect(process,
@@ -2801,13 +2805,13 @@ void MainWindow::encryptFile()
 
 
 
-void MainWindow::on_actionDecrypt_File_triggered()
+void MainWindow::decryptFile()
 {
     QString inputFile = QFileDialog::getOpenFileName(
         this,
         tr("Select File to Decrypt"),
         QString(),
-        tr("Encrypted Files (*.gpg);;All Files (*)")
+        tr("Encrypted Files (*.gpg *.asc);;All Files (*)")
         );
     if (inputFile.isEmpty())
         return;
@@ -2856,6 +2860,8 @@ void MainWindow::on_actionDecrypt_File_triggered()
          << "--passphrase" << password
          << "--use-embedded-filename"
          << inputFile;
+
+    process->setWorkingDirectory(QFileInfo(inputFile).absolutePath());
 
     // Connect finished signal
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),

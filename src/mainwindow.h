@@ -63,8 +63,6 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
-    // Actions
-    void on_actionDecrypt_File_triggered();
 
     // Other slots
     void loadCategories();
@@ -134,6 +132,7 @@ private:
     void encryptMessage();
     void decryptMessage();
     void encryptFile();
+    void decryptFile();
 
     void showPasswordsContextMenu(const QPoint &pos);
 
