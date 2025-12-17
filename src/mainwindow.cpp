@@ -2417,24 +2417,8 @@ void MainWindow::encryptMessage()
                 }
 
                 if (!isStrong(pass1)) {
-                    QMessageBox msgBox;
-                    msgBox.setIcon(QMessageBox::Warning);
-                    msgBox.setWindowTitle("Weak Password");
-                    msgBox.setText(
-                        "Your password can be easily cracked in a short time.\n\n"
-                        "A safe password should be at least 10 characters long and contain:\n"
-                        "• Lowercase letters\n"
-                        "• Uppercase letters\n"
-                        "• Digits\n"
-                        "• Special characters\n\n"
-                        "Click OK to ignore this advice and continue."
-                        );
-                    msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
-                    msgBox.setDefaultButton(QMessageBox::Cancel);
-
-                    if (msgBox.exec() == QMessageBox::Cancel) {
-                        return;    // user backed out
-                    }
+                    if (!warnAndContinue())
+                        return;
                 }
 
                 // Prepare gpg process
@@ -2677,7 +2661,7 @@ void MainWindow::decryptMessage()
 void MainWindow::encryptFile()
 {
     /*
-     * Encrypt File Dialog (GPG symmetric, binary output)
+     * Encrypt File Dialog (GPG symmetric, binary or ascii output)
      * Uses --pinentry-mode loopback and a temporary passphrase file.
      * Single dialog for file selection + password (with confirmation).
      */
@@ -2750,7 +2734,7 @@ void MainWindow::encryptFile()
         QMessageBox::critical(this, tr("Error"),
                               tr("Temporary passphrase file is not readable by this process:\n%1")
                                   .arg(tempFile));
-        QFile::remove(tempFile);
+        wipeFile(tempFile);
         return;
     }
 
@@ -2775,7 +2759,7 @@ void MainWindow::encryptFile()
             QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this,
             [this, process, outputFile, tempFile](int exitCode, QProcess::ExitStatus status) {
-                QFile::remove(tempFile);
+                wipeFile(tempFile);
 
                 QString err = process->readAllStandardError();
                 if (status == QProcess::NormalExit && exitCode == 0) {
@@ -2793,7 +2777,7 @@ void MainWindow::encryptFile()
     connect(process, &QProcess::errorOccurred,
             this,
             [this, process, tempFile](QProcess::ProcessError error) {
-                QFile::remove(tempFile);
+                wipeFile(tempFile);
                 QMessageBox::critical(
                     this,
                     tr("Error"),
@@ -2805,7 +2789,7 @@ void MainWindow::encryptFile()
 
     process->start("gpg", args);
     if (process->state() == QProcess::NotRunning) {
-        QFile::remove(tempFile);
+        wipeFile(tempFile);
         QMessageBox::critical(this, tr("Error"),
                               tr("Failed to start gpg process."));
         process->deleteLater();
@@ -5065,4 +5049,19 @@ QString MainWindow::formatOtp(const QString& otp)
     }
 
     return formatted;
+}
+
+void MainWindow::wipeFile(const QString &path)
+{
+    QFile f(path);
+    if (f.open(QIODevice::ReadWrite)) {
+        qDebug() << "Wiping" << f.fileName() <<"'s ass!";
+        qint64 size = f.size();
+        QByteArray zeros(size, '\0');
+        f.seek(0);
+        f.write(zeros);
+        f.flush();
+        f.close();
+    }
+    QFile::remove(path);
 }

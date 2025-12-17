@@ -11,6 +11,7 @@
 #include <QDialogButtonBox>
 #include <QCheckBox>
 #include <mainwindow.h>
+#include "gpgCheck.h"
 
 class EncryptFileDialog : public QDialog
 {
@@ -177,6 +178,12 @@ private slots:
             m_passConfirmEdit->clear();
             m_passEdit->setFocus();
             return;
+        }
+
+        if (!isStrong(p1))
+        {
+            if (!warnAndContinue())
+                return;
         }
 
         accept();

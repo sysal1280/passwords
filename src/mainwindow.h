@@ -120,6 +120,8 @@ private:
 
     QString formatOtp(const QString& otp);
 
+    void wipeFile(const QString &path);
+
     void newPassword();
     void openPassword(QTreeWidgetItem *item);
     void editPassword(QTreeWidgetItem *item);

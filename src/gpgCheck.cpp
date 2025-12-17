@@ -172,6 +172,31 @@ bool isStrong(const QString &str)
     return false;
 }
 
+bool warnAndContinue()
+{
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setWindowTitle("Weak Password");
+    msgBox.setText(
+        "Your password can be easily cracked in a short time.\n\n"
+        "A safe password should be at least 10 characters long and contain:\n"
+        "• Lowercase letters\n"
+        "• Uppercase letters\n"
+        "• Digits\n"
+        "• Special characters\n\n"
+        "Click OK to ignore this advice and continue."
+        );
+    msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+
+    if (msgBox.exec() == QMessageBox::Cancel) {
+        return false;
+    } else
+    {
+        return true;
+    }
+}
+
 bool hasUltimateTrust(const QString &keyId)
 {
     QProcess gpg;
