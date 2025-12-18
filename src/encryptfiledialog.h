@@ -54,9 +54,9 @@ public:
         m_passConfirmEdit = new QLineEdit(this);
 
         m_passEdit->setEchoMode(settings.getEchoMode());
-        m_passEdit->setPlaceholderText(tr("Password"));
+        m_passEdit->setPlaceholderText(tr("password"));
         m_passConfirmEdit->setEchoMode(settings.getEchoMode());
-        m_passConfirmEdit->setPlaceholderText(tr("Password again"));
+        m_passConfirmEdit->setPlaceholderText(tr("confirm password"));
 
         form->addRow(tr("Password:"), m_passEdit);
         form->addRow(tr("Password:"), m_passConfirmEdit);
@@ -112,7 +112,7 @@ public:
         // Resize relative to parent
         if (parent) {
             int w = parent->width() * 3 / 4;
-            resize(w, sizeHint().height()+20);
+            setFixedSize(w, sizeHint().height()+20);
         }
     }
 
