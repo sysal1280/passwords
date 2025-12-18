@@ -19,10 +19,10 @@ class EncryptFileDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit EncryptFileDialog(QWidget *parent = nullptr)
+    explicit EncryptFileDialog(QWidget *parent = nullptr, QString windowTitle = "")
         : QDialog(parent)
     {
-        setWindowTitle(tr("Encrypt File"));
+        setWindowTitle(windowTitle);
 
         auto *mainLayout = new QVBoxLayout(this);
 

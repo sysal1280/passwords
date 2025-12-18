@@ -2681,7 +2681,7 @@ void MainWindow::encryptFile()
      * Single dialog for file selection + password (with confirmation).
      */
 
-    EncryptFileDialog dlg(this);
+    EncryptFileDialog dlg(this,ui->actionEncrypt_File->text());
     if (dlg.exec() != QDialog::Accepted)
         return; // user cancelled
 
@@ -2725,7 +2725,7 @@ void MainWindow::encryptFile()
     // Create and write passphrase file
     QFile file(tempFile);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        QMessageBox::critical(this, tr("Error"),
+        QMessageBox::critical(this, ui->actionEncrypt_File->text(),
                               tr("Failed to create temporary passphrase file:\n%1")
                                   .arg(tempFile));
         return;
@@ -2734,7 +2734,7 @@ void MainWindow::encryptFile()
     // Restrict permissions to owner read/write (0600)
     if (!file.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner)) {
         file.remove();
-        QMessageBox::critical(this, tr("Error"),
+        QMessageBox::critical(this, ui->actionEncrypt_File->text(),
                               tr("Failed to set secure permissions on temporary passphrase file."));
         return;
     }
@@ -2746,7 +2746,7 @@ void MainWindow::encryptFile()
     // Sanity check: verify the file exists and is readable BEFORE starting gpg
     QFileInfo fi(tempFile);
     if (!fi.exists() || !fi.isReadable()) {
-        QMessageBox::critical(this, tr("Error"),
+        QMessageBox::critical(this, ui->actionEncrypt_File->text(),
                               tr("Temporary passphrase file is not readable by this process:\n%1")
                                   .arg(tempFile));
         wipeFile(tempFile);
@@ -2780,11 +2780,11 @@ void MainWindow::encryptFile()
 
                 QString err = process->readAllStandardError();
                 if (status == QProcess::NormalExit && exitCode == 0) {
-                    QMessageBox::information(this, tr("Success"),
+                    QMessageBox::information(this, ui->actionEncrypt_File->text(),
                                              tr("File encrypted successfully:\n%1")
                                                  .arg(outputFile));
                 } else {
-                    QMessageBox::critical(this, tr("Error"),
+                    QMessageBox::critical(this, ui->actionEncrypt_File->text(),
                                           tr("Encryption failed:\n%1").arg(err));
                 }
                 process->deleteLater();
@@ -2807,7 +2807,7 @@ void MainWindow::encryptFile()
     process->start("gpg", args);
     if (process->state() == QProcess::NotRunning) {
         wipeFile(tempFile);
-        QMessageBox::critical(this, tr("Error"),
+        QMessageBox::critical(this, ui->actionEncrypt_File->text(),
                               tr("Failed to start gpg process."));
         process->deleteLater();
         return;
@@ -2822,18 +2822,18 @@ void MainWindow::decryptFile()
 {
     QString inputFile = QFileDialog::getOpenFileName(
         this,
-        tr("Select File to Decrypt"),
+        ui->actionDecrypt_File->text(),
         QString(),
         tr("Encrypted Files (*.gpg *.asc);;All Files (*)")
         );
     if (inputFile.isEmpty())
         return;
-    qDebug() << "EchoMode is" << settings.getEchoMode();
+
     // Prompt for password
     QDialog passDlg(this);
-    passDlg.setWindowTitle("Enter Password");
+    passDlg.setWindowTitle(ui->actionDecrypt_File->text());
     QVBoxLayout layout(&passDlg);
-    QLabel label("Enter password to decrypt the file:", &passDlg);
+    QLabel label(tr("Enter the password to decrypt the file:"), &passDlg);
     QLineEdit passEdit(&passDlg);
     passEdit.setEchoMode(settings.getEchoMode());
     QPushButton okBtn("&OK", &passDlg);
@@ -2856,11 +2856,11 @@ void MainWindow::decryptFile()
 
     QString password = passEdit.text();
     if (password.isEmpty()) {
-        QMessageBox::warning(this, "No Password", "You must enter a password.");
+        QMessageBox::warning(this,ui->actionDecrypt_File->text(), tr("You must enter a password."));
         return;
     }
 
-    ui->statusbar->showMessage(QString("Decrypting %1 in the background...").arg(inputFile), 0);
+    ui->statusbar->showMessage(QString(tr("Decrypting %1 in the background...")).arg(inputFile), 0);
 
     // Create QProcess on heap so it lives until finished
     QProcess *process = new QProcess(this);
@@ -2882,11 +2882,12 @@ void MainWindow::decryptFile()
                 QString errorOutput = process->readAllStandardError();
                 if (status == QProcess::NormalExit && exitCode == 0) {
                     ui->statusbar->showMessage("Decryption complete", 5000);
-                    QMessageBox::information(this, "Success",
-                                             "File decrypted successfully using embedded filename.");
+                    QMessageBox::information(this,
+                                             ui->actionDecrypt_File->text(),
+                                             tr("File decrypted successfully."));
                 } else {
-                    ui->statusbar->showMessage("Decryption failed", 5000);
-                    QMessageBox::critical(this, "Error",
+                    ui->statusbar->showMessage(tr("Decryption failed"), 5000);
+                    QMessageBox::critical(this,  ui->actionDecrypt_File->text(),
                                           "Decryption failed:\n" + errorOutput);
                 }
                 process->deleteLater(); // clean up
@@ -2895,8 +2896,8 @@ void MainWindow::decryptFile()
     // Handle start errors
     connect(process, &QProcess::errorOccurred, this,
             [this](QProcess::ProcessError) {
-                ui->statusbar->showMessage("Failed to start gpg process", 5000);
-                QMessageBox::critical(this, "Error", "Failed to start gpg process.");
+                ui->statusbar->showMessage(tr("Failed to start gpg process"), 5000);
+                QMessageBox::critical(this, ui->actionDecrypt_File->text(), tr("Failed to start gpg process."));
             });
 
     process->start("gpg", args);
