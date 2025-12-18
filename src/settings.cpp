@@ -67,10 +67,12 @@ Settings::Settings()
         }
     }
 
-    // wordlist resource
-    QString wlFile = configDir + "/" + WORDLIST_FILENAME;
+    // --- Wordlist resource: always beside configFile ---
+    QFileInfo cfgInfo(configFile);
+    QString wlFile = cfgInfo.dir().filePath(WORDLIST_FILENAME);
+
     if (!QFile::exists(wlFile)) {
-        if (!QFile::copy(":/files/wordlist.rc", wlFile)) {
+        if (!QFile::copy(":/files/wordlist.rcc", wlFile)) {
             qWarning() << "Could not copy wordlist resource to" << wlFile;
         } else {
             QFile::setPermissions(wlFile,

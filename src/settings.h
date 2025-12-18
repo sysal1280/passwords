@@ -57,7 +57,7 @@ private:
     std::unique_ptr<QSettings> settings;
 
      static constexpr const char* CONFIG_FILENAME = "passwords.conf";
-     static constexpr const char* WORDLIST_FILENAME = "wordlist.rc";
+     static constexpr const char* WORDLIST_FILENAME = "wordlist.rcc";
 };
 
 #endif // SETTINGS_H

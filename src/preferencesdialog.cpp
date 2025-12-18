@@ -297,10 +297,12 @@ void PreferencesDialog::loadSettings()
 
 void PreferencesDialog::saveSettings()
 {
+    qDebug() << "Saving to" << settings.configFilePath();
     QSettings s(settings.configFilePath(), QSettings::IniFormat);
 
     for (auto it = widgetMap.begin(); it != widgetMap.end(); ++it) {
         QWidget *w = it.value();
+        qDebug() << it.key() << it.value();
 
         if (auto edit = qobject_cast<QLineEdit*>(w))
             s.setValue(it.key(), edit->text());

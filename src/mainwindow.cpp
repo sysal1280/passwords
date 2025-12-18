@@ -365,6 +365,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionPreferences, &QAction::triggered,
             this, [this]() {
 
+                QFileInfo fi(settings.configFilePath());
+                if (!fi.isWritable()) {
+                    qInfo() << "Config file is not writable:" << settings.configFilePath();
+                    QMessageBox::warning(this,
+                                         ui->actionPreferences->text(),
+                                         "You are not authorised to make configuration changes.");
+                    return;
+                }
+
                 auto *pd = new PreferencesDialog(this);
                 pd->setWindowTitle(ui->actionPreferences->text());
                 pd->adjustSize();
