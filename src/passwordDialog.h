@@ -2,6 +2,7 @@
 #include <QString>
 #include <QStringList>
 #include <QWidget>
+#include "settings.h"
 
 namespace PasswordDialog {
 void showPasswordGenerator(QWidget *parent,

@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QMap>
 #include <QAbstractButton>
+#include "settings.h"
 
 namespace Ui {
 class PreferencesDialog;
@@ -30,6 +31,7 @@ private:
     void onBackupCheckStateChanged(int state);
     void openBackupDir();
     void handleHelpRequested();
+    Settings settings;
 
 };
 

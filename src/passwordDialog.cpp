@@ -22,8 +22,10 @@ namespace PasswordDialog {
 
 void showPasswordGenerator(QWidget *parent,
                            const QString &title,
-                           const QStringList & /*unused*/)
+                           const QStringList & /*wordList*/)
 {
+    Settings settings;  // non-static instance
+
     // Build path to wordlist.rc in config dir
     QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
     QString wordListPath = QDir(configDir).filePath("wordlist.rc");
@@ -41,12 +43,12 @@ void showPasswordGenerator(QWidget *parent,
     }
 
     // Load wordlist from Settings path
-    QStringList wordList = passwordGenerator::loadWordList(Settings::getWordListFile());
+    QStringList wl = passwordGenerator::loadWordList(settings.getWordListFile());
 
     // Unregister after loading
     QResource::unregisterResource(wordListPath);
 
-    if (wordList.isEmpty()) {
+    if (wl.isEmpty()) {
         QMessageBox::warning(
             parent,
             QObject::tr("Word List Missing"),
@@ -65,7 +67,6 @@ void showPasswordGenerator(QWidget *parent,
 
     QVBoxLayout *layout = new QVBoxLayout(&dlg);
 
-    // Instruction label
     QLabel *instruction = new QLabel(
         "Choose the number of words and generate a secure passphrase.\n"
         "You can copy the result to your clipboard.",
@@ -80,7 +81,7 @@ void showPasswordGenerator(QWidget *parent,
     QLabel *wordCountLabel = new QLabel("Words:", &dlg);
     QSpinBox *wordCountSpin = new QSpinBox(&dlg);
     wordCountSpin->setRange(2, 10);
-    wordCountSpin->setValue(Settings::getGeneratedPasswordLength());
+    wordCountSpin->setValue(settings.getGeneratedPasswordLength());
 
     QPushButton *generateBtn = new QPushButton("&Generate", &dlg);
     QPushButton *copyBtn = new QPushButton("&Copy", &dlg);
@@ -97,7 +98,7 @@ void showPasswordGenerator(QWidget *parent,
     layout->addWidget(passwordEdit);
 
     // Pre‑generate a password using the restored spinbox value
-    passwordEdit->setText(passwordGenerator::generatePassword(wordList, wordCountSpin->value(), 100));
+    passwordEdit->setText(passwordGenerator::generatePassword(wl, wordCountSpin->value(), 100));
 
     // Close button
     QHBoxLayout *buttonLayout = new QHBoxLayout;
@@ -108,18 +109,17 @@ void showPasswordGenerator(QWidget *parent,
 
     // Connections
     QObject::connect(generateBtn, &QPushButton::clicked,
-                     generateBtn,   // context object
-                     [wordList, wordCountSpin, passwordEdit]() {
-                         QString pwd = passwordGenerator::generatePassword(wordList,
+                     &dlg,
+                     [wl, wordCountSpin, passwordEdit]() {
+                         QString pwd = passwordGenerator::generatePassword(wl,
                                                                            wordCountSpin->value(),
                                                                            100);
                          passwordEdit->setText(pwd);
                      });
 
-
     QObject::connect(copyBtn, &QPushButton::clicked,
-                     copyBtn,
-                     [passwordEdit]{
+                     &dlg,
+                     [passwordEdit] {
                          QApplication::clipboard()->setText(passwordEdit->text());
                      });
 
@@ -127,10 +127,10 @@ void showPasswordGenerator(QWidget *parent,
 
     QObject::connect(wordCountSpin,
                      QOverload<int>::of(&QSpinBox::valueChanged),
-                     wordCountSpin,   // context object
-                     [wordList, passwordEdit](int newValue) {
-                         Settings::setGeneratedPasswordLength(newValue);
-                         QString pwd = passwordGenerator::generatePassword(wordList, newValue, 100);
+                     &dlg,
+                     [wl, passwordEdit, &settings](int newValue) {
+                         settings.setGeneratedPasswordLength(newValue);
+                         QString pwd = passwordGenerator::generatePassword(wl, newValue, 100);
                          passwordEdit->setText(pwd);
                      });
 
@@ -138,4 +138,4 @@ void showPasswordGenerator(QWidget *parent,
     dlg.exec();
 }
 
-}
+} // namespace PasswordDialog

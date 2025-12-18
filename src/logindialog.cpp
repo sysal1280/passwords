@@ -140,7 +140,7 @@ void LoginDialog::generateResponse()
 
     QStringList words;
     {
-        QFile file(Settings::getWordListFile()); // e.g. :/wordlist/...
+        QFile file(settings.getWordListFile()); // e.g. :/wordlist/...
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QTextStream in(&file);
             while (!in.atEnd()) {

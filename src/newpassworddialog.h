@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QList>
 #include "keyentry.h"
+#include "settings.h"
 
 namespace Ui {
 class NewPasswordDialog;
@@ -39,6 +40,7 @@ private:
     Ui::NewPasswordDialog *ui;
     QList<KeyEntry> m_keys;
     void suggestFields();
+    Settings settings;
 };
 
 #endif // NEWPASSWORDDIALOG_H

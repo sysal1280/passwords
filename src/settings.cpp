@@ -31,102 +31,102 @@
 
 Settings::Settings()
 {
-    configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    // --- Build candidate paths ---
+#ifdef Q_OS_WIN
+    // Windows: ProgramData or GenericConfigLocation
+    QString globalFile = QDir(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation))
+                             .filePath(CONFIG_FILENAME);
+
+#elif defined(Q_OS_MAC)
+    // macOS: /Library/Preferences is the standard global prefs location
+    QString globalFile = QStringLiteral("/Library/Preferences/passwords/") + CONFIG_FILENAME;
+
+#else
+    // Linux/Unix: /etc/yourapp
+    QString globalFile = QStringLiteral("/etc/passwords/") + CONFIG_FILENAME;
+#endif
+
+
+    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
     QDir(configDir).mkpath(".");
+    QString localFile = configDir + "/" + CONFIG_FILENAME;
 
-    configFile = configDir + "/" + CONFIG_FILENAME;
-    QString wlFile = configDir + "/" + WORDLIST_FILENAME;
-
-    auto ensureFile = [](const QString &targetPath,
-                         const QString &resourcePath,
-                         const QString &description)
-    {
-        if (!QFile::exists(targetPath)) {
-            qDebug() << "Copying" << description << "file";
-            if (!QFile::copy(resourcePath, targetPath)) {
-                qWarning().noquote() << "Could not copy" << description << "to" << targetPath;
+    // --- Choose global if it exists, otherwise local ---
+    if (QFile::exists(globalFile)) {
+        configFile = globalFile;
+    } else {
+        configFile = localFile;
+        // ensure local template exists
+        if (!QFile::exists(configFile)) {
+            if (!QFile::copy(":/files/passwords.conf", configFile)) {
+                qWarning() << "Could not copy template config to" << configFile;
             } else {
-                QFile::setPermissions(targetPath,
+                QFile::setPermissions(configFile,
                                       QFileDevice::ReadOwner | QFileDevice::WriteOwner);
             }
         }
-    };
+    }
 
-    ensureFile(configFile, ":/files/passwords.conf", "template config");
-    ensureFile(wlFile, ":/files/wordlist.rc", "wordlist resource");
+    // wordlist resource
+    QString wlFile = configDir + "/" + WORDLIST_FILENAME;
+    if (!QFile::exists(wlFile)) {
+        if (!QFile::copy(":/files/wordlist.rc", wlFile)) {
+            qWarning() << "Could not copy wordlist resource to" << wlFile;
+        } else {
+            QFile::setPermissions(wlFile,
+                                  QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+        }
+    }
 
-    settings = new QSettings(configFile, QSettings::IniFormat);
+    settings = std::make_unique<QSettings>(configFile, QSettings::IniFormat);
 }
 
 
 QString Settings::configFilePath()
 {
-    QString dir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QDir(dir).mkpath(".");
-    qDebug() << Q_FUNC_INFO <<  dir + "/" + CONFIG_FILENAME;
-    return dir + "/" + CONFIG_FILENAME;
+    return settings->fileName();
 }
 
 void Settings::setLastUsedFile(const QString &filePath)
 {
-
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-
-    settings.beginGroup("General");
-    settings.setValue("LastDatabase", filePath);
-    settings.endGroup();
-    settings.sync();
-    qDebug() << "Saving"<<filePath<<"as last database";
+    settings->beginGroup("General");
+    settings->setValue("LastDatabase", filePath);
+    settings->endGroup();
+    settings->sync();
 }
-
 
 QString Settings::getLastUsedFile()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;   // use the constant
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("General");
-    QString val = settings.value("LastDatabase", "").toString();
-    settings.endGroup();
+    settings->beginGroup("General");
+    QString val = settings->value("LastDatabase", "").toString();
+    settings->endGroup();
 
     return val;
 }
 
 QString Settings::getWordListFile()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;   // use the constant
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("Passwords");
-    QString val = QString(":/wordlist/%1").arg(settings.value("WordList", "").toString());
-    settings.endGroup();
+    settings->beginGroup("Passwords");
+    QString val = QString(":/wordlist/%1").arg(settings->value("WordList", "").toString());
+    settings->endGroup();
 
     return val;
 }
 
-
-QString Settings::getPathSeparator()
+QString Settings::getPathSeparator() const
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;   // use the constant
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("Passwords");
-    QString val = settings.value("PathSeparator", " / ").toString();
-    settings.endGroup();
-
+    settings->beginGroup("Passwords");
+    QString val = settings->value("PathSeparator", " / ").toString();
+    settings->endGroup();
     return val;
 }
+
 
 bool Settings::getBackupDatabase()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("General");
-    QString val = settings.value("BackupDatabase", "yes").toString().trimmed().toLower();
-    settings.endGroup();
+    settings->beginGroup("General");
+    QString val = settings->value("BackupDatabase", "yes").toString().trimmed().toLower();
+    settings->endGroup();
 
     // Accept common truthy values
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
@@ -135,12 +135,9 @@ bool Settings::getBackupDatabase()
 
 bool Settings::getCloseHelpServer()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("Help");
-    QString val = settings.value("CloseServer", "yes").toString().trimmed().toLower();
-    settings.endGroup();
+    settings->beginGroup("Help");
+    QString val = settings->value("CloseServer", "yes").toString().trimmed().toLower();
+    settings->endGroup();
 
     // Accept common truthy values
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
@@ -149,12 +146,9 @@ bool Settings::getCloseHelpServer()
 
 bool Settings::getDragDropPrompt()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("Passwords");
-    QString val = settings.value("DragDropPrompt", "yes").toString().trimmed().toLower();
-    settings.endGroup();
+    settings->beginGroup("Passwords");
+    QString val = settings->value("DragDropPrompt", "yes").toString().trimmed().toLower();
+    settings->endGroup();
 
     // Accept common truthy values
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
@@ -163,12 +157,9 @@ bool Settings::getDragDropPrompt()
 
 bool Settings::getKillGpgAgent()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("Passwords");
-    QString val = settings.value("KillGPGAgent", "no").toString().trimmed().toLower();
-    settings.endGroup();
+    settings->beginGroup("Passwords");
+    QString val = settings->value("KillGPGAgent", "no").toString().trimmed().toLower();
+    settings->endGroup();
 
     // Accept common truthy values
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
@@ -177,79 +168,57 @@ bool Settings::getKillGpgAgent()
 
 int Settings::getGeneratedPasswordLength()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;   // use the constant here
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("Passwords");
-    int val = settings.value("GeneratedPasswordLength", 2).toInt();
-    settings.endGroup();
+    settings->beginGroup("Passwords");
+    int val = settings->value("GeneratedPasswordLength", 2).toInt();
+    settings->endGroup();
     return val;
 }
 
 QLineEdit::EchoMode Settings::getEchoMode()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("General");
-    int val = settings.value("EchoMode", QLineEdit::Password).toInt();
-    settings.endGroup();
+    settings->beginGroup("General");
+    int val = settings->value("EchoMode", QLineEdit::Password).toInt();
+    settings->endGroup();
     return static_cast<QLineEdit::EchoMode>(val);
 }
 
-
 int Settings::getHelpPort()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;   // use the constant here
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("Help");
-    int val = settings.value("Port", 1280).toInt();
-    settings.endGroup();
+    settings->beginGroup("Help");
+    int val = settings->value("Port", 1280).toInt();
+    settings->endGroup();
     return val;
 }
 
 int Settings::getMaxRecentResults()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;   // use the constant here
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("Search");
-    int val = settings.value("MaxRecentResults", 15).toInt();
-    settings.endGroup();
+    settings->beginGroup("Search");
+    int val = settings->value("MaxRecentResults", 15).toInt();
+    settings->endGroup();
     return val;
 }
 
 int Settings::getMaxPopularResults()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;   // use the constant here
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("Search");
-    int val = settings.value("MaxPopularResults", 15).toInt();
-    settings.endGroup();
+    settings->beginGroup("Search");
+    int val = settings->value("MaxPopularResults", 15).toInt();
+    settings->endGroup();
     return val;
 }
 
 int Settings::getAutoCloseSeconds()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;   // use the constant here
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("Passwords");
-    int val = settings.value("AutoClose", 0).toInt();
-    settings.endGroup();
+    settings->beginGroup("Passwords");
+    int val = settings->value("AutoClose", 0).toInt();
+    settings->endGroup();
     return val;
 }
 
 bool Settings::getLoginPreference()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("General");
-    QString val = settings.value("RequireChallenge", "yes").toString().trimmed().toLower();
-    settings.endGroup();
+    settings->beginGroup("General");
+    QString val = settings->value("RequireChallenge", "yes").toString().trimmed().toLower();
+    settings->endGroup();
     // Accept common truthy values
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
     return truthy.contains(val);
@@ -257,12 +226,9 @@ bool Settings::getLoginPreference()
 
 bool Settings::getAskClose()
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-    settings.beginGroup("General");
-    QString val = settings.value("AskBeforeClosing", "yes").toString().trimmed().toLower();
-    settings.endGroup();
+    settings->beginGroup("General");
+    QString val = settings->value("AskBeforeClosing", "yes").toString().trimmed().toLower();
+    settings->endGroup();
     // Accept common truthy values
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
     return truthy.contains(val);
@@ -276,13 +242,9 @@ void Settings::setGeneratedPasswordLength(int i)
     if (!dir.exists())
         dir.mkpath(".");
 
-    // use the constant filename
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-
-    settings.beginGroup("Passwords");
-    settings.setValue("GeneratedPasswordLength", i);
-    settings.endGroup();
+    settings->beginGroup("Passwords");
+    settings->setValue("GeneratedPasswordLength", i);
+    settings->endGroup();
 }
 
 QString Settings::getDefaultDbPath(QWidget* parent)
@@ -329,28 +291,19 @@ QString Settings::getDefaultDbPath(QWidget* parent)
 // Save MainWindow geometry/state
 void Settings::saveMainWindowState(QMainWindow *window)
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QDir(configDir).mkpath(".");
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-
-    settings.beginGroup("MainWindow");
-    settings.setValue("geometry", window->saveGeometry());
-    settings.setValue("state", window->saveState());
-    settings.endGroup();
+    settings->beginGroup("MainWindow");
+    settings->setValue("geometry", window->saveGeometry());
+    settings->setValue("state", window->saveState());
+    settings->endGroup();
 }
 
 // Restore MainWindow geometry/state
 void Settings::restoreMainWindowState(QMainWindow *window)
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-
-    settings.beginGroup("MainWindow");
-    window->restoreGeometry(settings.value("geometry").toByteArray());
-    window->restoreState(settings.value("state").toByteArray());
-    settings.endGroup();
+    settings->beginGroup("MainWindow");
+    window->restoreGeometry(settings->value("geometry").toByteArray());
+    window->restoreState(settings->value("state").toByteArray());
+    settings->endGroup();
 }
 
 // Save splitter state
@@ -361,30 +314,21 @@ void Settings::saveSplitterState(QSplitter *splitter, const QString &name)
         return;
     }
 
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QDir(configDir).mkpath(".");
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-
     QByteArray state = splitter->saveState();
     qDebug() << "Saving splitter" << name << "state size:" << state.size();
 
-    settings.beginGroup("Splitters");
-    settings.setValue(name, state);
-    settings.endGroup();
-    settings.sync();
+    settings->beginGroup("Splitters");
+    settings->setValue(name, state);
+    settings->endGroup();
+    settings->sync();
 }
 
 // Restore splitter state
 void Settings::restoreSplitterState(QSplitter *splitter, const QString &name)
 {
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString configFile = configDir + "/" + CONFIG_FILENAME;
-    QSettings settings(configFile, QSettings::IniFormat);
-
-    settings.beginGroup("Splitters");
-    splitter->restoreState(settings.value(name).toByteArray());
-    settings.endGroup();
+    settings->beginGroup("Splitters");
+    splitter->restoreState(settings->value(name).toByteArray());
+    settings->endGroup();
 }
 
 bool Settings::createUserDesktopFile()

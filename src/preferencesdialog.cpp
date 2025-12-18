@@ -186,7 +186,7 @@ void PreferencesDialog::restoreDefaults()
         return; // user cancelled
     }
 
-    const QString targetPath = Settings::configFilePath();
+    const QString targetPath = settings.configFilePath();
     QFile stock(":/files/passwords.conf");
     bool success = false;
 
@@ -239,7 +239,7 @@ PreferencesDialog::~PreferencesDialog()
 
 void PreferencesDialog::openBackupDir()
 {
-    QString settingsPath = Settings::getDefaultDbPath(this);
+    QString settingsPath = settings.getDefaultDbPath(this);
     if (settingsPath.isEmpty()) {
         QMessageBox::warning(this, tr("Error"), tr("Settings path is invalid."));
         return;
@@ -261,7 +261,7 @@ void PreferencesDialog::openBackupDir()
 
 void PreferencesDialog::loadSettings()
 {
-    QSettings s(Settings::configFilePath(), QSettings::IniFormat);
+    QSettings s(settings.configFilePath(), QSettings::IniFormat);
 
     for (auto it = widgetMap.begin(); it != widgetMap.end(); ++it) {
         const QString &key = it.key();
@@ -297,7 +297,7 @@ void PreferencesDialog::loadSettings()
 
 void PreferencesDialog::saveSettings()
 {
-    QSettings s(Settings::configFilePath(), QSettings::IniFormat);
+    QSettings s(settings.configFilePath(), QSettings::IniFormat);
 
     for (auto it = widgetMap.begin(); it != widgetMap.end(); ++it) {
         QWidget *w = it.value();
@@ -318,7 +318,7 @@ void PreferencesDialog::saveSettings()
 
     if (!ui->checkBoxBackupDB->isChecked())
     {
-        const QString dbPath = Settings::getDefaultDbPath(this);
+        const QString dbPath = settings.getDefaultDbPath(this);
         if (!dbPath.isEmpty()) {
             const QString dbDir = QFileInfo(dbPath).absolutePath();
             const QString backupsPath = QDir(dbDir).filePath("backups");
@@ -355,7 +355,7 @@ void PreferencesDialog::onBackupCheckStateChanged(int state)
                                  QMessageBox::No);
 
         if (reply == QMessageBox::Yes) {
-            const QString dbPath = Settings::getDefaultDbPath(this);
+            const QString dbPath = settings.getDefaultDbPath(this);
             if (!dbPath.isEmpty()) {
                 const QString dbDir = QFileInfo(dbPath).absolutePath();
                 const QString backupsPath = QDir(dbDir).filePath("backups");

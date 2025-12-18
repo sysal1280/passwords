@@ -55,6 +55,7 @@ public:
 
 private:
     QPlainTextEdit *textEdit;
+    Settings settings;
 
     QString collectSystemInfo()
     {
@@ -114,7 +115,7 @@ private:
         report += QString(tr("  Configuration file: %1\n"
                           "  Database file: %2\n"
                              "  Executable file: %3\n"))
-                      .arg(QDir::toNativeSeparators(Settings::configFilePath()),
+                      .arg(QDir::toNativeSeparators(settings.configFilePath()),
                            QDir::toNativeSeparators(qApp->property("dbFile").toString()),
                            QDir::toNativeSeparators(QCoreApplication::applicationFilePath()));
 

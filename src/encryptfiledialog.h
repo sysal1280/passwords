@@ -12,6 +12,7 @@
 #include <QCheckBox>
 #include <mainwindow.h>
 #include "gpgCheck.h"
+#include "settings.h"
 
 class EncryptFileDialog : public QDialog
 {
@@ -52,9 +53,9 @@ public:
         m_passEdit = new QLineEdit(this);
         m_passConfirmEdit = new QLineEdit(this);
 
-        m_passEdit->setEchoMode(QLineEdit::Password);
+        m_passEdit->setEchoMode(settings.getEchoMode());
         m_passEdit->setPlaceholderText(tr("Password"));
-        m_passConfirmEdit->setEchoMode(QLineEdit::Password);
+        m_passConfirmEdit->setEchoMode(settings.getEchoMode());
         m_passConfirmEdit->setPlaceholderText(tr("Password again"));
 
         form->addRow(tr("Password:"), m_passEdit);
@@ -225,4 +226,5 @@ private:
     QLineEdit *m_passConfirmEdit = nullptr;
     QCheckBox *m_asciiCheck = nullptr;
     QString m_lastSuggestedOutput;
+    Settings settings;
 };

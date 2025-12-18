@@ -13,7 +13,7 @@
 #include <QSplitter>
 #include <QProcess>
 #include <QIcon>
-
+#include "settings.h"
 #include "keyentry.h"
 
 namespace Ui {
@@ -146,6 +146,8 @@ private:
     QIcon closedIcon;
     QIcon openIcon;
     QProcess *helperProcess = nullptr;
+
+    Settings settings;
 };
 
 #endif // MAINWINDOW_H

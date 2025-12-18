@@ -23,41 +23,41 @@ public:
     Settings();
 
     // Example getters/setters
-    static QString configFilePath();
+     QString configFilePath();
 
-    static void setLastUsedFile(const QString &filePath);
-    static QString getLastUsedFile();
-    static int getGeneratedPasswordLength();
-    static void setGeneratedPasswordLength(int i);
-    static QString getDefaultDbPath(QWidget* parent);
-    static bool getBackupDatabase();
-    static bool getKillGpgAgent();
-    static bool getLoginPreference();
-    static bool getAskClose();
-    static void saveMainWindowState(QMainWindow *window);
-    static void restoreMainWindowState(QMainWindow *window);
-    static int getAutoCloseSeconds();
-    static int getMaxRecentResults();
-    static int getMaxPopularResults();
-    static QString getPathSeparator();
-    static bool getDragDropPrompt();
-    static QString getWordListFile();
-    static bool getCloseHelpServer();
+    void setLastUsedFile(const QString &filePath);
+     QString getLastUsedFile();
+     int getGeneratedPasswordLength();
+     void setGeneratedPasswordLength(int i);
+     QString getDefaultDbPath(QWidget* parent);
+     bool getBackupDatabase();
+     bool getKillGpgAgent();
+     bool getLoginPreference();
+     bool getAskClose();
+     void saveMainWindowState(QMainWindow *window);
+     void restoreMainWindowState(QMainWindow *window);
+     int getAutoCloseSeconds();
+     int getMaxRecentResults();
+     int getMaxPopularResults();
+     QString getPathSeparator() const;
+     bool getDragDropPrompt();
+     QString getWordListFile();
+     bool getCloseHelpServer();
 
-    static void saveSplitterState(QSplitter *splitter, const QString &name);
-    static void restoreSplitterState(QSplitter *splitter, const QString &name);
-    static bool createUserDesktopFile();
-    static bool verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent);
-    static int getHelpPort();
-    static QLineEdit::EchoMode getEchoMode();
+     void saveSplitterState(QSplitter *splitter, const QString &name);
+     void restoreSplitterState(QSplitter *splitter, const QString &name);
+     bool createUserDesktopFile();
+     bool verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent);
+     int getHelpPort();
+     QLineEdit::EchoMode getEchoMode();
 
 private:
     QString configDir;
     QString configFile;
-    QSettings *settings;
+    std::unique_ptr<QSettings> settings;
 
-    static constexpr const char* CONFIG_FILENAME = "passwords.conf";
-    static constexpr const char* WORDLIST_FILENAME = "wordlist.rc";
+     static constexpr const char* CONFIG_FILENAME = "passwords.conf";
+     static constexpr const char* WORDLIST_FILENAME = "wordlist.rc";
 };
 
 #endif // SETTINGS_H

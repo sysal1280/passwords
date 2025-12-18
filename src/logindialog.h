@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QMap>
 #include <QAbstractButton>
+#include "settings.h"
 
 namespace Ui {
 class LoginDialog;
@@ -31,6 +32,7 @@ private:
     void generateResponse();
     void tryResponse();
     void checkHelperFiles();
+    Settings settings;
 
 };
 

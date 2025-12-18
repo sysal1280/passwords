@@ -77,7 +77,8 @@ static QStringList checkKeysWithGpg(const QStringList &keys) {
 
 void checkGpgKeys(QWidget* parent)
 {
-    QString dbFile = Settings::getDefaultDbPath(parent);
+    Settings settings;
+    QString dbFile = settings.getDefaultDbPath(parent);
     if (!QFileInfo::exists(dbFile))
     {
         qDebug() << "skipping GPG keys check, no database.";
@@ -116,14 +117,14 @@ void checkGpgKeys(QWidget* parent)
     // Async GPG check
     auto *watcher = new QFutureWatcher<QStringList>(parent);
     QObject::connect(watcher, &QFutureWatcher<QStringList>::finished, parent,
-                     [parent, watcher]() {
+                     [parent, watcher, &settings]() {
                          QStringList invalidKeys = watcher->result();
 
                          if (!invalidKeys.isEmpty()) {
                              const QString connNameWrite = QUuid::createUuid().toString();
                              {
                                  QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connNameWrite);
-                                 db.setDatabaseName(Settings::getDefaultDbPath(parent));
+                                 db.setDatabaseName(settings.getDefaultDbPath(parent));
                                  if (db.open()) {
                                      for (const auto &keyId : std::as_const(invalidKeys)) {
                                          QSqlQuery remove(db);

@@ -108,7 +108,8 @@ int main(int argc, char *argv[])
     splash->showMessage(QCoreApplication::translate("main", "Checking installation.."),
                         Qt::AlignBottom | Qt::AlignLeft,Qt::white);
     QApplication::processEvents();
-    Settings::createUserDesktopFile();
+    Settings settings;   // construct your Settings instance
+    settings.createUserDesktopFile();  // call the member function
 
 
     /*
@@ -257,7 +258,7 @@ Ensure it is accessible in your PATH.
     /*
      * Show main window with slight delay and handle login preference
      */
-    QTimer::singleShot(500, w, [w, splash]() {
+    QTimer::singleShot(500, w, [w, splash, &settings]() {
         w->show();
         w->activateWindow();
         w->raise();
@@ -271,7 +272,7 @@ Ensure it is accessible in your PATH.
         splash->finish(w);
         delete splash;
 
-        if (Settings::getLoginPreference()) {
+        if (settings.getLoginPreference()) {
             LoginDialog login(w);
             login.move(w->geometry().center() - login.rect().center());
             login.setModal(true);
@@ -295,7 +296,8 @@ Ensure it is accessible in your PATH.
  */
 static bool setupDatabaseFile()
 {
-    qApp->setProperty("dbFile", Settings::getDefaultDbPath(nullptr));
+    Settings settings;
+    qApp->setProperty("dbFile", settings.getDefaultDbPath(nullptr));
 
     const QString dbPath = qApp->property("dbFile").toString();
     QFile file(dbPath);

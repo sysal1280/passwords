@@ -91,9 +91,9 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(central);
 
     // Restore saved window and splitter states
-    Settings::restoreMainWindowState(this);
-    Settings::restoreSplitterState(vSplitter, "vsplit");
-    Settings::restoreSplitterState(hSplitter, "hsplit");
+    settings.restoreMainWindowState(this);
+    settings.restoreSplitterState(vSplitter, "vsplit");
+    settings.restoreSplitterState(hSplitter, "hsplit");
 
     ui->treeWidget->setHeaderLabels({ tr("Categories") });
     ui->treeWidget->header()->setStretchLastSection(true);
@@ -235,9 +235,10 @@ MainWindow::MainWindow(QWidget *parent)
                 PasswordDialog::showPasswordGenerator(
                     this,
                     ui->actionGenerate_Password->text(),
-                    {} // ignored, wordlist is loaded internally
+                    QStringList()   // empty list
                     );
             });
+
 
     connect(ui->actionEncrypt_File, &QAction::triggered,
             this, &MainWindow::encryptFile);
@@ -443,7 +444,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (Settings::getCloseHelpServer()) {
+    if (settings.getCloseHelpServer()) {
         if (helperProcess) {
             // Disconnect error handler so no spurious popup
             disconnect(helperProcess, &QProcess::errorOccurred, nullptr, nullptr);
@@ -460,7 +461,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
     }
 
-    if (Settings::getAskClose()) {
+    if (settings.getAskClose()) {
         auto reply = QMessageBox::question(this,
                                            tr("Confirm Exit"),
                                            tr("Do you really want to quit?"),
@@ -472,13 +473,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 
     if (!qApp->property("skipSave").toBool()) {
-        Settings::saveMainWindowState(this);
-        Settings::saveSplitterState(vSplitter, "vsplit");
-        Settings::saveSplitterState(hSplitter, "hsplit");
+        settings.saveMainWindowState(this);
+        settings.saveSplitterState(vSplitter, "vsplit");
+        settings.saveSplitterState(hSplitter, "hsplit");
     }
 
     // Update last used file
-    Settings::setLastUsedFile(qApp->property("dbFile").toString());
+    settings.setLastUsedFile(qApp->property("dbFile").toString());
 
     event->accept();
 }
@@ -1171,7 +1172,7 @@ void MainWindow::clearScrollArea()
     connect(imageLabel, &DropLabel::itemDropped,
             this, [this](QTreeWidgetItem *item) {
                 if (!item) return;
-                if (Settings::getKillGpgAgent()) {
+                if (settings.getKillGpgAgent()) {
                     killGpgAgent();
                 }
                 openPassword(item);
@@ -1182,7 +1183,7 @@ void MainWindow::clearScrollArea()
 
 void MainWindow::openPassword(QTreeWidgetItem *item)
 {
-    if (Settings::getKillGpgAgent()) {
+    if (settings.getKillGpgAgent()) {
         killGpgAgent();
     }
 
@@ -1420,16 +1421,19 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         QLineEdit* passwordEdit = new QLineEdit();
         passwordEdit->setText(password);
         passwordEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
-        passwordEdit->setEchoMode(Settings::getEchoMode());
+        passwordEdit->setEchoMode(settings.getEchoMode());
         passwordEdit->setReadOnly(true);
 
         QAction *showPasswordAction = new QAction(tr("Show Password"), passwordEdit);
         showPasswordAction->setCheckable(true);
         passwordEdit->addAction(showPasswordAction);
 
-        connect(showPasswordAction, &QAction::toggled, this, [passwordEdit](bool checked) {
-            passwordEdit->setEchoMode(checked ? QLineEdit::Normal : Settings::getEchoMode());
-        });
+        connect(showPasswordAction, &QAction::toggled,
+                this, [this, passwordEdit](bool checked) {
+                    passwordEdit->setEchoMode(checked ? QLineEdit::Normal
+                                                      : settings.getEchoMode());
+                });
+
 
         QAction *copyPasswordAction = new QAction(tr("Copy Password"), passwordEdit);
         copyPasswordAction->setStatusTip("Password ony remains in clipboard for 15 seconds");
@@ -1610,7 +1614,7 @@ row++;
     /*
      * Setup any autoclose singlshot timer
      */
-    int autoClose = Settings::getAutoCloseSeconds();
+    int autoClose = settings.getAutoCloseSeconds();
     if (autoClose > 0) {
         autoCloseTimer->stop();
         autoCloseTimer->start(autoClose * 1000);
@@ -2082,7 +2086,7 @@ void MainWindow::keyList()
                 msgBox.setIcon(QMessageBox::Critical);
                 msgBox.setWindowTitle(tr("Key"));
                 msgBox.setText(tr("The key does not have ultimate trust.\n"
-                                  "Untrusted keys cannot encrypt passwords."));
+                                  "Untrusted keys cannot be used to encrypt passwords."));
                 msgBox.setStandardButtons(QMessageBox::Ok);
                 QPushButton *helpButton = msgBox.addButton(QMessageBox::Help);
                 connect(helpButton, &QPushButton::clicked, this, [this]() {
@@ -2140,7 +2144,7 @@ void MainWindow::keyList()
             if (db.open())
             {
 
-            if (!Settings::verifyDeleteAllowed(db, this)) {
+            if (!settings.verifyDeleteAllowed(db, this)) {
                 QMessageBox::warning(this, tr("Error"), tr("Delete not permitted."));
                 return; // bail out early
             }
@@ -2347,12 +2351,12 @@ void MainWindow::encryptMessage()
 
     QLabel *passLabel1 = new QLabel("Password:", dlg);
     QLineEdit *passEdit1 = new QLineEdit(dlg);
-    passEdit1->setEchoMode(Settings::getEchoMode());
+    passEdit1->setEchoMode(settings.getEchoMode());
     passEdit1->setPlaceholderText("Enter password");
 
     QLabel *passLabel2 = new QLabel("Confirm:", dlg);
     QLineEdit *passEdit2 = new QLineEdit(dlg);
-    passEdit2->setEchoMode(Settings::getEchoMode());
+    passEdit2->setEchoMode(settings.getEchoMode());
     passEdit2->setPlaceholderText("Re-enter password");
 
     QPushButton *generateBtn = new QPushButton("Generate Password", dlg);
@@ -2551,7 +2555,7 @@ void MainWindow::decryptMessage()
     QHBoxLayout *passLayout = new QHBoxLayout;
     QLabel *passLabel = new QLabel("Password:", dlg);
     QLineEdit *passEdit = new QLineEdit(dlg);
-    passEdit->setEchoMode(Settings::getEchoMode());
+    passEdit->setEchoMode(settings.getEchoMode());
     passEdit->setPlaceholderText("Enter password");
 
     QPushButton *decryptBtn = new QPushButton("&Decrypt", dlg);
@@ -2815,14 +2819,14 @@ void MainWindow::decryptFile()
         );
     if (inputFile.isEmpty())
         return;
-    qDebug() << "EchoMode is" << Settings::getEchoMode();
+    qDebug() << "EchoMode is" << settings.getEchoMode();
     // Prompt for password
     QDialog passDlg(this);
     passDlg.setWindowTitle("Enter Password");
     QVBoxLayout layout(&passDlg);
     QLabel label("Enter password to decrypt the file:", &passDlg);
     QLineEdit passEdit(&passDlg);
-    passEdit.setEchoMode(Settings::getEchoMode());
+    passEdit.setEchoMode(settings.getEchoMode());
     QPushButton okBtn("&OK", &passDlg);
     QPushButton cancelBtn("&Cancel", &passDlg);
 
@@ -2942,7 +2946,7 @@ bool MainWindow::openDatabase(const QString &fileName)
     QSqlDatabase::removeDatabase(connName);
 
     // Backup only if database was valid
-    if (Settings::getBackupDatabase()) {
+    if (settings.getBackupDatabase()) {
         QFileInfo fi(fileName);
         QString backupDirPath = fi.absolutePath() + "/backups";
         QDir backupDir(backupDirPath);
@@ -3169,7 +3173,7 @@ QString MainWindow::buildItemPath(QTreeWidgetItem *item) const
         parts.prepend(current->text(0)); // column 0 holds the name
         current = current->parent();
     }
-    return parts.join(Settings::getPathSeparator()); // or " > " if you prefer
+    return parts.join(settings.getPathSeparator()); // or " > " if you prefer
 }
 
 
@@ -3190,9 +3194,9 @@ void MainWindow::populateBookmarksMenu()
 
         // Only show Recent and Popular if the number of results
         // of these queries has been set to > 0.
-        if (Settings::getMaxRecentResults()>0)
+        if (settings.getMaxRecentResults()>0)
             ui->menuBookmarks->addAction(ui->actionRecent);
-        if (Settings::getMaxPopularResults()>0)
+        if (settings.getMaxPopularResults()>0)
             ui->menuBookmarks->addAction(ui->actionPopular);
 
         if (!ui->menuBookmarks->isEmpty())
@@ -3236,7 +3240,7 @@ void MainWindow::populateBookmarksMenu()
             }
 
             if (categoryItem) {
-                pathTip = buildItemPath(categoryItem) + Settings::getPathSeparator() + appName;
+                pathTip = buildItemPath(categoryItem) + settings.getPathSeparator() + appName;
             } else {
                 qDebug() << "populateBookmarksMenu: categoryId" << categoryId << "not found in tree";
             }
@@ -3543,7 +3547,7 @@ void MainWindow::deletePassword(QTreeWidgetItem *item)
                 return;
             }
 
-            if (!Settings::verifyDeleteAllowed(db, this)) {
+            if (!settings.verifyDeleteAllowed(db, this)) {
                 QMessageBox::warning(this, tr("Error"), tr("Delete not permitted."));
                 return; // bail out early
             }
@@ -3589,7 +3593,7 @@ void MainWindow::deleteCategory(QTreeWidgetItem *item)
             return;
         }
 
-        if (!Settings::verifyDeleteAllowed(db, this)) {
+        if (!settings.verifyDeleteAllowed(db, this)) {
             QMessageBox::warning(this, ui->actionDelete_Category->text(), tr("Delete not permitted."));
             return; // bail out early
         }
@@ -3649,7 +3653,7 @@ void MainWindow::searchPopular()
                           "GROUP BY a.id, a.category_id, a.application_name "
                           "ORDER BY view_count DESC, last_viewed DESC "
                           "LIMIT %1"
-                          ).arg(Settings::getMaxPopularResults());
+                          ).arg(settings.getMaxPopularResults());
 
         QSqlQuery query(db);
         if (!query.exec(sql)) {
@@ -3781,7 +3785,7 @@ void MainWindow::searchRecent()
             "   LIMIT 1 "
             ") "
             "ORDER BY av.dt DESC, av.audit_id DESC "
-            "LIMIT %1;").arg(Settings::getMaxRecentResults());
+            "LIMIT %1;").arg(settings.getMaxRecentResults());
 
         QSqlQuery query(db);
         if (!query.exec(sql)) {
@@ -3903,12 +3907,12 @@ QString MainWindow::buildCategoryPath(int categoryId, const QString &appKey, QSq
         currentId = parentVar.toInt();
     }
 
-    return parts.join(Settings::getPathSeparator());
+    return parts.join(settings.getPathSeparator());
 }
 
 void MainWindow::editPassword(QTreeWidgetItem *item)
 {
-    if (Settings::getKillGpgAgent()) {
+    if (settings.getKillGpgAgent()) {
         killGpgAgent();
     }
 
@@ -4112,7 +4116,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
         );
     if (reply != QMessageBox::Yes) return;
 
-    if (Settings::getKillGpgAgent()) {
+    if (settings.getKillGpgAgent()) {
         killGpgAgent();
     }
 
@@ -4214,7 +4218,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
     gpg->start("gpg", QStringList() << "--decrypt");
 }
 
-QString getItemPath(QTreeWidgetItem *item, int column = 0)
+QString MainWindow::getItemPath(QTreeWidgetItem *item, int column)
 {
     QStringList parts;
     QTreeWidgetItem *current = item;
@@ -4222,7 +4226,7 @@ QString getItemPath(QTreeWidgetItem *item, int column = 0)
         parts.prepend(current->text(column));   // or current->data(column, Qt::UserRole).toString()
         current = current->parent();
     }
-    return parts.join(Settings::getPathSeparator());
+    return parts.join(settings.getPathSeparator());
 }
 
 void MainWindow::moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targetItem) {
@@ -4239,7 +4243,7 @@ void MainWindow::moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targ
         return;
     }
 
-    if (Settings::getDragDropPrompt()) {
+    if (settings.getDragDropPrompt()) {
         const QString msg = tr("Move entry \"%1\" to category \"%2\"?")
         .arg(sourceItem->text(0), targetItem->text(0));
         if (QMessageBox::question(this, tr("Confirm Move"), msg,
@@ -4944,7 +4948,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
         if (openedCredentialID == -1) {
             qDebug() << "Already closed";
-            if (Settings::getAskClose()) {
+            if (settings.getAskClose()) {
                 close();
             }
             event->accept();
@@ -4987,7 +4991,7 @@ void MainWindow::launchHelperProcess(const QString &page)
 
     QStringList args;
     args << "--webdir" << tempDir
-         << "--port"   << QString::number(Settings::getHelpPort());
+         << "--port"   << QString::number(settings.getHelpPort());
 
     if (!page.isEmpty()) {
         args << "--page" << page;

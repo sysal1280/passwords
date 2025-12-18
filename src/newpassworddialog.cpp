@@ -68,7 +68,7 @@ NewPasswordDialog::NewPasswordDialog(QWidget *parent)
 
     connect(ui->pushButtonGenerate, &QPushButton::clicked,
             this, [this]() {
-                QStringList wordList = passwordGenerator::loadWordList(Settings::getWordListFile());
+                QStringList wordList = passwordGenerator::loadWordList(settings.getWordListFile());
                 PasswordDialog::showPasswordGenerator(this, tr("Generate Password"), wordList);
             });
 
