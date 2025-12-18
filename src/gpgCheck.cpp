@@ -31,7 +31,8 @@
 #include <QtConcurrent/QtConcurrentRun>
 #include <QFutureWatcher>
 #include <QFileInfo>
-
+#include "DataObfuscator.h"
+#include <QApplication>
 
 bool isToolAvailable(const QString &toolName)
 {
@@ -85,7 +86,7 @@ void checkGpgKeys(QWidget* parent)
         return;
     }
 
-    const QString connNameRead = QUuid::createUuid().toString();
+    const QString connNameRead = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QStringList keys;
 
     // Read keys
@@ -99,6 +100,9 @@ void checkGpgKeys(QWidget* parent)
             return;
         }
 
+
+        qDebug() << qApp->property("appKey").toByteArray();
+
         QSqlQuery select(db);
         if (!select.exec("SELECT key FROM keys")) {
             qWarning() << "gpgCheck Error:" << select.lastError().text();
@@ -108,7 +112,10 @@ void checkGpgKeys(QWidget* parent)
         }
 
         while (select.next())
-            keys << select.value(0).toString();
+        {
+            keys << DataObfuscator::deobfuscate(select.value(0).toString(),qApp->property("appKey").toByteArray());
+            qDebug() << DataObfuscator::deobfuscate(select.value(0).toString(),qApp->property("appKey").toByteArray());
+        }
 
         db.close();
     }
@@ -129,7 +136,7 @@ void checkGpgKeys(QWidget* parent)
                                      for (const auto &keyId : std::as_const(invalidKeys)) {
                                          QSqlQuery remove(db);
                                          remove.prepare("DELETE FROM keys WHERE key = :key");
-                                         remove.bindValue(":key", keyId);
+                                         remove.bindValue(":key", DataObfuscator::obfuscate(keyId,qApp->property("appKey").toByteArray()));
                                          if (!remove.exec())
                                              qWarning() << "Failed to remove key:" << keyId << remove.lastError().text();
                                      }

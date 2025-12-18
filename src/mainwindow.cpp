@@ -1003,8 +1003,8 @@ QList<KeyEntry> MainWindow::fetchKeys() const
             while (query.next()) {
                 KeyEntry entry;
                 entry.id    = query.value(0).toInt();
-                entry.label = query.value(1).toString();
-                entry.key   = query.value(2).toString();
+                entry.label = DataObfuscator::deobfuscate(query.value(1).toString(),qApp->property("appKey").toByteArray());
+                entry.key   = DataObfuscator::deobfuscate(query.value(2).toString(),qApp->property("appKey").toByteArray());
                 keys.append(entry);
             }
         }
@@ -2021,8 +2021,8 @@ void MainWindow::keyList()
             int row = 0;
             while (query.next()) {
                 table->insertRow(row);
-                table->setItem(row, 0, new QTableWidgetItem(query.value(0).toString()));
-                table->setItem(row, 1, new QTableWidgetItem(query.value(1).toString()));
+                table->setItem(row, 0, new QTableWidgetItem(DataObfuscator::deobfuscate(query.value(0).toString(),this->appKey)));
+                table->setItem(row, 1,new QTableWidgetItem(DataObfuscator::deobfuscate(query.value(1).toString(),this->appKey)));
                 row++;
             }
         } else {
@@ -2113,8 +2113,8 @@ void MainWindow::keyList()
                 if (db.open()) {
                     QSqlQuery insert(db);
                     insert.prepare("INSERT INTO keys (label, key) VALUES (:label, :key)");
-                    insert.bindValue(":label", name);
-                    insert.bindValue(":key", keyId);
+                    insert.bindValue(":label", DataObfuscator::obfuscate(name,this->appKey));
+                    insert.bindValue(":key", DataObfuscator::obfuscate(keyId,this->appKey));
                     if (!insert.exec()) {
                         QMessageBox::critical(dlg, tr("Error"), insert.lastError().text());
                         return;
@@ -2161,7 +2161,7 @@ void MainWindow::keyList()
 
             QSqlQuery remove(db);
             remove.prepare("DELETE FROM keys WHERE key = :key");
-            remove.bindValue(":key", keyId);
+            remove.bindValue(":key", DataObfuscator::obfuscate(keyId,this->appKey));
             if (!remove.exec()) {
                 qWarning() << "Failed to delete key:" << remove.lastError().text();
                 QMessageBox::critical(dlg, tr("Error"), tr("Failed to unlink key from database."));
@@ -3433,6 +3433,7 @@ void MainWindow::initDb()
             qDebug() << tr("Failed to read app_key") << query.lastError().text();
         } else if (query.next()) {
             this->appKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
+            qApp->setProperty("appKey", QByteArray::fromBase64(query.value(0).toString().toUtf8()));
         } else {
             qCritical() << "No app_key found in app_info table.";
         }
@@ -4080,8 +4081,6 @@ connect(gpg,
                                     update.bindValue(":data", DataObfuscator::obfuscate(QString::fromUtf8(newEncrypted), appKey));
                                     update.bindValue(":id", item->data(0, Qt::UserRole).toInt());
                                     if (!update.exec()) { qDebug() << "Update failed:" << update.lastError().text(); ok = false; }
-
-                                    // … audit and token logic unchanged …
 
                                     if (ok) { if (!db.commit()) qDebug() << "Commit failed:" << db.lastError().text(); }
                                     else { if (!db.rollback()) qDebug() << "Rollback failed:" << db.lastError().text(); }
