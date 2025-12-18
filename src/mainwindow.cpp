@@ -25,6 +25,7 @@
 #include <QLabel>
 #include <QClipboard>
 #include <QTextEdit>
+#include <QRandomGenerator>
 #include <QJsonDocument>
 #include <QTableWidget>
 #include <QListWidget>
@@ -873,7 +874,7 @@ void MainWindow::newPassword()
         QFile outFile(tempFile);
         if (!outFile.exists() || !outFile.open(QIODevice::ReadOnly)) {
             qDebug() << "Encrypted file not found or failed to open:" << tempFile;
-            QFile::remove(tempFile);
+            wipeFile(tempFile);
             return;
         }
 
@@ -5068,17 +5069,58 @@ QString MainWindow::formatOtp(const QString& otp)
     return formatted;
 }
 
-void MainWindow::wipeFile(const QString &path)
+void MainWindow::wipeFile(const QString &path, int passes)
 {
     QFile f(path);
-    if (f.open(QIODevice::ReadWrite)) {
-        qDebug() << "Wiping" << f.fileName() <<"'s ass!";
-        qint64 size = f.size();
-        QByteArray zeros(size, '\0');
-        f.seek(0);
-        f.write(zeros);
-        f.flush();
-        f.close();
+    if (!f.open(QIODevice::ReadWrite)) {
+        qWarning() << "Failed to open file for wiping:" << path;
+        return;
     }
-    QFile::remove(path);
+
+    qint64 size = f.size();
+    const qint64 chunkSize = 4096;
+    QByteArray buffer(chunkSize, '\0');
+
+    for (int pass = 0; pass < passes; ++pass) {
+        qDebug() << "Wiping pass" << (pass + 1) << "on" << f.fileName();
+
+        if (!f.seek(0)) {
+            qWarning() << "Failed to seek to beginning of file:" << f.fileName();
+            break;
+        }
+
+        qint64 remaining = size;
+        while (remaining > 0) {
+            qint64 toWrite = qMin(chunkSize, remaining);
+
+            if (pass % 2 == 0) {
+                // Random data pass
+                for (qint64 i = 0; i < toWrite; ++i) {
+                    buffer[i] = static_cast<char>(
+                        QRandomGenerator::global()->bounded(256));
+                }
+            } else {
+                // Zero pass
+                buffer.fill('\0', toWrite);
+            }
+
+            if (f.write(buffer.constData(), toWrite) != toWrite) {
+                qWarning() << "Failed to overwrite chunk in" << f.fileName();
+                break;
+            }
+
+            remaining -= toWrite;
+        }
+
+        f.flush();
+    }
+
+    f.close();
+
+    if (!QFile::remove(path)) {
+        qWarning() << "Failed to remove file:" << path;
+    } else {
+        qDebug() << "File securely wiped and removed:" << path;
+    }
 }
+

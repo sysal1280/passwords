@@ -118,7 +118,7 @@ private:
 
     QString formatOtp(const QString& otp);
 
-    void wipeFile(const QString &path);
+    void wipeFile(const QString &path, int passes = 2);
 
     void newPassword();
     void openPassword(QTreeWidgetItem *item);
