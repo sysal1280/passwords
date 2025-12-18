@@ -44,10 +44,10 @@ public:
     static QByteArray base32Decode(const QString &base32);
     QList<KeyEntry> fetchKeys() const;
 
-    // Public state
     QString userName;
     QByteArray appKey = "";
     int openedCredentialID = -1;
+
     bool showDebugMessages = false;
 
     QLabel *countdownLabel = nullptr;

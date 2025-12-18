@@ -453,6 +453,17 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    if (settings.getAskClose()) {
+        auto reply = QMessageBox::question(this,
+                                           tr("Confirm Exit"),
+                                           tr("Do you really want to quit?"),
+                                           QMessageBox::Yes | QMessageBox::No);
+        if (reply == QMessageBox::No) {
+            event->ignore();
+            return;
+        }
+    }
+
     if (settings.getCloseHelpServer()) {
         if (helperProcess) {
             // Disconnect error handler so no spurious popup
@@ -467,17 +478,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
         } else
         {
             qInfo() << "Could not find a help server to close.";
-        }
-    }
-
-    if (settings.getAskClose()) {
-        auto reply = QMessageBox::question(this,
-                                           tr("Confirm Exit"),
-                                           tr("Do you really want to quit?"),
-                                           QMessageBox::Yes | QMessageBox::No);
-        if (reply == QMessageBox::No) {
-            event->ignore();
-            return;
         }
     }
 
