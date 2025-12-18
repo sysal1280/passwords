@@ -1,28 +1,30 @@
 QTreeWidget::item:selected {
-    background-color: #0064b9;
+    background-color: #2299d4;
     color: white;
 }
 
 QTableView::item:selected {
-    background-color: #0064b9;
+    background-color: #2299d4;
     color: white;
 }
 
 QMenuBar::item:selected {
-    background-color: #0064b9;
+    background-color: #2299d4;
     color: white;
 }
 
 QMenuBar::item:pressed {
-    background-color: #0064b9;
+    background-color: #2299d4;
     color: white;
 }
 
 QMenu::item:selected {
-    background-color: #0064b9;
+    background-color: #2299d4;
     color: white;
 }
 
 QLineEdit {
     background-color: white;
 }
+
+

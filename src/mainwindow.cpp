@@ -4058,7 +4058,7 @@ connect(gpg,
                         if (f.open(QIODevice::ReadOnly)) {
                             QByteArray newEncrypted = f.readAll();
                             f.close();
-                            QFile::remove(tempFile);
+                            wipeFile(tempFile);
                             {
                                 QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE","sqlEditPassword");
                                 db.setDatabaseName(qApp->property("dbFile").toString());
@@ -4556,7 +4556,7 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
             }
             QByteArray encrypted = outFile.readAll();
             outFile.close();
-            QFile::remove(tempFile);
+            wipeFile(tempFile);
 
             if (encrypted.isEmpty()) {
                 errors << tr("Skipping '%1': encrypted output is empty.")
@@ -4954,15 +4954,12 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     //ESC Key
     if (event->key() == Qt::Key_Escape) {
-        qDebug() << "Escape pressed!";
-
         if (openedCredentialID == -1) {
-            qDebug() << "Already closed";
             if (settings.getAskClose()) {
                 close();
             }
             event->accept();
-            return; // symmetry with other branch
+            return;
         } else {
             clearScrollArea();
             event->accept();
