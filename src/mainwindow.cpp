@@ -2017,12 +2017,13 @@ void MainWindow::keyList()
         }
 
         QSqlQuery query(db);
-        if (query.exec("SELECT label, key FROM keys")) {
+        if (query.exec("SELECT id, label, key FROM keys")) {
             int row = 0;
             while (query.next()) {
                 table->insertRow(row);
-                table->setItem(row, 0, new QTableWidgetItem(DataObfuscator::deobfuscate(query.value(0).toString(),this->appKey)));
-                table->setItem(row, 1,new QTableWidgetItem(DataObfuscator::deobfuscate(query.value(1).toString(),this->appKey)));
+                table->setItem(row, 0, new QTableWidgetItem(DataObfuscator::deobfuscate(query.value(1).toString(),this->appKey)));
+                table->setItem(row, 1,new QTableWidgetItem(DataObfuscator::deobfuscate(query.value(2).toString(),this->appKey)));
+                table->item(row,1)->setData(Qt::UserRole,query.value(0).toInt());
                 row++;
             }
         } else {
@@ -2142,6 +2143,11 @@ void MainWindow::keyList()
         QString name  = table->item(row, 0)->text();
         QString keyId = table->item(row, 1)->text();
 
+        qDebug() << table->item(row,1)->data(Qt::UserRole);
+        qDebug() << qApp->property("appKey").toByteArray();
+        qDebug() << keyId;
+        qDebug() << DataObfuscator::obfuscate(keyId,qApp->property("appKey").toByteArray());
+
         if (QMessageBox::question(dlg, tr("Confirm Delete"),
                                   QString(tr("Delete key '%1' (%2)?")).arg(name, keyId))
             != QMessageBox::Yes) {
@@ -2160,8 +2166,8 @@ void MainWindow::keyList()
             }
 
             QSqlQuery remove(db);
-            remove.prepare("DELETE FROM keys WHERE key = :key");
-            remove.bindValue(":key", DataObfuscator::obfuscate(keyId,this->appKey));
+            remove.prepare("DELETE FROM keys WHERE id = :id");
+            remove.bindValue(":id",table->item(row,1)->data(Qt::UserRole).toInt());
             if (!remove.exec()) {
                 qWarning() << "Failed to delete key:" << remove.lastError().text();
                 QMessageBox::critical(dlg, tr("Error"), tr("Failed to unlink key from database."));
