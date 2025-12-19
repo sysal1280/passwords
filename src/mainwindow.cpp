@@ -917,24 +917,6 @@ void MainWindow::newPassword()
             int appId = query.lastInsertId().toInt();
             qDebug() << "last insert id" << appId;
 
-            // Insert CREATED audit row
-            if (success) {
-                QSqlQuery audit(db);
-                audit.prepare(R"(
-                    INSERT INTO application_views_audit(application_id, dt, user, host, action, audit_time)
-                    VALUES (:id, :dt, :user, :host, 'CREATED', strftime('%s','now')))");
-
-                audit.bindValue(":id", appId);
-                audit.bindValue(":dt", QDateTime::currentSecsSinceEpoch());
-                audit.bindValue(":user", userName);
-                audit.bindValue(":host", QSysInfo::machineHostName());
-
-                if (!audit.exec()) {
-                    qDebug() << "Audit insert failed:" << audit.lastError().text();
-                    success = false;
-                }
-            }
-
             // Tokenize and hash search terms
             if (success) {
                 // Normalize: lowercase, replace any non-letter/digit with a space
@@ -962,7 +944,6 @@ void MainWindow::newPassword()
                 }
             }
 
-
             // Commit or rollback
             if (success) {
                 if (!db.commit()) {
@@ -970,6 +951,13 @@ void MainWindow::newPassword()
                     db.rollback();
                 } else {
                     qDebug() << "Transaction committed successfully.";
+
+                    // Insert CREATED audit row
+                        insertAuditRow(appId,
+                                       userName,
+                                       QSysInfo::machineHostName(),
+                                       "CREATED");
+
                     if (!ui->treeWidget->selectedItems().isEmpty()) {
                         openCategory(ui->treeWidget->selectedItems().first(), 0);
                     }
@@ -4086,10 +4074,21 @@ connect(gpg,
                                     update.bindValue(":name", DataObfuscator::obfuscate(dlg.PublicAppName, appKey));
                                     update.bindValue(":data", DataObfuscator::obfuscate(QString::fromUtf8(newEncrypted), appKey));
                                     update.bindValue(":id", item->data(0, Qt::UserRole).toInt());
-                                    if (!update.exec()) { qDebug() << "Update failed:" << update.lastError().text(); ok = false; }
+                                    if (!update.exec()) {
+                                        qDebug() << "Update failed:" << update.lastError().text();
+                                        ok = false;
+                                    } else
+                                    {
+                                        ok = true;
+                                    }
 
                                     if (ok) { if (!db.commit()) qDebug() << "Commit failed:" << db.lastError().text(); }
                                     else { if (!db.rollback()) qDebug() << "Rollback failed:" << db.lastError().text(); }
+                                    if (ok)
+                                        insertAuditRow(item->data(0, Qt::UserRole).toInt(),
+                                                       userName,
+                                                       QSysInfo::machineHostName(),
+                                                       "EDITED");
                                 }
                                 db.close();
                             }
@@ -4215,39 +4214,10 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
                                 outFile.write(decrypted_data);
                                 outFile.close();
 
-                                // Insert CREATED audit row
-                                const QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-
-                                {
-                                    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
-                                    db.setDatabaseName(qApp->property("dbFile").toString());
-
-                                    if (db.open()) {
-
-                                        {
-                                            QSqlQuery audit(db);
-                                            if (!audit.prepare(R"(
-                INSERT INTO application_views_audit(
-                    application_id, dt, user, host, action, audit_time
-                ) VALUES (
-                    :id, :dt, :user, :host, 'EXPORTED', strftime('%s','now')
-                )
-            )")) {
-                                                qWarning() << "Prepare failed:" << audit.lastError();
-                                            }
-
-                                            audit.bindValue(":id", item->data(0, Qt::UserRole).toInt());
-                                            audit.bindValue(":dt", QDateTime::currentSecsSinceEpoch());
-                                            audit.bindValue(":user", userName);
-                                            audit.bindValue(":host", QSysInfo::machineHostName());
-
-                                            if (!audit.exec())
-                                                qWarning() << "Export audit record failed:" << audit.lastError();
-                                        } // QSqlQuery destroyed here
-                                    }
-                                }
-
-                                QSqlDatabase::removeDatabase(connName);
+                                insertAuditRow(item->data(0, Qt::UserRole).toInt(),
+                                               userName,
+                                               QSysInfo::machineHostName(),
+                                               "EXPORTED");
 
                                 QMessageBox::information(this, ui->actionExport_Password->text(),
                                                          tr("Decrypted JSON saved to:\n") + fileName);
@@ -4627,21 +4597,10 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
             int appId = query.lastInsertId().toInt();
 
             // --- Audit row ---
-            QSqlQuery audit(db);
-            audit.prepare(R"(
-                INSERT INTO application_views_audit(application_id, dt, user, host, action, audit_time)
-                VALUES (:id, :dt, :user, :host, 'CREATED', strftime('%s','now')))");
-
-            audit.bindValue(":id", appId);
-            audit.bindValue(":dt", QDateTime::currentSecsSinceEpoch());
-            audit.bindValue(":user", userName);
-            audit.bindValue(":host", QSysInfo::machineHostName());
-            if (!audit.exec()) {
-                errors << tr("Audit insert failed for '%1': %2")
-                .arg(publicAppName, audit.lastError().text());
-                skippedCount++;
-                continue;
-            }
+            insertAuditRow(appId,
+                           userName,
+                           QSysInfo::machineHostName(),
+                           "CREATED");
 
             // --- Tokenize ---
             static const QRegularExpression whitespaceRe("\\s+");
@@ -5165,3 +5124,39 @@ void MainWindow::wipeFile(const QString &path, int passes)
     }
 }
 
+void MainWindow::insertAuditRow(int applicationId, const QString &user, const QString &host, const QString &action)
+{
+    const QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+        db.setDatabaseName(qApp->property("dbFile").toString());
+
+        if (db.open()) {
+
+            {
+                QSqlQuery audit(db);
+                if (!audit.prepare(R"(
+                    INSERT INTO application_views_audit(
+                        application_id, dt, user, host, action, audit_time
+                    ) VALUES (
+                        :id, :dt, :user, :host, :action, strftime('%s','now')
+                    )
+                )")) {
+                    qWarning() << "Prepare failed:" << audit.lastError();
+                }
+
+                audit.bindValue(":id", applicationId);
+                audit.bindValue(":dt", QDateTime::currentSecsSinceEpoch());
+                audit.bindValue(":user", user);
+                audit.bindValue(":host", host);
+                audit.bindValue(":action", action);
+
+                if (!audit.exec())
+                    qWarning() << "Audit insert failed:" << audit.lastError();
+            } // QSqlQuery destroyed here
+        }
+    }
+
+    QSqlDatabase::removeDatabase(connName);
+}

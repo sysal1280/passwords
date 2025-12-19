@@ -133,6 +133,7 @@ private:
     void decryptMessage();
     void encryptFile();
     void decryptFile();
+    void insertAuditRow(int applicationId, const QString &user, const QString &host, const QString &action);
 
     void showPasswordsContextMenu(const QPoint &pos);
 
