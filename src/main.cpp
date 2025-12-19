@@ -51,14 +51,12 @@ int main(int argc, char *argv[])
     /*
      * init settings for default config file
      */
-
     {
         Settings settings;
         showDebugMessages = settings.getDebugMode();
 
     }
     qInstallMessageHandler(myMessageHandler);
-
 
     /*
      * Set QApplication settings
@@ -71,7 +69,6 @@ int main(int argc, char *argv[])
     if (auto *style = QStyleFactory::create("Fusion")) {
         QApplication::setStyle(style);
     }
-
 
     /*
      * Check for multiple instances.
@@ -371,7 +368,18 @@ void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const Q
         return;
 
     QByteArray localMsg = msg.toLocal8Bit();
-    fprintf(stderr, "%s\n", localMsg.constData());
+    const char* prefix;
+
+    switch (type) {
+    case QtDebugMsg:   prefix = "[DEBUG] "; break;   // won't be used: QT_NO_DEBUG_OUTPUT
+    case QtInfoMsg:    prefix = "[INFO]  "; break;
+    case QtWarningMsg: prefix = "[WARN]  "; break;
+    case QtCriticalMsg:prefix = "[ERROR] "; break;
+    case QtFatalMsg:   prefix = "[FATAL] "; break;
+    }
+
+    fprintf(stderr, "%s%s\n", prefix, localMsg.constData());
     fflush(stderr);
 }
+
 
