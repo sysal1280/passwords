@@ -3472,7 +3472,7 @@ void MainWindow::setBookmark(bool checked)
         return;
     }
 
-    int id = selected.first()->data(0,Qt::UserRole).toInt();
+    int id = selected.front()->data(0,Qt::UserRole).toInt();
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     {
@@ -3486,15 +3486,14 @@ void MainWindow::setBookmark(bool checked)
         QSqlQuery query(db);
         if (checked) {
             query.prepare("INSERT INTO favourite (application_id, username) "
-                          "VALUES (:application_id, :username)");
-            query.bindValue(":application_id", id);
-            query.bindValue(":username", userName);
+                          "VALUES (:id, :user)");
         } else {
             query.prepare("DELETE FROM favourite "
-                          "WHERE application_id = :application_id AND username = :username");
-            query.bindValue(":application_id", id);
-            query.bindValue(":username", userName);
+                          "WHERE application_id = :id AND username = :user");
         }
+
+        query.bindValue(":id", id);
+        query.bindValue(":user", userName);
 
         if (!query.exec()) {
             QMessageBox::critical(this, ui->actionBookmark->text(), query.lastError().databaseText());
@@ -5154,7 +5153,7 @@ void MainWindow::insertAuditRow(int applicationId, const QString &user, const QS
 
                 if (!audit.exec())
                     qWarning() << "Audit insert failed:" << audit.lastError();
-            } // QSqlQuery destroyed here
+            }
         }
     }
 

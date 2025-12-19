@@ -86,11 +86,17 @@ Settings::Settings()
 
 QString Settings::configFilePath()
 {
+    if (!settings)
+        return QString();
+
     return settings->fileName();
 }
 
 void Settings::setLastUsedFile(const QString &filePath)
 {
+    if (!settings)
+        return;
+
     settings->beginGroup("General");
     settings->setValue("LastDatabase", filePath);
     settings->endGroup();
@@ -99,8 +105,11 @@ void Settings::setLastUsedFile(const QString &filePath)
 
 QString Settings::getLastUsedFile()
 {
+    if (!settings)
+        return QString();
+
     settings->beginGroup("General");
-    QString val = settings->value("LastDatabase", "").toString();
+    QString val = settings->value("LastDatabase", "").toString().trimmed();
     settings->endGroup();
 
     return val;
@@ -108,141 +117,231 @@ QString Settings::getLastUsedFile()
 
 QString Settings::getWordListFile()
 {
+    if (!settings)
+        return QString();
+
     settings->beginGroup("Passwords");
-    QString val = QString(":/wordlist/%1").arg(settings->value("WordList", "").toString());
+    QString file = settings->value("WordList", "").toString().trimmed();
     settings->endGroup();
 
-    return val;
+    // Build full resource path
+    QString path = QString(":/wordlist/%1").arg(file);
+
+    // Optional sanity check: ensure a filename was provided
+    if (file.isEmpty())
+        return QString();   // or a default like ":/wordlist/default.txt"
+
+    return path;
 }
 
 QString Settings::getPathSeparator() const
 {
+    if (!settings)
+        return " / ";
+
     settings->beginGroup("Passwords");
-    QString val = settings->value("PathSeparator", " / ").toString();
+    QString val = settings->value("PathSeparator", "\\").toString();
     settings->endGroup();
+
+    // Optional sanity check
+    if (val.isEmpty())
+        val = " / ";
+
     return val;
 }
 
 
 bool Settings::getBackupDatabase()
 {
+    if (!settings)
+        return true;
+
     settings->beginGroup("General");
-    QString val = settings->value("BackupDatabase", "yes").toString().trimmed().toLower();
+    QString val = settings->value("BackupDatabase", "yes")
+                      .toString()
+                      .trimmed()
+                      .toLower();
     settings->endGroup();
 
-    // Accept common truthy values
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
     return truthy.contains(val);
 }
 
 bool Settings::getCloseHelpServer()
 {
+    if (!settings)
+        return true;
+
     settings->beginGroup("Help");
-    QString val = settings->value("CloseServer", "yes").toString().trimmed().toLower();
+    QString val = settings->value("CloseServer", "yes")
+                      .toString()
+                      .trimmed()
+                      .toLower();
     settings->endGroup();
 
-    // Accept common truthy values
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
     return truthy.contains(val);
 }
 
 bool Settings::getDragDropPrompt()
 {
+    if (!settings)
+        return true;
+
     settings->beginGroup("Passwords");
-    QString val = settings->value("DragDropPrompt", "yes").toString().trimmed().toLower();
+    QString val = settings->value("DragDropPrompt", "yes")
+                      .toString()
+                      .trimmed()
+                      .toLower();
     settings->endGroup();
 
-    // Accept common truthy values
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
     return truthy.contains(val);
 }
 
 bool Settings::getKillGpgAgent()
 {
+    if (!settings)
+        return false;
+
     settings->beginGroup("Passwords");
-    QString val = settings->value("KillGPGAgent", "no").toString().trimmed().toLower();
+    QString val = settings->value("KillGGPGAgent", "yes")
+                      .toString()
+                      .trimmed()
+                      .toLower();
     settings->endGroup();
 
-    // Accept common truthy values
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
     return truthy.contains(val);
 }
 
 int Settings::getGeneratedPasswordLength()
 {
+    if (!settings)
+        return 2;
+
     settings->beginGroup("Passwords");
     int val = settings->value("GeneratedPasswordLength", 2).toInt();
     settings->endGroup();
+
+    // Sanity check: enforce a reasonable range
+    if (val < 2 || val > 15)
+        val = 2;
+
     return val;
 }
 
 QLineEdit::EchoMode Settings::getEchoMode()
 {
+    if (!settings)
+        return QLineEdit::Password;
+
     settings->beginGroup("General");
     int val = settings->value("EchoMode", QLineEdit::Password).toInt();
     settings->endGroup();
+
+    // Sanity check: ensure val is a valid QLineEdit::EchoMode
+    if (val < QLineEdit::Normal || val > QLineEdit::PasswordEchoOnEdit)
+        val = QLineEdit::Password;
+
     return static_cast<QLineEdit::EchoMode>(val);
 }
 
 int Settings::getHelpPort()
 {
+    if (!settings)
+        return 1280;
+
     settings->beginGroup("Help");
     int val = settings->value("Port", 1280).toInt();
     settings->endGroup();
+
+    // Accept only non‑privileged ports: 1024–65535
+    if (val < 1024 || val > 65535)
+        val = 1280;
+
     return val;
 }
 
 int Settings::getMaxRecentResults()
 {
+    if (!settings)
+        return 15;
+
     settings->beginGroup("Search");
     int val = settings->value("MaxRecentResults", 15).toInt();
     settings->endGroup();
+
+    if (val < 0)
+        val = 15;
+
     return val;
 }
 
 int Settings::getMaxPopularResults()
 {
+    if (!settings)
+        return 0;
+
     settings->beginGroup("Search");
     int val = settings->value("MaxPopularResults", 15).toInt();
     settings->endGroup();
+
+    // sanity check
+    if (val < 0)
+        val = 15;
+
     return val;
 }
 
 int Settings::getAutoCloseSeconds()
 {
+    if (!settings)
+        return 0;
+
     settings->beginGroup("Passwords");
     int val = settings->value("AutoClose", 0).toInt();
     settings->endGroup();
+
     return val;
 }
 
 bool Settings::getLoginPreference()
 {
+    if (!settings)
+        return false; // safe fallback
+
     settings->beginGroup("General");
-    QString val = settings->value("RequireChallenge", "yes").toString().trimmed().toLower();
+    QString val = settings->value("RequireChallenge", "yes")
+                      .toString()
+                      .trimmed()
+                      .toLower();
     settings->endGroup();
-    // Accept common truthy values
+
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
     return truthy.contains(val);
 }
 
 bool Settings::getAskClose()
 {
+    if (!settings)
+        return true; // safe default
+
     settings->beginGroup("General");
-    QString val = settings->value("AskBeforeClosing", "yes").toString().trimmed().toLower();
+    QString val = settings->value("AskBeforeClosing", "yes")
+                      .toString()
+                      .trimmed()
+                      .toLower();
     settings->endGroup();
-    // Accept common truthy values
+
     static const QSet<QString> truthy = {"1", "true", "yes", "on"};
     return truthy.contains(val);
 }
 
 void Settings::setGeneratedPasswordLength(int i)
 {
-    // build config dir
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QDir dir(configDir);
-    if (!dir.exists())
-        dir.mkpath(".");
+    if (!settings)
+        return;
 
     settings->beginGroup("Passwords");
     settings->setValue("GeneratedPasswordLength", i);
@@ -293,18 +392,30 @@ QString Settings::getDefaultDbPath(QWidget* parent)
 // Save MainWindow geometry/state
 void Settings::saveMainWindowState(QMainWindow *window)
 {
+    if (!window)
+        return;
+
     settings->beginGroup("MainWindow");
     settings->setValue("geometry", window->saveGeometry());
     settings->setValue("state", window->saveState());
     settings->endGroup();
 }
 
+
 // Restore MainWindow geometry/state
 void Settings::restoreMainWindowState(QMainWindow *window)
 {
+    if (!window)
+        return;
+
     settings->beginGroup("MainWindow");
-    window->restoreGeometry(settings->value("geometry").toByteArray());
-    window->restoreState(settings->value("state").toByteArray());
+
+    if (settings->contains("geometry"))
+        window->restoreGeometry(settings->value("geometry").toByteArray());
+
+    if (settings->contains("state"))
+        window->restoreState(settings->value("state").toByteArray());
+
     settings->endGroup();
 }
 
@@ -312,26 +423,29 @@ void Settings::restoreMainWindowState(QMainWindow *window)
 void Settings::saveSplitterState(QSplitter *splitter, const QString &name)
 {
     if (!splitter)
-    {
         return;
-    }
-
-    QByteArray state = splitter->saveState();
-    qDebug() << "Saving splitter" << name << "state size:" << state.size();
 
     settings->beginGroup("Splitters");
-    settings->setValue(name, state);
+    settings->setValue(name, splitter->saveState());
     settings->endGroup();
-    settings->sync();
 }
+
 
 // Restore splitter state
 void Settings::restoreSplitterState(QSplitter *splitter, const QString &name)
 {
+    if (!splitter)
+        return;
+
     settings->beginGroup("Splitters");
-    splitter->restoreState(settings->value(name).toByteArray());
+
+    if (settings->contains(name)) {
+        splitter->restoreState(settings->value(name).toByteArray());
+    }
+
     settings->endGroup();
 }
+
 
 bool Settings::createUserDesktopFile()
 {
