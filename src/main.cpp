@@ -35,7 +35,9 @@
 #include <QFile>
 #include <QFileDevice>
 #include <QStandardPaths>
-
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 
 // Forward declaration of helper
 // Returns true if a database file is ready (exists or was created/copied)
@@ -371,15 +373,21 @@ void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const Q
     const char* prefix;
 
     switch (type) {
-    case QtDebugMsg:   prefix = "[DEBUG] "; break;   // won't be used: QT_NO_DEBUG_OUTPUT
+    case QtDebugMsg:   prefix = "[DEBUG] "; break;
     case QtInfoMsg:    prefix = "[INFO]  "; break;
     case QtWarningMsg: prefix = "[WARN]  "; break;
     case QtCriticalMsg:prefix = "[ERROR] "; break;
     case QtFatalMsg:   prefix = "[FATAL] "; break;
+    default:           prefix = "[LOG]   "; break;
     }
 
+#ifdef Q_OS_WIN
+    // Send to Visual Studio Output window or DebugView
+    QString fullMsg = QString("%1%2\n").arg(prefix).arg(QString::fromLocal8Bit(localMsg));
+    OutputDebugStringW(reinterpret_cast<const wchar_t*>(fullMsg.utf16()));
+#else
+    // Print to stderr (Linux/macOS)
     fprintf(stderr, "%s%s\n", prefix, localMsg.constData());
     fflush(stderr);
+#endif
 }
-
-
