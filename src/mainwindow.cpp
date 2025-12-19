@@ -143,6 +143,8 @@ MainWindow::MainWindow(QWidget *parent)
         { ui->actionRename,                ":/menus/glyphs/bookmark_manager_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionAdd_Search,            ":/menus/glyphs/loupe_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionDonate,                ":/menus/glyphs/favorite_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
+        { ui->actionExported_Passwords,    ":/menus/glyphs/table_view_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
+        { ui->actionLast_Edited,           ":/menus/glyphs/table_view_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionOnline_Documentation,  ":/menus/glyphs/help_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" }
     };
 
@@ -417,7 +419,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         QDateEdit *dateEdit = new QDateEdit(&dlg);
         dateEdit->setCalendarPopup(true);
-        dateEdit->setDate(QDate::currentDate().addDays(-90)); // default
+        dateEdit->setDate(QDate::currentDate().addDays(-90)); // default 90 days
         layout->addWidget(dateEdit);
 
         QHBoxLayout *btnLayout = new QHBoxLayout();
@@ -436,8 +438,6 @@ MainWindow::MainWindow(QWidget *parent)
             NotChangedSince(cutoff);
         }
     });
-
-
 
     connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested,
             this, [this](const QPoint &pos)
@@ -5290,13 +5290,8 @@ void MainWindow::ExportedWithoutEdits()
             r.id         = query.value("application_id").toInt();
             r.categoryId = query.value("category_id").toInt();
             r.appName    = DataObfuscator::deobfuscate(query.value("application_name").toString(), this->appKey);
-
-            // Build full category path
             r.categoryName = buildCategoryPath(r.categoryId, this->appKey, db);
-
-            // Store last_export_dt timestamp
             r.description = query.value("last_export_dt").toString();
-
             results.append(r);
         }
     }
@@ -5309,32 +5304,33 @@ void MainWindow::ExportedWithoutEdits()
     }
 
     // -------------------------
-    // Build dialog UI
+    // Build MODELLESS dialog UI
     // -------------------------
-    QDialog dlg(this);
-    dlg.setWindowTitle(tr("Exported Passwords Without Edits"));
+    QDialog *dlg = new QDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->setWindowTitle(tr("Exported Passwords Without Edits"));
 
-    QVBoxLayout *layout = new QVBoxLayout(&dlg);
+    QVBoxLayout *layout = new QVBoxLayout(dlg);
 
-    QTableWidget *table = new QTableWidget(results.size(), 3, &dlg);
+    QTableWidget *table = new QTableWidget(results.size(), 3, dlg);
     table->setHorizontalHeaderLabels({ tr("Password"), tr("Category"), tr("Exported") });
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
     table->verticalHeader()->setDefaultSectionSize(20);
 
+    // 🔥 Prevent Qt from auto‑closing the dialog on double‑click
+    disconnect(table, &QTableWidget::itemActivated, nullptr, nullptr);
+
     for (int row = 0; row < results.size(); ++row) {
 
-        // Application column
         QTableWidgetItem *appItem = new QTableWidgetItem(results[row].appName);
         appItem->setData(Qt::UserRole, results[row].id);
         appItem->setData(Qt::UserRole + 1, results[row].categoryId);
         table->setItem(row, 0, appItem);
 
-        // Category column
         table->setItem(row, 1, new QTableWidgetItem(results[row].categoryName));
 
-        // Exported column (convert Unix timestamp → locale short datetime)
         qint64 ts = results[row].description.toLongLong();
         QDateTime dt = QDateTime::fromSecsSinceEpoch(ts);
         QString shortDate = QLocale().toString(dt, QLocale::ShortFormat);
@@ -5352,15 +5348,37 @@ void MainWindow::ExportedWithoutEdits()
     // Buttons
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
-    QPushButton *cancelBtn = new QPushButton("Cancel", &dlg);
-    QPushButton *okBtn     = new QPushButton("Select", &dlg);
+    QPushButton *cancelBtn = new QPushButton("Cancel", dlg);
+    QPushButton *okBtn     = new QPushButton("Select", dlg);
     buttonLayout->addWidget(cancelBtn);
     buttonLayout->addWidget(okBtn);
     layout->addLayout(buttonLayout);
 
-    connect(okBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
-    connect(cancelBtn, &QPushButton::clicked, &dlg, &QDialog::reject);
-    connect(table, &QTableWidget::itemDoubleClicked, &dlg, &QDialog::accept);
+    // -------------------------
+    // Modeless behavior wiring
+    // -------------------------
+
+    auto selectRow = [this, dlg, table]() {
+        int row = table->currentRow();
+        if (row >= 0) {
+            QTableWidgetItem *item = table->item(row, 0);
+            int appId      = item->data(Qt::UserRole).toInt();
+            int categoryId = item->data(Qt::UserRole + 1).toInt();
+            selectInTreeWidgets(categoryId, appId);
+        }
+    };
+
+    connect(okBtn, &QPushButton::clicked, dlg, [selectRow, dlg]() {
+        selectRow();
+        dlg->close();
+    });
+
+    connect(cancelBtn, &QPushButton::clicked, dlg, &QDialog::close);
+
+    connect(table, &QTableWidget::itemDoubleClicked, dlg, [selectRow]() {
+        selectRow();
+        // ❗ Do NOT close the dialog — user wants it to stay open
+    });
 
     // Center dialog
     QSize parentSize = this->size();
@@ -5369,17 +5387,9 @@ void MainWindow::ExportedWithoutEdits()
     QPoint parentPos = this->pos();
     int x = parentPos.x() + (parentSize.width() - w) / 2;
     int y = parentPos.y() + (parentSize.height() - h) / 2;
-    dlg.setGeometry(x, y, w, h);
+    dlg->setGeometry(x, y, w, h);
 
-    if (dlg.exec() == QDialog::Accepted) {
-        int row = table->currentRow();
-        if (row >= 0) {
-            QTableWidgetItem *item = table->item(row, 0);
-            int appId      = item->data(Qt::UserRole).toInt();
-            int categoryId = item->data(Qt::UserRole + 1).toInt();
-            selectInTreeWidgets(categoryId, appId);
-        }
-    }
+    dlg->show();   // MODELLESS
 }
 
 int MainWindow::countExportedWithoutEdits()
@@ -5444,12 +5454,6 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
             return;
         }
 
-        //
-        // Query:
-        //  - Get last EDITED timestamp per application
-        //  - Include apps with no edits (NULL)
-        //  - Compare last_edit_dt <= cutoff
-        //
         QString sql =
             "WITH last_edit AS ("
             "    SELECT application_id, MAX(dt) AS last_edit_dt "
@@ -5479,12 +5483,8 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
             r.id         = query.value("application_id").toInt();
             r.categoryId = query.value("category_id").toInt();
             r.appName    = DataObfuscator::deobfuscate(query.value("application_name").toString(), this->appKey);
-
             r.categoryName = buildCategoryPath(r.categoryId, this->appKey, db);
-
-            // Store last_edit_dt timestamp
             r.description = query.value("last_edit_dt").toString();
-
             results.append(r);
         }
     }
@@ -5496,47 +5496,43 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
             this,
             tr("Passwords Not Updated"),
             tr("No passwords were found that have not been updated since the selected date.")
-            );
+        );
         return;
     }
 
     // -------------------------
-    // Build dialog UI
+    // Build MODELLESS dialog UI
     // -------------------------
-    QDialog dlg(this);
-    dlg.setWindowTitle(tr("Passwords Not Updated Since %1")
-                           .arg(QLocale().toString(cutoff, QLocale::ShortFormat)));
+    QDialog *dlg = new QDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->setWindowTitle(tr("Passwords Not Updated Since %1")
+                        .arg(QLocale().toString(cutoff, QLocale::ShortFormat)));
 
-    QVBoxLayout *layout = new QVBoxLayout(&dlg);
+    QVBoxLayout *layout = new QVBoxLayout(dlg);
 
-    QTableWidget *table = new QTableWidget(results.size(), 3, &dlg);
+    QTableWidget *table = new QTableWidget(results.size(), 3, dlg);
     table->setHorizontalHeaderLabels({ tr("Password"), tr("Category"), tr("Last Edited") });
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
     table->verticalHeader()->setDefaultSectionSize(20);
 
+    // 🔥 Prevent Qt from auto‑closing the dialog on double‑click
+    disconnect(table, &QTableWidget::itemActivated, nullptr, nullptr);
+
     for (int row = 0; row < results.size(); ++row) {
 
-        // Password column
         QTableWidgetItem *appItem = new QTableWidgetItem(results[row].appName);
         appItem->setData(Qt::UserRole, results[row].id);
         appItem->setData(Qt::UserRole + 1, results[row].categoryId);
         table->setItem(row, 0, appItem);
 
-        // Category column
         table->setItem(row, 1, new QTableWidgetItem(results[row].categoryName));
 
-        // Last Edited column
         qint64 ts = results[row].description.toLongLong();
-        QString shortDate;
-
-        if (ts == 0)
-            shortDate = tr("Never");
-        else {
-            QDateTime dt = QDateTime::fromSecsSinceEpoch(ts);
-            shortDate = QLocale().toString(dt, QLocale::ShortFormat);
-        }
+        QString shortDate = (ts == 0)
+            ? tr("Never")
+            : QLocale().toString(QDateTime::fromSecsSinceEpoch(ts), QLocale::ShortFormat);
 
         QTableWidgetItem *editedItem = new QTableWidgetItem(shortDate);
         editedItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -5551,15 +5547,37 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
     // Buttons
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
-    QPushButton *cancelBtn = new QPushButton("Cancel", &dlg);
-    QPushButton *okBtn     = new QPushButton("Select", &dlg);
+    QPushButton *cancelBtn = new QPushButton("Close", dlg);
+    QPushButton *okBtn     = new QPushButton("Select", dlg);
     buttonLayout->addWidget(cancelBtn);
     buttonLayout->addWidget(okBtn);
     layout->addLayout(buttonLayout);
 
-    connect(okBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
-    connect(cancelBtn, &QPushButton::clicked, &dlg, &QDialog::reject);
-    connect(table, &QTableWidget::itemDoubleClicked, &dlg, &QDialog::accept);
+    // -------------------------
+    // Modeless behavior wiring
+    // -------------------------
+
+    auto selectRow = [this, dlg, table]() {
+        int row = table->currentRow();
+        if (row >= 0) {
+            QTableWidgetItem *item = table->item(row, 0);
+            int appId      = item->data(Qt::UserRole).toInt();
+            int categoryId = item->data(Qt::UserRole + 1).toInt();
+            selectInTreeWidgets(categoryId, appId);
+        }
+    };
+
+    connect(okBtn, &QPushButton::clicked, dlg, [selectRow, dlg]() {
+        selectRow();
+        dlg->close();
+    });
+
+    connect(cancelBtn, &QPushButton::clicked, dlg, &QDialog::close);
+
+    connect(table, &QTableWidget::itemDoubleClicked, dlg, [selectRow]() {
+        selectRow();
+        // ❗ Do NOT close the dialog — user wants it to stay open
+    });
 
     // Center dialog
     QSize parentSize = this->size();
@@ -5568,15 +5586,7 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
     QPoint parentPos = this->pos();
     int x = parentPos.x() + (parentSize.width() - w) / 2;
     int y = parentPos.y() + (parentSize.height() - h) / 2;
-    dlg.setGeometry(x, y, w, h);
+    dlg->setGeometry(x, y, w, h);
 
-    if (dlg.exec() == QDialog::Accepted) {
-        int row = table->currentRow();
-        if (row >= 0) {
-            QTableWidgetItem *item = table->item(row, 0);
-            int appId      = item->data(Qt::UserRole).toInt();
-            int categoryId = item->data(Qt::UserRole + 1).toInt();
-            selectInTreeWidgets(categoryId, appId);
-        }
-    }
+    dlg->show();   // MODELLESS
 }
