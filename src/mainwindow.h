@@ -15,6 +15,7 @@
 #include <QIcon>
 #include "settings.h"
 #include "keyentry.h"
+#include <QDateTime>
 
 namespace Ui {
 class MainWindow;
@@ -57,10 +58,12 @@ public:
     void initDb();
     bool openDatabase(const QString &fileName = QString());
     void launchHelperProcess(const QString &page);
+    int countExportedWithoutEdits();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 private slots:
 
@@ -80,6 +83,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui = nullptr;
+
+    bool firstShow = true;
 
     // Crypto helpers
     QByteArray intToBytes(quint64 counter);
@@ -113,6 +118,7 @@ private:
     void renameCategory();
     void showAboutDlg();
 
+
     void openCategory(QTreeWidgetItem *item, int column);
     void setBookmark(bool checked);
 
@@ -133,7 +139,9 @@ private:
     void decryptMessage();
     void encryptFile();
     void decryptFile();
+    void ExportedWithoutEdits();
     void insertAuditRow(int applicationId, const QString &user, const QString &host, const QString &action);
+    void NotChangedSince(const QDateTime &cutoff);
 
     void showPasswordsContextMenu(const QPoint &pos);
 

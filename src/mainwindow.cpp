@@ -50,6 +50,7 @@
 #include <QPropertyAnimation>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QDateEdit>
 
 const QMap<QString, QString> MainWindow::headerMap = {
     { "application", "Passwords" },
@@ -401,6 +402,42 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionDecrypt_message, &QAction::triggered,
             this, &MainWindow::decryptMessage);
 
+    connect(ui->actionExported_Passwords, &QAction::triggered,
+            this, &MainWindow::ExportedWithoutEdits);
+
+    connect(ui->actionLast_Edited, &QAction::triggered, this, [this]() {
+
+        QDialog dlg(this);
+        dlg.setWindowTitle("Select Cutoff Date");
+
+        QVBoxLayout *layout = new QVBoxLayout(&dlg);
+
+        QLabel *label = new QLabel("Show passwords not edited since:", &dlg);
+        layout->addWidget(label);
+
+        QDateEdit *dateEdit = new QDateEdit(&dlg);
+        dateEdit->setCalendarPopup(true);
+        dateEdit->setDate(QDate::currentDate().addDays(-90)); // default
+        layout->addWidget(dateEdit);
+
+        QHBoxLayout *btnLayout = new QHBoxLayout();
+        QPushButton *okBtn = new QPushButton("OK", &dlg);
+        QPushButton *cancelBtn = new QPushButton("Cancel", &dlg);
+        btnLayout->addStretch();
+        btnLayout->addWidget(cancelBtn);
+        btnLayout->addWidget(okBtn);
+        layout->addLayout(btnLayout);
+
+        connect(okBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
+        connect(cancelBtn, &QPushButton::clicked, &dlg, &QDialog::reject);
+
+        if (dlg.exec() == QDialog::Accepted) {
+            QDateTime cutoff = dateEdit->date().startOfDay();
+            NotChangedSince(cutoff);
+        }
+    });
+
+
 
     connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested,
             this, [this](const QPoint &pos)
@@ -450,6 +487,7 @@ MainWindow::MainWindow(QWidget *parent)
     // ui->treeWidget_2->setStyleSheet(
     //     "QTreeWidget::item { padding-top: 6px; padding-bottom: 6px; }"
     //     );
+
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -492,6 +530,52 @@ void MainWindow::closeEvent(QCloseEvent *event)
     settings.setLastUsedFile(qApp->property("dbFile").toString());
 
     event->accept();
+}
+
+void MainWindow::showEvent(QShowEvent *event)
+{
+    QMainWindow::showEvent(event);
+
+    if (firstShow) {
+        firstShow = false;
+
+        QMetaObject::invokeMethod(this, [this]() {
+
+            QTimer::singleShot(250, this, [this]() {
+
+                int count = countExportedWithoutEdits();
+                if (count <= 0)
+                    return;
+
+                QString plural = (count == 1 ? "" : "s");
+
+                QString message = QString(
+                                      "There %1 %2 exported password%3 that %4 not been updated since they were last exported.\n\n"
+                                      "For security reasons, these password%3 should be updated or removed from the database.\n\n"
+                                      "Would you like to review them now?"
+                                      )
+                                      .arg(count == 1 ? "is" : "are")
+                                      .arg(count)
+                                      .arg(plural)
+                                      .arg(count == 1 ? "has" : "have");
+
+                QMessageBox::StandardButton reply =
+                    QMessageBox::warning(
+                        this,
+                        "Security Notice",
+                        message,
+                        QMessageBox::Yes | QMessageBox::No,
+                        QMessageBox::Yes
+                        );
+
+                if (reply == QMessageBox::Yes) {
+                    ExportedWithoutEdits();
+                }
+
+            });
+
+        }, Qt::QueuedConnection);
+    }
 }
 
 void MainWindow::setActionIcon(QAction *action, const QString &iconPath) {
@@ -5158,4 +5242,341 @@ void MainWindow::insertAuditRow(int applicationId, const QString &user, const QS
     }
 
     QSqlDatabase::removeDatabase(connName);
+}
+
+void MainWindow::ExportedWithoutEdits()
+{
+    qDebug() << countExportedWithoutEdits();
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QList<SearchResult> results;
+
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+        db.setDatabaseName(qApp->property("dbFile").toString());
+        if (!db.open()) {
+            QMessageBox::critical(this, tr("Exported Passwords"), db.lastError().text());
+            return;
+        }
+
+        QString sql =
+            "WITH last_export AS ("
+            "    SELECT application_id, MAX(dt) AS last_export_dt "
+            "    FROM application_views_audit "
+            "    WHERE action = 'EXPORTED' "
+            "    GROUP BY application_id"
+            ") "
+            "SELECT a.id AS application_id, "
+            "       a.category_id, "
+            "       a.application_name, "
+            "       le.last_export_dt "
+            "FROM application a "
+            "JOIN last_export le ON le.application_id = a.id "
+            "WHERE NOT EXISTS ("
+            "    SELECT 1 "
+            "    FROM application_views_audit av "
+            "    WHERE av.application_id = a.id "
+            "      AND av.action = 'EDITED' "
+            "      AND av.dt > le.last_export_dt"
+            ");";
+
+        QSqlQuery query(db);
+        if (!query.exec(sql)) {
+            qCritical() << "Exported-without-edits query failed:" << query.lastError().text();
+            return;
+        }
+
+        while (query.next()) {
+            SearchResult r;
+            r.id         = query.value("application_id").toInt();
+            r.categoryId = query.value("category_id").toInt();
+            r.appName    = DataObfuscator::deobfuscate(query.value("application_name").toString(), this->appKey);
+
+            // Build full category path
+            r.categoryName = buildCategoryPath(r.categoryId, this->appKey, db);
+
+            // Store last_export_dt timestamp
+            r.description = query.value("last_export_dt").toString();
+
+            results.append(r);
+        }
+    }
+
+    QSqlDatabase::removeDatabase(connName);
+
+    if (results.isEmpty()) {
+        QMessageBox::information(this, tr("Exported Passwords"), "No exported passwords without edits found.");
+        return;
+    }
+
+    // -------------------------
+    // Build dialog UI
+    // -------------------------
+    QDialog dlg(this);
+    dlg.setWindowTitle(tr("Exported Passwords Without Edits"));
+
+    QVBoxLayout *layout = new QVBoxLayout(&dlg);
+
+    QTableWidget *table = new QTableWidget(results.size(), 3, &dlg);
+    table->setHorizontalHeaderLabels({ tr("Password"), tr("Category"), tr("Exported") });
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    table->verticalHeader()->setDefaultSectionSize(20);
+
+    for (int row = 0; row < results.size(); ++row) {
+
+        // Application column
+        QTableWidgetItem *appItem = new QTableWidgetItem(results[row].appName);
+        appItem->setData(Qt::UserRole, results[row].id);
+        appItem->setData(Qt::UserRole + 1, results[row].categoryId);
+        table->setItem(row, 0, appItem);
+
+        // Category column
+        table->setItem(row, 1, new QTableWidgetItem(results[row].categoryName));
+
+        // Exported column (convert Unix timestamp → locale short datetime)
+        qint64 ts = results[row].description.toLongLong();
+        QDateTime dt = QDateTime::fromSecsSinceEpoch(ts);
+        QString shortDate = QLocale().toString(dt, QLocale::ShortFormat);
+
+        QTableWidgetItem *exportedItem = new QTableWidgetItem(shortDate);
+        exportedItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        table->setItem(row, 2, exportedItem);
+    }
+
+    table->resizeColumnsToContents();
+    table->horizontalHeader()->setStretchLastSection(true);
+    table->setSortingEnabled(false);
+    layout->addWidget(table);
+
+    // Buttons
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addStretch();
+    QPushButton *cancelBtn = new QPushButton("Cancel", &dlg);
+    QPushButton *okBtn     = new QPushButton("Select", &dlg);
+    buttonLayout->addWidget(cancelBtn);
+    buttonLayout->addWidget(okBtn);
+    layout->addLayout(buttonLayout);
+
+    connect(okBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
+    connect(cancelBtn, &QPushButton::clicked, &dlg, &QDialog::reject);
+    connect(table, &QTableWidget::itemDoubleClicked, &dlg, &QDialog::accept);
+
+    // Center dialog
+    QSize parentSize = this->size();
+    int w = static_cast<int>(parentSize.width() * 0.75);
+    int h = static_cast<int>(parentSize.height() * 0.75);
+    QPoint parentPos = this->pos();
+    int x = parentPos.x() + (parentSize.width() - w) / 2;
+    int y = parentPos.y() + (parentSize.height() - h) / 2;
+    dlg.setGeometry(x, y, w, h);
+
+    if (dlg.exec() == QDialog::Accepted) {
+        int row = table->currentRow();
+        if (row >= 0) {
+            QTableWidgetItem *item = table->item(row, 0);
+            int appId      = item->data(Qt::UserRole).toInt();
+            int categoryId = item->data(Qt::UserRole + 1).toInt();
+            selectInTreeWidgets(categoryId, appId);
+        }
+    }
+}
+
+int MainWindow::countExportedWithoutEdits()
+{
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    int count = 0;
+
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+        db.setDatabaseName(qApp->property("dbFile").toString());
+
+        if (!db.open()) {
+            qCritical() << "DB open failed:" << db.lastError().text();
+            return 0;
+        }
+
+        QString sql =
+            "WITH last_export AS ("
+            "    SELECT application_id, MAX(dt) AS last_export_dt "
+            "    FROM application_views_audit "
+            "    WHERE action = 'EXPORTED' "
+            "    GROUP BY application_id"
+            ") "
+            "SELECT COUNT(*) "
+            "FROM application a "
+            "JOIN last_export le ON le.application_id = a.id "
+            "WHERE NOT EXISTS ("
+            "    SELECT 1 "
+            "    FROM application_views_audit av "
+            "    WHERE av.application_id = a.id "
+            "      AND av.action = 'EDITED' "
+            "      AND av.dt > le.last_export_dt"
+            ");";
+
+        QSqlQuery query(db);
+        if (!query.exec(sql)) {
+            qCritical() << "Count query failed:" << query.lastError().text();
+            return 0;
+        }
+
+        if (query.next()) {
+            count = query.value(0).toInt();
+        }
+    }
+
+    QSqlDatabase::removeDatabase(connName);
+    return count;
+}
+
+void MainWindow::NotChangedSince(const QDateTime &cutoff)
+{
+    qint64 cutoffTs = cutoff.toSecsSinceEpoch();
+
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QList<SearchResult> results;
+
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+        db.setDatabaseName(qApp->property("dbFile").toString());
+        if (!db.open()) {
+            QMessageBox::critical(this, tr("Passwords Not Updated"), db.lastError().text());
+            return;
+        }
+
+        //
+        // Query:
+        //  - Get last EDITED timestamp per application
+        //  - Include apps with no edits (NULL)
+        //  - Compare last_edit_dt <= cutoff
+        //
+        QString sql =
+            "WITH last_edit AS ("
+            "    SELECT application_id, MAX(dt) AS last_edit_dt "
+            "    FROM application_views_audit "
+            "    WHERE action = 'EDITED' "
+            "    GROUP BY application_id"
+            ") "
+            "SELECT a.id AS application_id, "
+            "       a.category_id, "
+            "       a.application_name, "
+            "       COALESCE(le.last_edit_dt, 0) AS last_edit_dt "
+            "FROM application a "
+            "LEFT JOIN last_edit le ON le.application_id = a.id "
+            "WHERE COALESCE(le.last_edit_dt, 0) <= :cutoff;";
+
+        QSqlQuery query(db);
+        query.prepare(sql);
+        query.bindValue(":cutoff", cutoffTs);
+
+        if (!query.exec()) {
+            qCritical() << "Not-changed-since query failed:" << query.lastError().text();
+            return;
+        }
+
+        while (query.next()) {
+            SearchResult r;
+            r.id         = query.value("application_id").toInt();
+            r.categoryId = query.value("category_id").toInt();
+            r.appName    = DataObfuscator::deobfuscate(query.value("application_name").toString(), this->appKey);
+
+            r.categoryName = buildCategoryPath(r.categoryId, this->appKey, db);
+
+            // Store last_edit_dt timestamp
+            r.description = query.value("last_edit_dt").toString();
+
+            results.append(r);
+        }
+    }
+
+    QSqlDatabase::removeDatabase(connName);
+
+    if (results.isEmpty()) {
+        QMessageBox::information(
+            this,
+            tr("Passwords Not Updated"),
+            tr("No passwords were found that have not been updated since the selected date.")
+            );
+        return;
+    }
+
+    // -------------------------
+    // Build dialog UI
+    // -------------------------
+    QDialog dlg(this);
+    dlg.setWindowTitle(tr("Passwords Not Updated Since %1")
+                           .arg(QLocale().toString(cutoff, QLocale::ShortFormat)));
+
+    QVBoxLayout *layout = new QVBoxLayout(&dlg);
+
+    QTableWidget *table = new QTableWidget(results.size(), 3, &dlg);
+    table->setHorizontalHeaderLabels({ tr("Password"), tr("Category"), tr("Last Edited") });
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    table->verticalHeader()->setDefaultSectionSize(20);
+
+    for (int row = 0; row < results.size(); ++row) {
+
+        // Password column
+        QTableWidgetItem *appItem = new QTableWidgetItem(results[row].appName);
+        appItem->setData(Qt::UserRole, results[row].id);
+        appItem->setData(Qt::UserRole + 1, results[row].categoryId);
+        table->setItem(row, 0, appItem);
+
+        // Category column
+        table->setItem(row, 1, new QTableWidgetItem(results[row].categoryName));
+
+        // Last Edited column
+        qint64 ts = results[row].description.toLongLong();
+        QString shortDate;
+
+        if (ts == 0)
+            shortDate = tr("Never");
+        else {
+            QDateTime dt = QDateTime::fromSecsSinceEpoch(ts);
+            shortDate = QLocale().toString(dt, QLocale::ShortFormat);
+        }
+
+        QTableWidgetItem *editedItem = new QTableWidgetItem(shortDate);
+        editedItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        table->setItem(row, 2, editedItem);
+    }
+
+    table->resizeColumnsToContents();
+    table->horizontalHeader()->setStretchLastSection(true);
+    table->setSortingEnabled(false);
+    layout->addWidget(table);
+
+    // Buttons
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addStretch();
+    QPushButton *cancelBtn = new QPushButton("Cancel", &dlg);
+    QPushButton *okBtn     = new QPushButton("Select", &dlg);
+    buttonLayout->addWidget(cancelBtn);
+    buttonLayout->addWidget(okBtn);
+    layout->addLayout(buttonLayout);
+
+    connect(okBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
+    connect(cancelBtn, &QPushButton::clicked, &dlg, &QDialog::reject);
+    connect(table, &QTableWidget::itemDoubleClicked, &dlg, &QDialog::accept);
+
+    // Center dialog
+    QSize parentSize = this->size();
+    int w = static_cast<int>(parentSize.width() * 0.75);
+    int h = static_cast<int>(parentSize.height() * 0.75);
+    QPoint parentPos = this->pos();
+    int x = parentPos.x() + (parentSize.width() - w) / 2;
+    int y = parentPos.y() + (parentSize.height() - h) / 2;
+    dlg.setGeometry(x, y, w, h);
+
+    if (dlg.exec() == QDialog::Accepted) {
+        int row = table->currentRow();
+        if (row >= 0) {
+            QTableWidgetItem *item = table->item(row, 0);
+            int appId      = item->data(Qt::UserRole).toInt();
+            int categoryId = item->data(Qt::UserRole + 1).toInt();
+            selectInTreeWidgets(categoryId, appId);
+        }
+    }
 }
