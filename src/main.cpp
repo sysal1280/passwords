@@ -35,15 +35,12 @@
 #include <QFile>
 #include <QFileDevice>
 #include <QStandardPaths>
-#ifdef Q_OS_WIN
-#include <windows.h>
-#endif
 
 // Forward declaration of helper
 // Returns true if a database file is ready (exists or was created/copied)
 // and qApp->property("dbFile") is set. It DOES NOT open the DB.
 static bool setupDatabaseFile();
-void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+void pwdMsgHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 static bool showDebugMessages = false;
 
 int main(int argc, char *argv[])
@@ -58,7 +55,7 @@ int main(int argc, char *argv[])
         showDebugMessages = settings.getDebugMode();
 
     }
-    qInstallMessageHandler(myMessageHandler);
+    qInstallMessageHandler(pwdMsgHandler);
 
     /*
      * Set QApplication settings
@@ -364,7 +361,7 @@ static bool setupDatabaseFile()
     }
 }
 
-void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+void pwdMsgHandler(QtMsgType type, const QMessageLogContext &, const QString &msg)
 {
     if (!showDebugMessages)
         return;
@@ -381,13 +378,7 @@ void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const Q
     default:           prefix = "[LOG]   "; break;
     }
 
-#ifdef Q_OS_WIN
-    // Send to Visual Studio Output window or DebugView
-    QString fullMsg = QString("%1%2\n").arg(prefix).arg(QString::fromLocal8Bit(localMsg));
-    OutputDebugStringW(reinterpret_cast<const wchar_t*>(fullMsg.utf16()));
-#else
-    // Print to stderr (Linux/macOS)
     fprintf(stderr, "%s%s\n", prefix, localMsg.constData());
     fflush(stderr);
-#endif
 }
+
