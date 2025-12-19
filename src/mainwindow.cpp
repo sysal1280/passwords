@@ -4214,8 +4214,44 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
                             if (outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
                                 outFile.write(decrypted_data);
                                 outFile.close();
+
+                                // Insert CREATED audit row
+                                const QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+                                {
+                                    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+                                    db.setDatabaseName(qApp->property("dbFile").toString());
+
+                                    if (db.open()) {
+
+                                        {
+                                            QSqlQuery audit(db);
+                                            if (!audit.prepare(R"(
+                INSERT INTO application_views_audit(
+                    application_id, dt, user, host, action, audit_time
+                ) VALUES (
+                    :id, :dt, :user, :host, 'EXPORTED', strftime('%s','now')
+                )
+            )")) {
+                                                qWarning() << "Prepare failed:" << audit.lastError();
+                                            }
+
+                                            audit.bindValue(":id", item->data(0, Qt::UserRole).toInt());
+                                            audit.bindValue(":dt", QDateTime::currentSecsSinceEpoch());
+                                            audit.bindValue(":user", userName);
+                                            audit.bindValue(":host", QSysInfo::machineHostName());
+
+                                            if (!audit.exec())
+                                                qWarning() << "Export audit record failed:" << audit.lastError();
+                                        } // QSqlQuery destroyed here
+                                    }
+                                }
+
+                                QSqlDatabase::removeDatabase(connName);
+
                                 QMessageBox::information(this, ui->actionExport_Password->text(),
                                                          tr("Decrypted JSON saved to:\n") + fileName);
+
                             } else {
                                 QMessageBox::critical(this, ui->actionExport_Password->text(),
                                                       tr("Could not open file for writing:\n") + fileName);
