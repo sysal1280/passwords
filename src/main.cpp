@@ -41,10 +41,25 @@
 // Returns true if a database file is ready (exists or was created/copied)
 // and qApp->property("dbFile") is set. It DOES NOT open the DB.
 static bool setupDatabaseFile();
+void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+static bool showDebugMessages = false;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    /*
+     * init settings for default config file
+     */
+
+    {
+        Settings settings;
+        showDebugMessages = settings.getDebugMode();
+
+    }
+    qInstallMessageHandler(myMessageHandler);
+
+
     /*
      * Set QApplication settings
      */
@@ -110,12 +125,6 @@ int main(int argc, char *argv[])
     QApplication::processEvents();
     Settings settings;   // construct your Settings instance
     settings.createUserDesktopFile();  // call the member function
-
-
-    /*
-     * init settings for default config file
-     */
-    Settings();
 
     splash->showMessage(QCoreApplication::translate("main", "Checking GPG.."),
                         Qt::AlignBottom | Qt::AlignLeft, Qt::white);
@@ -355,3 +364,14 @@ static bool setupDatabaseFile()
         return false;
     }
 }
+
+void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    if (!showDebugMessages)
+        return;
+
+    QByteArray localMsg = msg.toLocal8Bit();
+    fprintf(stderr, "%s\n", localMsg.constData());
+    fflush(stderr);
+}
+

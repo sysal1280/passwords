@@ -150,6 +150,21 @@ QString Settings::getPathSeparator() const
     return val;
 }
 
+bool Settings::getDebugMode()
+{
+    if (!settings)
+        return true;
+
+    settings->beginGroup("General");
+    QString val = settings->value("Debug", "no")
+                      .toString()
+                      .trimmed()
+                      .toLower();
+    settings->endGroup();
+
+    static const QSet<QString> truthy = {"1", "true", "yes", "on"};
+    return truthy.contains(val);
+}
 
 bool Settings::getBackupDatabase()
 {

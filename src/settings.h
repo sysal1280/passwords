@@ -43,7 +43,7 @@ public:
      bool getDragDropPrompt();
      QString getWordListFile();
      bool getCloseHelpServer();
-
+     bool getDebugMode();
      void saveSplitterState(QSplitter *splitter, const QString &name);
      void restoreSplitterState(QSplitter *splitter, const QString &name);
      bool createUserDesktopFile();

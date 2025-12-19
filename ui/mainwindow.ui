@@ -107,7 +107,6 @@
     <addaction name="actionDecrypt_File"/>
     <addaction name="separator"/>
     <addaction name="actionKey_List"/>
-    <addaction name="actionShow_debug_messages"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="menuReports"/>
@@ -239,14 +238,6 @@
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
-   </property>
-  </action>
-  <action name="actionShow_debug_messages">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Show debug messages</string>
    </property>
   </action>
   <action name="actionKey_List">

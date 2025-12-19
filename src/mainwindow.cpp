@@ -343,12 +343,6 @@ MainWindow::MainWindow(QWidget *parent)
                 setBookmark(checked);
             });
 
-    connect(ui->actionShow_debug_messages, &QAction::toggled,
-            this, [this](bool checked) {
-                showDebugMessages = checked;
-                qDebug() << "showDebugMessages" << showDebugMessages;
-            });
-
     connect(ui->actionImport, &QAction::triggered,
             this, [this]() {
 
@@ -1303,9 +1297,6 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
             query.bindValue(":id", parentId);
             if (query.exec() && query.first()) {
                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
-                if (showDebugMessages) {
-                    QMessageBox::information(this,"Test",data);
-                }
             } else {
                 qDebug() << "Query failed:" << query.lastError().text();
             }
@@ -1334,10 +1325,6 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
         QByteArray decrypted_data = gpg->readAllStandardOutput();
         if (!decrypted_data.isEmpty()) {
             ui->statusbar->clearMessage();
-
-            if (showDebugMessages) {
-                QMessageBox::information(this,"Decrypted",decrypted_data);
-            }
 
             //parseJsonApplication(decrypted_data);
             populateFromJsonApplication(decrypted_data, ui);
@@ -4022,9 +4009,6 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
             query.bindValue(":id", item->data(0,Qt::UserRole).toInt());
             if (query.exec() && query.first()) {
                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
-                if (showDebugMessages) {
-                    QMessageBox::information(this, "Encrypted data", data);
-                }
             } else {
                 qDebug() << "Query failed:" << query.lastError().text();
             }
@@ -4061,10 +4045,6 @@ connect(gpg,
                 QByteArray decrypted_data = *decBuffer;  // use accumulated buffer
                 if (!decrypted_data.isEmpty()) {
                     ui->statusbar->clearMessage();
-
-                    if (showDebugMessages) {
-                        QMessageBox::information(this, "Decrypted JSON", decrypted_data);
-                    }
 
                     // --- Step 3: Populate dialog with decrypted JSON ---
                     QJsonDocument doc = QJsonDocument::fromJson(decrypted_data);
@@ -4231,9 +4211,6 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
             query.bindValue(":id", item->data(0, Qt::UserRole).toInt());
             if (query.exec() && query.first()) {
                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
-                if (showDebugMessages) {
-                    QMessageBox::information(this, "Encrypted data", data);
-                }
             } else {
                 qDebug() << "Query failed:" << query.lastError().text();
             }
