@@ -1933,6 +1933,7 @@ QTreeWidgetItem* MainWindow::makeItemFromApplication(QSqlQuery& query) {
     item->setText(0, name);
     item->setData(0, Qt::UserRole, id);
     item->setIcon(0,QPixmap(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+    qDebug().noquote() << id << name;
     return item;
 }
 
@@ -1943,7 +1944,6 @@ void MainWindow::keyList()
         QMessageBox::warning(this, ui->actionKey_List->text(), tr("No database open."));
         return;
     }
-
 
     // Create dialog
     QDialog *dlg = new QDialog(this);
@@ -2205,7 +2205,8 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
     db.setDatabaseName(qApp->property("dbFile").toString());
     if (!db.open()) {
-        qDebug() << "Failed to open DB:" << db.lastError().text();
+        qCritical().noquote() << Q_FUNC_INFO << "No database open." << db.lastError().text();
+        return;
     } else {
         QSqlQuery query(db);
         query.prepare(R"(
@@ -2232,7 +2233,7 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
                 row++;
             }
         } else {
-            qDebug() << "Failed to query audit log:" << query.lastError().text();
+            qWarning().noquote() << Q_FUNC_INFO << "Failed to query audit log." << query.lastError().text();
         }
     }
 
@@ -4663,7 +4664,7 @@ void MainWindow::createCategory(const QString& categoryName /* = QString() */)
     //
     // 2. Validate name
     //
-    static const QRegularExpression re("^[\\w\\-\\s]{1,64}$");
+    static const QRegularExpression re("^.{1,64}$");
     if (!re.match(text).hasMatch()) {
         QMessageBox::warning(this,
                              tr("Invalid Name"),
