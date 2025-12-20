@@ -1,3 +1,6 @@
+#ifndef ENCRYPTFILEDIALOG_H
+#define ENCRYPTFILEDIALOG_H
+
 #include <QLineEdit>
 #include <QObject>
 #include <QLabel>
@@ -228,3 +231,5 @@ private:
     QString m_lastSuggestedOutput;
     Settings settings;
 };
+
+#endif // ENCRYPTFILEDIALOG_H

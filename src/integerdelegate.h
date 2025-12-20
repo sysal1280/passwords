@@ -1,4 +1,6 @@
-#pragma once
+#ifndef INTEGERDELEGATE_H
+#define INTEGERDELEGATE_H
+
 #include <QStyledItemDelegate>
 #include <QSpinBox>
 
@@ -28,3 +30,5 @@ public:
         model->setData(index, value, Qt::EditRole);
     }
 };
+
+#endif // INTEGERDELEGATE_H

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MULTILINEDELEGATE_H
+#define MULTILINEDELEGATE_H
+
 #include <QStyledItemDelegate>
 #include <QTextEdit>
 
@@ -34,3 +36,5 @@ public:
         editor->setGeometry(option.rect);
     }
 };
+
+#endif // MULTILINEDELEGATE_H

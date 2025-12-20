@@ -19,7 +19,6 @@
 
 
 #include "droplabel.h"
-#include <QDebug>
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 

@@ -1,4 +1,5 @@
 // categorydialog.h
+#pragma once
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
 #include <QLabel>

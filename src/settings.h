@@ -1,6 +1,6 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
-#pragma once
+
 #include <QString>
 #include <QSettings>
 #include <QStandardPaths>

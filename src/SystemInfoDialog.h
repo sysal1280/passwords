@@ -1,5 +1,6 @@
 // systeminfodialog.h
-#pragma once
+#ifndef SYSTEMINFODIALOG_H
+#define SYSTEMINFODIALOG_H
 
 #include <QDialog>
 #include <QPlainTextEdit>
@@ -162,3 +163,5 @@ private:
         return report;
     }
 };
+
+#endif // SYSTEMINFODIALOG_H
