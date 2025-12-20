@@ -1801,8 +1801,6 @@ QByteArray MainWindow::base32Decode(const QString &base32) {
     return result;
 }
 
-
-
 void MainWindow::showPasswordsContextMenu(const QPoint &pos)
 {
     // 1. Selection check

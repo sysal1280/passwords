@@ -2,15 +2,11 @@
 #define UTILS_H
 
 #include "settings.h"
-#include <QSqlDatabase>
-#include <QSqlQuery>
 #include <QMessageBox>
 #include <QApplication>
-#include <QSqlError>
 #include <QResource>
 
-inline QString loadWordlistResource(const QWidget *parent,
-                                    const char *caller)
+inline QString loadWordlistResource(const QWidget *parent, const char *caller)
 {
     Settings settings;
     QString configFile = settings.configFilePath();
