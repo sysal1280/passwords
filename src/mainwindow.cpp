@@ -3291,52 +3291,22 @@ void MainWindow::search(int appId)
 
 void MainWindow::initDb()
 {
-    /*
-     * One time DB tasks and their initilizations goes here.
-     */
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
+
         if (!db.open()) {
             QMessageBox::critical(this, QApplication::applicationName(), db.lastError().text());
             return;
         }
 
-        /*
-         * Create a nice looking app key
-         */
-        QString appKeyStr;
-
-        for (int i = 0; i < 5; ++i) {
-            QString uuidStr = QUuid::createUuid().toString(QUuid::WithoutBraces);
-            uuidStr.remove('-');
-            appKeyStr += uuidStr;
-        }
-
         QSqlQuery query(db);
-        query.prepare(R"(
-    INSERT OR IGNORE INTO app_info (key, value)
-    VALUES (:app_key, :guid)
-)");
-        query.bindValue(":app_key", "app_key");
-        query.bindValue(":guid", appKeyStr.toUtf8().toBase64());
-        if (!query.exec())
-        {
-            qDebug() << "initDb() has failed.";
-        }
 
-        query.prepare(R"(
-    INSERT OR IGNORE INTO app_info (key, value)
-    VALUES (:db_create, :dt)
-)");
-        query.bindValue(":db_create", "db_create");
-        query.bindValue(":dt", QDateTime::currentDateTime());
-        if (!query.exec())
-        {
-            qCritical() << "initDb has failed.";
-        }
-
+        //
+        // 1. Check if app_key already exists
+        //
         query.prepare(R"(
             SELECT value
             FROM app_info
@@ -3344,32 +3314,83 @@ void MainWindow::initDb()
         )");
         query.bindValue(":app_key", "app_key");
 
+        QByteArray existingKey;
+
         if (!query.exec()) {
             qCritical().noquote() << tr("Failed to query appKey:") << query.lastError().text();
         } else if (query.next()) {
-            this->appKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
-            qApp->setProperty("appKey", QByteArray::fromBase64(query.value(0).toString().toUtf8()));
-            qInfo().noquote() << "Found appKey:"
-                              << (appKey.length() > 7
+            existingKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
+        }
+
+        //
+        // 2. If no key exists, generate and insert one
+        //
+        if (existingKey.isEmpty()) {
+
+            // Generate a nice-looking app key
+            QString appKeyStr;
+            for (int i = 0; i < 5; ++i) {
+                QString uuidStr = QUuid::createUuid().toString(QUuid::WithoutBraces);
+                uuidStr.remove('-');
+                appKeyStr += uuidStr;
+            }
+
+            QByteArray encoded = appKeyStr.toUtf8().toBase64();
+
+            query.prepare(R"(
+                INSERT INTO app_info (key, value)
+                VALUES (:app_key, :guid)
+            )");
+            query.bindValue(":app_key", "app_key");
+            query.bindValue(":guid", encoded);
+
+            if (!query.exec()) {
+                qCritical() << "Failed to insert new app_key:" << query.lastError().text();
+            } else {
+                existingKey = QByteArray::fromBase64(encoded);
+            }
+        }
+
+        //
+        // 3. Store the key in the application
+        //
+        if (existingKey.isEmpty()) {
+            qFatal() << "No appKey found in the database.";
+        }
+
+        this->appKey = existingKey;
+        qApp->setProperty("appKey", existingKey);
+
+        qInfo().noquote() << "Using appKey:"
+                          << (appKey.length() > 7
                                   ? appKey.left(3) + "..." + appKey.right(4)
                                   : appKey);
 
-        } else {
-            qFatal() << "No appKey found in the database.";
+        //
+        // 4. Insert db_create timestamp if missing
+        //
+        query.prepare(R"(
+            INSERT OR IGNORE INTO app_info (key, value)
+            VALUES (:db_create, :dt)
+        )");
+        query.bindValue(":db_create", "db_create");
+        query.bindValue(":dt", QDateTime::currentDateTime());
+
+        if (!query.exec()) {
+            qCritical() << "Failed to insert db_create timestamp:" << query.lastError().text();
         }
     }
+
     QSqlDatabase::removeDatabase(connName);
 
-    /*
- * Check if keys exist
- * Having a key linked in the keys table is a essential
- * requirement for operation of this program.
- */
-
+    //
+    // 5. Check if GPG keys exist
+    //
     QList<KeyEntry> keys = fetchKeys();
     if (keys.isEmpty()) {
         qWarning().noquote() << "No GPG Keys have been linked.";
         QApplication::restoreOverrideCursor();
+
         QMessageBox::StandardButton reply =
             QMessageBox::question(this,
                                   tr("No Keys Configured"),
@@ -3379,7 +3400,6 @@ void MainWindow::initDb()
                                   QMessageBox::Yes | QMessageBox::No);
 
         if (reply == QMessageBox::Yes) {
-            // Open the key setup dialog/action immediately
             keyList();
         } else {
             QMessageBox::information(this,
@@ -3388,7 +3408,6 @@ void MainWindow::initDb()
                                         "to create or edit encrypted passwords."));
         }
     }
-
 }
 
 void MainWindow::setBookmark(bool checked)
