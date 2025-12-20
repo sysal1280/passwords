@@ -22,6 +22,7 @@
 #include "mainwindow.h"
 #include "settings.h"
 #include "DataObfuscator.h"
+#include "dbutils.h"
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -70,13 +71,11 @@ LoginDialog::LoginDialog(QWidget *parent)
                     }
                 } else
                 {
-                    qCritical().noquote() << Q_FUNC_INFO << "Query Failed." << query.lastError().text();
+                    showQueryError(this,query,Q_FUNC_INFO);
                 }
                 db.close();
             } else {
-                qCritical().noquote() << Q_FUNC_INFO << "No open database." << db.lastError().text();
-                QMessageBox::critical(this, tr("Database Error"),
-                                      tr("No open database.\n%1").arg(db.lastError().text()));
+                showDbNotOpenError(this,db,Q_FUNC_INFO);
             }
         }
         // remove connection after db object is destroyed

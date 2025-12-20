@@ -37,7 +37,25 @@ inline void showQueryError(const QWidget *parent,
     QMessageBox::critical(
         const_cast<QWidget*>(parent),
         QApplication::applicationName(),
-        "A database query failed. Check logs for details."
+        QString("A database query failed.\n%1")
+            .arg(query.lastError().text())
+        );
+}
+
+inline void showTransactionError(const QWidget *parent,
+                                 const QSqlDatabase &db,
+                                 const char *caller)
+{
+    qCritical().noquote()
+    << caller
+    << "Failed to start or commit transaction:"
+    << db.lastError().text();
+
+    QMessageBox::critical(
+        const_cast<QWidget*>(parent),
+        QApplication::applicationName(),
+        QString("A database transaction failed.\n%1")
+            .arg(db.lastError().text())
         );
 }
 

@@ -928,7 +928,7 @@ void MainWindow::newPassword()
 
             // --- Transaction start ---
             if (!db.transaction()) {
-                qCritical().noquote() << Q_FUNC_INFO << "Failed to start transaction:" << db.lastError().text();
+                showTransactionError(this,db,Q_FUNC_INFO);
                 return;
             }
             bool success = true;
@@ -4020,7 +4020,7 @@ connect(gpg,
                                 db.setDatabaseName(qApp->property("dbFile").toString());
                                 if (db.open()) {
                                     if (!db.transaction()) {
-                                        qCritical().noquote() << Q_FUNC_INFO << "Failed to start transaction:" << db.lastError().text();
+                                        showTransactionError(this,db,Q_FUNC_INFO);
                                     }
                                     bool ok = true;
 

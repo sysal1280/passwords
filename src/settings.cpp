@@ -19,6 +19,7 @@
 
 
 #include "settings.h"
+#include "dbutils.h"
 #include <QFileDialog>
 #include <QFile>
 #include <QApplication>
@@ -541,7 +542,7 @@ bool Settings::verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent)
 {
     QSqlQuery q(db);
     if (!q.exec("SELECT value FROM app_info WHERE key LIKE 'destructive_operation_password_%'")) {
-        qWarning() << "Failed to query app_info:" << q.lastError().text();
+        showQueryError(parent, q, Q_FUNC_INFO);
         return false; // fail safe
     }
 
