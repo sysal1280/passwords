@@ -82,7 +82,7 @@ void checkGpgKeys(QWidget* parent)
     QString dbFile = settings.getDefaultDbPath(parent);
     if (!QFileInfo::exists(dbFile))
     {
-        qDebug() << "skipping GPG keys check, no database.";
+        qWarning().noquote() << "skipping GPG keys check. There is no database.";
         return;
     }
 
@@ -95,17 +95,14 @@ void checkGpgKeys(QWidget* parent)
         db.setDatabaseName(dbFile);
 
         if (!db.open()) {
-            qWarning() << "DB open failed:" << db.lastError().text();
+            qCritical().noquote() << "DB open failed:" << db.lastError().text();
             QSqlDatabase::removeDatabase(connNameRead);
             return;
         }
 
-
-        qDebug() << qApp->property("appKey").toByteArray();
-
         QSqlQuery select(db);
         if (!select.exec("SELECT key FROM keys")) {
-            qWarning() << "gpgCheck Error:" << select.lastError().text();
+            qWarning().noquote() << "gpgCheck Error:" << select.lastError().text();
             db.close();
             QSqlDatabase::removeDatabase(connNameRead);
             return;
@@ -114,7 +111,7 @@ void checkGpgKeys(QWidget* parent)
         while (select.next())
         {
             keys << DataObfuscator::deobfuscate(select.value(0).toString(),qApp->property("appKey").toByteArray());
-            qDebug() << DataObfuscator::deobfuscate(select.value(0).toString(),qApp->property("appKey").toByteArray());
+            qInfo().noquote() << "Checking Key:" << DataObfuscator::deobfuscate(select.value(0).toString(),qApp->property("appKey").toByteArray());
         }
 
         db.close();

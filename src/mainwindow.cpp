@@ -530,6 +530,9 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
 
+    if (qApp->property("dbPath").toString().isEmpty())
+        return;
+
     if (firstShow) {
         firstShow = false;
 
@@ -585,7 +588,7 @@ void MainWindow::loadCategories()
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (!db.open()) {
-            qCritical() << "Failed to open database:" << db.lastError().text();
+            qCritical().noquote() << Q_FUNC_INFO << "Failed to open database:" << db.lastError().text();
             QSqlDatabase::removeDatabase(connectionName);
             return;
         }
@@ -604,7 +607,7 @@ void MainWindow::loadCategories()
         {
             QSqlQuery query(db);
             if (!query.exec("SELECT id, parent_id, text FROM categories ORDER BY id")) {
-                qDebug() << "Query failed:" << query.lastError().text();
+                qCritical().noquote() << Q_FUNC_INFO << "Query failed:" << query.lastError().text();
                 return;
             }
 
@@ -612,6 +615,7 @@ void MainWindow::loadCategories()
                 int id = query.value(0).toInt();
                 int parentId = query.value(1).isNull() ? 0 : query.value(1).toInt();
                 QString text = DataObfuscator::deobfuscate(query.value(2).toString(), appKey);
+                qDebug() << id << parentId << text;
 
                 QTreeWidgetItem* item = new QTreeWidgetItem();
                 item->setText(0, text);
@@ -620,7 +624,6 @@ void MainWindow::loadCategories()
 
                 itemMap[id] = item;
                 ui->treeWidget->addTopLevelItem(item);
-
                 links.push_back({id, parentId});
             }
         }
@@ -645,17 +648,17 @@ void MainWindow::loadCategories()
 
             QTreeWidgetItem* parent = itemMap.value(parentId, nullptr);
             if (!parent) {
-                qWarning() << "Orphan category id" << id << "parent" << parentId << "not found; leaving as top-level.";
+                qWarning().noquote() << Q_FUNC_INFO << "Orphan category id" << id << "parent" << parentId << "not found; leaving as top-level.";
                 continue;
             }
 
             if (parentId == id) {
-                qWarning() << "Self-parent detected for id" << id << "; skipping re-parent.";
+                qWarning().noquote() << Q_FUNC_INFO << "Self-parent detected for id" << id << "; skipping re-parent.";
                 continue;
             }
 
             if (isAncestorOf(item, parent)) {
-                qWarning() << "Cycle detected while linking id" << id << "-> parent" << parentId << "; skipping.";
+                qWarning().noquote() << Q_FUNC_INFO << "Cycle detected while linking id" << id << "-> parent" << parentId << "; skipping.";
                 continue;
             }
 
@@ -700,53 +703,6 @@ void MainWindow::loadCategories()
     QSqlDatabase::removeDatabase(connectionName);
 }
 
-void MainWindow::saveTreeToDb(QTreeWidget* tree, QSqlDatabase& db) {
-    for (int i = 0; i < tree->topLevelItemCount(); ++i) {
-        QTreeWidgetItem* item = tree->topLevelItem(i);
-        saveItemToDb(item, db, QVariant()); // No parent for top-level
-    }
-}
-
-void MainWindow::saveItemToDb(QTreeWidgetItem* item, QSqlDatabase& db, const QVariant& parentId) {
-    QString itemText = item->text(0);
-    int normalizedParentId = parentId.isNull() ? 0 : parentId.toInt();
-
-    qDebug() << "Attempting to save item:" << itemText << "with parent_id:" << normalizedParentId;
-
-    QSqlQuery query(db);
-    query.prepare("INSERT OR IGNORE INTO categories (parent_id, text) VALUES (?, ?)");
-    query.addBindValue(normalizedParentId);
-    query.addBindValue(DataObfuscator::obfuscate(itemText,appKey));
-
-    if (!query.exec()) {
-        qDebug() << "Insert failed:" << query.lastError().text();
-    } else {
-        qDebug() << "Insert attempted (may be ignored if duplicate).";
-    }
-
-    // Retrieve ID whether inserted or already existing
-    QVariant id;
-    QSqlQuery getId(db);
-    getId.setForwardOnly(true);
-    getId.prepare("SELECT id FROM categories WHERE parent_id = ? AND text = ?");
-    getId.addBindValue(normalizedParentId);
-    getId.addBindValue(DataObfuscator::obfuscate(itemText,appKey));
-
-    if (!getId.exec()) {
-        qDebug() << "ID lookup failed:" << getId.lastError().text();
-    } else if (getId.next()) {
-        id = getId.value(0);
-        qDebug() << "Retrieved ID for item:" << itemText << "->" << id.toInt();
-    } else {
-        qDebug() << "No ID found for item:" << itemText << "with parent_id:" << normalizedParentId;
-    }
-
-    // Recurse into children
-    for (int i = 0; i < item->childCount(); ++i) {
-        qDebug() << "Saving child" << i << "of item:" << itemText;
-        saveItemToDb(item->child(i), db, id);
-    }
-}
 
 MainWindow::~MainWindow()
 {
@@ -915,6 +871,7 @@ void MainWindow::newPassword()
 
         QString tempFile = baseDir + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".asc";
 
+
         QStringList args;
         for (const QString &key : std::as_const(selectedKeys)) {
             args << "--recipient" << key;
@@ -1082,8 +1039,6 @@ QList<KeyEntry> MainWindow::fetchKeys() const
 void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     clearScrollArea();
-
-    qDebug() << item->data(0,Qt::UserRole).toInt() << "userrole id";
 
     // Block signals and clear the second tree widget
     ui->treeWidget_2->blockSignals(true);
@@ -1697,12 +1652,12 @@ bool MainWindow::killGpgAgent()
     process.start("gpgconf", QStringList() << "--kill" << "gpg-agent");
 
     if (!process.waitForStarted(1500)) {
-        qWarning() << "Failed to start gpgconf process";
+        qWarning().noquote() << Q_FUNC_INFO << "Failed to start gpgconf process";
         return false;
     }
 
     if (!process.waitForFinished(2500)) {
-        qWarning() << "gpgconf process did not finish";
+        qWarning().noquote() << Q_FUNC_INFO  << "gpgconf process did not finish";
         return false;
     }
 
@@ -1710,9 +1665,9 @@ bool MainWindow::killGpgAgent()
     QByteArray errors = process.readAllStandardError();
 
     if (!output.isEmpty())
-        qDebug() << "gpgconf output:" << output;
+        qDebug().noquote() << Q_FUNC_INFO  << "gpgconf output:" << output;
     if (!errors.isEmpty())
-        qDebug() << "gpgconf errors:" << errors;
+        qDebug().noquote() << Q_FUNC_INFO  << "gpgconf errors:" << errors;
 
     return (process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0);
 }
@@ -1803,7 +1758,7 @@ void MainWindow::updateFields()
                     edit->setText(formatOtp(newValue));
                 }
             } else {
-                edit->setText("NA");
+                edit->setText("-");
             }
         }
     }
@@ -1948,7 +1903,8 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
             isBookmarked = (query.exec() && query.next());
             db.close();
         } else {
-            db.close();
+            qCritical().noquote() << Q_FUNC_INFO << "No database open." << db.lastError().text();
+            return;
         }
 
         ui->actionBookmark->setCheckable(true);
@@ -1972,53 +1928,11 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
 QTreeWidgetItem* MainWindow::makeItemFromApplication(QSqlQuery& query) {
     int id       = query.value(0).toInt();
     //int parentId = query.value(1).toInt();
-    QString name = DataObfuscator::deobfuscate(query.value(2).toString(),appKey);
-
-    //qDebug() << Q_FUNC_INFO << id << parentId << name << url;
-
+    QString name = DataObfuscator::deobfuscate(query.value(2).toString(),qApp->property("appKey").toByteArray());
     auto* item = new QTreeWidgetItem();
     item->setText(0, name);
     item->setData(0, Qt::UserRole, id);
     item->setIcon(0,QPixmap(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
-    //item->setText(1, QString::number(id));
-    return item;
-}
-
-QTreeWidgetItem* MainWindow::makeItemFromNote(QSqlQuery& query) {
-    int id       = query.value(0).toInt();
-    int parentId = query.value(1).toInt();
-    QString title = query.value(2).toString();
-    //QString body  = query.value(3).toString();
-
-    auto* item = new QTreeWidgetItem();
-    item->setText(0, title);
-    item->setText(1, QString::number(id));
-    item->setData(0, Qt::UserRole, parentId);
-    return item;
-}
-
-QTreeWidgetItem* MainWindow::makeItemFromFile(QSqlQuery& query) {
-    int id       = query.value(0).toInt();
-    int parentId = query.value(1).toInt();
-    QString title = query.value(2).toString();
-
-    auto* item = new QTreeWidgetItem();
-    item->setText(0, title);
-    item->setText(1, QString::number(id));
-    item->setData(0, Qt::UserRole, parentId);
-    return item;
-}
-
-QTreeWidgetItem* MainWindow::makeItemFromCredit(QSqlQuery& query) {
-    int id       = query.value(0).toInt();
-    int parentId = query.value(1).toInt();
-    QString title = query.value(2).toString();
-    //QString body  = query.value(3).toString();
-
-    auto* item = new QTreeWidgetItem();
-    item->setText(0, title);
-    item->setText(1, QString::number(id));
-    item->setData(0, Qt::UserRole, parentId);
     return item;
 }
 
@@ -2026,7 +1940,7 @@ void MainWindow::keyList()
 {
     const QString dbFile = qApp->property("dbFile").toString();
     if (Q_UNLIKELY(dbFile.isEmpty())) {
-        QMessageBox::warning(this, ui->actionKey_List->text(), "No database open.");
+        QMessageBox::warning(this, ui->actionKey_List->text(), tr("No database open."));
         return;
     }
 
@@ -2071,7 +1985,7 @@ void MainWindow::keyList()
         db.setDatabaseName(dbFile);
         if (!db.open())
         {
-            qCritical() << db.lastError().databaseText();
+            qCritical().noquote() << Q_FUNC_INFO << "No database open." << db.lastError().databaseText();
             return;
         }
 
@@ -2086,7 +2000,7 @@ void MainWindow::keyList()
                 row++;
             }
         } else {
-            qWarning() << "Failed to query keys:" << query.lastError().text();
+            qWarning().noquote() << Q_FUNC_INFO << "Failed to query keys:" << query.lastError().text();
         }
     }
     QSqlDatabase::removeDatabase("fetchkeys");
@@ -2201,11 +2115,6 @@ void MainWindow::keyList()
 
         QString name  = table->item(row, 0)->text();
         QString keyId = table->item(row, 1)->text();
-
-        qDebug() << table->item(row,1)->data(Qt::UserRole);
-        qDebug() << qApp->property("appKey").toByteArray();
-        qDebug() << keyId;
-        qDebug() << DataObfuscator::obfuscate(keyId,qApp->property("appKey").toByteArray());
 
         if (QMessageBox::question(dlg, tr("Confirm Delete"),
                                   QString(tr("Delete key '%1' (%2)?")).arg(name, keyId))
@@ -3034,11 +2943,9 @@ bool MainWindow::openDatabase(const QString &fileName)
         QString backupPath = backupDirPath + "/" + fi.completeBaseName() + "_" + timestamp;
 
         if (!QFile::copy(fileName, backupPath)) {
-            qWarning().noquote()
-            << tr("Failed to create backup at %1:").arg(backupDirPath)
-            << QFile(fileName).errorString();
+            qCritical().noquote() << Q_FUNC_INFO << "Failed to create backup:" << QDir::toNativeSeparators(backupPath) + ":" << QFile(fileName).errorString();
         } else {
-            qDebug() << "Backup created as:" << backupPath;
+            qInfo().noquote() << "Backup created as:" << backupPath;
         }
     }
 
@@ -3484,7 +3391,7 @@ void MainWindow::initDb()
         query.bindValue(":dt", QDateTime::currentDateTime());
         if (!query.exec())
         {
-            qDebug() << "initDb() has failed.";
+            qCritical() << "initDb has failed.";
         }
 
         query.prepare(R"(
@@ -3495,12 +3402,17 @@ void MainWindow::initDb()
         query.bindValue(":app_key", "app_key");
 
         if (!query.exec()) {
-            qDebug() << tr("Failed to read app_key") << query.lastError().text();
+            qCritical().noquote() << tr("Failed to query appKey:") << query.lastError().text();
         } else if (query.next()) {
             this->appKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
             qApp->setProperty("appKey", QByteArray::fromBase64(query.value(0).toString().toUtf8()));
+            qInfo().noquote() << "Found appKey:"
+                              << (appKey.length() > 7
+                                  ? appKey.left(3) + "..." + appKey.right(4)
+                                  : appKey);
+
         } else {
-            qCritical() << "No app_key found in app_info table.";
+            qFatal() << "No appKey found in the database.";
         }
     }
     QSqlDatabase::removeDatabase(connName);
@@ -3513,6 +3425,7 @@ void MainWindow::initDb()
 
     QList<KeyEntry> keys = fetchKeys();
     if (keys.isEmpty()) {
+        qWarning().noquote() << "No GPG Keys have been linked.";
         QApplication::restoreOverrideCursor();
         QMessageBox::StandardButton reply =
             QMessageBox::question(this,
@@ -5223,6 +5136,12 @@ void MainWindow::insertAuditRow(int applicationId, const QString &user, const QS
 
 void MainWindow::ExportedWithoutEdits()
 {
+    const QString dbFile = qApp->property("dbFile").toString();
+    if (Q_UNLIKELY(dbFile.isEmpty())) {
+        QMessageBox::warning(this, ui->actionKey_List->text(), tr("No database open."));
+        return;
+    }
+
     qDebug() << countExportedWithoutEdits();
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QList<SearchResult> results;
@@ -5418,6 +5337,12 @@ int MainWindow::countExportedWithoutEdits()
 
 void MainWindow::NotChangedSince(const QDateTime &cutoff)
 {
+    const QString dbFile = qApp->property("dbFile").toString();
+    if (Q_UNLIKELY(dbFile.isEmpty())) {
+        QMessageBox::warning(this, ui->actionKey_List->text(), tr("No database open."));
+        return;
+    }
+
     qint64 cutoffTs = cutoff.toSecsSinceEpoch();
 
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);

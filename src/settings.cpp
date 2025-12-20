@@ -375,7 +375,7 @@ QString Settings::getDefaultDbPath(QWidget* parent)
     QDir(configDir).mkpath(".");
     QString localPath = QDir(configDir).filePath("passwords");
 
-    qDebug() << "Looking for database at" << localPath;
+    qInfo().noquote() << QString("Looking for database at %1.").arg(localPath);
     if (QFile::exists(localPath)) {
         return localPath;
     }
@@ -390,7 +390,7 @@ QString Settings::getDefaultDbPath(QWidget* parent)
     QString globalPath = "/var/lib/password/passwords";
 #endif
 
-    qDebug() << "Looking for global database at" << globalPath;
+    qInfo().noquote() << QString("Looking for database at %1.").arg(globalPath);
     if (QFile::exists(globalPath)) {
         return globalPath;
     }

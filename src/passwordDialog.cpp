@@ -24,21 +24,21 @@ void showPasswordGenerator(QWidget *parent,
                            const QString &title,
                            const QStringList & /*wordList*/)
 {
-    Settings settings;  // non-static instance
+    Settings settings;
 
     // Build path to wordlist.rc in config dir
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString wordListPath = QDir(configDir).filePath("wordlist.rc");
+    QString configFile = settings.configFilePath();
+    QString configDir  = QFileInfo(configFile).absolutePath();
+    QString wordListPath = QDir(configDir).filePath("wordlist.rcc");
 
     if (QFile::exists(wordListPath)) {
         if (QResource::registerResource(wordListPath)) {
-            qDebug() << "Loaded wordlist.rc";
+            qInfo().noquote() << Q_FUNC_INFO << "Loaded wordlist.rcc file.";
         } else {
-            qWarning() << "Failed to register resource:" << wordListPath;
+            qCritical().noquote() << Q_FUNC_INFO << "Failed to register resource:" << wordListPath;
         }
     } else {
-        qWarning() << "Resource file not found:" << wordListPath;
-        QMessageBox::warning(parent, title, "Missing wordlist.rc file.");
+        qCritical().noquote() << Q_FUNC_INFO << "Missing resource file:" << wordListPath;
         return;
     }
 
@@ -46,7 +46,10 @@ void showPasswordGenerator(QWidget *parent,
     QStringList wl = passwordGenerator::loadWordList(settings.getWordListFile());
 
     // Unregister after loading
-    QResource::unregisterResource(wordListPath);
+    if (!QResource::unregisterResource(wordListPath))
+    {
+        qCritical().noquote() << "Failed to unregister " << wordListPath;
+    }
 
     if (wl.isEmpty()) {
         QMessageBox::warning(

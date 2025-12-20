@@ -39,7 +39,7 @@
 // Forward declaration of helper
 // Returns true if a database file is ready (exists or was created/copied)
 // and qApp->property("dbFile") is set. It DOES NOT open the DB.
-static bool setupDatabaseFile();
+static bool setupDatabaseFile(QWidget *parent);
 void pwdMsgHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 static bool showDebugMessages = false;
 
@@ -53,14 +53,18 @@ int main(int argc, char *argv[])
     {
         Settings settings;
         showDebugMessages = settings.getDebugMode();
-
     }
     qInstallMessageHandler(pwdMsgHandler);
+    {
+        Settings settings;
+        qInfo().noquote() << "Config file loaded:" << QDir::toNativeSeparators(settings.configFilePath());
+
+    }
 
     /*
      * Set QApplication settings
      */
-    QString applicationName = QCoreApplication::translate("main","passwords");
+    QString applicationName = QCoreApplication::translate("main","Passwords");
     QApplication::setWindowIcon(QIcon(":/password.png"));
     QGuiApplication::setDesktopFileName(applicationName);
     QApplication::setApplicationName(applicationName);
@@ -78,6 +82,7 @@ int main(int argc, char *argv[])
     QLockFile lockFile(QDir::temp().absoluteFilePath(lockFileName));
     lockFile.setStaleLockTime(0);
     if (!lockFile.tryLock()) {
+        qWarning() << "Already running.";
         QMessageBox::warning(nullptr,QApplication::applicationDisplayName(),
                              QCoreApplication::translate("main", "Already running."));
         return 0;
@@ -103,12 +108,10 @@ int main(int argc, char *argv[])
 
     if (translator.load(locale, QCoreApplication::applicationDirPath())) {
         QApplication::installTranslator(&translator);
+        qInfo().noquote() << QString(QCoreApplication::translate("main", "Loaded translation file: %1.")).arg(locale+".qm");
     } else {
-        qWarning().noquote()
-        << QString(QCoreApplication::translate("main", "No translation file found for %1, using defaults.")).arg(locale);
-        qWarning().noquote()
-            << QString(QCoreApplication::translate("main", "To load translation add %1.qm file to %2"))
-                   .arg(locale, QCoreApplication::applicationDirPath());
+        qWarning().noquote() << QString(QCoreApplication::translate("main", "No translation file found for %1, using defaults.")).arg(locale);
+        qInfo().noquote() << QString(QCoreApplication::translate("main", "To load translation add %1.qm file to %2.")).arg(locale, QCoreApplication::applicationDirPath());
     }
 
 
@@ -119,8 +122,8 @@ int main(int argc, char *argv[])
     splash->showMessage(QCoreApplication::translate("main", "Checking installation.."),
                         Qt::AlignBottom | Qt::AlignLeft,Qt::white);
     QApplication::processEvents();
-    Settings settings;   // construct your Settings instance
-    settings.createUserDesktopFile();  // call the member function
+    Settings settings;
+    settings.createUserDesktopFile();
 
     splash->showMessage(QCoreApplication::translate("main", "Checking GPG.."),
                         Qt::AlignBottom | Qt::AlignLeft, Qt::white);
@@ -172,7 +175,7 @@ sudo zypper install gnupg   (openSUSE)
 Ensure it is accessible in your PATH.
 )");
 #endif
-
+        qFatal() << msg;
         QMessageBox box(QMessageBox::Critical,
                         QApplication::applicationDisplayName(),
                         msg,
@@ -182,7 +185,6 @@ Ensure it is accessible in your PATH.
 
         return 0;
     }
-
 
     /*
      * Load stylesheet
@@ -199,14 +201,10 @@ Ensure it is accessible in your PATH.
         qApp->setStyleSheet(QString::fromUtf8(styleFile.readAll()));
 
         if (styleFile.fileName().startsWith(":/")) {
-            qWarning().noquote()
-            << QString(QCoreApplication::translate("main", "No stylesheet file found, using defaults."));
-            qWarning().noquote()
-                << QString(QCoreApplication::translate("main", "To load stylesheet add style.css file to %1"))
-                       .arg(QCoreApplication::applicationDirPath());
+            qWarning().noquote() << QString(QCoreApplication::translate("main", "No stylesheet file found, using defaults."));
+            qInfo().noquote() << QString(QCoreApplication::translate("main", "To load stylesheet add style.css file to %1.")).arg(QCoreApplication::applicationDirPath());
         } else {
-            qInfo().noquote()
-            << QString(QCoreApplication::translate("main", "Loaded stylesheet file: %1")).arg(styleFile.fileName());
+            qInfo().noquote() << QString(QCoreApplication::translate("main", "Loaded stylesheet file: %1.")).arg(styleFile.fileName());
         }
     }
 
@@ -219,7 +217,7 @@ Ensure it is accessible in your PATH.
     splash->showMessage(QCoreApplication::translate("main", "Setting up database file.."),
                         Qt::AlignBottom | Qt::AlignLeft, Qt::white);
     QApplication::processEvents();
-    bool dbFileReady = setupDatabaseFile();
+    bool dbFileReady = setupDatabaseFile(splash);
 
     /*
      * Create main window (needed to call its DB methods)
@@ -244,8 +242,6 @@ Ensure it is accessible in your PATH.
                 return 0;
             dbOpened = true;
         }
-    } else {
-        qWarning() << QCoreApplication::translate("main", "Database file not ready, running in limited mode.");
     }
 
 
@@ -299,7 +295,7 @@ Ensure it is accessible in your PATH.
  * Helper: ensure a database file exists and set qApp->dbFile.
  * Does NOT open the database (that is done by MainWindow).
  */
-static bool setupDatabaseFile()
+static bool setupDatabaseFile(QWidget *parent)
 {
     Settings settings;
     qApp->setProperty("dbFile", settings.getDefaultDbPath(nullptr));
@@ -308,14 +304,15 @@ static bool setupDatabaseFile()
     QFile file(dbPath);
 
     if (file.exists()) {
+        qInfo().noquote() << QString("Found database %1.").arg(dbPath);
         return true;
     }
 
-    qDebug() << "No db found at" << dbPath;
+    qWarning().noquote() << "No database has been found.";
 
     QMessageBox::StandardButton reply =
         QMessageBox::question(
-            nullptr,
+            parent,
             QCoreApplication::translate("main", "Database Missing"),
             QCoreApplication::translate("main",
                                         "No database was found.\n"
@@ -332,7 +329,7 @@ static bool setupDatabaseFile()
         // Ensure parent directory exists
         QDir(QFileInfo(localPath).absolutePath()).mkpath(".");
 
-        qDebug() << "Creating database at" << localPath;
+        qInfo().noquote() << QString("Creating database at %1.").arg(localPath);
 
         if (QFile::copy(":/files/passwords", localPath)) {
             QFile::setPermissions(localPath,
@@ -340,6 +337,7 @@ static bool setupDatabaseFile()
             qApp->setProperty("dbFile", localPath);
             return true;
         } else {
+            qCritical().noquote() << "Failed to copy database template to %1";
             QMessageBox::critical(
                 nullptr,
                 QCoreApplication::translate("main", "Error"),
@@ -349,13 +347,14 @@ static bool setupDatabaseFile()
             return false;
         }
     } else {
+        qInfo().noquote() << "Running in limited mode. A database should be setup for full functionality.";
         QMessageBox::information(
-            nullptr,
+            parent,
             QCoreApplication::translate("main", "Database Required"),
             QCoreApplication::translate("main",
-                                        "The application can continue without a database,\n"
+                                        "%1 can continue without a database,\n"
                                         "but functionality will be severely limited.\n"
-                                        "For example, you won't be able to save passwords.")
+                                        "For example, you won't be able to create passwords.").arg(QApplication::applicationName())
             );
         return false;
     }
@@ -375,10 +374,13 @@ void pwdMsgHandler(QtMsgType type, const QMessageLogContext &, const QString &ms
     case QtWarningMsg: prefix = "[WARN]  "; break;
     case QtCriticalMsg:prefix = "[ERROR] "; break;
     case QtFatalMsg:   prefix = "[FATAL] "; break;
-    default:           prefix = "[LOG]   "; break;
     }
 
-    fprintf(stderr, "%s%s\n", prefix, localMsg.constData());
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+
+    fprintf(stderr, "%s [%s] %s\n",
+            prefix,
+            timestamp.toLocal8Bit().constData(),
+            localMsg.constData());
     fflush(stderr);
 }
-

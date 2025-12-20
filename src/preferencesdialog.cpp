@@ -83,19 +83,22 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
      * Load wordlist rc file.
      */
 
-    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QString wordListPath = QDir(configDir).filePath("wordlist.rc");
+    Settings settings;
+    QString configFile = settings.configFilePath();
+    QString configDir  = QFileInfo(configFile).absolutePath();
+
+    QString wordListPath = QDir(configDir).filePath("wordlist.rcc");
 
     if (QFile::exists(wordListPath)) {
         if (QResource::registerResource(wordListPath)) {
-            qDebug() << "Loaded wordlist.rc";
+            qInfo().noquote() << Q_FUNC_INFO << "Loaded wordlist.rcc file.";
         } else {
-            qCritical() << "Failed to register resource:" << wordListPath;
+            qCritical().noquote() << Q_FUNC_INFO << "Failed to register resource:" << wordListPath;
             QMessageBox::critical(this,"",QString(tr("Failed to register resource: %1")).arg(wordListPath));
         }
     } else
     {
-        qCritical() << "Missing resource file:" << wordListPath;
+        qCritical().noquote() << "Missing resource file:" << wordListPath;
         QMessageBox::critical(this,"",QString(tr("Missing resource file: %1")).arg(wordListPath));
     }
 
@@ -191,14 +194,16 @@ void PreferencesDialog::restoreDefaults()
     bool success = false;
 
     if (!stock.exists()) {
+        qCritical().noquote() << Q_FUNC_INFO << "The boilerplate configuration file was not found inside the resource file.";
         QMessageBox::critical(this, "",
-                              tr("Stock configuration file not found in resources."));
+                              tr("The boilerplate configuration file was not found."));
         return;
     }
 
     if (!stock.open(QIODevice::ReadOnly)) {
+        qCritical().noquote() << Q_FUNC_INFO << "The boilerplate configuration file could not be opened for reading.";
         QMessageBox::critical(this, "",
-                              tr("Could not open stock configuration file."));
+                              tr("Could not open the boilerplate configuration file."));
         return;
     }
 
@@ -207,12 +212,14 @@ void PreferencesDialog::restoreDefaults()
 
     QFile target(targetPath);
     if (!target.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        qCritical().noquote() << Q_FUNC_INFO << "Could not write to" << targetPath << target.errorString();
         QMessageBox::critical(this, "",
                               tr("Could not write to %1").arg(targetPath));
         return;
     }
 
     if (target.write(data) != data.size()) {
+        qCritical().noquote() << Q_FUNC_INFO << "Failed to write all data to" << targetPath << target.errorString();
         QMessageBox::critical(this, "",
                               tr("Failed to write all data to %1").arg(targetPath));
         target.close();
@@ -228,6 +235,7 @@ void PreferencesDialog::restoreDefaults()
         QMessageBox::information(this, "",
                                  tr("Settings have been restored to defaults.\n\n"
                                     "Please restart the application for all default settings to take effect."));
+        qInfo().noquote() << Q_FUNC_INFO << "Default configuration restored.";
     }
 
 }
@@ -241,6 +249,7 @@ void PreferencesDialog::openBackupDir()
 {
     QString settingsPath = settings.getDefaultDbPath(this);
     if (settingsPath.isEmpty()) {
+        qCritical().noquote() << Q_FUNC_INFO << "Default DB Path is invalid.";
         QMessageBox::warning(this, tr("Error"), tr("Settings path is invalid."));
         return;
     }
@@ -250,6 +259,7 @@ void PreferencesDialog::openBackupDir()
     QString backupsPath = QDir(dir).filePath("backups");
 
     if (!QDir().mkpath(backupsPath)) {
+        qCritical().noquote() << Q_FUNC_INFO << "Could not create backups folder at" << backupsPath;
         QMessageBox::warning(this, tr("Error"), tr("Could not create backups folder."));
         return;
     }
@@ -302,7 +312,6 @@ void PreferencesDialog::saveSettings()
 
     for (auto it = widgetMap.begin(); it != widgetMap.end(); ++it) {
         QWidget *w = it.value();
-        qDebug() << it.key() << it.value();
 
         if (auto edit = qobject_cast<QLineEdit*>(w))
             s.setValue(it.key(), edit->text());
@@ -364,6 +373,7 @@ void PreferencesDialog::onBackupCheckStateChanged(int state)
 
                 QDir dir(backupsPath);
                 if (dir.exists() && !dir.removeRecursively()) {
+                    qWarning().noquote() << Q_FUNC_INFO << "Could not remove the backups folder" << backupsPath;
                     QMessageBox::warning(this, tr("Error"),
                                          tr("Could not remove backups folder."));
                 }
