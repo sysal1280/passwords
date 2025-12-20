@@ -21,6 +21,7 @@
 #include "ui_logindialog.h"
 #include "mainwindow.h"
 #include "settings.h"
+#include "DataObfuscator.h"
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -56,8 +57,8 @@ LoginDialog::LoginDialog(QWidget *parent)
                     keys.clear();
 
                     while (query.next()) {
-                        const QString label = query.value(0).toString();
-                        const QString key   = query.value(1).toString();
+                        const QString label = DataObfuscator::deobfuscate(query.value(0).toString(), qApp->property("appKey").toByteArray());
+                        const QString key   = DataObfuscator::deobfuscate(query.value(1).toString(), qApp->property("appKey").toByteArray());
                         ui->comboBoxLogin->addItem(label);
                         keys.insert(label, key);
                     }
@@ -67,10 +68,15 @@ LoginDialog::LoginDialog(QWidget *parent)
                         ui->comboBoxLogin->setCurrentIndex(0);
                         generateResponse();
                     }
+                } else
+                {
+                    qCritical().noquote() << Q_FUNC_INFO << "Query Failed." << query.lastError().text();
                 }
                 db.close();
             } else {
-                QMessageBox::critical(this, QString(), db.lastError().text());
+                qCritical().noquote() << Q_FUNC_INFO << "No open database." << db.lastError().text();
+                QMessageBox::critical(this, tr("Database Error"),
+                                      tr("No open database.\n%1").arg(db.lastError().text()));
             }
         }
         // remove connection after db object is destroyed
@@ -126,16 +132,21 @@ void LoginDialog::generateResponse()
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    const QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    const QString wordListRcc = QDir(configDir).filePath("wordlist.rc");
+    Settings settings;
+    QString configFile = settings.configFilePath();
+    QString configDir  = QFileInfo(configFile).absolutePath();
 
-    if (!QResource::registerResource(wordListRcc)) {
-        QMessageBox::warning(this,
-                             tr("Word List Missing"),
-                             tr("Could not load wordlist resource file.\n"
-                                "Please select a wordlist from Preferences → Passwords tab."));
-        QApplication::restoreOverrideCursor();
-        return;
+    QString wordListPath = QDir(configDir).filePath("wordlist.rcc");
+
+    if (QFile::exists(wordListPath)) {
+        if (QResource::registerResource(wordListPath)) {
+            qInfo().noquote() << Q_FUNC_INFO << "Loaded wordlist.rcc file.";
+        } else {
+            qCritical().noquote() << Q_FUNC_INFO << "Failed to register resource:" << wordListPath;
+        }
+    } else
+    {
+        qCritical().noquote() << "Missing resource file:" << wordListPath;
     }
 
     QStringList words;
@@ -151,7 +162,12 @@ void LoginDialog::generateResponse()
             file.close();
         }
     }
-    QResource::unregisterResource(wordListRcc);
+
+    // Unregister after loading
+    if (!QResource::unregisterResource(wordListPath))
+    {
+        qCritical().noquote() << Q_FUNC_INFO << "Failed to unregister " << wordListPath;
+    }
 
     QByteArray responseBytes;
     {
@@ -223,7 +239,8 @@ void LoginDialog::generateResponse()
     responseBytes.clear();
 
     QByteArray hashHex = responseHash.toHex();
-    qDebug() << "response hash:" << hashHex;
+    qDebug().noquote() << Q_FUNC_INFO
+                       << "Response hash:" << hashHex;
     std::fill(hashHex.begin(), hashHex.end(), '\0');
     hashHex.clear();
 

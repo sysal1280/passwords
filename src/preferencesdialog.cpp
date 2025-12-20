@@ -107,7 +107,12 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     for (const QString &name : std::as_const(entries)) {
         ui->comboBoxWordList->addItem(name);
     }
-    QResource::unregisterResource(wordListPath);
+
+    // Unregister after loading
+    if (!QResource::unregisterResource(wordListPath))
+    {
+        qCritical().noquote() << Q_FUNC_INFO << "Failed to unregister " << wordListPath;
+    }
 
     ui->labelOrchidStreetWords->setOpenExternalLinks(true);
 

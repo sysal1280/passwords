@@ -4709,8 +4709,9 @@ void MainWindow::createCategory(const QString& categoryName /* = QString() */)
         db.setDatabaseName(qApp->property("dbFile").toString());
 
         if (!db.open()) {
+            qCritical().noquote() << Q_FUNC_INFO << "No open database." << db.lastError().text();
             QMessageBox::critical(this, tr("Database Error"),
-                                  tr("Failed to open database:\n%1").arg(db.lastError().text()));
+                                  tr("No open database.\n%1").arg(db.lastError().text()));
             QSqlDatabase::removeDatabase(connName);
             return;
         }
@@ -4721,8 +4722,9 @@ void MainWindow::createCategory(const QString& categoryName /* = QString() */)
         query.bindValue(":text", DataObfuscator::obfuscate(text, this->appKey));
 
         if (!query.exec()) {
+            qCritical().noquote() << Q_FUNC_INFO << "Insert failed." << db.lastError().text();
             QMessageBox::critical(this, tr("Database Error"),
-                                  tr("Insert failed:\n%1").arg(query.lastError().text()));
+                                  tr("Insert failed.\n%1").arg(query.lastError().text()));
             db.close();
             QSqlDatabase::removeDatabase(connName);
             return;
@@ -4802,7 +4804,9 @@ void MainWindow::renameCategory()
         db.setDatabaseName(qApp->property("dbFile").toString());
 
         if (!db.open()) {
-            QMessageBox::critical(this, tr("Database Error"), tr("Failed to open database:\n%1").arg(db.lastError().text()));
+            qCritical().noquote() << Q_FUNC_INFO << "No open database." << db.lastError().text();
+            QMessageBox::critical(this, tr("Database Error"),
+                                  tr("No open database.\n%1").arg(db.lastError().text()));
             QSqlDatabase::removeDatabase(connName);
             return;
         }
@@ -4814,7 +4818,8 @@ void MainWindow::renameCategory()
         query.bindValue(":id", id);
 
         if (!query.exec()) {
-            QMessageBox::critical(this, tr("Database Error"), tr("Update failed:\n%1").arg(query.lastError().text()));
+            qCritical().noquote() << Q_FUNC_INFO << "Update failed." << db.lastError().text();
+            QMessageBox::critical(this, tr("Database Error"), tr("Update failed.\n%1").arg(query.lastError().text()));
             return;
         } else
         {
@@ -4826,8 +4831,6 @@ void MainWindow::renameCategory()
     }
     QSqlDatabase::removeDatabase(connName);
 }
-
-
 
 void MainWindow::addSearchTerms(QTreeWidgetItem *item)
 {

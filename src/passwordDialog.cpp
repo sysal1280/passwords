@@ -48,7 +48,7 @@ void showPasswordGenerator(QWidget *parent,
     // Unregister after loading
     if (!QResource::unregisterResource(wordListPath))
     {
-        qCritical().noquote() << "Failed to unregister " << wordListPath;
+        qCritical().noquote() << Q_FUNC_INFO << "Failed to unregister " << wordListPath;
     }
 
     if (wl.isEmpty()) {
