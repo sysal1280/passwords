@@ -59,7 +59,7 @@ Settings::Settings()
         // ensure local template exists
         if (!QFile::exists(configFile)) {
             if (!QFile::copy(":/files/passwords.conf", configFile)) {
-                qWarning() << "Could not copy template config to" << configFile;
+                qWarning().noquote() << Q_FUNC_INFO << "Could not copy template config to" << configFile;
             } else {
                 QFile::setPermissions(configFile,
                                       QFileDevice::ReadOwner | QFileDevice::WriteOwner);
@@ -73,7 +73,7 @@ Settings::Settings()
 
     if (!QFile::exists(wlFile)) {
         if (!QFile::copy(":/files/wordlist.rcc", wlFile)) {
-            qWarning() << "Could not copy wordlist resource to" << wlFile;
+            qWarning().noquote() << Q_FUNC_INFO << "Could not copy wordlist resource to" << wlFile;
         } else {
             QFile::setPermissions(wlFile,
                                   QFileDevice::ReadOwner | QFileDevice::WriteOwner);
@@ -129,8 +129,7 @@ QString Settings::getWordListFile()
 
     // Optional sanity check: ensure a filename was provided
     if (file.isEmpty())
-        return QString();   // or a default like ":/wordlist/default.txt"
-
+        return QString();
     return path;
 }
 
@@ -534,7 +533,7 @@ bool Settings::createUserDesktopFile()
     out << content;
     outFile.close();
 
-    qDebug() << "Creating a .desktop file at" << desktopFilePath;
+    qDebug().noquote() << Q_FUNC_INFO << "Creating a .desktop file at" << desktopFilePath;
     return true;
 }
 

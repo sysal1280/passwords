@@ -6,6 +6,7 @@
 #include "settings.h"
 #include "encryptfiledialog.h"
 #include "gpgCheck.h"
+#include "dbutils.h"
 #include "categorydialog.h"
 #include "preferencesdialog.h"
 #include "DataObfuscator.h"
@@ -506,11 +507,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
                 if (!helperProcess->waitForFinished(2000)) {
                     helperProcess->kill();
                 }
-                qInfo() << "Closed help server.";
+                qInfo().noquote() << Q_FUNC_INFO << "Closed help server";
             }
         } else
         {
-            qInfo() << "Could not find a help server to close.";
+            qInfo().noquote() << "Could not find a help server to close.";
         }
     }
 
@@ -588,8 +589,7 @@ void MainWindow::loadCategories()
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (!db.open()) {
-            qCritical().noquote() << Q_FUNC_INFO << "Failed to open database:" << db.lastError().text();
-            QSqlDatabase::removeDatabase(connectionName);
+            showDbNotOpenError(this, db);
             return;
         }
 
@@ -878,12 +878,12 @@ void MainWindow::newPassword()
         }
         args << "--encrypt" << "--armor" << "--output" << tempFile;
 
-        qDebug().noquote() << "Running command:" << "gpg" << args.join(' ');
+        qInfo().noquote() << "Running command:" << "gpg" << args.join(' ');
 
         QProcess process;
         process.start("gpg", args);
         if (!process.waitForStarted()) {
-            qDebug() << "Failed to start GPG process.";
+            qDebug().noquote() << "Failed to start GPG process.";
             QMessageBox::critical(this,ui->actionNew_Password->text(),tr("Failed to start GPG process."));
             return;
         }
@@ -895,20 +895,20 @@ void MainWindow::newPassword()
 
         if (!process.waitForFinished()) {
             QMessageBox::critical(this,ui->actionNew_Password->text(),tr("GPG process did not finish correctly."));
-            qCritical() << "GPG process did not finish correctly.";
+            qCritical().noquote() << Q_FUNC_INFO << "GPG process did not finish correctly.";
             return;
         }
 
         QByteArray errors = process.readAllStandardError();
         if (!errors.isEmpty()) {
-            qCritical().noquote() << "GPG Errors:\n" << QString::fromUtf8(errors);
+            qCritical().noquote() << Q_FUNC_INFO << "GPG Errors:\n" << QString::fromUtf8(errors);
             QMessageBox::critical(this,ui->actionNew_Password->text(),QString::fromUtf8(errors));
             return;
         }
 
         QFile outFile(tempFile);
         if (!outFile.exists() || !outFile.open(QIODevice::ReadOnly)) {
-            qDebug() << "Encrypted file not found or failed to open:" << tempFile;
+            qCritical().noquote() << Q_FUNC_INFO << "Encrypted file not found or failed to open:" << tempFile;
             wipeFile(tempFile);
             return;
         }
@@ -922,13 +922,13 @@ void MainWindow::newPassword()
 
             db.setDatabaseName(qApp->property("dbFile").toString());
             if (!db.open()) {
-                qDebug() << "Failed to open database:" << db.lastError().text();
+                showDbNotOpenError(this, db);
                 return;
             }
 
             // --- Transaction start ---
             if (!db.transaction()) {
-                qDebug() << "Failed to start transaction:" << db.lastError().text();
+                qCritical().noquote() << Q_FUNC_INFO << "Failed to start transaction:" << db.lastError().text();
                 return;
             }
             bool success = true;
@@ -945,7 +945,7 @@ void MainWindow::newPassword()
             query.bindValue(":created", QDateTime::currentSecsSinceEpoch());
 
             if (!query.exec()) {
-                qDebug() << "Insert failed:" << query.lastError().text();
+                qCritical().noquote() << Q_FUNC_INFO << "Insert failed:" << query.lastError().text();
                 success = false;
             }
 
@@ -972,7 +972,7 @@ void MainWindow::newPassword()
                     insertToken.addBindValue(appId);
                     insertToken.addBindValue(QString(hash));
                     if (!insertToken.exec()) {
-                        qDebug() << "Token insert failed:" << insertToken.lastError().text();
+                        qCritical().noquote() << Q_FUNC_INFO << "Token insert failed:" << insertToken.lastError().text();
                         success = false;
                         break;
                     }
@@ -982,7 +982,7 @@ void MainWindow::newPassword()
             // Commit or rollback
             if (success) {
                 if (!db.commit()) {
-                    qDebug() << "Commit failed:" << db.lastError().text();
+                    qCritical().noquote() << Q_FUNC_INFO  << "Commit failed:" << db.lastError().text();
                     db.rollback();
                 } else {
                     qDebug() << "Transaction committed successfully.";
@@ -999,7 +999,7 @@ void MainWindow::newPassword()
                 }
             } else {
                 db.rollback();
-                qDebug() << "Transaction rolled back due to errors.";
+                qCritical().noquote() << Q_FUNC_INFO << "Transaction rolled back due to errors.";
             }
 
             outFile.close();
@@ -1030,6 +1030,9 @@ QList<KeyEntry> MainWindow::fetchKeys() const
                 entry.key   = DataObfuscator::deobfuscate(query.value(2).toString(),qApp->property("appKey").toByteArray());
                 keys.append(entry);
             }
+        } else
+        {
+            showDbNotOpenError(this, db);
         }
     }
     QSqlDatabase::removeDatabase(connName);
@@ -1050,7 +1053,7 @@ void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
         db.setDatabaseName(qApp->property("dbFile").toString());
 
         if (!db.open()) {
-            qDebug() << "Failed to open database:" << db.lastError().text();
+            showDbNotOpenError(this, db);
             ui->treeWidget_2->blockSignals(false); // Unblock signals on error
             return;
         }
@@ -1198,7 +1201,8 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
                 qDebug() << "Query failed:" << query.lastError().text();
             }
         } else {
-            qDebug() << db.lastError().text();
+            showDbNotOpenError(this, db);
+            return;
         }
     }
     QSqlDatabase::removeDatabase(connName);
@@ -1265,6 +1269,9 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
                             if (!upsert.exec()) {
                                 qDebug() << "ERROR:" << upsert.lastError().text();
                             }
+                        } else
+                        {
+                            showDbNotOpenError(this, db);
                         }
                     }
                     QSqlDatabase::removeDatabase(connName);
@@ -1493,9 +1500,7 @@ row++;
         db.setDatabaseName(qApp->property("dbFile").toString());
 
         if (!db.open()) {
-            QMessageBox::critical(this, this->windowTitle(),
-                                  QString("Could not open %1\n%2.")
-                                      .arg(qApp->property("dbFile").toString(), db.lastError().text()));
+            showDbNotOpenError(this, db);
         } else {
             QList<QTreeWidgetItem*> selected = ui->treeWidget_2->selectedItems();
             if (!selected.isEmpty()) {
@@ -1845,7 +1850,7 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
             isBookmarked = (query.exec() && query.next());
             db.close();
         } else {
-            qCritical().noquote() << Q_FUNC_INFO << "No database open." << db.lastError().text();
+            showDbNotOpenError(this, db);
             return;
         }
 
@@ -1927,7 +1932,7 @@ void MainWindow::keyList()
         db.setDatabaseName(dbFile);
         if (!db.open())
         {
-            qCritical().noquote() << Q_FUNC_INFO << "No database open." << db.lastError().databaseText();
+            showDbNotOpenError(this, db);
             return;
         }
 
@@ -2035,6 +2040,9 @@ void MainWindow::keyList()
                         QMessageBox::critical(dlg, tr("Error"), insert.lastError().text());
                         return;
                     }
+                } else
+                {
+                    showDbNotOpenError(this, db);
                 }
             }
             QSqlDatabase::removeDatabase("insertkeys");
@@ -2083,6 +2091,9 @@ void MainWindow::keyList()
                 QMessageBox::critical(dlg, tr("Error"), tr("Failed to unlink key from database."));
                 return;
             }
+            } else
+            {
+                showDbNotOpenError(this, db);
             }
         }
         QSqlDatabase::removeDatabase("deletekeys");
@@ -3305,7 +3316,7 @@ void MainWindow::initDb()
         QSqlQuery query(db);
 
         //
-        // 1. Check if app_key already exists
+        // 1. Try to load an existing app_key
         //
         query.prepare(R"(
             SELECT value
@@ -3314,22 +3325,19 @@ void MainWindow::initDb()
         )");
         query.bindValue(":app_key", "app_key");
 
-        QByteArray existingKey;
-
         if (!query.exec()) {
             qCritical().noquote() << tr("Failed to query appKey:") << query.lastError().text();
-        } else if (query.next()) {
-            existingKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
+            return;
         }
 
-        //
-        // 2. If no key exists, generate and insert one
-        //
-        if (existingKey.isEmpty()) {
-
-            // Generate a nice-looking app key
+        if (query.next()) {
+            this->appKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
+        } else {
+            //
+            // 2. No key found — generate a new one
+            //
             QString appKeyStr;
-            for (int i = 0; i < 5; ++i) {
+            for (int i = 0; i < 6; ++i) {
                 QString uuidStr = QUuid::createUuid().toString(QUuid::WithoutBraces);
                 uuidStr.remove('-');
                 appKeyStr += uuidStr;
@@ -3346,20 +3354,20 @@ void MainWindow::initDb()
 
             if (!query.exec()) {
                 qCritical() << "Failed to insert new app_key:" << query.lastError().text();
-            } else {
-                existingKey = QByteArray::fromBase64(encoded);
+                return;
             }
+
+            this->appKey = QByteArray::fromBase64(encoded);
         }
 
         //
-        // 3. Store the key in the application
+        // 3. Store key globally
         //
-        if (existingKey.isEmpty()) {
+        if (this->appKey.isEmpty()) {
             qFatal() << "No appKey found in the database.";
         }
 
-        this->appKey = existingKey;
-        qApp->setProperty("appKey", existingKey);
+        qApp->setProperty("appKey", this->appKey);
 
         qInfo().noquote() << "Using appKey:"
                           << (appKey.length() > 7
@@ -3885,10 +3893,12 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
             if (query.exec() && query.first()) {
                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
             } else {
-                qDebug() << "Query failed:" << query.lastError().text();
+                qCritical().noquote() << Q_FUNC_INFO << "Query failed:" << query.lastError().text();
             }
         } else {
-            qDebug() << db.lastError().text();
+            qCritical().noquote() << Q_FUNC_INFO << db.lastError().text();
+            QMessageBox::critical(this,QApplication::applicationName(),"No database open.");
+            return;
         }
     }
     QSqlDatabase::removeDatabase(connName);
@@ -3947,7 +3957,7 @@ connect(gpg,
                         QString secretOpt = credObj.value("secretOptCode").toString();
                         int length        = credObj.value("length").toInt();
 
-                        qDebug() << "Credential:"
+                        qDebug().noquote() << "Credential:"
                                  << "username=" << username
                                  << "password=" << password
                                  << "secretOptCode=" << secretOpt
@@ -3998,7 +4008,7 @@ connect(gpg,
                                 db.setDatabaseName(qApp->property("dbFile").toString());
                                 if (db.open()) {
                                     if (!db.transaction()) {
-                                        qDebug() << "Failed to start transaction:" << db.lastError().text();
+                                        qCritical().noquote() << Q_FUNC_INFO << "Failed to start transaction:" << db.lastError().text();
                                     }
                                     bool ok = true;
 
@@ -4020,8 +4030,8 @@ connect(gpg,
                                         ok = true;
                                     }
 
-                                    if (ok) { if (!db.commit()) qDebug() << "Commit failed:" << db.lastError().text(); }
-                                    else { if (!db.rollback()) qDebug() << "Rollback failed:" << db.lastError().text(); }
+                                    if (ok) { if (!db.commit()) qCritical().noquote() << Q_FUNC_INFO << "Commit failed:" << db.lastError().text(); }
+                                    else { if (!db.rollback()) qDebug().noquote() << Q_FUNC_INFO << "Rollback failed:" << db.lastError().text(); }
                                     if (ok)
                                         insertAuditRow(item->data(0, Qt::UserRole).toInt(),
                                                        userName,
@@ -4045,7 +4055,7 @@ connect(gpg,
         QByteArray errors = gpg->readAllStandardError();
         if (!errors.isEmpty()) {
             ui->statusbar->showMessage(QString::fromUtf8(errors),10000);
-            qDebug().noquote() << "GPG stderr:" << errors;
+            qCritical().noquote() << Q_FUNC_INFO << "GPG stderr:" << errors;
         }
     });
 
@@ -4087,10 +4097,11 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
             if (query.exec() && query.first()) {
                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
             } else {
-                qDebug() << "Query failed:" << query.lastError().text();
+                qCritical().noquote() << Q_FUNC_INFO << "Query failed." << query.lastError().text();
             }
         } else {
-            qDebug() << db.lastError().text();
+            qCritical().noquote() << "Database not opened." << db.lastError().text();
+            QMessageBox::critical(this,QApplication::applicationName(),"No database open.");
         }
     }
     QSqlDatabase::removeDatabase(connName);
@@ -4118,7 +4129,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
         QByteArray errors = gpg->readAllStandardError();
         if (!errors.isEmpty()) {
             ui->statusbar->showMessage(QString::fromUtf8(errors));
-            qDebug().noquote() << "GPG stderr:" << errors;
+            qCritical().noquote() << Q_FUNC_INFO << "GPG stderr:" << errors;
         }
     });
 
@@ -5317,7 +5328,7 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (!db.open()) {
-            QMessageBox::critical(this, tr("Passwords Not Updated"), db.lastError().text());
+            showDbNotOpenError(this, db);
             return;
         }
 
