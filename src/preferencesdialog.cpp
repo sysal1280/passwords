@@ -22,6 +22,7 @@
 #include "ui_preferencesdialog.h"
 #include "mainwindow.h"
 #include "settings.h"
+#include "utils.h"
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QLineEdit>
@@ -82,25 +83,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     /*
      * Load wordlist rc file.
      */
-
-    Settings settings;
-    QString configFile = settings.configFilePath();
-    QString configDir  = QFileInfo(configFile).absolutePath();
-
-    QString wordListPath = QDir(configDir).filePath("wordlist.rcc");
-
-    if (QFile::exists(wordListPath)) {
-        if (QResource::registerResource(wordListPath)) {
-            qInfo().noquote() << "Loaded wordlist.rcc file.";
-        } else {
-            qCritical().noquote() << Q_FUNC_INFO << "Failed to register resource:" << wordListPath;
-            QMessageBox::critical(this,"",QString(tr("Failed to register resource: %1")).arg(wordListPath));
-        }
-    } else
-    {
-        qCritical().noquote() << "Missing resource file:" << wordListPath;
-        QMessageBox::critical(this,"",QString(tr("Missing resource file: %1")).arg(wordListPath));
-    }
+    QString wordListPath = loadWordlistResource(this, Q_FUNC_INFO);
 
     QDir dir(":/wordlist");
     QStringList entries = dir.entryList(QDir::Files);

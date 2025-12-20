@@ -1,7 +1,7 @@
 #include "passwordDialog.h"
 #include "passwordGenerator.h"
 #include "settings.h"
-
+#include "utils.h"
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -26,30 +26,14 @@ void showPasswordGenerator(QWidget *parent,
 {
     Settings settings;
 
-    // Build path to wordlist.rc in config dir
-    QString configFile = settings.configFilePath();
-    QString configDir  = QFileInfo(configFile).absolutePath();
-    QString wordListPath = QDir(configDir).filePath("wordlist.rcc");
-
-    if (QFile::exists(wordListPath)) {
-        if (QResource::registerResource(wordListPath)) {
-            qInfo().noquote() << "Loaded wordlist.rcc file.";
-        } else {
-            qCritical().noquote() << Q_FUNC_INFO << "Failed to register resource:" << wordListPath;
-        }
-    } else {
-        qCritical().noquote() << Q_FUNC_INFO << "Missing resource file:" << wordListPath;
-        return;
-    }
+QString wordListPath = loadWordlistResource(parent, Q_FUNC_INFO);
 
     // Load wordlist from Settings path
     QStringList wl = passwordGenerator::loadWordList(settings.getWordListFile());
 
     // Unregister after loading
     if (!QResource::unregisterResource(wordListPath))
-    {
         qCritical().noquote() << Q_FUNC_INFO << "Failed to unregister " << wordListPath;
-    }
 
     if (wl.isEmpty()) {
         QMessageBox::warning(
