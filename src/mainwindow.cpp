@@ -589,7 +589,7 @@ void MainWindow::loadCategories()
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (!db.open()) {
-            showDbNotOpenError(this, db);
+            showDbNotOpenError(this, db, Q_FUNC_INFO);
             return;
         }
 
@@ -922,7 +922,7 @@ void MainWindow::newPassword()
 
             db.setDatabaseName(qApp->property("dbFile").toString());
             if (!db.open()) {
-                showDbNotOpenError(this, db);
+                showDbNotOpenError(this, db, Q_FUNC_INFO);
                 return;
             }
 
@@ -945,6 +945,7 @@ void MainWindow::newPassword()
             query.bindValue(":created", QDateTime::currentSecsSinceEpoch());
 
             if (!query.exec()) {
+                showQueryError(this,query,Q_FUNC_INFO);
                 qCritical().noquote() << Q_FUNC_INFO << "Insert failed:" << query.lastError().text();
                 success = false;
             }
@@ -1032,7 +1033,7 @@ QList<KeyEntry> MainWindow::fetchKeys() const
             }
         } else
         {
-            showDbNotOpenError(this, db);
+            showDbNotOpenError(this, db, Q_FUNC_INFO);
         }
     }
     QSqlDatabase::removeDatabase(connName);
@@ -1053,7 +1054,7 @@ void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
         db.setDatabaseName(qApp->property("dbFile").toString());
 
         if (!db.open()) {
-            showDbNotOpenError(this, db);
+            showDbNotOpenError(this, db, Q_FUNC_INFO);
             ui->treeWidget_2->blockSignals(false); // Unblock signals on error
             return;
         }
@@ -1201,7 +1202,7 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
                 qDebug() << "Query failed:" << query.lastError().text();
             }
         } else {
-            showDbNotOpenError(this, db);
+            showDbNotOpenError(this, db, Q_FUNC_INFO);
             return;
         }
     }
@@ -1271,7 +1272,7 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
                             }
                         } else
                         {
-                            showDbNotOpenError(this, db);
+                            showDbNotOpenError(this, db, Q_FUNC_INFO);
                         }
                     }
                     QSqlDatabase::removeDatabase(connName);
@@ -1500,7 +1501,7 @@ row++;
         db.setDatabaseName(qApp->property("dbFile").toString());
 
         if (!db.open()) {
-            showDbNotOpenError(this, db);
+            showDbNotOpenError(this, db, Q_FUNC_INFO);
         } else {
             QList<QTreeWidgetItem*> selected = ui->treeWidget_2->selectedItems();
             if (!selected.isEmpty()) {
@@ -1850,7 +1851,7 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
             isBookmarked = (query.exec() && query.next());
             db.close();
         } else {
-            showDbNotOpenError(this, db);
+            showDbNotOpenError(this, db, Q_FUNC_INFO);
             return;
         }
 
@@ -1932,7 +1933,7 @@ void MainWindow::keyList()
         db.setDatabaseName(dbFile);
         if (!db.open())
         {
-            showDbNotOpenError(this, db);
+            showDbNotOpenError(this, db, Q_FUNC_INFO);
             return;
         }
 
@@ -2042,7 +2043,7 @@ void MainWindow::keyList()
                     }
                 } else
                 {
-                    showDbNotOpenError(this, db);
+                    showDbNotOpenError(this, db, Q_FUNC_INFO);
                 }
             }
             QSqlDatabase::removeDatabase("insertkeys");
@@ -2093,7 +2094,7 @@ void MainWindow::keyList()
             }
             } else
             {
-                showDbNotOpenError(this, db);
+                showDbNotOpenError(this, db, Q_FUNC_INFO);
             }
         }
         QSqlDatabase::removeDatabase("deletekeys");
@@ -5328,7 +5329,7 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
         if (!db.open()) {
-            showDbNotOpenError(this, db);
+            showDbNotOpenError(this, db, Q_FUNC_INFO);
             return;
         }
 
