@@ -220,8 +220,9 @@ void LoginDialog::generateResponse()
     });
 
     connect(process, &QProcess::readyReadStandardError, this, [=]() {
-        qCritical().noquote() << Q_FUNC_INFO  << "GPG error:" << QString::fromUtf8(process->readAllStandardError());
-        QMessageBox::critical(this,QApplication::applicationName(),process->readAllStandardError());
+        QByteArray error = process->readAllStandardError();
+        qCritical().noquote() << Q_FUNC_INFO  << "GPG error:" << QString::fromUtf8(error);
+        QMessageBox::critical(this,QApplication::applicationName(),QString::fromUtf8(error));
     });
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this, [=](int exitCode, QProcess::ExitStatus status) {
