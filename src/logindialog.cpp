@@ -131,6 +131,8 @@ LoginDialog::~LoginDialog()
 void LoginDialog::generateResponse()
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
+    ui->textEdit->clear();
+    ui->textEdit->setPlaceholderText(tr("Loading challenge.."));
 
     Settings settings;
     QString configFile = settings.configFilePath();
@@ -140,7 +142,7 @@ void LoginDialog::generateResponse()
 
     if (QFile::exists(wordListPath)) {
         if (QResource::registerResource(wordListPath)) {
-            qInfo().noquote() << Q_FUNC_INFO << "Loaded wordlist.rcc file.";
+            qInfo().noquote() << "Loaded wordlist.rcc file.";
         } else {
             qCritical().noquote() << Q_FUNC_INFO << "Failed to register resource:" << wordListPath;
         }
@@ -219,11 +221,12 @@ void LoginDialog::generateResponse()
     });
 
     connect(process, &QProcess::readyReadStandardError, this, [=]() {
-        qDebug() << "GPG error:" << QString::fromUtf8(process->readAllStandardError());
+        qCritical().noquote() << Q_FUNC_INFO  << "GPG error:" << QString::fromUtf8(process->readAllStandardError());
+        QMessageBox::critical(this,QApplication::applicationName(),process->readAllStandardError());
     });
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this, [=](int exitCode, QProcess::ExitStatus status) {
-                qDebug() << "GPG finished with code" << exitCode << "status" << status;
+                qDebug().noquote() << Q_FUNC_INFO << "GPG finished with code" << exitCode << "status" << status;
             });
 
     process->start("gpg", {"-ea", "-r", recipient});
@@ -249,7 +252,6 @@ void LoginDialog::generateResponse()
 
 void LoginDialog::tryResponse()
 {
-
         QByteArray enteredBytes = ui->lineEdit->text().toUtf8();
         QByteArray enteredHash = QCryptographicHash::hash(enteredBytes, QCryptographicHash::Sha512);
         std::fill(enteredBytes.begin(), enteredBytes.end(), '\0');
@@ -266,7 +268,6 @@ void LoginDialog::tryResponse()
                 errorCount++;
             }
         }
-
 }
 
 bool LoginDialog::hasKeys() const {
@@ -282,22 +283,16 @@ void LoginDialog::showEvent(QShowEvent *event) {
 
 void LoginDialog::checkHelperFiles()
 {
-    QString appDir = QCoreApplication::applicationDirPath();
-    QString pwdhlpExe = appDir + "/pwdhlp.exe";
-    QString pwdhlpNoExt = appDir + "/pwdhlp";
-    QString pwdhlpRcc = appDir + "/pwdhlp.rcc";
+    const QString appDir = QCoreApplication::applicationDirPath();
 
-    // Check existence of help system
-    bool exeExists = QFile::exists(pwdhlpExe) || QFile::exists(pwdhlpNoExt);
-    bool rccExists = QFile::exists(pwdhlpRcc);
+    const bool exeExists =
+        QFile::exists(appDir + "/pwdhlp.exe") ||
+        QFile::exists(appDir + "/pwdhlp");
 
-    // If missing, disable Help button
-    if (!(exeExists && rccExists)) {
-        QPushButton *helpButton = ui->buttonBox->button(QDialogButtonBox::Help);
-        if (helpButton) {
+    const bool rccExists = QFile::exists(appDir + "/pwdhlp.rcc");
+
+    if (!exeExists || !rccExists) {
+        if (auto *helpButton = ui->buttonBox->button(QDialogButtonBox::Help))
             helpButton->setEnabled(false);
-        }
     }
 }
-
-

@@ -274,6 +274,7 @@ Ensure it is accessible in your PATH.
         delete splash;
 
         if (settings.getLoginPreference()) {
+            qInfo().noquote() << "Issuing access challenge.";
             LoginDialog login(w);
             login.move(w->geometry().center() - login.rect().center());
             login.setModal(true);
@@ -365,6 +366,7 @@ void pwdMsgHandler(QtMsgType type, const QMessageLogContext &, const QString &ms
     if (!showDebugMessages)
         return;
 
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
     QByteArray localMsg = msg.toLocal8Bit();
     const char* prefix;
 
@@ -375,8 +377,6 @@ void pwdMsgHandler(QtMsgType type, const QMessageLogContext &, const QString &ms
     case QtCriticalMsg:prefix = "[ERROR] "; break;
     case QtFatalMsg:   prefix = "[FATAL] "; break;
     }
-
-    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
 
     fprintf(stderr, "%s [%s] %s\n",
             prefix,

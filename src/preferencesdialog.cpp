@@ -91,7 +91,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 
     if (QFile::exists(wordListPath)) {
         if (QResource::registerResource(wordListPath)) {
-            qInfo().noquote() << Q_FUNC_INFO << "Loaded wordlist.rcc file.";
+            qInfo().noquote() << "Loaded wordlist.rcc file.";
         } else {
             qCritical().noquote() << Q_FUNC_INFO << "Failed to register resource:" << wordListPath;
             QMessageBox::critical(this,"",QString(tr("Failed to register resource: %1")).arg(wordListPath));

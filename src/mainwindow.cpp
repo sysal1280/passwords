@@ -1088,64 +1088,6 @@ void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
     openedCredentialID = -1;
 }
 
-
-// void MainWindow::on_treeWidget_itemActivated(QTreeWidgetItem *item, int column) {
-//     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-//     clearScrollArea();
-
-//     qDebug() << item->data(0,Qt::UserRole).toInt() << "userrole id";
-
-//     // Block signals and clear the second tree widget
-//     ui->treeWidget_2->blockSignals(true);
-//     ui->treeWidget_2->clear();
-
-//     // Create the database connection
-//     {
-//         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
-//         db.setDatabaseName(qApp->property("dbFile").toString());
-
-//         if (!db.open()) {
-//             qDebug() << "Failed to open database:" << db.lastError().text();
-//             ui->treeWidget_2->blockSignals(false); // Unblock signals on error
-//             return;
-//         }
-
-//         // Prepare and execute the query
-//         QSqlQuery query(db);
-//         query.prepare(QString("SELECT * FROM application WHERE category_id = :id ORDER BY id"));
-//         query.bindValue(":id", item->data(0,Qt::UserRole).toInt());
-
-//         if (!query.exec()) {
-//             db.close();
-//             QSqlDatabase::removeDatabase(connName);
-//             ui->treeWidget_2->blockSignals(false);
-//             return;
-//         }
-
-//         // Process each row of the query result and create tree items
-//         while (query.next()) {
-//             QTreeWidgetItem* newItem = nullptr;
-//              newItem = makeItemFromApplication(query);
-//             if (newItem) {
-//                 ui->treeWidget_2->addTopLevelItem(newItem);
-//             }
-//         }
-
-//         // Clean up
-//         db.close();
-//     }
-//     QSqlDatabase::removeDatabase(connName);
-
-//     // Unblock signals after processing is complete
-//     ui->treeWidget_2->blockSignals(false);
-
-//     // Reset openedCredentialID
-//     openedCredentialID = -1;
-// }
-
-
-
-
 void MainWindow::clearScrollArea()
 {
     if (countdownTimer) {

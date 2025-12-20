@@ -56,13 +56,13 @@ static QStringList checkKeysWithGpg(const QStringList &keys) {
         QProcess gpg;
         gpg.start("gpg", {"--list-keys", keyId});
         if (!gpg.waitForFinished(5000)) {
-            qDebug() << "gpg timed out for key:" << keyId;
+            qDebug().noquote() << Q_FUNC_INFO << "gpg timed out for key:" << keyId;
             invalidKeys << keyId;
             continue;
         }
 
         if (gpg.exitStatus() != QProcess::NormalExit || gpg.exitCode() != 0) {
-            qDebug() << "gpg failed for key:" << keyId << gpg.errorString();
+            qDebug().noquote() << Q_FUNC_INFO  << "gpg failed for key:" << keyId << gpg.errorString();
             invalidKeys << keyId;
             continue;
         }
@@ -82,7 +82,7 @@ void checkGpgKeys(QWidget* parent)
     QString dbFile = settings.getDefaultDbPath(parent);
     if (!QFileInfo::exists(dbFile))
     {
-        qWarning().noquote() << "skipping GPG keys check. There is no database.";
+        qWarning().noquote() << Q_FUNC_INFO  << "skipping GPG keys check. There is no database.";
         return;
     }
 
@@ -135,7 +135,7 @@ void checkGpgKeys(QWidget* parent)
                                          remove.prepare("DELETE FROM keys WHERE key = :key");
                                          remove.bindValue(":key", DataObfuscator::obfuscate(keyId,qApp->property("appKey").toByteArray()));
                                          if (!remove.exec())
-                                             qWarning() << "Failed to remove key:" << keyId << remove.lastError().text();
+                                             qWarning().noquote() << Q_FUNC_INFO  << "Failed to remove key:" << keyId << remove.lastError().text();
                                      }
                                      db.close();
                                  }
