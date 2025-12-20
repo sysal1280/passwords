@@ -607,7 +607,7 @@ void MainWindow::loadCategories()
         {
             QSqlQuery query(db);
             if (!query.exec("SELECT id, parent_id, text FROM categories ORDER BY id")) {
-                qCritical().noquote() << Q_FUNC_INFO << "Query failed:" << query.lastError().text();
+                showQueryError(this,query,Q_FUNC_INFO);
                 return;
             }
 
@@ -1023,13 +1023,18 @@ QList<KeyEntry> MainWindow::fetchKeys() const
         {
             QSqlQuery query(db);
             query.setForwardOnly(true);
-            query.exec("SELECT id, label, key FROM keys");
+            if (query.exec("SELECT id, label, key FROM keys"))
+            {
             while (query.next()) {
                 KeyEntry entry;
                 entry.id    = query.value(0).toInt();
                 entry.label = DataObfuscator::deobfuscate(query.value(1).toString(),qApp->property("appKey").toByteArray());
                 entry.key   = DataObfuscator::deobfuscate(query.value(2).toString(),qApp->property("appKey").toByteArray());
                 keys.append(entry);
+            }
+            } else
+            {
+                showQueryError(this,query,Q_FUNC_INFO);
             }
         } else
         {
@@ -1065,6 +1070,7 @@ void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
         query.bindValue(":id", item->data(0,Qt::UserRole).toInt());
 
         if (!query.exec()) {
+            showQueryError(this,query,Q_FUNC_INFO);
             db.close();
             QSqlDatabase::removeDatabase(connName);
             ui->treeWidget_2->blockSignals(false);
@@ -1199,7 +1205,7 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
             if (query.exec() && query.first()) {
                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
             } else {
-                qDebug() << "Query failed:" << query.lastError().text();
+                showQueryError(this,query,Q_FUNC_INFO);
             }
         } else {
             showDbNotOpenError(this, db, Q_FUNC_INFO);
@@ -1268,7 +1274,7 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
                             upsert.bindValue(":user", userName);
                             upsert.bindValue(":host", QSysInfo::machineHostName());
                             if (!upsert.exec()) {
-                                qDebug() << "ERROR:" << upsert.lastError().text();
+                                showQueryError(this,upsert,Q_FUNC_INFO);
                             }
                         } else
                         {
@@ -1559,6 +1565,9 @@ row++;
                         gridLayout->addWidget(lastAccessByLabel, row, 0, 1, -1);
                         row++;
 
+                    } else
+                    {
+                        showQueryError(this,query,Q_FUNC_INFO);
                     }
                 } // query destroyed here
             }
@@ -1948,7 +1957,7 @@ void MainWindow::keyList()
                 row++;
             }
         } else {
-            qWarning().noquote() << Q_FUNC_INFO << "Failed to query keys:" << query.lastError().text();
+            showQueryError(this,query,Q_FUNC_INFO);
         }
     }
     QSqlDatabase::removeDatabase("fetchkeys");
@@ -2038,7 +2047,7 @@ void MainWindow::keyList()
                     insert.bindValue(":label", DataObfuscator::obfuscate(name,this->appKey));
                     insert.bindValue(":key", DataObfuscator::obfuscate(keyId,this->appKey));
                     if (!insert.exec()) {
-                        QMessageBox::critical(dlg, tr("Error"), insert.lastError().text());
+                        showQueryError(this,insert,Q_FUNC_INFO);
                         return;
                     }
                 } else
@@ -2088,8 +2097,7 @@ void MainWindow::keyList()
             remove.prepare("DELETE FROM keys WHERE id = :id");
             remove.bindValue(":id",table->item(row,1)->data(Qt::UserRole).toInt());
             if (!remove.exec()) {
-                qWarning() << "Failed to delete key:" << remove.lastError().text();
-                QMessageBox::critical(dlg, tr("Error"), tr("Failed to unlink key from database."));
+                showQueryError(this,remove,Q_FUNC_INFO);
                 return;
             }
             } else
@@ -2187,7 +2195,7 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
                 row++;
             }
         } else {
-            qWarning().noquote() << Q_FUNC_INFO << "Failed to query audit log." << query.lastError().text();
+            showQueryError(this,query,Q_FUNC_INFO);
         }
     }
 
@@ -2852,8 +2860,7 @@ bool MainWindow::openDatabase(const QString &fileName)
 
         QSqlQuery query(db);
         if (!query.exec("SELECT key, value FROM app_info WHERE key IN ('app_signature','schema_version')")) {
-            QMessageBox::critical(this, tr("Error"),
-                                  tr("This is not a valid passwords database (missing app_info)."));
+            showQueryError(this,query,Q_FUNC_INFO);
             db.close();
             QSqlDatabase::removeDatabase(connName);
             return false;
@@ -2969,7 +2976,7 @@ void MainWindow::search(const QString &text)
         }
 
         if (!query.exec()) {
-            qDebug() << "Search failed:" << query.lastError().text();
+            showQueryError(this,query,Q_FUNC_INFO);
             return;
         }
 
@@ -2992,6 +2999,9 @@ void MainWindow::search(const QString &text)
                     QDateTime ts = QDateTime::fromSecsSinceEpoch(unixTime);
                     r.description = ts.toString(Qt::TextDate);
                 }
+            } else
+            {
+                showQueryError(this,query,Q_FUNC_INFO);
             }
 
             results.append(r);
@@ -3154,7 +3164,7 @@ void MainWindow::populateBookmarksMenu()
         query.setForwardOnly(true);
 
         if (!query.exec()) {
-            qWarning() << "Failed to execute query:" << query.lastError().text();
+            showQueryError(this,query,Q_FUNC_INFO);
             return;
         }
 
@@ -3244,6 +3254,9 @@ void MainWindow::search(int appId)
         query.addBindValue(appId);
         if (query.exec() && query.next()) {
             categoryId = query.value(0).toInt();
+        } else
+        {
+            showQueryError(this,query,Q_FUNC_INFO);
         }
         db.close();
     }
@@ -3327,7 +3340,7 @@ void MainWindow::initDb()
         query.bindValue(":app_key", "app_key");
 
         if (!query.exec()) {
-            qCritical().noquote() << tr("Failed to query appKey:") << query.lastError().text();
+            showQueryError(this,query,Q_FUNC_INFO);
             return;
         }
 
@@ -3354,7 +3367,7 @@ void MainWindow::initDb()
             query.bindValue(":guid", encoded);
 
             if (!query.exec()) {
-                qCritical() << "Failed to insert new app_key:" << query.lastError().text();
+                showQueryError(this,query,Q_FUNC_INFO);
                 return;
             }
 
@@ -3386,7 +3399,7 @@ void MainWindow::initDb()
         query.bindValue(":dt", QDateTime::currentDateTime());
 
         if (!query.exec()) {
-            qCritical() << "Failed to insert db_create timestamp:" << query.lastError().text();
+            showQueryError(this,query,Q_FUNC_INFO);
         }
     }
 
@@ -3451,7 +3464,7 @@ void MainWindow::setBookmark(bool checked)
         query.bindValue(":user", userName);
 
         if (!query.exec()) {
-            QMessageBox::critical(this, ui->actionBookmark->text(), query.lastError().databaseText());
+            showQueryError(this,query,Q_FUNC_INFO);
         }
     }
 
@@ -3521,7 +3534,7 @@ void MainWindow::deletePassword(QTreeWidgetItem *item)
             query.bindValue(":id",item->data(0,Qt::UserRole).toInt());
             if (!query.exec())
             {
-                QMessageBox::critical(this,"",query.lastError().text());
+                showQueryError(this,query,Q_FUNC_INFO);
             } else
             {
                 QTreeWidgetItem *parent = item->parent();
@@ -3576,9 +3589,7 @@ void MainWindow::deleteCategory(QTreeWidgetItem *item)
                                      ui->actionDelete_Category->text(),
                                      tr("This category cannot be deleted because items are still assigned to it."));
             } else {
-                QMessageBox::critical(this,
-                                      ui->actionDelete_Category->text(),
-                                      err.text());
+                showQueryError(this,query,Q_FUNC_INFO);
             }
         } else {
             // Remove from UI
@@ -3617,7 +3628,7 @@ void MainWindow::searchPopular()
 
         QSqlQuery query(db);
         if (!query.exec(sql)) {
-            qCritical() << "Popular query failed:" << query.lastError().text();
+            showQueryError(this,query,Q_FUNC_INFO);
             return;
         }
 
@@ -3749,7 +3760,7 @@ void MainWindow::searchRecent()
 
         QSqlQuery query(db);
         if (!query.exec(sql)) {
-            qDebug() << "Recent query failed:" << query.lastError().text();
+            showQueryError(this,query,Q_FUNC_INFO);
             return;
         }
 
@@ -3894,7 +3905,7 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
             if (query.exec() && query.first()) {
                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
             } else {
-                qCritical().noquote() << Q_FUNC_INFO << "Query failed:" << query.lastError().text();
+                showQueryError(this,query,Q_FUNC_INFO);
             }
         } else {
             qCritical().noquote() << Q_FUNC_INFO << db.lastError().text();
@@ -4098,7 +4109,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
             if (query.exec() && query.first()) {
                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
             } else {
-                qCritical().noquote() << Q_FUNC_INFO << "Query failed." << query.lastError().text();
+                showQueryError(this,query,Q_FUNC_INFO);
             }
         } else {
             qCritical().noquote() << "Database not opened." << db.lastError().text();
@@ -4236,8 +4247,7 @@ void MainWindow::moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targ
             query.bindValue(":id", appId);
 
             if (!query.exec()) {
-                QMessageBox::critical(this, tr("Database Error"),
-                                      tr("Could not update category:\n%1").arg(query.lastError().text()));
+                showQueryError(this,query,Q_FUNC_INFO);
             } else {
                 QTreeWidget *tree = ui->treeWidget_2;
                 if (tree) {
@@ -4695,9 +4705,7 @@ void MainWindow::createCategory(const QString& categoryName /* = QString() */)
         query.bindValue(":text", DataObfuscator::obfuscate(text, this->appKey));
 
         if (!query.exec()) {
-            qCritical().noquote() << Q_FUNC_INFO << "Insert failed." << db.lastError().text();
-            QMessageBox::critical(this, tr("Database Error"),
-                                  tr("Insert failed.\n%1").arg(query.lastError().text()));
+            showQueryError(this,query,Q_FUNC_INFO);
             db.close();
             QSqlDatabase::removeDatabase(connName);
             return;
@@ -4791,8 +4799,7 @@ void MainWindow::renameCategory()
         query.bindValue(":id", id);
 
         if (!query.exec()) {
-            qCritical().noquote() << Q_FUNC_INFO << "Update failed." << db.lastError().text();
-            QMessageBox::critical(this, tr("Database Error"), tr("Update failed.\n%1").arg(query.lastError().text()));
+            showQueryError(this,query,Q_FUNC_INFO);
             return;
         } else
         {
@@ -5154,7 +5161,7 @@ void MainWindow::ExportedWithoutEdits()
 
         QSqlQuery query(db);
         if (!query.exec(sql)) {
-            qCritical() << "Exported-without-edits query failed:" << query.lastError().text();
+            showQueryError(this,query,Q_FUNC_INFO);
             return;
         }
 
@@ -5299,7 +5306,7 @@ int MainWindow::countExportedWithoutEdits()
 
         QSqlQuery query(db);
         if (!query.exec(sql)) {
-            qCritical() << "Count query failed:" << query.lastError().text();
+            showQueryError(this,query,Q_FUNC_INFO);
             return 0;
         }
 
@@ -5353,7 +5360,7 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
         query.bindValue(":cutoff", cutoffTs);
 
         if (!query.exec()) {
-            qCritical() << "Not-changed-since query failed:" << query.lastError().text();
+            showQueryError(this,query,Q_FUNC_INFO);
             return;
         }
 
