@@ -2,6 +2,7 @@
 #include "ui_newpassworddialog.h"
 #include "passwordDialog.h"
 #include "passwordGenerator.h"
+#include "randomnoisedialog.h"
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -15,6 +16,8 @@
 #include "integerdelegate.h"
 #include <QPushButton>
 #include "settings.h"
+#include <QToolButton>
+#include <QMenu>
 
 NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     : QDialog(parent)
@@ -23,6 +26,35 @@ NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     ui->setupUi(this);
 
     ui->pushButtonGenerate->setText(tr("&Generate Password"));
+    ui->toolButton->setPopupMode(QToolButton::MenuButtonPopup);
+    ui->toolButton->setText(tr("&Generate Password"));
+
+    QMenu *menu = new QMenu(ui->toolButton);
+
+    QAction *optA = menu->addAction("Generate Password");
+    QAction *optB = menu->addAction("Generate Noise");
+
+    ui->toolButton->setMenu(menu);
+
+    // Connect using connect()
+    connect(optA, &QAction::triggered,
+            this,
+            [this]() {
+                QStringList wordList = passwordGenerator::loadWordList(settings.getWordListFile());
+                PasswordDialog::showPasswordGenerator(this, tr("Generate Password"), wordList);
+            });
+
+    connect(optB, &QAction::triggered,
+            this,
+            [this]() {
+                RandomNoiseDialog::showRandomNoiseGenerator(this);
+            });
+
+    connect(ui->toolButton, &QToolButton::clicked,
+            this, [this]() {
+                QStringList wordList = passwordGenerator::loadWordList(settings.getWordListFile());
+                PasswordDialog::showPasswordGenerator(this, tr("Generate Password"), wordList);
+            });
 
     // Existing context menu setup...
     ui->tableWidgetNotes->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -65,13 +97,6 @@ NewPasswordDialog::NewPasswordDialog(QWidget *parent)
 
     connect(ui->lineEditPublicAppName, &QLineEdit::editingFinished,
             this, &NewPasswordDialog::suggestFields);
-
-    connect(ui->pushButtonGenerate, &QPushButton::clicked,
-            this, [this]() {
-                QStringList wordList = passwordGenerator::loadWordList(settings.getWordListFile());
-                PasswordDialog::showPasswordGenerator(this, tr("Generate Password"), wordList);
-            });
-
 
     // In your NewPasswordDialog constructor or setup code
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, [this]() {
