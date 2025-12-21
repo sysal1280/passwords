@@ -7,10 +7,12 @@
 #include "encryptfiledialog.h"
 #include "gpgCheck.h"
 #include "dbutils.h"
+#include "passwordGenerator.h"
 #include "randomnoisedialog.h"
 #include "categorydialog.h"
 #include "preferencesdialog.h"
 #include "DataObfuscator.h"
+#include "plaintextedit.h"
 #include "SystemInfoDialog.h"
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
@@ -27,6 +29,7 @@
 #include <QLabel>
 #include <QClipboard>
 #include <QTextEdit>
+#include <QToolButton>
 #include <QRandomGenerator>
 #include <QJsonDocument>
 #include <QTableWidget>
@@ -2294,8 +2297,9 @@ void MainWindow::encryptMessage()
     layout->addWidget(instruction);
 
     // Plaintext input
-    QTextEdit *plainTextEdit = new QTextEdit(dlg);
+    QTextEdit *plainTextEdit = new PlainTextEdit(dlg);
     plainTextEdit->setPlaceholderText("Enter text to encrypt...");
+    plainTextEdit->setAcceptRichText(false);
     layout->addWidget(plainTextEdit);
 
     // Password entry row (two fields + generate button)
@@ -2311,7 +2315,16 @@ void MainWindow::encryptMessage()
     passEdit2->setEchoMode(settings.getEchoMode());
     passEdit2->setPlaceholderText("Re-enter password");
 
-    QPushButton *generateBtn = new QPushButton("Generate Password", dlg);
+    // ✅ REPLACED QPushButton WITH QToolButton
+    QToolButton *generateBtn = new QToolButton(dlg);
+    generateBtn->setText("Generate Password");
+    generateBtn->setPopupMode(QToolButton::MenuButtonPopup);
+
+    // ✅ Dropdown menu
+    QMenu *menu = new QMenu(generateBtn);
+    QAction *optA = menu->addAction("Generate Password");
+    QAction *optB = menu->addAction("Random Noise");
+    generateBtn->setMenu(menu);
 
     passLayout->addWidget(passLabel1);
     passLayout->addWidget(passEdit1);
@@ -2345,14 +2358,30 @@ void MainWindow::encryptMessage()
 
     connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::accept);
 
-    // Generate password action
-    connect(generateBtn, &QPushButton::clicked, this, [this, passEdit1, passEdit2]() {
-        PasswordDialog::showPasswordGenerator(
-            this,
-            ui->actionGenerate_Password->text(),
-            {} // ignored, wordlist is loaded internally
-            );
-    });
+    // ✅ Default click (left side of split button)
+    connect(generateBtn, &QToolButton::clicked, this,
+            [this, passEdit1, passEdit2]() {
+                PasswordDialog::showPasswordGenerator(
+                    this,
+                    ui->actionGenerate_Password->text(),
+                    {}
+                );
+            });
+
+    // ✅ Menu option A
+    connect(optA, &QAction::triggered, this,
+            [this]() {
+                QStringList wordList = passwordGenerator::loadWordList(settings.getWordListFile());
+                PasswordDialog::showPasswordGenerator(this,
+                                                      tr("Generate Password"),
+                                                      wordList);
+            });
+
+    // ✅ Menu option B
+    connect(optB, &QAction::triggered, this,
+            [this]() {
+                RandomNoiseDialog::showRandomNoiseGenerator(this);
+            });
 
     // Encrypt action
     connect(encryptBtn, &QPushButton::clicked, this,
@@ -2439,7 +2468,7 @@ void MainWindow::encryptMessage()
                 }
             });
 
-      connect(plainTextEdit, &QTextEdit::textChanged, this,
+    connect(plainTextEdit, &QTextEdit::textChanged, this,
             [plainTextEdit, encryptedTextEdit]() {
                 if (plainTextEdit->toPlainText().isEmpty()) {
                     encryptedTextEdit->clear();

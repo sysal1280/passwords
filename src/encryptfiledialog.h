@@ -16,6 +16,10 @@
 #include <mainwindow.h>
 #include "gpgCheck.h"
 #include "settings.h"
+#include "passwordDialog.h"
+#include "randomnoisedialog.h"
+#include <QMenu>
+#include <QToolButton>
 
 class EncryptFileDialog : public QDialog
 {
@@ -61,8 +65,51 @@ public:
         m_passConfirmEdit->setEchoMode(settings.getEchoMode());
         m_passConfirmEdit->setPlaceholderText(tr("confirm password"));
 
-        form->addRow(tr("Password:"), m_passEdit);
-        form->addRow(tr("Password:"), m_passConfirmEdit);
+        // Password row with Generate/Noise toolbutton
+        auto *passRow = new QWidget(this);
+        auto *passLayout = new QHBoxLayout(passRow);
+        passLayout->setContentsMargins(0, 0, 0, 0);
+
+        passLayout->addWidget(m_passEdit);
+        passLayout->addWidget(m_passConfirmEdit);
+
+        // --- QToolButton for Generate Password / Random Noise ---
+        QToolButton *toolBtn = new QToolButton(this);
+        toolBtn->setText(tr("Generate"));
+        toolBtn->setPopupMode(QToolButton::MenuButtonPopup);
+
+        QMenu *menu = new QMenu(toolBtn);
+        QAction *optA = menu->addAction(tr("Generate Password"));
+        QAction *optB = menu->addAction(tr("Random Noise"));
+        toolBtn->setMenu(menu);
+
+        passLayout->addWidget(toolBtn);
+
+        form->addRow(tr("Password:"), passRow);
+
+        // --- Connect default click (Generate Password) ---
+        connect(toolBtn, &QToolButton::clicked, this, [this]() {
+            PasswordDialog::showPasswordGenerator(
+                this,
+                tr("Generate Password"),
+                {}
+                );
+        });
+
+        // --- Connect menu option A ---
+        connect(optA, &QAction::triggered, this, [this]() {
+            PasswordDialog::showPasswordGenerator(
+                this,
+                tr("Generate Password"),
+                {}
+                );
+        });
+
+        // --- Connect menu option B ---
+        connect(optB, &QAction::triggered, this, [this]() {
+            RandomNoiseDialog::showRandomNoiseGenerator(this);
+        });
+
 
         // ASCII armor checkbox
         m_asciiCheck = new QCheckBox(this);
