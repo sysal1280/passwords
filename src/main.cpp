@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     QApplication::setWindowIcon(QIcon(":/password.png"));
     QGuiApplication::setDesktopFileName(applicationName);
     QApplication::setApplicationName(applicationName);
-    QApplication::setApplicationVersion("0.1.0");
+    QApplication::setApplicationVersion("1.0.0");
     QApplication::setOrganizationName("sysal1280");
     if (auto *style = QStyleFactory::create("Fusion")) {
         QApplication::setStyle(style);
