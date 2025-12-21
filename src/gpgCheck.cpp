@@ -33,6 +33,7 @@
 #include <QFileInfo>
 #include "DataObfuscator.h"
 #include <QApplication>
+#include <QTimer>
 
 bool isToolAvailable(const QString &toolName)
 {
@@ -117,6 +118,10 @@ void checkGpgKeys(QWidget* parent)
         db.close();
     }
     QSqlDatabase::removeDatabase(connNameRead);
+
+    if (!keys.isEmpty()) {
+        warmupGpg(keys.first(), parent);
+    }
 
     // Async GPG check
     auto *watcher = new QFutureWatcher<QStringList>(parent);
@@ -224,4 +229,55 @@ bool hasUltimateTrust(const QString &keyId)
     return false;
 }
 
+bool warmupGpg(const QString &recipientKey, QWidget *parent)
+{
+    if (recipientKey.isEmpty())
+        return false;
+
+    QProcess warmup;
+
+    // Feed input once the process starts
+    QObject::connect(&warmup, &QProcess::started, [&warmup]() {
+        warmup.write("warmup\n");
+        warmup.closeWriteChannel();
+    });
+
+    bool ok = false;
+    QObject::connect(&warmup, &QProcess::finished,
+                     [&](int exitCode, QProcess::ExitStatus status) {
+                         ok = (status == QProcess::NormalExit && exitCode == 0);
+                     });
+
+    warmup.start("gpg", {
+                            "--batch",
+                            "--yes",
+                            "--pinentry-mode", "loopback",
+                            "--encrypt",
+                            "--recipient", recipientKey,
+                            "--output", "NUL"
+                        });
+
+    // Wait while keeping UI responsive
+    QEventLoop loop;
+    QObject::connect(&warmup, &QProcess::finished, &loop, &QEventLoop::quit);
+
+    // Timeout protection
+    QTimer timer;
+    timer.setSingleShot(true);
+    QObject::connect(&timer, &QTimer::timeout, [&]() {
+        if (warmup.state() == QProcess::Running)
+            warmup.kill();
+        loop.quit();
+    });
+    timer.start(10000);
+
+    loop.exec(); // keeps splash screen responsive
+
+    if (!ok) {
+        qWarning().noquote() << "GPG warm-up failed:"
+                             << warmup.readAllStandardError();
+    }
+
+    return ok;
+}
 
