@@ -119,9 +119,11 @@ void checkGpgKeys(QWidget* parent)
     }
     QSqlDatabase::removeDatabase(connNameRead);
 
-    if (!keys.isEmpty()) {
-        warmupGpg(keys.first(), parent);
-    }
+    #ifdef Q_OS_WIN
+        if (!keys.isEmpty()) {
+            warmupGpg(keys.first(), parent);
+        }
+    #endif
 
     // Async GPG check
     auto *watcher = new QFutureWatcher<QStringList>(parent);
