@@ -411,10 +411,12 @@ void Settings::saveMainWindowState(QMainWindow *window)
     if (!window)
         return;
 
-    settings->beginGroup("MainWindow");
-    settings->setValue("geometry", window->saveGeometry());
-    settings->setValue("state", window->saveState());
-    settings->endGroup();
+    QSettings localSettings;
+
+    localSettings.beginGroup("MainWindow");
+    localSettings.setValue("geometry", window->saveGeometry());
+    localSettings.setValue("state", window->saveState());
+    localSettings.endGroup();
 }
 
 
@@ -424,15 +426,17 @@ void Settings::restoreMainWindowState(QMainWindow *window)
     if (!window)
         return;
 
-    settings->beginGroup("MainWindow");
+    QSettings localSettings;
 
-    if (settings->contains("geometry"))
-        window->restoreGeometry(settings->value("geometry").toByteArray());
+    localSettings.beginGroup("MainWindow");
 
-    if (settings->contains("state"))
-        window->restoreState(settings->value("state").toByteArray());
+    if (localSettings.contains("geometry"))
+        window->restoreGeometry(localSettings.value("geometry").toByteArray());
 
-    settings->endGroup();
+    if (localSettings.contains("state"))
+        window->restoreState(localSettings.value("state").toByteArray());
+
+    localSettings.endGroup();
 }
 
 // Save splitter state
@@ -441,9 +445,11 @@ void Settings::saveSplitterState(QSplitter *splitter, const QString &name)
     if (!splitter)
         return;
 
-    settings->beginGroup("Splitters");
-    settings->setValue(name, splitter->saveState());
-    settings->endGroup();
+    QSettings localSettings;
+
+    localSettings.beginGroup("Splitters");
+    localSettings.setValue(name, splitter->saveState());
+    localSettings.endGroup();
 }
 
 
@@ -453,13 +459,15 @@ void Settings::restoreSplitterState(QSplitter *splitter, const QString &name)
     if (!splitter)
         return;
 
-    settings->beginGroup("Splitters");
+    QSettings localSettings;
 
-    if (settings->contains(name)) {
-        splitter->restoreState(settings->value(name).toByteArray());
+    localSettings.beginGroup("Splitters");
+
+    if (localSettings.contains(name)) {
+        splitter->restoreState(localSettings.value(name).toByteArray());
     }
 
-    settings->endGroup();
+    localSettings.endGroup();
 }
 
 
