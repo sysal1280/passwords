@@ -2423,14 +2423,19 @@ void MainWindow::encryptMessage()
 
     // Copy action
     connect(copyBtn, &QPushButton::clicked, this,
-            [encryptedTextEdit]() {
+            [this, encryptedTextEdit]() {
                 const QString text = encryptedTextEdit->toPlainText();
                 if (!text.isEmpty()) {
+
                     QClipboard *clipboard = QGuiApplication::clipboard();
                     clipboard->setText(text);
-                    QMessageBox::information(nullptr, "Copied", "Encrypted text copied to clipboard.");
+
+                    // Direct access — you're already in MainWindow
+                    statusBar()->showMessage("Encrypted text copied to clipboard.", 3000);
+
                 } else {
-                    QMessageBox::warning(nullptr, "No Text", "There is no encrypted text to copy.");
+
+                    statusBar()->showMessage("There is no encrypted text to copy.", 3000);
                 }
             });
 
