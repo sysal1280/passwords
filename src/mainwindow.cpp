@@ -2496,20 +2496,15 @@ void MainWindow::decryptMessage()
     encryptedInputEdit->setPlaceholderText("Paste encrypted text here...");
     layout->addWidget(encryptedInputEdit);
 
-    // Password entry row (single field + decrypt button aligned right)
+    // Password entry row (password only)
     QHBoxLayout *passLayout = new QHBoxLayout;
     QLabel *passLabel = new QLabel("Password:", dlg);
     QLineEdit *passEdit = new QLineEdit(dlg);
     passEdit->setEchoMode(settings.getEchoMode());
     passEdit->setPlaceholderText("Enter password");
 
-    QPushButton *decryptBtn = new QPushButton("&Decrypt", dlg);
-
     passLayout->addWidget(passLabel);
     passLayout->addWidget(passEdit);
-    passLayout->addStretch();
-    passLayout->addWidget(decryptBtn);
-
     layout->addLayout(passLayout);
 
     // Decrypted output
@@ -2518,12 +2513,17 @@ void MainWindow::decryptMessage()
     decryptedTextEdit->setPlaceholderText("Decrypted text will appear here...");
     layout->addWidget(decryptedTextEdit);
 
-    // Copy + Close buttons side by side (aligned right)
+    // Bottom button row: Copy | Decrypt | Close
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
+
     QPushButton *copyBtn  = new QPushButton("Copy", dlg);
+    QPushButton *decryptBtn = new QPushButton("&Decrypt", dlg);
     QPushButton *closeBtn = new QPushButton("&Close", dlg);
-    copyBtn->setEnabled(false); // initially disabled
+
+    copyBtn->setEnabled(false);
+
+    buttonLayout->addWidget(decryptBtn);
     buttonLayout->addWidget(copyBtn);
     buttonLayout->addWidget(closeBtn);
     layout->addLayout(buttonLayout);
@@ -2606,8 +2606,6 @@ void MainWindow::decryptMessage()
     dlg->resize(700, 500);
     dlg->exec();
 }
-
-
 
 void MainWindow::encryptFile()
 {
