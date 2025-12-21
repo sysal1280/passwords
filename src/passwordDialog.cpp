@@ -17,6 +17,8 @@
 #include <QFile>
 #include <QResource>
 #include <QDebug>
+#include <QMainWindow>
+#include <QStatusBar>
 
 namespace PasswordDialog {
 
@@ -113,9 +115,19 @@ void showPasswordGenerator(QWidget *parent,
 
     QObject::connect(copyBtn, &QPushButton::clicked,
                      &dlg,
-                     [passwordEdit] {
+                     [passwordEdit, parent] {
                          QApplication::clipboard()->setText(passwordEdit->text());
+
+                         // Try to find a QMainWindow parent
+                         QWidget *p = parent;
+                         while (p && !qobject_cast<QMainWindow*>(p))
+                             p = p->parentWidget();
+
+                         if (auto *mw = qobject_cast<QMainWindow*>(p)) {
+                             mw->statusBar()->showMessage("Copied to clipboard", 3000);
+                         }
                      });
+
 
     QObject::connect(closeBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
 

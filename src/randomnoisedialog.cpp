@@ -11,6 +11,8 @@
 #include <QComboBox>
 #include <QRandomGenerator>
 #include <QByteArray>
+#include <QMainWindow>
+#include <QStatusBar>
 
 namespace RandomNoiseDialog {
 
@@ -150,7 +152,17 @@ void showRandomNoiseGenerator(QWidget *parent, const QString &title)
     QObject::connect(copyBtn, &QPushButton::clicked,
                      &dlg, [&]() {
                          QApplication::clipboard()->setText(outputEdit->toPlainText());
+
+                         // Try to find a QMainWindow parent
+                         QWidget *p = parent;
+                         while (p && !qobject_cast<QMainWindow*>(p))
+                             p = p->parentWidget();
+
+                         if (auto *mw = qobject_cast<QMainWindow*>(p)) {
+                             mw->statusBar()->showMessage("Copied to clipboard", 3000);
+                         }
                      });
+
 
     QObject::connect(closeBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
 
