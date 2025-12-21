@@ -48,6 +48,18 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     /*
+     * Set QApplication settings
+     */
+    QString applicationName = QCoreApplication::translate("main","Passwords");
+    QApplication::setWindowIcon(QIcon(":/password.png"));
+    QGuiApplication::setDesktopFileName(applicationName);
+    QApplication::setApplicationName(applicationName);
+    QApplication::setApplicationVersion("0.1.0");
+    if (auto *style = QStyleFactory::create("Fusion")) {
+        QApplication::setStyle(style);
+    }
+
+    /*
      * init settings for default config file
      */
     {
@@ -59,18 +71,6 @@ int main(int argc, char *argv[])
         Settings settings;
         qInfo().noquote() << "Config file loaded:" << QDir::toNativeSeparators(settings.configFilePath());
 
-    }
-
-    /*
-     * Set QApplication settings
-     */
-    QString applicationName = QCoreApplication::translate("main","Passwords");
-    QApplication::setWindowIcon(QIcon(":/password.png"));
-    QGuiApplication::setDesktopFileName(applicationName);
-    QApplication::setApplicationName(applicationName);
-    QApplication::setApplicationVersion("0.1.0");
-    if (auto *style = QStyleFactory::create("Fusion")) {
-        QApplication::setStyle(style);
     }
 
     /*

@@ -32,22 +32,24 @@
 
 Settings::Settings()
 {
-    // --- Build candidate paths ---
+    QString globalDir;
+
 #ifdef Q_OS_WIN
-    // Windows: ProgramData or GenericConfigLocation
-    QString globalFile = QDir(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation))
-                             .filePath(CONFIG_FILENAME);
-
+    // Windows: C:/ProgramData/Passwords
+    globalDir = QDir::fromNativeSeparators(qEnvironmentVariable("PROGRAMDATA") + "/Passwords");
 #elif defined(Q_OS_MAC)
-    // macOS: /Library/Preferences is the standard global prefs location
-    QString globalFile = QStringLiteral("/Library/Preferences/passwords/") + CONFIG_FILENAME;
-
+    // macOS: /Library/Preferences/Passwords
+    globalDir = "/Library/Preferences/Passwords";
 #else
-    // Linux/Unix: /etc/yourapp
-    QString globalFile = QStringLiteral("/etc/passwords/") + CONFIG_FILENAME;
+    // Linux/Unix: /etc/passwords
+    globalDir = "/etc/passwords";
 #endif
 
+    // Ensure global directory exists (harmless if read‑only)
+    QDir(globalDir).mkpath(".");
+    QString globalFile = globalDir + "/" + CONFIG_FILENAME;
 
+    // Local per‑user config
     QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
     QDir(configDir).mkpath(".");
     QString localFile = configDir + "/" + CONFIG_FILENAME;
@@ -83,7 +85,6 @@ Settings::Settings()
 
     settings = std::make_unique<QSettings>(configFile, QSettings::IniFormat);
 }
-
 
 QString Settings::configFilePath()
 {

@@ -271,7 +271,7 @@ bool warmupGpg(const QString &recipientKey, QWidget *parent)
             warmup.kill();
         loop.quit();
     });
-    timer.start(10000);
+    timer.start(12000);
 
     loop.exec(); // keeps splash screen responsive
 
