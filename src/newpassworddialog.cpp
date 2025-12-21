@@ -14,10 +14,10 @@
 #include <QMenu>
 #include "multilinedelegate.h"
 #include "integerdelegate.h"
-#include <QPushButton>
 #include "settings.h"
 #include <QToolButton>
 #include <QMenu>
+#include <QPushButton>
 
 NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     : QDialog(parent)
@@ -25,15 +25,11 @@ NewPasswordDialog::NewPasswordDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->pushButtonGenerate->setText(tr("&Generate Password"));
     ui->toolButton->setPopupMode(QToolButton::MenuButtonPopup);
     ui->toolButton->setText(tr("&Generate Password"));
-
     QMenu *menu = new QMenu(ui->toolButton);
-
     QAction *optA = menu->addAction("Generate Password");
-    QAction *optB = menu->addAction("Generate Noise");
-
+    QAction *optB = menu->addAction("Random Noise");
     ui->toolButton->setMenu(menu);
 
     // Connect using connect()
