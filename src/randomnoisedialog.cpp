@@ -81,10 +81,11 @@ void showRandomNoiseGenerator(QWidget *parent, const QString &title)
     // Controls row (NO copy button here anymore)
     QHBoxLayout *controlLayout = new QHBoxLayout;
 
-    QLabel *lenLabel = new QLabel("Length (bytes):", &dlg);
+    QLabel *lenLabel = new QLabel("Length:", &dlg);
     QSpinBox *lenSpin = new QSpinBox(&dlg);
     lenSpin->setRange(4, 4096);
     lenSpin->setValue(32);
+    lenSpin->setSuffix(" bytes");
 
     QLabel *formatLabel = new QLabel("Format:", &dlg);
     QComboBox *formatCombo = new QComboBox(&dlg);

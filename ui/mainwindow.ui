@@ -99,8 +99,8 @@
      <addaction name="actionLast_Edited"/>
     </widget>
     <addaction name="actionGenerate_Password"/>
-    <addaction name="separator"/>
     <addaction name="actionRandom_Noise"/>
+    <addaction name="separator"/>
     <addaction name="actionEncrypt_message"/>
     <addaction name="actionDecrypt_message"/>
     <addaction name="separator"/>
@@ -423,6 +423,9 @@
   <action name="actionRandom_Noise">
    <property name="text">
     <string>Random Noise</string>
+   </property>
+   <property name="shortcut">
+    <string>F6</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

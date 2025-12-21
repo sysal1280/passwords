@@ -26,7 +26,7 @@ void showPasswordGenerator(QWidget *parent,
 {
     Settings settings;
 
-QString wordListPath = loadWordlistResource(parent, Q_FUNC_INFO);
+    QString wordListPath = loadWordlistResource(parent, Q_FUNC_INFO);
 
     // Load wordlist from Settings path
     QStringList wl = passwordGenerator::loadWordList(settings.getWordListFile());
@@ -75,8 +75,13 @@ QString wordListPath = loadWordlistResource(parent, Q_FUNC_INFO);
 
     controlLayout->addWidget(wordCountLabel);
     controlLayout->addWidget(wordCountSpin);
+
+    // ✅ Add stretch BEFORE the buttons so they shrink to minimum size
+    controlLayout->addStretch();
+
     controlLayout->addWidget(generateBtn);
     controlLayout->addWidget(copyBtn);
+
     layout->addLayout(controlLayout);
 
     // Password display
@@ -98,9 +103,11 @@ QString wordListPath = loadWordlistResource(parent, Q_FUNC_INFO);
     QObject::connect(generateBtn, &QPushButton::clicked,
                      &dlg,
                      [wl, wordCountSpin, passwordEdit]() {
-                         QString pwd = passwordGenerator::generatePassword(wl,
-                                                                           wordCountSpin->value(),
-                                                                           100);
+                         QString pwd = passwordGenerator::generatePassword(
+                             wl,
+                             wordCountSpin->value(),
+                             100
+                             );
                          passwordEdit->setText(pwd);
                      });
 
