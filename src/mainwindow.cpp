@@ -541,7 +541,7 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
 
-    if (qApp->property("dbPath").toString().isEmpty())
+    if (qApp->property("dbFile").toString().isEmpty())
         return;
 
     if (firstShow) {
