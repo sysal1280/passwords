@@ -556,16 +556,21 @@ void MainWindow::showEvent(QShowEvent *event)
                     return;
 
                 QString plural = (count == 1 ? "" : "s");
+                bool singular = (count == 1);
 
                 QString message = QString(
-                                      "There %1 %2 exported password%3 that %4 not been updated since they were last exported.\n\n"
-                                      "For security reasons, these password%3 should be updated or removed from the database.\n\n"
-                                      "Would you like to review them now?"
-                                      )
-                                      .arg(count == 1 ? "is" : "are")
-                                      .arg(count)
-                                      .arg(plural)
-                                      .arg(count == 1 ? "has" : "have");
+                    "There %1 %2 exported password%3 that %4 not been updated since %5 last exported.\n\n"
+                    "For security reasons, %6 password%3 should be updated or removed from the database.\n\n"
+                    "Would you like to review %7 now?"
+                )
+                .arg(singular ? "is" : "are")        // %1
+                .arg(count)                          // %2
+                .arg(plural)                         // %3
+                .arg(singular ? "has" : "have")      // %4
+                .arg(singular ? "it was" : "they were") // %5
+                .arg(singular ? "this" : "these")    // %6
+                .arg(singular ? "it" : "them");      // %7
+
 
                 QMessageBox::StandardButton reply =
                     QMessageBox::warning(
