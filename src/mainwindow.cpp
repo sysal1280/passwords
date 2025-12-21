@@ -7,6 +7,7 @@
 #include "encryptfiledialog.h"
 #include "gpgCheck.h"
 #include "dbutils.h"
+#include "randomnoisedialog.h"
 #include "categorydialog.h"
 #include "preferencesdialog.h"
 #include "DataObfuscator.h"
@@ -146,6 +147,7 @@ MainWindow::MainWindow(QWidget *parent)
         { ui->actionDonate,                ":/menus/glyphs/favorite_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionExported_Passwords,    ":/menus/glyphs/table_view_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionLast_Edited,           ":/menus/glyphs/table_view_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
+        { ui->actionRandom_Noise,          ":/menus/glyphs/grain_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"},
         { ui->actionOnline_Documentation,  ":/menus/glyphs/help_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" }
     };
 
@@ -244,6 +246,11 @@ MainWindow::MainWindow(QWidget *parent)
                     );
             });
 
+    connect(ui->actionRandom_Noise, &QAction::triggered,
+            this,
+            [this]() {
+                RandomNoiseDialog::showRandomNoiseGenerator(this);
+            });
 
     connect(ui->actionEncrypt_File, &QAction::triggered,
             this, &MainWindow::encryptFile);

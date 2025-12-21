@@ -100,6 +100,7 @@
     </widget>
     <addaction name="actionGenerate_Password"/>
     <addaction name="separator"/>
+    <addaction name="actionRandom_Noise"/>
     <addaction name="actionEncrypt_message"/>
     <addaction name="actionDecrypt_message"/>
     <addaction name="separator"/>
@@ -414,6 +415,14 @@
   <action name="actionLast_Edited">
    <property name="text">
     <string>Last Edited</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionRandom_Noise">
+   <property name="text">
+    <string>Random Noise</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
