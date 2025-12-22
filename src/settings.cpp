@@ -371,33 +371,40 @@ QString Settings::getDefaultDbPath(QWidget* parent)
         return getLastUsedFile();
     }
 
-    // 2. Local user data path
+// 2. Global system path (OS-specific)
+#ifdef Q_OS_WIN
+    // Windows: C:/ProgramData/Passwords/Data
+    QString globalPath = QDir::fromNativeSeparators(
+        qEnvironmentVariable("PROGRAMDATA") + "/Passwords/Data/passwords"
+        );
+#elif defined(Q_OS_MAC)
+    // macOS: /Library/Application Support/Passwords/passwords
+    QString globalPath = "/Library/Application Support/Passwords/passwords";
+
+#else
+    // Linux: /var/lib/password/passwords
+    QString globalPath = "/var/lib/passwords/passwords";
+
+#endif
+
+    // 3. Local
     QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir(configDir).mkpath(".");
     QString localPath = QDir(configDir).filePath("passwords");
-
-    qInfo().noquote() << QString("Looking for database at %1.").arg(localPath);
-    if (QFile::exists(localPath)) {
-        return localPath;
-    }
-
-    // 3. Global system path (OS-specific)
-#ifdef Q_OS_WIN
-    QString globalPath = QDir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation))
-                             .filePath("Passwords/passwords");
-#elif defined(Q_OS_MAC)
-    QString globalPath = "/Library/Application Support/Passwords/passwords";
-#else
-    QString globalPath = "/var/lib/password/passwords";
-#endif
 
     qInfo().noquote() << QString("Looking for database at %1.").arg(globalPath);
     if (QFile::exists(globalPath)) {
         return globalPath;
     }
 
+    qInfo().noquote() << QString("Looking for database at %1.").arg(localPath);
+    if (QFile::exists(localPath)) {
+        return localPath;
+    }
+
     // 4. Portable mode: next to the executable
     QString portablePath = QDir(QCoreApplication::applicationDirPath()).filePath("passwords");
+    qInfo() << "Looking for database at" << portablePath;
     if (QFile::exists(portablePath)) {
         return portablePath;
     }
