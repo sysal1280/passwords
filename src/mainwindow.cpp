@@ -1924,13 +1924,10 @@ void MainWindow::keyList()
 
     // Instruction label at the top
     QLabel *instruction = new QLabel(
-        "Keys listed here are only linked, not stored, this application references your existing GPG keyring."
-        "Your private keys remain under your control and are never copied into this database.\n\n"
-        "If you lose access to a private key that was used to encrypt data,"
-        "there is NO WAY to recover that data. Keep backups of your keys in a safe place.",
+        "Keys are linked by Key ID only. They are not imported. Neither public or private keys\nare stored in the database.\n\nGPG Keys:",
         dlg
         );
-    instruction->setWordWrap(true);
+    instruction->setWordWrap(false);
     instruction->setAlignment(Qt::AlignLeft);
     layout->addWidget(instruction);
 
@@ -2315,17 +2312,11 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
             return;
         }
 
+        db.close();
         insertAuditRow(appId,this->userName,QSysInfo::machineHostName(),"AUDIT LOG CLEARED");
 
-        QMessageBox::information(dlg, tr("Deleted"), tr("Audit log and view records deleted."));
+        QMessageBox::information(dlg, tr("Deleted"), tr("The audit log has been successfully cleared."));
         dlg->accept();
-    });
-
-    // Clean up connection when dialog closes
-    connect(dlg, &QDialog::finished, this, [connName](int){
-        QSqlDatabase db = QSqlDatabase::database(connName);
-        db.close();
-        QSqlDatabase::removeDatabase(connName);
     });
 
     dlg->setLayout(layout);

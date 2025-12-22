@@ -121,7 +121,6 @@ private:
                            QDir::toNativeSeparators(qApp->property("dbFile").toString()),
                            QDir::toNativeSeparators(QCoreApplication::applicationFilePath()));
 
-
         // AppKey source
             QString appKeyPath = appKeyFilePath();
             if (!appKeyPath.isEmpty() && QFile::exists(appKeyPath)) {
