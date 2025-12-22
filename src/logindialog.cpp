@@ -21,6 +21,7 @@
 #include "ui_logindialog.h"
 #include "mainwindow.h"
 #include "settings.h"
+#include "utils.h"
 #include "DataObfuscator.h"
 #include "dbutils.h"
 #include <QSqlDatabase>
@@ -42,10 +43,9 @@ LoginDialog::LoginDialog(QWidget *parent)
     ui->textEdit->setReadOnly(true);
 
     QPushButton *okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    okButton->setEnabled(false); // disable initially
+    okButton->setEnabled(false);
 
     QString connectionName = QUuid::createUuid().toString();
-        // create a scoped database object
         {
             QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
             db.setDatabaseName(qApp->property("dbFile").toString());
@@ -119,7 +119,11 @@ LoginDialog::LoginDialog(QWidget *parent)
                 ui->lineEdit->setFocus();
             });
 
-    checkHelperFiles();
+    if (!hasHelp())
+    {
+        if (auto *helpButton = ui->buttonBox->button(QDialogButtonBox::Help))
+            helpButton->setEnabled(false);
+    }
 }
 
 LoginDialog::~LoginDialog()
@@ -280,21 +284,5 @@ void LoginDialog::showEvent(QShowEvent *event) {
     QDialog::showEvent(event);
     if (!ui->textEdit->toPlainText().isEmpty()) {
         QApplication::clipboard()->setText(ui->textEdit->toPlainText(), QClipboard::Clipboard);
-    }
-}
-
-void LoginDialog::checkHelperFiles()
-{
-    const QString appDir = QCoreApplication::applicationDirPath();
-
-    const bool exeExists =
-        QFile::exists(appDir + "/pwdhlp.exe") ||
-        QFile::exists(appDir + "/pwdhlp");
-
-    const bool rccExists = QFile::exists(appDir + "/pwdhlp.rcc");
-
-    if (!exeExists || !rccExists) {
-        if (auto *helpButton = ui->buttonBox->button(QDialogButtonBox::Help))
-            helpButton->setEnabled(false);
     }
 }

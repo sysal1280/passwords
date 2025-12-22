@@ -30,7 +30,6 @@ private:
     int errorCount = 0;
     void generateChallenge();
     void tryResponse();
-    void checkHelperFiles();
     Settings settings;
 
 };

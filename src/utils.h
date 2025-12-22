@@ -43,4 +43,13 @@ inline QString appKeyFilePath()
     return QFile::exists(path) ? path : QString();
 }
 
+inline bool hasHelp()
+{
+    const QString appDir = QCoreApplication::applicationDirPath();
+
+    return (QFile::exists(appDir + "/pwdhlp.exe") ||
+            QFile::exists(appDir + "/pwdhlp"))
+           && QFile::exists(appDir + "/pwdhlp.rcc");
+}
+
 #endif // UTILS_H
