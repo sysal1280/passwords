@@ -119,6 +119,10 @@ private:
     void showAboutDlg();
 
 
+    QByteArray loadOrCreateAppKey();
+    void checkGpgKeys();
+    void initDbMetadata();
+
     void openCategory(QTreeWidgetItem *item, int column);
     void setBookmark(bool checked);
 

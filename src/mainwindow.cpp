@@ -2218,9 +2218,12 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
     // Buttons layout
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     QPushButton *exportBtn = new QPushButton("&Export", dlg);
+    QPushButton *deleteBtn = new QPushButton("&Delete", dlg);   // <‑‑‑‑‑ Added
     QPushButton *closeBtn = new QPushButton("&Close", dlg);
+
     buttonLayout->addStretch();
     buttonLayout->addWidget(exportBtn);
+    buttonLayout->addWidget(deleteBtn);                         // <‑‑‑‑‑ Added
     buttonLayout->addWidget(closeBtn);
     layout->addLayout(buttonLayout);
 
@@ -2258,7 +2261,6 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
             for (int col = 0; col < table->columnCount(); ++col) {
                 QTableWidgetItem *item = table->item(row, col);
                 QString text = item ? item->text() : "";
-                // Quote each field to protect spaces/commas
                 fields << "\"" + text.replace("\"", "\"\"") + "\"";
             }
             out << fields.join(",") << "\n";
@@ -2266,6 +2268,63 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
 
         file.close();
         QMessageBox::information(dlg, "Export Complete", "Audit log exported successfully.");
+    });
+
+    connect(deleteBtn, &QPushButton::clicked, this, [this, dlg, appId, connName]() {
+        if (QMessageBox::warning(
+                dlg,
+                tr("Confirm Delete"),
+                tr("This will permanently delete all audit log entries and view records "
+                   "for this application.\n\nAre you sure you want to continue?"),
+                QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+        {
+            return;
+        }
+
+        QSqlDatabase db = QSqlDatabase::database(connName);
+        if (!db.isOpen()) {
+            showDbNotOpenError(this,db,Q_FUNC_INFO);
+            return;
+        }
+
+        if (!settings.verifyDeleteAllowed(db, this)) {
+            QMessageBox::warning(this, tr("Error"), tr("Delete not permitted."));
+            return;
+        }
+
+        QSqlQuery query(db);
+
+        if (!db.transaction()) {
+            showTransactionError(this,db,Q_FUNC_INFO);
+            return;
+        }
+
+        query.prepare("DELETE FROM application_views_audit WHERE application_id = :id");
+        query.bindValue(":id", appId);
+        if (!query.exec()) {
+            db.rollback();
+            showQueryError(this, query, Q_FUNC_INFO);
+            return;
+        }
+
+        query.prepare("DELETE FROM application_views WHERE application_id = :id");
+        query.bindValue(":id", appId);
+        if (!query.exec()) {
+            db.rollback();
+            showQueryError(this, query, Q_FUNC_INFO);
+            return;
+        }
+
+        if (!db.commit()) {
+            db.rollback();
+            showTransactionError(this,db,Q_FUNC_INFO);
+            return;
+        }
+
+        insertAuditRow(appId,this->userName,QSysInfo::machineHostName(),"AUDIT LOG CLEARED");
+
+        QMessageBox::information(dlg, tr("Deleted"), tr("Audit log and view records deleted."));
+        dlg->accept();
     });
 
     // Clean up connection when dialog closes
@@ -3356,24 +3415,68 @@ void MainWindow::search(int appId)
     QMessageBox::information(this, tr("Search"), tr("Password not found in category."));
 }
 
+
 void MainWindow::initDb()
 {
+    // 1. Load or create the appKey (file → DB → generate)
+    this->appKey = loadOrCreateAppKey();
+    qApp->setProperty("appKey", this->appKey);
+
+    // 2. Initialize DB metadata (timestamps, etc.)
+    initDbMetadata();
+
+    // 3. Check if GPG keys exist and prompt user if needed
+    checkGpgKeys();
+}
+
+
+QByteArray MainWindow::loadOrCreateAppKey()
+{
+    //
+    // 1. Try file-based key first
+    //
+    QString keyFilePath =
+        (QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)),
+         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/appkey");
+
+    if (QFile::exists(keyFilePath)) {
+        QFile keyFile(keyFilePath);
+        keyFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+        if (keyFile.open(QIODevice::ReadOnly)) {
+            QByteArray encoded = keyFile.readAll();
+            keyFile.close();
+
+            QByteArray decoded = QByteArray::fromBase64(encoded);
+            if (!decoded.isEmpty()) {
+                qInfo().noquote() << "Using appKey from file:"
+                                  << (decoded.length() > 7
+                                          ? decoded.left(3) + "..." + decoded.right(4)
+                                          : decoded) << "in" << keyFilePath;
+                return decoded;
+            }
+        }
+    } else
+    {
+        qInfo().noquote() << "No appKey file exists at" << keyFilePath;
+    }
+
+    //
+    // 2. Fall back to DB-based key
+    //
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QByteArray appKey;
 
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
 
         if (!db.open()) {
-            QMessageBox::critical(this, QApplication::applicationName(), db.lastError().text());
-            return;
+            showDbNotOpenError(this, db, Q_FUNC_INFO);
+            QMessageBox::critical(nullptr, QApplication::applicationName(), db.lastError().text());
+            return {};
         }
 
         QSqlQuery query(db);
-
-        //
-        // 1. Try to load an existing app_key
-        //
         query.prepare(R"(
             SELECT value
             FROM app_info
@@ -3382,15 +3485,15 @@ void MainWindow::initDb()
         query.bindValue(":app_key", "app_key");
 
         if (!query.exec()) {
-            showQueryError(this,query,Q_FUNC_INFO);
-            return;
+            showQueryError(nullptr, query, Q_FUNC_INFO);
+            return {};
         }
 
         if (query.next()) {
-            this->appKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
+            appKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
         } else {
             //
-            // 2. No key found — generate a new one
+            // 3. No key found — generate a new one
             //
             QString appKeyStr;
             for (int i = 0; i < 6; ++i) {
@@ -3409,30 +3512,40 @@ void MainWindow::initDb()
             query.bindValue(":guid", encoded);
 
             if (!query.exec()) {
-                showQueryError(this,query,Q_FUNC_INFO);
-                return;
+                showQueryError(nullptr, query, Q_FUNC_INFO);
+                return {};
             }
 
-            this->appKey = QByteArray::fromBase64(encoded);
+            appKey = QByteArray::fromBase64(encoded);
+        }
+    }
+
+    QSqlDatabase::removeDatabase(connName);
+
+    qInfo().noquote() << "Using appKey from DB:"
+                      << (appKey.length() > 7
+                              ? appKey.left(3) + "..." + appKey.right(4)
+                              : appKey);
+
+    return appKey;
+}
+
+void MainWindow::initDbMetadata()
+{
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+        db.setDatabaseName(qApp->property("dbFile").toString());
+
+        if (!db.open()) {
+            showDbNotOpenError(this, db, Q_FUNC_INFO);
+            QMessageBox::critical(this, QApplication::applicationName(), db.lastError().text());
+            return;
         }
 
-        //
-        // 3. Store key globally
-        //
-        if (this->appKey.isEmpty()) {
-            qFatal() << "No appKey found in the database.";
-        }
+        QSqlQuery query(db);
 
-        qApp->setProperty("appKey", this->appKey);
-
-        qInfo().noquote() << "Using appKey:"
-                          << (appKey.length() > 7
-                                  ? appKey.left(3) + "..." + appKey.right(4)
-                                  : appKey);
-
-        //
-        // 4. Insert db_create timestamp if missing
-        //
         query.prepare(R"(
             INSERT OR IGNORE INTO app_info (key, value)
             VALUES (:db_create, :dt)
@@ -3441,36 +3554,38 @@ void MainWindow::initDb()
         query.bindValue(":dt", QDateTime::currentDateTime());
 
         if (!query.exec()) {
-            showQueryError(this,query,Q_FUNC_INFO);
+            showQueryError(this, query, Q_FUNC_INFO);
         }
     }
 
     QSqlDatabase::removeDatabase(connName);
+}
 
-    //
-    // 5. Check if GPG keys exist
-    //
+
+void MainWindow::checkGpgKeys()
+{
     QList<KeyEntry> keys = fetchKeys();
-    if (keys.isEmpty()) {
-        qWarning().noquote() << "No GPG Keys have been linked.";
-        QApplication::restoreOverrideCursor();
+    if (!keys.isEmpty())
+        return;
 
-        QMessageBox::StandardButton reply =
-            QMessageBox::question(this,
-                                  tr("No Keys Configured"),
-                                  tr("You must configure at least one GPG private key "
-                                     "fingerprint before saving passwords.\n\n"
-                                     "Would you like to add one now?"),
-                                  QMessageBox::Yes | QMessageBox::No);
+    qWarning().noquote() << "No GPG Keys have been linked.";
+    QApplication::restoreOverrideCursor();
 
-        if (reply == QMessageBox::Yes) {
-            keyList();
-        } else {
-            QMessageBox::information(this,
-                                     tr("Keys Required"),
-                                     tr("Without a configured key, you will not be able "
-                                        "to create or edit encrypted passwords."));
-        }
+    QMessageBox::StandardButton reply =
+        QMessageBox::question(this,
+                              tr("No Keys Configured"),
+                              tr("You must configure at least one GPG private key "
+                                 "fingerprint before saving passwords.\n\n"
+                                 "Would you like to add one now?"),
+                              QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        keyList();
+    } else {
+        QMessageBox::information(this,
+                                 tr("Keys Required"),
+                                 tr("Without a configured key, you will not be able "
+                                    "to create or edit encrypted passwords."));
     }
 }
 
