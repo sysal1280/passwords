@@ -1976,7 +1976,7 @@ void MainWindow::keyList()
     // Buttons
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     QPushButton *importBtn = new QPushButton("&Link Key", dlg);
-    QPushButton *deleteBtn = new QPushButton("&Delete", dlg);   // new delete button
+    QPushButton *deleteBtn = new QPushButton("&Delete", dlg);
     QPushButton *helpBtn   = new QPushButton("&Help", dlg);
     QPushButton *closeBtn  = new QPushButton("&Close", dlg);
     buttonLayout->addWidget(importBtn);
@@ -1985,6 +1985,8 @@ void MainWindow::keyList()
     buttonLayout->addStretch();
     buttonLayout->addWidget(closeBtn);
     layout->addLayout(buttonLayout);
+
+    helpBtn->setEnabled(hasHelp());
 
     // Hook up import
     connect(importBtn, &QPushButton::clicked, this, [=]() {

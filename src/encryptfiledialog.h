@@ -1,6 +1,7 @@
 #ifndef ENCRYPTFILEDIALOG_H
 #define ENCRYPTFILEDIALOG_H
 
+#include "utils.h"
 #include <QLineEdit>
 #include <QObject>
 #include <QLabel>
@@ -163,6 +164,8 @@ public:
         if (parent) {
             int w = parent->width() * 3 / 4;
             setFixedSize(w, sizeHint().height()+20);
+
+            hasHelp(btnBox->button(QDialogButtonBox::Help));
         }
     }
 

@@ -57,9 +57,24 @@ static QString convertBytes(const QByteArray &bytes, int mode)
 // ------------------------------------------------------------
 // Entropy estimation
 // ------------------------------------------------------------
-static double estimateEntropyBits(int byteCount)
+static double estimateEntropyBits(const QByteArray &data)
 {
-    return byteCount * 8.0;
+    if (data.isEmpty())
+        return 0.0;
+
+    int counts[256] = {0};
+    for (unsigned char c : data)
+        counts[c]++;
+
+    int maxCount = 0;
+    for (int i = 0; i < 256; ++i)
+        if (counts[i] > maxCount)
+            maxCount = counts[i];
+
+    const double pMax = double(maxCount) / double(data.size());
+
+    // Min-entropy per symbol (matches your Python script)
+    return -std::log2(pMax);
 }
 
 // ------------------------------------------------------------
@@ -137,8 +152,8 @@ void showRandomNoiseGenerator(QWidget *parent, const QString &title)
 
         outputEdit->setPlainText(out);
 
-        double entropy = estimateEntropyBits(len);
-        entropyLabel->setText(QString("Entropy: %1 bits").arg(entropy));
+        double entropy = estimateEntropyBits(bytes);
+        entropyLabel->setText(QString("Min‑entropy: %1 bits per byte").arg(entropy));
     };
 
     regenerate();

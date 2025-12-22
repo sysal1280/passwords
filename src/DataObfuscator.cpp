@@ -42,4 +42,3 @@ QString DataObfuscator::deobfuscate(const QString &encoded, const QByteArray &ke
     QByteArray xored = xorProcess(payload, key + salt);
     return QString::fromUtf8(xored);
 }
-

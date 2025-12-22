@@ -556,6 +556,10 @@ bool Settings::createUserDesktopFile()
 
 bool Settings::verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent)
 {
+    /*
+     * Destructive password prompt
+     */
+
     QSqlQuery q(db);
     if (!q.exec("SELECT value FROM app_info WHERE key LIKE 'destructive_operation_password_%'")) {
         showQueryError(parent, q, Q_FUNC_INFO);
@@ -588,9 +592,9 @@ bool Settings::verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent)
 
     for (const QString &stored : std::as_const(hashes)) {
         if (enteredHex == stored) {
-            return true; // match found
+            return true;
         }
     }
 
-    return false; // no match
+    return false;
 }
