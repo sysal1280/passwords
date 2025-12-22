@@ -92,7 +92,7 @@ private:
     QString generateTOTP(const QByteArray &secret, int digits = 6, int step = 30);
 
     // UI helpers
-    void setActionIcon(QAction *action, const QString &iconPath);
+    //void setActionIcon(QAction *action, const QString &iconPath);
     QTreeWidgetItem* findCategoryItemRecursive(QTreeWidgetItem *item, int categoryId);
     QString buildItemPath(QTreeWidgetItem *item) const;
     QString getItemPath(QTreeWidgetItem *item, int column = 0);

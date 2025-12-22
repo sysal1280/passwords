@@ -21,7 +21,6 @@ public:
     QMap<QString,QString> keys;
     bool hasKeys() const;
 
-
 private slots:
     void showEvent(QShowEvent *event) ;
 
@@ -29,7 +28,7 @@ private:
     Ui::LoginDialog *ui;
     QByteArray responseHash;
     int errorCount = 0;
-    void generateResponse();
+    void generateChallenge();
     void tryResponse();
     void checkHelperFiles();
     Settings settings;

@@ -589,12 +589,6 @@ void MainWindow::showEvent(QShowEvent *event)
         }, Qt::QueuedConnection);
     }
 }
-
-void MainWindow::setActionIcon(QAction *action, const QString &iconPath) {
-    action->setIcon(QIcon(iconPath));
-}
-
-
 void MainWindow::loadCategories()
 {
     const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -4342,7 +4336,7 @@ QString MainWindow::getItemPath(QTreeWidgetItem *item, int column)
     QStringList parts;
     QTreeWidgetItem *current = item;
     while (current) {
-        parts.prepend(current->text(column));   // or current->data(column, Qt::UserRole).toString()
+        parts.prepend(current->text(column));
         current = current->parent();
     }
     return parts.join(settings.getPathSeparator());

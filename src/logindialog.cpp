@@ -67,7 +67,7 @@ LoginDialog::LoginDialog(QWidget *parent)
                     // --- activate first entry and update clipboard ---
                     if (ui->comboBoxLogin->count() > 0) {
                         ui->comboBoxLogin->setCurrentIndex(0);
-                        generateResponse();
+                        generateChallenge();
                     }
                 } else
                 {
@@ -93,7 +93,7 @@ LoginDialog::LoginDialog(QWidget *parent)
     connect(ui->comboBoxLogin, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this](int index) {
                 if (index > -1) {
-                    generateResponse();
+                    generateChallenge();
                 }
             });
 
@@ -127,7 +127,7 @@ LoginDialog::~LoginDialog()
     delete ui;
 }
 
-void LoginDialog::generateResponse()
+void LoginDialog::generateChallenge()
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     ui->textEdit->clear();
