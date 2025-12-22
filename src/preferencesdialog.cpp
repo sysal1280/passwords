@@ -148,6 +148,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     connect(ui->buttonBox, &QDialogButtonBox::helpRequested,
             this, &PreferencesDialog::handleHelpRequested);
 
+    hasHelp(ui->buttonBox->button(QDialogButtonBox::Help));
 
 }
 

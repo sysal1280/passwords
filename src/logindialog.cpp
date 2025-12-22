@@ -119,11 +119,9 @@ LoginDialog::LoginDialog(QWidget *parent)
                 ui->lineEdit->setFocus();
             });
 
-    if (!hasHelp())
-    {
-        if (auto *helpButton = ui->buttonBox->button(QDialogButtonBox::Help))
-            helpButton->setEnabled(false);
-    }
+
+    hasHelp(ui->buttonBox->button(QDialogButtonBox::Help));
+
 }
 
 LoginDialog::~LoginDialog()

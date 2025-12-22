@@ -6,6 +6,8 @@
 #include <QApplication>
 #include <QResource>
 #include <QStandardPaths>
+#include <QDialogButtonBox>
+#include <QPushButton>
 
 inline QString loadWordlistResource(const QWidget *parent, const char *caller)
 {
@@ -43,13 +45,19 @@ inline QString appKeyFilePath()
     return QFile::exists(path) ? path : QString();
 }
 
-inline bool hasHelp()
+inline bool hasHelp(QPushButton *helpButton = nullptr)
 {
     const QString appDir = QCoreApplication::applicationDirPath();
 
-    return (QFile::exists(appDir + "/pwdhlp.exe") ||
-            QFile::exists(appDir + "/pwdhlp"))
-           && QFile::exists(appDir + "/pwdhlp.rcc");
+    const bool ok =
+        (QFile::exists(appDir + "/pwdhlp.exe") ||
+         QFile::exists(appDir + "/pwdhlp"))
+        && QFile::exists(appDir + "/pwdhlp.rcc");
+
+    if (!ok && helpButton)
+        helpButton->setEnabled(false);
+
+    return ok;
 }
 
 #endif // UTILS_H

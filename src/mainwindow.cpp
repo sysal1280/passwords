@@ -492,6 +492,12 @@ MainWindow::MainWindow(QWidget *parent)
     //     "QTreeWidget::item { padding-top: 6px; padding-bottom: 6px; }"
     //     );
 
+    if (!hasHelp())
+    {
+        ui->actionOnline_Documentation->setEnabled(false);
+        ui->actionDonate->setEnabled(false);
+    }
+
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
