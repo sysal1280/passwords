@@ -119,7 +119,6 @@ private:
     void showAboutDlg();
     //QString appKeyFilePath() const;
 
-
     QByteArray loadOrCreateAppKey();
     void checkGpgKeys();
     void initDbMetadata();

@@ -9,7 +9,6 @@ bool isStrong(const QString &str);
 bool hasUltimateTrust(const QString &keyId);
 bool warnAndContinue();
 bool warmupGpg(const QString &recipientKey, QWidget *parent);
-
 static QStringList checkKeysWithGpg(const QStringList &keys);
 
 #endif // GPGCHECK_H
