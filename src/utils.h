@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QResource>
+#include <QStandardPaths>
 
 inline QString loadWordlistResource(const QWidget *parent, const char *caller)
 {
@@ -34,6 +35,12 @@ inline QString loadWordlistResource(const QWidget *parent, const char *caller)
     return wordListPath;
 }
 
-
+inline QString appKeyFilePath()
+{
+    const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(dir);
+    const QString path = dir + "/appkey";
+    return QFile::exists(path) ? path : QString();
+}
 
 #endif // UTILS_H

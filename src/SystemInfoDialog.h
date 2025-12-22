@@ -18,6 +18,7 @@
 #include <QFile>
 #include <QTextStream>
 #include "settings.h"
+#include "utils.h"
 
 class SystemInfoDialog : public QDialog
 {
@@ -119,6 +120,18 @@ private:
                       .arg(QDir::toNativeSeparators(settings.configFilePath()),
                            QDir::toNativeSeparators(qApp->property("dbFile").toString()),
                            QDir::toNativeSeparators(QCoreApplication::applicationFilePath()));
+
+
+        // AppKey source
+        {
+            QString appKeyPath = appKeyFilePath();
+            if (!appKeyPath.isEmpty() && QFile::exists(appKeyPath)) {
+                report += QString("\nAppKey:\n  Sourced from local file (%1).\n")
+                .arg(QDir::toNativeSeparators(appKeyPath));
+            } else {
+                report += "\nAppKey:\n  Sourced from database.\n";
+            }
+        }
 
         // GPG info
         QString gpgPath = QStandardPaths::findExecutable("gpg");

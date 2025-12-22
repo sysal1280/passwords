@@ -7,6 +7,7 @@
 #include "encryptfiledialog.h"
 #include "gpgCheck.h"
 #include "dbutils.h"
+#include "utils.h"
 #include "passwordGenerator.h"
 #include "randomnoisedialog.h"
 #include "categorydialog.h"
@@ -3408,7 +3409,6 @@ void MainWindow::search(int appId)
     QMessageBox::information(this, tr("Search"), tr("Password not found in category."));
 }
 
-
 void MainWindow::initDb()
 {
     // 1. Load or create the appKey (file → DB → generate)
@@ -3428,9 +3428,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
     //
     // 1. Try file-based key first
     //
-    QString keyFilePath =
-        (QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)),
-         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/appkey");
+    QString keyFilePath = appKeyFilePath();
 
     if (QFile::exists(keyFilePath)) {
         QFile keyFile(keyFilePath);
@@ -3444,12 +3442,12 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 qInfo().noquote() << "Using appKey from file:"
                                   << (decoded.length() > 7
                                           ? decoded.left(3) + "..." + decoded.right(4)
-                                          : decoded) << "in" << keyFilePath;
+                                          : decoded)
+                                  << "in" << keyFilePath;
                 return decoded;
             }
         }
-    } else
-    {
+    } else {
         qInfo().noquote() << "No appKey file exists at" << keyFilePath;
     }
 
