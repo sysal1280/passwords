@@ -123,8 +123,9 @@ int main(int argc, char *argv[])
     splash->showMessage(QCoreApplication::translate("main", "Checking installation.."),
                         Qt::AlignBottom | Qt::AlignLeft,Qt::white);
     QApplication::processEvents();
-    Settings settings;
-    settings.createUserDesktopFile();
+
+        Settings settings;
+        settings.createUserDesktopFile();
 
     splash->showMessage(QCoreApplication::translate("main", "Checking GPG.."),
                         Qt::AlignBottom | Qt::AlignLeft, Qt::white);
@@ -254,6 +255,7 @@ Ensure it is accessible in your PATH.
         splash->showMessage(QCoreApplication::translate("main", "Checking keys.."),
                             Qt::AlignBottom | Qt::AlignLeft, Qt::white);
         QApplication::processEvents();
+
         checkGpgKeys(splash);
     }
 

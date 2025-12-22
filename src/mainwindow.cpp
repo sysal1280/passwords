@@ -487,8 +487,6 @@ MainWindow::MainWindow(QWidget *parent)
 
                 menu.exec(globalPos);
             });
-
-
     // ui->treeWidget_2->setStyleSheet(
     //     "QTreeWidget::item { padding-top: 6px; padding-bottom: 6px; }"
     //     );

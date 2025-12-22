@@ -80,17 +80,17 @@ static QStringList checkKeysWithGpg(const QStringList &keys) {
 void checkGpgKeys(QWidget* parent)
 {
     Settings settings;
-    QString dbFile = settings.getDefaultDbPath(parent);
-    if (!QFileInfo::exists(dbFile))
-    {
-        qWarning().noquote() << Q_FUNC_INFO  << "skipping GPG keys check. There is no database.";
+    const QString dbFile = settings.getDefaultDbPath(parent);
+    if (!QFileInfo::exists(dbFile)) {
+        qWarning().noquote() << Q_FUNC_INFO
+                             << "skipping GPG keys check. There is no database.";
         return;
     }
 
-    const QString connNameRead = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QStringList keys;
 
-    // Read keys
+    // Read keys (separate scope so db and query die before removeDatabase)
+    const QString connNameRead = QUuid::createUuid().toString(QUuid::WithoutBraces);
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connNameRead);
         db.setDatabaseName(dbFile);
@@ -105,53 +105,73 @@ void checkGpgKeys(QWidget* parent)
         if (!select.exec("SELECT key FROM keys")) {
             qWarning().noquote() << "gpgCheck Error:" << select.lastError().text();
             db.close();
+            // db and select will be destroyed at end of scope
             QSqlDatabase::removeDatabase(connNameRead);
             return;
         }
 
-        while (select.next())
-        {
-            keys << DataObfuscator::deobfuscate(select.value(0).toString(),qApp->property("appKey").toByteArray());
-            qInfo().noquote() << "Checking Key:" << DataObfuscator::deobfuscate(select.value(0).toString(),qApp->property("appKey").toByteArray());
+        const QByteArray appKey = qApp->property("appKey").toByteArray();
+
+        while (select.next()) {
+            const QString obfuscated = select.value(0).toString();
+            const QString key = DataObfuscator::deobfuscate(obfuscated, appKey);
+            keys << key;
+            qInfo().noquote() << "Checking Key:" << key;
         }
 
         db.close();
     }
+    // All objects using this connection are now destroyed
     QSqlDatabase::removeDatabase(connNameRead);
 
-    #ifdef Q_OS_WIN
-        if (!keys.isEmpty()) {
-            warmupGpg(keys.first(), parent);
-        }
-    #endif
+#ifdef Q_OS_WIN
+    if (!keys.isEmpty()) {
+        warmupGpg(keys.first(), parent);
+    }
+#endif
 
     // Async GPG check
     auto *watcher = new QFutureWatcher<QStringList>(parent);
-    QObject::connect(watcher, &QFutureWatcher<QStringList>::finished, parent,
-                     [parent, watcher, &settings]() {
-                         QStringList invalidKeys = watcher->result();
 
-                         if (!invalidKeys.isEmpty()) {
-                             const QString connNameWrite = QUuid::createUuid().toString();
-                             {
-                                 QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connNameWrite);
-                                 db.setDatabaseName(settings.getDefaultDbPath(parent));
-                                 if (db.open()) {
-                                     for (const auto &keyId : std::as_const(invalidKeys)) {
-                                         QSqlQuery remove(db);
-                                         remove.prepare("DELETE FROM keys WHERE key = :key");
-                                         remove.bindValue(":key", DataObfuscator::obfuscate(keyId,qApp->property("appKey").toByteArray()));
-                                         if (!remove.exec())
-                                             qWarning().noquote() << Q_FUNC_INFO  << "Failed to remove key:" << keyId << remove.lastError().text();
-                                     }
-                                     db.close();
-                                 }
-                             }
-                             QSqlDatabase::removeDatabase(connNameWrite);
-                         }
+    // We only need the DB path in the async continuation, not Settings or parent
+    const QString dbFileForWrite = dbFile;
 
-                         watcher->deleteLater();
-                     });
+    QObject::connect(
+        watcher,
+        &QFutureWatcher<QStringList>::finished,
+        watcher, // use watcher as the receiver to avoid depending on 'parent'
+        [watcher, dbFileForWrite]() {
+            const QStringList invalidKeys = watcher->result();
+
+            if (!invalidKeys.isEmpty()) {
+                const QString connNameWrite = QUuid::createUuid().toString(QUuid::WithoutBraces);
+                {
+                    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connNameWrite);
+                    db.setDatabaseName(dbFileForWrite);
+                    if (db.open()) {
+                        const QByteArray appKey = qApp->property("appKey").toByteArray();
+                        for (const auto &keyId : std::as_const(invalidKeys)) {
+                            QSqlQuery remove(db);
+                            remove.prepare("DELETE FROM keys WHERE key = :key");
+                            remove.bindValue(
+                                ":key",
+                                DataObfuscator::obfuscate(keyId, appKey)
+                                );
+                            if (!remove.exec()) {
+                                qWarning().noquote() << Q_FUNC_INFO
+                                                     << "Failed to remove key:" << keyId
+                                                     << remove.lastError().text();
+                            }
+                        }
+                        db.close();
+                    }
+                }
+                // db and queries destroyed before removing the connection
+                QSqlDatabase::removeDatabase(connNameWrite);
+            }
+
+            watcher->deleteLater();
+        });
 
     watcher->setFuture(QtConcurrent::run(checkKeysWithGpg, keys));
 }
