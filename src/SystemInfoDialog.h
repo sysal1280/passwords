@@ -123,7 +123,6 @@ private:
 
 
         // AppKey source
-        {
             QString appKeyPath = appKeyFilePath();
             if (!appKeyPath.isEmpty() && QFile::exists(appKeyPath)) {
                 report += QString("\nAppKey:\n  Sourced from local file (%1).\n")
@@ -131,7 +130,6 @@ private:
             } else {
                 report += "\nAppKey:\n  Sourced from database.\n";
             }
-        }
 
         // GPG info
         QString gpgPath = QStandardPaths::findExecutable("gpg");
