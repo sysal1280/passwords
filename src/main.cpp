@@ -63,10 +63,9 @@ int main(int argc, char *argv[])
     /*
      * init settings for default config file
      */
-    {
-        Settings settings;
-        showDebugMessages = settings.getDebugMode();
-    }
+    Settings settings;
+    showDebugMessages = settings.getDebugMode();
+
     qInstallMessageHandler(pwdMsgHandler);
     {
         Settings settings;
@@ -123,9 +122,7 @@ int main(int argc, char *argv[])
     splash->showMessage(QCoreApplication::translate("main", "Checking installation.."),
                         Qt::AlignBottom | Qt::AlignLeft,Qt::white);
     QApplication::processEvents();
-
-        Settings settings;
-        settings.createUserDesktopFile();
+    settings.createUserDesktopFile();
 
     splash->showMessage(QCoreApplication::translate("main", "Checking GPG.."),
                         Qt::AlignBottom | Qt::AlignLeft, Qt::white);
