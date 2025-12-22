@@ -2155,12 +2155,7 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
     QVBoxLayout *layout = new QVBoxLayout(dlg);
 
     // Instruction label
-    QLabel *instruction = new QLabel(tr(
-                                         "This view shows the password audit log.\n"
-                                         "It records actions performed, by which user and host, and when.\n"
-                                         "Note: application_id is used internally as a key and is not displayed."),
-                                     dlg
-                                     );
+    QLabel *instruction = new QLabel(tr( "Audit Log:"),dlg);
     instruction->setWordWrap(true);
     layout->addWidget(instruction);
 
