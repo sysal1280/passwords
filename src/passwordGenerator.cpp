@@ -65,7 +65,7 @@ QString passwordGenerator::generatePassword(const QStringList &wordList,
 
 // Pick a random separator character
 QChar passwordGenerator::randomSeparator() {
-    const QString separators = "-_:.!@#";
+    const QString separators = "-_:.!@$^&*";
     int sepIndex = QRandomGenerator::global()->bounded(separators.size());
     return separators.at(sepIndex);
 }
