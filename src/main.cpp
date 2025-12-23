@@ -18,6 +18,7 @@
  */
 
 #include "mainwindow.h"
+#include "debugutils.h"
 #include "gpgCheck.h"
 #include "logindialog.h"
 #include "settings.h"
@@ -46,6 +47,9 @@ static bool showDebugMessages = false;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    if (isDebuggerAttached()) {
+        return 0;
+    }
 
     /*
      * Set QApplication settings

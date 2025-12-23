@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "watermarkedtreewidget.h"
 #include "droplabel.h"
+#include "debugutils.h"
 #include "passwordDialog.h"
 #include "settings.h"
 #include "encryptfiledialog.h"
@@ -70,6 +71,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    startDebuggerMonitor(this, 10000);
 
 #ifdef Q_OS_WIN
     userName = QString::fromLocal8Bit(qgetenv("USERNAME"));
