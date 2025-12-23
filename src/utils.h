@@ -8,6 +8,9 @@
 #include <QStandardPaths>
 #include <QDialogButtonBox>
 #include <QPushButton>
+#include <QTimer>
+#include <QLabel>
+#include <QStatusBar>
 
 inline QString loadWordlistResource(const QWidget *parent, const char *caller)
 {
@@ -59,5 +62,32 @@ inline bool hasHelp(QPushButton *helpButton = nullptr)
 
     return ok;
 }
+
+inline void setupDebugWarnings(QWidget *parent, QStatusBar *statusBar)
+{
+#ifdef APP_DEBUG_BUILD
+    // Permanent status bar warning
+    QLabel *debugWarning = new QLabel("📛 WARNING: Debug version — Do NOT use for real passwords 📛");
+    debugWarning->setStyleSheet("color: red; font-weight: bold;");
+    statusBar->addPermanentWidget(debugWarning);
+
+    // Repeating messagebox every 5 minutes
+    QTimer *debugTimer = new QTimer(parent);
+    QObject::connect(debugTimer, &QTimer::timeout, parent, []() {
+        QMessageBox::critical(
+            nullptr,
+            QApplication::applicationName(),
+            "This is a DEBUG build.\n\n"
+            "It is not safe for production use. It is intended for testing purposes only. "
+            "Do not store real passwords or other proper data in this database.\n\nIf this program has been installed for you, uninstall it immediately."
+            );
+    });
+    debugTimer->start(5 * 60 * 1000); // 5 minutes
+#else
+    Q_UNUSED(parent)
+    Q_UNUSED(statusBar)
+#endif
+}
+
 
 #endif // UTILS_H

@@ -510,6 +510,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->actionDonate->setEnabled(false);
     }
 
+    setupDebugWarnings(this, ui->statusbar);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -777,7 +778,17 @@ void MainWindow::showAboutDlg()
     mainLayout->addWidget(nameLabel);
 
     // --- Version ---
-    QLabel *versionLabel = new QLabel(QApplication::applicationVersion(), &dlg);
+    QString versionText = QApplication::applicationVersion();
+
+    #ifdef APP_DEBUG_BUILD
+        versionText += " (Debug)";
+    #endif
+
+    #ifdef APP_RELEASE_BUILD
+        versionText += " (Release)";
+    #endif
+
+    QLabel *versionLabel = new QLabel(versionText, &dlg);
     versionLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(versionLabel);
 

@@ -38,6 +38,11 @@ qt_add_executable(password WIN32
     resources/appicon.rc
 )
 
+target_compile_definitions(password PRIVATE
+    $<$<CONFIG:Debug>:APP_DEBUG_BUILD>
+    $<$<CONFIG:Release>:APP_RELEASE_BUILD>
+)
+
 target_link_libraries(password PRIVATE
     Qt6::Widgets
     Qt6::Sql
