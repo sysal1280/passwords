@@ -221,7 +221,7 @@ bool Settings::getKillGpgAgent()
         return false;
 
     settings->beginGroup("Passwords");
-    QString val = settings->value("KillGGPGAgent", "yes")
+    QString val = settings->value("KillGPGAgent", "yes")
                       .toString()
                       .trimmed()
                       .toLower();
