@@ -85,9 +85,15 @@ if(NOT MSVC)
         $<$<CONFIG:Release>:-D_FORTIFY_SOURCE=2>
     )
 
-    # Linker hardening + strip symbols
+    # Linux-only linker hardening
+    if(UNIX AND NOT APPLE)
+        target_link_options(password PRIVATE
+            $<$<CONFIG:Release>:-Wl,-z,relro,-z,now>
+        )
+    endif()
+
+    # Strip symbols (works on MinGW too)
     target_link_options(password PRIVATE
-        $<$<CONFIG:Release>:-Wl,-z,relro,-z,now>
         $<$<CONFIG:Release>:-s>
     )
 endif()
