@@ -4426,6 +4426,15 @@ void MainWindow::moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targ
 
 void MainWindow::importApplicationsFromFile(const QString &filePath)
 {
+    struct AuditEvent {
+        int appId;
+        QString userName;
+        QString hostName;
+        QString action;
+    };
+
+    QVector<AuditEvent> auditEvents;
+
     // 1) Validate file
     QFileInfo fi(filePath);
     if (!fi.exists() || fi.suffix().toLower() != "json") {
@@ -4708,11 +4717,12 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
 
             int appId = query.lastInsertId().toInt();
 
-            // --- Audit row ---
-            insertAuditRow(appId,
-                           userName,
-                           QSysInfo::machineHostName(),
-                           "CREATED");
+            auditEvents.append({
+                appId,
+                userName,
+                QSysInfo::machineHostName(),
+                "CREATED"
+            });
 
             // --- Tokenize ---
             static const QRegularExpression whitespaceRe("\\s+");
@@ -4745,6 +4755,12 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
                                   tr("Commit failed:\n%1").arg(db.lastError().text()));
             db.rollback();
         } else {
+
+            // Insert audit rows AFTER commit to avoid SQLite writer lock
+            for (const AuditEvent &ev : auditEvents) {
+                insertAuditRow(ev.appId, ev.userName, ev.hostName, ev.action);
+            }
+
             QMessageBox msgBox(this);
             msgBox.setIcon(QMessageBox::Information);
             msgBox.setWindowTitle(tr("Import Complete"));
