@@ -16,9 +16,6 @@
 
 namespace RandomNoiseDialog {
 
-// ------------------------------------------------------------
-// Generate random bytes
-// ------------------------------------------------------------
 static QByteArray generateRandomBytes(int byteCount)
 {
     QByteArray buffer(byteCount, Qt::Uninitialized);
@@ -26,37 +23,39 @@ static QByteArray generateRandomBytes(int byteCount)
     return buffer;
 }
 
-// ------------------------------------------------------------
-// Convert bytes to selected format
-// ------------------------------------------------------------
 static QString convertBytes(const QByteArray &bytes, int mode)
 {
-    // mode: 0 = Base64, 1 = Hex, 2 = ASCII printable
     if (mode == 0)
         return bytes.toBase64();
 
     if (mode == 1)
         return bytes.toHex();
 
-    // ASCII printable
+    // ASCII printable (unbiased)
     static const char charset[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
         "0123456789"
         "!@#$%^&*()-_=+[]{};:,.<>/?";
 
+    const int charsetSize = sizeof(charset) - 1;
+    const int limit = 256 - (256 % charsetSize);
+
     QString out;
     out.reserve(bytes.size());
 
     for (unsigned char b : bytes)
-        out.append(charset[b % (sizeof(charset) - 1)]);
+    {
+        while (b >= limit) {
+            // regenerate a byte until it's in range
+            b = QRandomGenerator::system()->generate() & 0xFF;
+        }
+        out.append(charset[b % charsetSize]);
+    }
 
     return out;
 }
 
-// ------------------------------------------------------------
-// Entropy estimation
-// ------------------------------------------------------------
 static double estimateEntropyBits(const QByteArray &data)
 {
     if (data.isEmpty())
@@ -77,9 +76,6 @@ static double estimateEntropyBits(const QByteArray &data)
     return -std::log2(pMax);
 }
 
-// ------------------------------------------------------------
-// Main dialog
-// ------------------------------------------------------------
 void showRandomNoiseGenerator(QWidget *parent, const QString &title)
 {
     QDialog dlg(parent);
@@ -140,9 +136,6 @@ void showRandomNoiseGenerator(QWidget *parent, const QString &title)
 
     layout->addLayout(buttonLayout);
 
-    // ------------------------------------------------------------
-    // Live update function
-    // ------------------------------------------------------------
     auto regenerate = [&]() {
         int len = lenSpin->value();
         int mode = formatCombo->currentIndex();
