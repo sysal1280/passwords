@@ -27,7 +27,7 @@
    <item row="1" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -172,14 +172,7 @@
           <string>Password Access</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="checkBoxKillGPGAgent">
-            <property name="text">
-             <string>Require GPG master password everytime</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
              <widget class="QLabel" name="label_4">
@@ -199,6 +192,20 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="checkBoxKillGPGAgent">
+            <property name="text">
+             <string>Clear GPG Passphrase Cache always</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="checkBoxKillGPGAgentExit">
+            <property name="text">
+             <string>Clear GPG Passphrase Cache on exit</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

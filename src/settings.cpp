@@ -215,13 +215,13 @@ bool Settings::getDragDropPrompt()
     return truthy.contains(val);
 }
 
-bool Settings::getKillGpgAgent()
+bool Settings::getKillGpgAgent(const QString &key)
 {
     if (!settings)
         return false;
 
     settings->beginGroup("Passwords");
-    QString val = settings->value("KillGPGAgent", "yes")
+    QString val = settings->value(key, "yes")
                       .toString()
                       .trimmed()
                       .toLower();

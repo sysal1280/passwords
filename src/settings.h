@@ -31,7 +31,7 @@ public:
      void setGeneratedPasswordLength(int i);
      QString getDefaultDbPath(QWidget* parent);
      bool getBackupDatabase();
-     bool getKillGpgAgent();
+     bool getKillGpgAgent(const QString &key = "KillGPGAgent");
      bool getLoginPreference();
      bool getAskClose();
      void saveMainWindowState(QMainWindow *window);

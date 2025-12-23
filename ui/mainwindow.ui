@@ -111,6 +111,7 @@
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="menuReports"/>
+    <addaction name="actionClear_GPG_Passphrase_Cache"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -426,6 +427,14 @@
    </property>
    <property name="shortcut">
     <string>F6</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionClear_GPG_Passphrase_Cache">
+   <property name="text">
+    <string>Clear GPG Passphrase Cache</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

@@ -125,7 +125,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     widgetMap.insert("Help/Port", ui->spinBoxHelpPort);
     widgetMap.insert("Help/CloseServer", ui->checkBoxCloseHelpServer);
     widgetMap.insert("General/EchoMode", ui->comboBoxEchoMode);
-
+    widgetMap.insert("Passwords/KillGPGAgentOnExit", ui->checkBoxKillGPGAgentExit);
 
 
     /*

@@ -152,6 +152,7 @@ MainWindow::MainWindow(QWidget *parent)
         { ui->actionExported_Passwords,    ":/menus/glyphs/table_view_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionLast_Edited,           ":/menus/glyphs/table_view_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionRandom_Noise,          ":/menus/glyphs/grain_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"},
+        { ui->actionClear_GPG_Passphrase_Cache, ":/menus/glyphs/lock_reset_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"},
         { ui->actionOnline_Documentation,  ":/menus/glyphs/help_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" }
     };
 
@@ -296,6 +297,14 @@ MainWindow::MainWindow(QWidget *parent)
                 }
             });
 
+    connect(ui->actionClear_GPG_Passphrase_Cache, &QAction::triggered,
+            this, [this]() {
+                bool ok = killGpgAgent();
+                if (ok)
+                    QMessageBox::information(this, "GPG Agent", "Passphrase cache cleared.");
+                else
+                    QMessageBox::warning(this, "GPG Agent", "Failed to clear passphrase cache.");
+            });
 
     // Line edit search
     connect(ui->lineEdit, &QLineEdit::returnPressed,
@@ -528,6 +537,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
         {
             qInfo().noquote() << "Could not find a help server to close.";
         }
+    }
+
+    if (settings.getKillGpgAgent("KillGPGAgentOnExit"))
+    {
+        qInfo().noquote() << "Killing GPG Agent:" << killGpgAgent();
     }
 
     if (!qApp->property("skipSave").toBool()) {
