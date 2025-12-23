@@ -2,6 +2,7 @@
 #include <QtGlobal>
 #include <QTimer>
 #include <QCoreApplication>
+#include <QDebug>
 
 #if defined(Q_OS_WIN)
 #include <windows.h>
@@ -55,6 +56,7 @@ void startDebuggerMonitor(QObject *parent, int intervalMs)
     QTimer *timer = new QTimer(parent);
 
     QObject::connect(timer, &QTimer::timeout, []() {
+        qDebug() << Q_FUNC_INFO;
         if (isDebuggerAttached()) {
             qWarning("Debugger detected during runtime — exiting.");
             QCoreApplication::exit(0);

@@ -13,18 +13,6 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/ui)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Build type
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
-endif()
-
-# Harden Release builds
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_compile_options(-fvisibility=hidden)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
-    add_definitions(-DQT_NO_DEBUG_OUTPUT)
-endif()
-
 # Qt
 find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools Sql)
 
@@ -62,6 +50,61 @@ target_include_directories(password PRIVATE
 
 qt_finalize_executable(password)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_definitions(password PRIVATE QT_NO_DEBUG_OUTPUT)
+#
+# ============================
+#   RELEASE HARDENING (ALL)
+# ============================
+#
+
+# Remove Qt debug output in Release
+target_compile_definitions(password PRIVATE
+    $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
+)
+
+# Hide internal symbols (GCC/Clang/MinGW)
+target_compile_options(password PRIVATE
+    $<$<CONFIG:Release>:-fvisibility=hidden>
+)
+
+#
+# ============================
+#   GCC / CLANG / MINGW
+# ============================
+#
+if(NOT MSVC)
+    message(STATUS "GCC/Clang/MinGW hardening enabled")
+
+    # Stack protection + fortified libc
+    target_compile_options(password PRIVATE
+        $<$<CONFIG:Release>:-fstack-protector-strong>
+        $<$<CONFIG:Release>:-D_FORTIFY_SOURCE=2>
+    )
+
+    # Linker hardening + strip symbols
+    target_link_options(password PRIVATE
+        $<$<CONFIG:Release>:-Wl,-z,relro,-z,now>
+        $<$<CONFIG:Release>:-s>
+    )
+endif()
+
+#
+# ============================
+#   MSVC (Visual Studio)
+# ============================
+#
+if(MSVC)
+    message(STATUS "MSVC hardening enabled")
+
+    # Security flags
+    target_compile_options(password PRIVATE
+        $<$<CONFIG:Release>:/GS>
+        $<$<CONFIG:Release>:/guard:cf>
+    )
+
+    # Remove debug info + optimize + fold identical functions
+    target_link_options(password PRIVATE
+        $<$<CONFIG:Release>:/OPT:REF>
+        $<$<CONFIG:Release>:/OPT:ICF>
+        $<$<CONFIG:Release>:/DEBUG:NONE>
+    )
 endif()
