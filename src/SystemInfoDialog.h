@@ -75,6 +75,26 @@ private:
         report += QString(tr("Architecture: %1\n"))
                       .arg(QSysInfo::currentCpuArchitecture());
 
+        // Compiler
+        QString compiler;
+#if defined(__clang__)
+        compiler = QString("Clang %1.%2.%3")
+                       .arg(__clang_major__)
+                       .arg(__clang_minor__)
+                       .arg(__clang_patchlevel__);
+#elif defined(__GNUC__)
+        compiler = QString("GCC %1.%2.%3")
+                       .arg(__GNUC__)
+                       .arg(__GNUC_MINOR__)
+                       .arg(__GNUC_PATCHLEVEL__);
+#elif defined(_MSC_VER)
+        compiler = QString("MSVC %1").arg(_MSC_VER);
+#else
+        compiler = "Unknown compiler";
+#endif
+
+        report += QString("Compiler: %1\n\n").arg(compiler);
+
         // Environment variables
         report += tr("Environment:\n");
         auto env = QProcessEnvironment::systemEnvironment();
@@ -115,20 +135,20 @@ private:
 
         // Locations of program, conf and database
         report += QString(tr("  Configuration file: %1\n"
-                          "  Database file: %2\n"
+                             "  Database file: %2\n"
                              "  Executable file: %3\n"))
                       .arg(QDir::toNativeSeparators(settings.configFilePath()),
                            QDir::toNativeSeparators(qApp->property("dbFile").toString()),
                            QDir::toNativeSeparators(QCoreApplication::applicationFilePath()));
 
         // AppKey source
-            QString appKeyPath = appKeyFilePath();
-            if (!appKeyPath.isEmpty() && QFile::exists(appKeyPath)) {
-                report += QString("\nAppKey:\n  Sourced from local file (%1)\n")
-                .arg(QDir::toNativeSeparators(appKeyPath));
-            } else {
-                report += "\nAppKey:\n  Sourced from database\n";
-            }
+        QString appKeyPath = appKeyFilePath();
+        if (!appKeyPath.isEmpty() && QFile::exists(appKeyPath)) {
+            report += QString("\nAppKey:\n  Sourced from local file (%1)\n")
+            .arg(QDir::toNativeSeparators(appKeyPath));
+        } else {
+            report += "\nAppKey:\n  Sourced from database\n";
+        }
 
         // GPG info
         QString gpgPath = QStandardPaths::findExecutable("gpg");

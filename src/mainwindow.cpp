@@ -799,6 +799,7 @@ void MainWindow::showAboutDlg()
     versionText += QString(" (%1)").arg(BUILD_TIMESTAMP);
 
     QLabel *versionLabel = new QLabel(versionText, &dlg);
+    versionLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
     versionLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(versionLabel);
 
