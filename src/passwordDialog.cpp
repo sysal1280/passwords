@@ -24,6 +24,9 @@
 #include <QScrollArea>
 #include <QScreen>
 #include <QtMath>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
+#include <QParallelAnimationGroup>
 
 namespace PasswordDialog {
 
@@ -111,6 +114,7 @@ PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
     int dialogWidth = int(screenWidth * percent);
 
     resize(dialogWidth, 300);
+
 }
 
 // ------------------------------------------------------------

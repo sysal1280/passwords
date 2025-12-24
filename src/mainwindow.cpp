@@ -1308,6 +1308,14 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
                                                       : settings.getEchoMode());
                 });
 
+        QAction *inspectPasswordAction = new QAction(tr("Inspect Password"), passwordEdit);
+        passwordEdit->addAction(inspectPasswordAction, QLineEdit::TrailingPosition);
+
+        connect(inspectPasswordAction, &QAction::triggered,
+                this, [this, passwordEdit]() {
+                    PasswordDialog::PasswordInspectorDialog dlg(passwordEdit->text(), this);
+                    dlg.exec();
+                });
 
         QAction *copyPasswordAction = new QAction(tr("Copy Password"), passwordEdit);
         copyPasswordAction->setStatusTip("Password ony remains in clipboard for 15 seconds");
