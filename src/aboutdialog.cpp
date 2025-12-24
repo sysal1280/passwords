@@ -185,20 +185,10 @@ QLayout* AboutDialog::createCredits(QWidget *parent)
         "Licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPLv3 License</a> or later."));
 
     layout->addWidget(makePlain(
-        "This program is distributed in the hope that it will be useful,\n"
-        "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n"
-        "GNU General Public License for more details."
+        "This program is distributed in the hope that it will be useful, but it is provided without any warranty; "
+        "including without the implied warranties of merchantability or fitness for a particular purpose. "
+        "For full details, see the GNU General Public License."
         ));
-
-
-
-    // GPL logo (optional)
-    // QLabel *gpl = new QLabel(parent);
-    // QPixmap logo(":/pngs/gplv3-with-text-136x68.png");
-    // gpl->setPixmap(logo.scaledToWidth(136, Qt::SmoothTransformation));
-    // gpl->setAlignment(Qt::AlignCenter);
-    // layout->addWidget(gpl);
 
     return layout;
 }
