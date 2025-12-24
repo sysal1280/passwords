@@ -64,6 +64,7 @@ PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
     QFont big; big.setPointSize(20); big.setBold(true);
     pwLabel->setFont(big);
     pwLabel->setAlignment(Qt::AlignCenter);
+    pwLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
     main->addWidget(pwLabel);
 
     // Scroll area for tiles
