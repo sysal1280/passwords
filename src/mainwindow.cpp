@@ -4944,7 +4944,7 @@ void MainWindow::addSearchTerms(QTreeWidgetItem *item)
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    //ESC Key
+    // ESC Key
     if (event->key() == Qt::Key_Escape) {
         if (openedCredentialID == -1) {
             if (settings.getAskClose()) {
@@ -4959,7 +4959,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         }
     }
 
-    //CTRL+F
+    // CTRL+F
     if (event->key() == Qt::Key_F && event->modifiers() == Qt::ControlModifier)
     {
         ui->lineEdit->setFocus();
@@ -4967,9 +4967,16 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         return;
     }
 
+    // F2 — open About dialog
+    if (event->key() == Qt::Key_F2)
+    {
+        newPassword();
+    }
+
     // Pass unhandled keys to base class
     QMainWindow::keyPressEvent(event);
 }
+
 
 void MainWindow::launchHelperProcess(const QString &page)
 {
