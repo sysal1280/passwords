@@ -2,6 +2,20 @@ cmake_minimum_required(VERSION 3.16)
 
 project(password VERSION 0.1 LANGUAGES CXX)
 
+execute_process(
+    COMMAND git rev-parse --short HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/src/gitversion.h.in
+    ${CMAKE_BINARY_DIR}/gitversion.h
+    @ONLY
+)
+
+
 # Qt auto features
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -52,6 +66,8 @@ target_include_directories(password PRIVATE
     src
     ui
 )
+
+target_include_directories(password PRIVATE ${CMAKE_BINARY_DIR})
 
 qt_finalize_executable(password)
 

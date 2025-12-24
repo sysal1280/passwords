@@ -9,6 +9,7 @@
 #include "gpgCheck.h"
 #include "dbutils.h"
 #include "utils.h"
+#include "gitversion.h"
 #include "passwordGenerator.h"
 #include "randomnoisedialog.h"
 #include "categorydialog.h"
@@ -71,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    qDebug() << "Commit:" << GIT_COMMIT_HASH;
 
     startDebuggerMonitor(this, 10000);
 
