@@ -225,6 +225,9 @@
    <property name="text">
     <string>Open Password</string>
    </property>
+   <property name="shortcut">
+    <string>Return</string>
+   </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
