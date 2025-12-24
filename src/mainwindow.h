@@ -116,7 +116,6 @@ private:
     void createCategory(const QString& categoryName = QString());
     void importApplicationsFromFile(const QString &filePath);
     void renameCategory();
-    void showAboutDlg();
     //QString appKeyFilePath() const;
 
     QByteArray loadOrCreateAppKey();

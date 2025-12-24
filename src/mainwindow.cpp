@@ -3,6 +3,7 @@
 #include "watermarkedtreewidget.h"
 #include "droplabel.h"
 #include "debugutils.h"
+#include "aboutdialog.h"
 #include "passwordDialog.h"
 #include "settings.h"
 #include "encryptfiledialog.h"
@@ -345,8 +346,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionRename, &QAction::triggered,
             this, &MainWindow::renameCategory);
 
-    connect(ui->actionAbout, &QAction::triggered,
-            this, &MainWindow::showAboutDlg);
+    connect(ui->actionAbout, &QAction::triggered, this, [this] {
+        AboutDialog dlg(this);
+        dlg.exec();
+    });
 
     connect(ui->actionClose, &QAction::triggered,
             this, &MainWindow::close);
@@ -740,171 +743,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-
-void MainWindow::showAboutDlg()
-{
-    QDialog dlg(this);
-    dlg.setWindowTitle(tr("About %1").arg(QCoreApplication::applicationName()));
-    dlg.setModal(true);
-    dlg.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
-
-    QVBoxLayout *mainLayout = new QVBoxLayout(&dlg);
-
-    // --- Icon ---
-    QLabel *iconLabel = new QLabel(&dlg);
-    QPixmap pix(":/password.png");
-    iconLabel->setPixmap(pix.scaled(96, 96, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    iconLabel->setAlignment(Qt::AlignCenter);
-    mainLayout->addWidget(iconLabel);
-
-    // Apply an opacity effect
-    QGraphicsOpacityEffect *opacityEffect = new QGraphicsOpacityEffect(iconLabel);
-    iconLabel->setGraphicsEffect(opacityEffect);
-
-    QPropertyAnimation *fadeIn = new QPropertyAnimation(opacityEffect, "opacity");
-    fadeIn->setDuration(1000);
-    fadeIn->setStartValue(0.0);
-    fadeIn->setEndValue(1.0);
-    fadeIn->setEasingCurve(QEasingCurve::InOutQuad);
-    fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
-
-    // --- Application name ---
-    QLabel *nameLabel = new QLabel(QCoreApplication::applicationName(), &dlg);
-    QFont nameFont;
-    nameFont.setPointSize(14);
-    nameFont.setBold(true);
-    nameLabel->setFont(nameFont);
-    nameLabel->setAlignment(Qt::AlignCenter);
-    mainLayout->addWidget(nameLabel);
-
-    // --- Version ---
-    QString versionText = QApplication::applicationVersion();
-
-    // Build type
-    #ifdef APP_DEBUG_BUILD
-        versionText += "-debug";
-    #endif
-
-    #ifdef APP_RELEASE_BUILD
-        versionText += "-release";
-    #endif
-
-    // +commit.branch.dirty
-    versionText += QString("+%1.%2%3")
-        .arg(GIT_COMMIT_HASH)
-        .arg(GIT_BRANCH)
-        .arg(GIT_DIRTY);
-
-    // Build timestamp
-    versionText += QString(" (%1)").arg(BUILD_TIMESTAMP);
-
-    QLabel *versionLabel = new QLabel(versionText, &dlg);
-    versionLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    versionLabel->setAlignment(Qt::AlignCenter);
-    mainLayout->addWidget(versionLabel);
-
-    // --- Website link (URL exempt from translation) ---
-    QLabel *websiteLabel = new QLabel(
-        tr("Website: %1").arg(QStringLiteral("<a href=\"https://github.com/sysal1280/passwords\">https://github.com/sysal1280/passwords</a>")),
-        &dlg);
-    websiteLabel->setTextFormat(Qt::RichText);
-    websiteLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    websiteLabel->setOpenExternalLinks(true);
-    websiteLabel->setAlignment(Qt::AlignCenter);
-    mainLayout->addWidget(websiteLabel);
-
-    // --- Copyright ---
-    QFont smallPrintFont;
-    smallPrintFont.setPointSize(8);
-    smallPrintFont.setBold(false);
-
-    QLabel *copyrightLabel = new QLabel(
-        tr("Copyright © 2026 %1.<br/>").arg(QStringLiteral("Adam Lanzafame")),
-        &dlg);
-    copyrightLabel->setAlignment(Qt::AlignCenter);
-    copyrightLabel->setFont(smallPrintFont);
-    copyrightLabel->setTextFormat(Qt::RichText);
-    copyrightLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-
-    // --- Word Lists ---
-    QLabel *wordListLabel = new QLabel(
-        tr("Wordlists from Orchard Street Wordlists by %1.")
-            .arg(QStringLiteral("<a href=\"https://www.samschlinkert.com/\">Sam Schlinkert</a>")),
-        &dlg);
-    wordListLabel->setAlignment(Qt::AlignCenter);
-    wordListLabel->setFont(smallPrintFont);
-    wordListLabel->setTextFormat(Qt::RichText);
-    wordListLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    wordListLabel->setOpenExternalLinks(true);
-
-    // --- Material Symbols ---
-    QLabel *materialSymbolsLabel = new QLabel(
-        tr("Material Symbols from Google Fonts<br/>"
-           "Licensed under the %1, Version 2.0.")
-            .arg(QStringLiteral("<a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License</a>")),
-        &dlg);
-    materialSymbolsLabel->setAlignment(Qt::AlignCenter);
-    materialSymbolsLabel->setFont(smallPrintFont);
-    materialSymbolsLabel->setTextFormat(Qt::RichText);
-    materialSymbolsLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    materialSymbolsLabel->setOpenExternalLinks(true);
-
-    // --- Password icon credit ---
-    QLabel *iconLabelText = new QLabel(
-        tr("Passwords icon created by %1.")
-            .arg(QStringLiteral("<a href=\"https://www.flaticon.com/free-icons/password\">Iconic Panda - Flaticon</a>")),
-        &dlg);
-    iconLabelText->setAlignment(Qt::AlignCenter);
-    iconLabelText->setFont(smallPrintFont);
-    iconLabelText->setTextFormat(Qt::RichText);
-    iconLabelText->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    iconLabelText->setOpenExternalLinks(true);
-
-    // --- License disclaimer ---
-    QLabel *licenseLabel = new QLabel(
-        tr("This program comes with absolutely no warranty.<br>"
-           "See the %1 or later for details.")
-            .arg(QStringLiteral("<a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU General Public License, version 3</a>")),
-        &dlg);
-    licenseLabel->setWordWrap(true);
-    licenseLabel->setAlignment(Qt::AlignCenter);
-    licenseLabel->setTextFormat(Qt::RichText);
-    licenseLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    licenseLabel->setOpenExternalLinks(true);
-    licenseLabel->setFont(smallPrintFont);
-
-    // --- GPLv3 logo ---
-    QLabel *gplLogoLabel = new QLabel(&dlg);
-    QPixmap gplLogo(":/pngs/gplv3-with-text-136x68.png");
-    gplLogoLabel->setPixmap(gplLogo.scaledToWidth(136, Qt::SmoothTransformation));
-    gplLogoLabel->setAlignment(Qt::AlignCenter);
-
-    // --- Credits layout ---
-    QVBoxLayout *creditsLayout = new QVBoxLayout;
-    creditsLayout->setSpacing(6);
-    creditsLayout->setContentsMargins(0,0,0,0);
-
-    QFrame *line = new QFrame(&dlg);
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
-
-    creditsLayout->addWidget(copyrightLabel);
-    creditsLayout->addWidget(wordListLabel);
-    creditsLayout->addWidget(materialSymbolsLabel);
-    creditsLayout->addWidget(iconLabelText);
-    creditsLayout->addSpacing(4);
-    creditsLayout->addWidget(line);
-    creditsLayout->addSpacing(4);
-    creditsLayout->addWidget(licenseLabel);
-    creditsLayout->addWidget(gplLogoLabel);
-
-    mainLayout->addLayout(creditsLayout);
-
-     dlg.resize(400, 440);
-    dlg.setFixedSize(dlg.size());
-    dlg.exec();
-}
-
 
 void MainWindow::newPassword()
 {
