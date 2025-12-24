@@ -31,7 +31,7 @@ AboutDialog::AboutDialog(QWidget *parent)
     // Credits (static, no collapsible section)
     main->addLayout(createCredits(this));
 
-    resize(400, 440);
+    resize(400, 410);
     setFixedSize(size());
 }
 
@@ -144,27 +144,31 @@ QLayout* AboutDialog::createCredits(QWidget *parent)
     layout->setSpacing(6);
     layout->setContentsMargins(0,0,0,0);
 
-    QFont small; small.setPointSize(8);
+    QFont small;
+    small.setPointSize(8);
 
-    auto make = [&](const QString &html) {
+    auto makePlain = [&](const QString &text) {
+        QLabel *l = new QLabel(text, parent);
+        l->setAlignment(Qt::AlignCenter);
+        l->setFont(small);
+        l->setWordWrap(true);
+        l->setTextFormat(Qt::PlainText);
+        return l;
+    };
+
+    auto makeLink = [&](const QString &html) {
         QLabel *l = new QLabel(html, parent);
         l->setAlignment(Qt::AlignCenter);
         l->setFont(small);
         l->setTextFormat(Qt::RichText);
         l->setOpenExternalLinks(true);
-        l->setTextInteractionFlags(Qt::TextBrowserInteraction);
         return l;
     };
 
-    layout->addWidget(make(tr("Wordlists from Orchard Street Wordlists by %1.")
-                               .arg("<a href=\"https://www.samschlinkert.com/\">Sam Schlinkert</a>")));
-
-    layout->addWidget(make(tr("Material Symbols from Google Fonts<br/>"
-                              "Licensed under the %1, Version 2.0.")
-                               .arg("<a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License</a>")));
-
-    layout->addWidget(make(tr("Passwords icon created by %1.")
-                               .arg("<a href=\"https://www.flaticon.com/free-icons/password\">Iconic Panda - Flaticon</a>")));
+    // Minimal required attributions (no hyperlinks)
+    layout->addWidget(makePlain("Wordlists by Sam Schlinkert (MIT License)"));
+    layout->addWidget(makePlain("Material Symbols by Google (Apache 2.0 License)"));
+    layout->addWidget(makePlain("Password icon by Iconic Panda (Flaticon)"));
 
     layout->addSpacing(4);
 
@@ -175,15 +179,27 @@ QLayout* AboutDialog::createCredits(QWidget *parent)
 
     layout->addSpacing(4);
 
-    layout->addWidget(make(tr("This program comes with absolutely no warranty.<br>"
-                              "See the %1 or later for details.")
-                               .arg("<a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPLv3</a>")));
+    // GPL notice (friendly wording + clickable link)
+    // GPL notice (friendly wording + clickable link)
+    layout->addWidget(makeLink(
+        "Licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPLv3 License</a> or later."));
 
-    QLabel *gpl = new QLabel(parent);
-    QPixmap logo(":/pngs/gplv3-with-text-136x68.png");
-    gpl->setPixmap(logo.scaledToWidth(136, Qt::SmoothTransformation));
-    gpl->setAlignment(Qt::AlignCenter);
-    layout->addWidget(gpl);
+    layout->addWidget(makePlain(
+        "This program is distributed in the hope that it will be useful,\n"
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n"
+        "GNU General Public License for more details."
+        ));
+
+
+
+    // GPL logo (optional)
+    // QLabel *gpl = new QLabel(parent);
+    // QPixmap logo(":/pngs/gplv3-with-text-136x68.png");
+    // gpl->setPixmap(logo.scaledToWidth(136, Qt::SmoothTransformation));
+    // gpl->setAlignment(Qt::AlignCenter);
+    // layout->addWidget(gpl);
 
     return layout;
 }
+

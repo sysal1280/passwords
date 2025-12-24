@@ -9,7 +9,6 @@
         <file>files/passwords</file>
         <file>files/passwords.desktop</file>
         <file>files/style.css</file>
-        <file>pngs/gplv3-with-text-136x68.png</file>
         <file>files/wordlist.rcc</file>
     </qresource>
     <qresource prefix="/menus">
