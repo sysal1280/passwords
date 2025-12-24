@@ -4972,6 +4972,26 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_F2)
     {
         newPassword();
+        event->accept();
+        return;
+    }
+
+    // Del — either initate del category or del password
+    //depending on focus.
+    if (event->key() == Qt::Key_Delete)
+    {
+        QWidget *focus = QApplication::focusWidget();
+        if (focus == ui->treeWidget) {
+            deleteCategory(ui->treeWidget->currentItem());
+            event->accept();
+            return;
+        }
+        if (focus == ui->treeWidget_2) {
+            deletePassword(ui->treeWidget_2->currentItem());
+            event->accept();
+            return;
+        }
+
     }
 
     // Pass unhandled keys to base class
