@@ -1711,6 +1711,7 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
         auto *actionCloseCredential = new QAction(tr("Close Password"), &menu);
         actionCloseCredential->setIcon(
             QIcon(":/menus/glyphs/lock_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+        actionCloseCredential->setShortcut(Qt::Key_Escape);
         connect(actionCloseCredential, &QAction::triggered,
                 this, &MainWindow::clearScrollArea);
 
