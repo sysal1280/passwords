@@ -145,7 +145,7 @@ private:
     void ExportedWithoutEdits();
     void insertAuditRow(int applicationId, const QString &user, const QString &host, const QString &action);
     void NotChangedSince(const QDateTime &cutoff);
-
+    void inspectPassword();
     void showPasswordsContextMenu(const QPoint &pos);
 
     // Members

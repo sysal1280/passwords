@@ -1308,14 +1308,33 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
                                                       : settings.getEchoMode());
                 });
 
-        QAction *inspectPasswordAction = new QAction(tr("Inspect Password"), passwordEdit);
+
+
+
+        QAction *inspectPasswordAction = new QAction(tr("Inspect Password"), this);
         passwordEdit->addAction(inspectPasswordAction, QLineEdit::TrailingPosition);
 
         connect(inspectPasswordAction, &QAction::triggered,
-                this, [this, passwordEdit]() {
-                    PasswordDialog::PasswordInspectorDialog dlg(passwordEdit->text(), this);
-                    dlg.exec();
+                this, [passwordEdit]() {
+                    // Copy OUT the data you need *now*
+                    const QString password = passwordEdit->text();
+
+                    // Defer dialog creation to the next event loop turn
+                    QMetaObject::invokeMethod(
+                        qApp,  // or `passwordEdit`, or `this` – any living QObject
+                        [password]() {
+                            auto *dlg = new PasswordDialog::PasswordInspectorDialog(password, nullptr);
+                            dlg->setAttribute(Qt::WA_DeleteOnClose);
+                            dlg->setWindowModality(Qt::NonModal);
+                            dlg->show();   // non-blocking
+                        },
+                        Qt::QueuedConnection);
                 });
+
+
+
+
+
 
         QAction *copyPasswordAction = new QAction(tr("Copy Password"), passwordEdit);
         copyPasswordAction->setStatusTip("Password ony remains in clipboard for 15 seconds");
@@ -5548,4 +5567,18 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
     dlg->setGeometry(x, y, w, h);
 
     dlg->show();   // MODELLESS
+}
+
+void MainWindow::inspectPassword()
+{
+    auto *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+
+    auto *edit = action->parent()->findChild<QLineEdit*>();
+    if (!edit)
+        return;
+
+    PasswordDialog::PasswordInspectorDialog dlg(edit->text(), nullptr);
+    dlg.exec();
 }
