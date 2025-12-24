@@ -141,6 +141,9 @@
    <property name="text">
     <string>New Password</string>
    </property>
+   <property name="shortcut">
+    <string>F2</string>
+   </property>
   </action>
   <action name="actionAbout">
    <property name="text">
