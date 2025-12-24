@@ -2,11 +2,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRandomGenerator>
-#include <algorithm> // for std::shuffle
+#include <algorithm>
 
-// ---------------------------------------------
-// Load words from a file (one word per line)
-// ---------------------------------------------
 QStringList passwordGenerator::loadWordList(const QString &filePath) {
     QFile file(filePath);
     QStringList words;
@@ -22,9 +19,6 @@ QStringList passwordGenerator::loadWordList(const QString &filePath) {
     return words;
 }
 
-// ---------------------------------------------
-// Capitalize first letter of a word
-// ---------------------------------------------
 QString capitalizeWord(const QString &word) {
     if (word.isEmpty())
         return word;
@@ -34,10 +28,6 @@ QString capitalizeWord(const QString &word) {
     return cap;
 }
 
-// ---------------------------------------------
-// Smart symbol substitution (Option 5)
-// Only one substitution per password
-// ---------------------------------------------
 QString applySmartSymbolSubstitution(const QString &word, bool &substitutionUsed) {
 
     // If we've already substituted once, skip entirely
@@ -87,18 +77,12 @@ QString applySmartSymbolSubstitution(const QString &word, bool &substitutionUsed
     return w;
 }
 
-// ---------------------------------------------
-// Generate password
-// ---------------------------------------------
 QString passwordGenerator::generatePassword(const QStringList &wordList,
                                             int wordCount,
                                             int maxNumber) {
     if (wordList.isEmpty())
         return QString("ERROR: Word list is empty");
 
-    // -----------------------------------------
-    // Option 2: Shuffle word list to avoid repeats
-    // -----------------------------------------
     QStringList shuffled = wordList;
     std::shuffle(shuffled.begin(), shuffled.end(), *QRandomGenerator::global());
 
@@ -119,9 +103,6 @@ QString passwordGenerator::generatePassword(const QStringList &wordList,
         chosenWords << w;
     }
 
-    // -----------------------------------------
-    // Random number placement: beginning OR end
-    // -----------------------------------------
     int numWordIndex = QRandomGenerator::global()->bounded(chosenWords.size());
     int number = QRandomGenerator::global()->bounded(qMax(1, maxNumber));
 
@@ -132,9 +113,6 @@ QString passwordGenerator::generatePassword(const QStringList &wordList,
     else
         chosenWords[numWordIndex] += QString::number(number);
 
-    // -----------------------------------------
-    // Join words with shuffled separators
-    // -----------------------------------------
     QString password;
     for (int i = 0; i < chosenWords.size(); ++i) {
         password += chosenWords[i];
@@ -146,10 +124,6 @@ QString passwordGenerator::generatePassword(const QStringList &wordList,
     return password;
 }
 
-// ---------------------------------------------
-// Random separator with shuffle (Option A)
-// Ensures separators do not repeat until exhausted
-// ---------------------------------------------
 QChar passwordGenerator::randomSeparator() {
     static QList<QChar> shuffled;
     static int index = 0;
