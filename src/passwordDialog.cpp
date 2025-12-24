@@ -57,7 +57,7 @@ void showPasswordGenerator(QWidget *parent,
     QVBoxLayout *layout = new QVBoxLayout(&dlg);
 
     QLabel *instruction = new QLabel(
-        "Choose the number of words and generate a secure passphrase.\n"
+        "Choose the number of words and generate a secure password.\n"
         "You can copy the result to your clipboard.",
         &dlg
         );
