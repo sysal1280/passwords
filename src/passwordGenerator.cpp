@@ -2,8 +2,11 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRandomGenerator>
+#include <algorithm> // for std::shuffle
 
+// ---------------------------------------------
 // Load words from a file (one word per line)
+// ---------------------------------------------
 QStringList passwordGenerator::loadWordList(const QString &filePath) {
     QFile file(filePath);
     QStringList words;
@@ -19,39 +22,119 @@ QStringList passwordGenerator::loadWordList(const QString &filePath) {
     return words;
 }
 
+// ---------------------------------------------
+// Capitalize first letter of a word
+// ---------------------------------------------
 QString capitalizeWord(const QString &word) {
-    if (word.isEmpty()) return word;
+    if (word.isEmpty())
+        return word;
+
     QString cap = word;
-    cap[0] = cap[0].toUpper();
+    cap.replace(0, 1, cap.at(0).toUpper());
     return cap;
 }
 
+// ---------------------------------------------
+// Smart symbol substitution (Option 5)
+// Only one substitution per password
+// ---------------------------------------------
+QString applySmartSymbolSubstitution(const QString &word, bool &substitutionUsed) {
+
+    // If we've already substituted once, skip entirely
+    if (substitutionUsed)
+        return word;
+
+    // 40% chance to apply substitution at all
+    if (QRandomGenerator::global()->bounded(100) >= 40)
+        return word;
+
+    QString w = word;
+    QList<int> candidatePositions;
+
+    // Identify letters that have meaningful symbol replacements
+    for (int i = 0; i < w.length(); ++i) {
+        QChar c = w[i].toLower();
+        if (c == 'a' || c == 's' || c == 'i' || c == 'o' || c == 'e' || c == 't')
+            candidatePositions.append(i);
+    }
+
+    if (candidatePositions.isEmpty())
+        return word;
+
+    // Pick one position to replace
+    int pos = candidatePositions.at(
+        QRandomGenerator::global()->bounded(candidatePositions.size())
+        );
+
+    QChar c = w[pos].toLower();
+    QChar replacement;
+
+    switch (c.unicode()) {
+    case 'a': replacement = '@'; break;
+    case 's': replacement = '$'; break;
+    case 'i': replacement = '!'; break;
+    case 'o': replacement = '0'; break;
+    case 'e': replacement = '3'; break;
+    case 't': replacement = '+'; break;
+    default: return word;
+    }
+
+    w[pos] = replacement;
+
+    // Mark substitution as used
+    substitutionUsed = true;
+
+    return w;
+}
+
+// ---------------------------------------------
+// Generate password
+// ---------------------------------------------
 QString passwordGenerator::generatePassword(const QStringList &wordList,
                                             int wordCount,
                                             int maxNumber) {
     if (wordList.isEmpty())
         return QString("ERROR: Word list is empty");
 
-    const QString symbols = "!@#$%^&*()-_=+[]{};:,.<>?";
-    QStringList chosenWords;
+    // -----------------------------------------
+    // Option 2: Shuffle word list to avoid repeats
+    // -----------------------------------------
+    QStringList shuffled = wordList;
+    std::shuffle(shuffled.begin(), shuffled.end(), *QRandomGenerator::global());
 
-    // Pick random words
+    // Ensure we have enough words
+    if (shuffled.size() < wordCount)
+        return QString("ERROR: Word list too small");
+
+    QStringList chosenWords;
+    bool substitutionUsed = false;
+
+    // Pick first N unique words
     for (int i = 0; i < wordCount; ++i) {
-        int index = QRandomGenerator::global()->bounded(wordList.size());
-        chosenWords << capitalizeWord(wordList.at(index));
+        QString w = capitalizeWord(shuffled.at(i));
+
+        // Apply smart symbol substitution (only once per password)
+        w = applySmartSymbolSubstitution(w, substitutionUsed);
+
+        chosenWords << w;
     }
 
-    // Choose random positions for number and symbol
+    // -----------------------------------------
+    // Random number placement: beginning OR end
+    // -----------------------------------------
     int numWordIndex = QRandomGenerator::global()->bounded(chosenWords.size());
-    int symWordIndex = QRandomGenerator::global()->bounded(chosenWords.size());
+    int number = QRandomGenerator::global()->bounded(qMax(1, maxNumber));
 
-    // Append number to one word
-    chosenWords[numWordIndex] += QString::number(QRandomGenerator::global()->bounded(maxNumber));
+    bool placeAtBeginning = QRandomGenerator::global()->bounded(2); // 0 or 1
 
-    // Append symbol to another word (could be same word, that’s fine)
-    chosenWords[symWordIndex] += symbols.at(QRandomGenerator::global()->bounded(symbols.size()));
+    if (placeAtBeginning)
+        chosenWords[numWordIndex] = QString::number(number) + chosenWords[numWordIndex];
+    else
+        chosenWords[numWordIndex] += QString::number(number);
 
-    // Join words with random separators
+    // -----------------------------------------
+    // Join words with shuffled separators
+    // -----------------------------------------
     QString password;
     for (int i = 0; i < chosenWords.size(); ++i) {
         password += chosenWords[i];
@@ -63,10 +146,25 @@ QString passwordGenerator::generatePassword(const QStringList &wordList,
     return password;
 }
 
-// Pick a random separator character
+// ---------------------------------------------
+// Random separator with shuffle (Option A)
+// Ensures separators do not repeat until exhausted
+// ---------------------------------------------
 QChar passwordGenerator::randomSeparator() {
-    const QString separators = "-_:.!@$^&*";
-    int sepIndex = QRandomGenerator::global()->bounded(separators.size());
-    return separators.at(sepIndex);
-}
+    static QList<QChar> shuffled;
+    static int index = 0;
 
+    // Base separator list
+    static const QList<QChar> baseList = {
+        '-', '_', ':', '.', '!', '@', '$', '^', '&', '*', '~', '?'
+    };
+
+    // Refill + reshuffle when needed
+    if (shuffled.isEmpty() || index >= shuffled.size()) {
+        shuffled = baseList;
+        std::shuffle(shuffled.begin(), shuffled.end(), *QRandomGenerator::global());
+        index = 0;
+    }
+
+    return shuffled[index++];
+}
