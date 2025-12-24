@@ -131,7 +131,6 @@ QWidget* AboutDialog::createWebsite(QWidget *parent)
     label->setAlignment(Qt::AlignCenter);
     label->setTextFormat(Qt::RichText);
     label->setOpenExternalLinks(true);
-    label->setTextInteractionFlags(Qt::TextBrowserInteraction);
     return label;
 }
 
@@ -168,7 +167,7 @@ QLayout* AboutDialog::createCredits(QWidget *parent)
     // Minimal required attributions (no hyperlinks)
     layout->addWidget(makePlain("Wordlists by Sam Schlinkert (MIT License)"));
     layout->addWidget(makePlain("Material Symbols by Google (Apache 2.0 License)"));
-    layout->addWidget(makePlain("Password icon by Iconic Panda (Flaticon)"));
+    layout->addWidget(makePlain(QString("%1 icon by Iconic Panda (Flaticon)").arg(QCoreApplication::applicationName())));
 
     layout->addSpacing(4);
 
