@@ -75,6 +75,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     startDebuggerMonitor(this, 10000);
 
+//PasswordDialog::PasswordInspectorDialog inspector("testing123", this);
+//inspector.exec();
+
 #ifdef Q_OS_WIN
     userName = QString::fromLocal8Bit(qgetenv("USERNAME"));
 #else
