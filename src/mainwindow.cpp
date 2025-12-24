@@ -72,8 +72,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    qDebug() << "Commit:" << GIT_COMMIT_HASH;
-
     startDebuggerMonitor(this, 10000);
 
 #ifdef Q_OS_WIN
@@ -782,13 +780,23 @@ void MainWindow::showAboutDlg()
     // --- Version ---
     QString versionText = QApplication::applicationVersion();
 
+    // Build type
     #ifdef APP_DEBUG_BUILD
-        versionText += " (Debug)";
+        versionText += "-debug";
     #endif
 
     #ifdef APP_RELEASE_BUILD
-        versionText += " (Release)";
+        versionText += "-release";
     #endif
+
+    // +commit.branch.dirty
+    versionText += QString("+%1.%2%3")
+        .arg(GIT_COMMIT_HASH)
+        .arg(GIT_BRANCH)
+        .arg(GIT_DIRTY);
+
+    // Build timestamp
+    versionText += QString(" (%1)").arg(BUILD_TIMESTAMP);
 
     QLabel *versionLabel = new QLabel(versionText, &dlg);
     versionLabel->setAlignment(Qt::AlignCenter);

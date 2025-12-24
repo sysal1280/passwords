@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(password VERSION 0.1 LANGUAGES CXX)
 
+# Commit hash
 execute_process(
     COMMAND git rev-parse --short HEAD
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -9,12 +10,35 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+# Branch name
+execute_process(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Dirty state (uncommitted changes)
+execute_process(
+    COMMAND git diff --quiet --ignore-submodules HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    RESULT_VARIABLE GIT_DIRTY_RESULT
+)
+
+if(GIT_DIRTY_RESULT EQUAL 1)
+    set(GIT_DIRTY "-dirty")
+else()
+    set(GIT_DIRTY "")
+endif()
+
+# Build date/time
+string(TIMESTAMP BUILD_TIMESTAMP "%Y-%m-%d %H:%M")
+
 configure_file(
     ${CMAKE_SOURCE_DIR}/src/gitversion.h.in
     ${CMAKE_BINARY_DIR}/gitversion.h
     @ONLY
 )
-
 
 # Qt auto features
 set(CMAKE_AUTOUIC ON)
