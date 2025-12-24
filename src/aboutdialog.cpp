@@ -180,7 +180,6 @@ QLayout* AboutDialog::createCredits(QWidget *parent)
     layout->addSpacing(4);
 
     // GPL notice (friendly wording + clickable link)
-    // GPL notice (friendly wording + clickable link)
     layout->addWidget(makeLink(
         "Licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPLv3 License</a> or later."));
 
