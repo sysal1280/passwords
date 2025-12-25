@@ -96,7 +96,9 @@ int main(int argc, char *argv[])
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    QPixmap pixmap(":/splash.png");
+    QPixmap pixmap(QFile::exists("splash.png")
+                       ? "splash.png"
+                       : ":/splash.png");
     QSplashScreen *splash = new QSplashScreen(pixmap);
     splash->showMessage(QCoreApplication::translate("main", "Setting language.."),
                         Qt::AlignBottom | Qt::AlignLeft,Qt::white);
