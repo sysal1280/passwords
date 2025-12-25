@@ -1,5 +1,5 @@
 /*
- * passwords - A simple password manager
+ * passwords - A GnuPG based password manager
  *
  * Copyright (C) 2025  Adam.Lanzafame <sysal@tuta.io>
  *

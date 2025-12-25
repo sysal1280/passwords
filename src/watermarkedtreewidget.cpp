@@ -1,5 +1,5 @@
 /*
- * passwords - A simple password manager
+ * passwords - A GnuPG based password manager
  *
  * Copyright (C) 2025  Adam.Lanzafame <sysal@tuta.io>
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 
 #include "watermarkedtreewidget.h"
 #include <QPainter>

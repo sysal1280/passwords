@@ -1,8 +1,27 @@
+/*
+ * passwords - A GnuPG based password manager
+ *
+ * Copyright (C) 2025  Adam.Lanzafame <sysal@tuta.io>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+
 #include "passwordDialog.h"
 #include "passwordGenerator.h"
 #include "settings.h"
 #include "utils.h"
-
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -29,10 +48,6 @@
 #include <QParallelAnimationGroup>
 
 namespace PasswordDialog {
-
-// ------------------------------------------------------------
-// PasswordInspectorDialog IMPLEMENTATION
-// ------------------------------------------------------------
 
 PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
                                                  QWidget *parent)
@@ -117,10 +132,6 @@ PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
     resize(dialogWidth, 300);
 
 }
-
-// ------------------------------------------------------------
-// Helper functions (legend, tiles, symbol names, analysis)
-// ------------------------------------------------------------
 
 QWidget *PasswordInspectorDialog::makeLegendItem(const QString &color, const QString &label)
 {
@@ -221,10 +232,6 @@ QString PasswordInspectorDialog::characterDescription(QChar c) const
     return symbolName(c);
 }
 
-// ------------------------------------------------------------
-// Password analysis helpers
-// ------------------------------------------------------------
-
 PasswordInspectorDialog::PasswordAnalysis
 PasswordInspectorDialog::analyzePassword(const QString &password) const
 {
@@ -309,10 +316,6 @@ QString PasswordInspectorDialog::formatAnalysisSummary(const PasswordAnalysis &a
 
     return summary;
 }
-
-// ------------------------------------------------------------
-// Password Generator Dialog (unchanged)
-// ------------------------------------------------------------
 
 void showPasswordGenerator(QWidget *parent,
                            const QString &title,
