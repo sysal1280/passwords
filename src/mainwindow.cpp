@@ -1288,7 +1288,7 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         QJsonObject credObj = val.toObject();
         QString username = credObj.value("username").toString();
         QString password = credObj.value("password").toString();
-        QString otp      = credObj.value("secretOptCode").toString();
+        QString otp      = credObj.value("secretOtpCode").toString();
         int otpLength      = credObj.value("length").toInt(6);
         qDebug() << "length " << otpLength;
 
@@ -4038,13 +4038,13 @@ connect(gpg,
                         QJsonObject credObj = creds.at(i).toObject();
                         QString username  = credObj.value("username").toString();
                         QString password  = credObj.value("password").toString();
-                        QString secretOpt = credObj.value("secretOptCode").toString();
+                        QString secretOpt = credObj.value("secretOtpCode").toString();
                         int length        = credObj.value("length").toInt();
 
                         qDebug().noquote() << "Credential:"
                                  << "username=" << username
                                  << "password=" << password
-                                 << "secretOptCode=" << secretOpt
+                                 << "secretOtpCode=" << secretOpt
                                  << "length=" << length;
 
                         dlg.openCredentials(username, password, secretOpt, length);

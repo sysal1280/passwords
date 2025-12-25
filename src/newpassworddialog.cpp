@@ -156,7 +156,7 @@ void NewPasswordDialog::openPassword()
 
 void NewPasswordDialog::openCredentials(QString username,
                                         QString password,
-                                        QString secretOptCode,
+                                        QString secretOtpCode,
                                         int length)
 {
     // Ensure the table has the right number of columns
@@ -173,7 +173,7 @@ void NewPasswordDialog::openCredentials(QString username,
     // Populate cells
     ui->tableWidgetCredentials->setItem(row, 0, new QTableWidgetItem(username));
     ui->tableWidgetCredentials->setItem(row, 1, new QTableWidgetItem(password));
-    ui->tableWidgetCredentials->setItem(row, 2, new QTableWidgetItem(secretOptCode));
+    ui->tableWidgetCredentials->setItem(row, 2, new QTableWidgetItem(secretOtpCode));
     ui->tableWidgetCredentials->setItem(row, 3, new QTableWidgetItem(QString::number(length)));
 
     // Optional: adjust column widths
@@ -325,7 +325,7 @@ QByteArray NewPasswordDialog::toJson() const
 
         cred["username"]      = usernameItem->text();
         cred["password"]      = passwordItem->text();
-        cred["secretOptCode"] = secretItem->text();
+        cred["secretOtpCode"] = secretItem->text();
         cred["length"]        = lengthItem->text().toInt();
 
         credsArray.append(cred);
