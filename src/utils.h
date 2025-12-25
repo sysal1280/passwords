@@ -11,6 +11,10 @@
 #include <QTimer>
 #include <QLabel>
 #include <QStatusBar>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QUrl>
 
 inline QString loadWordlistResource(const QWidget *parent, const char *caller)
 {
@@ -89,5 +93,18 @@ inline void setupDebugWarnings(QWidget *parent, QStatusBar *statusBar)
 #endif
 }
 
+inline void checkHelpReachable(std::function<void(bool)> callback,
+                               QObject* parent = nullptr)
+{
+    auto manager = new QNetworkAccessManager(parent);
+    QNetworkRequest request(QUrl("https://sysal1280.github.io/passwords/"));
+    QNetworkReply* reply = manager->head(request);
+
+    QObject::connect(reply, &QNetworkReply::finished, [reply, callback]() {
+        bool ok = (reply->error() == QNetworkReply::NoError);
+        callback(ok);
+        reply->deleteLater();
+    });
+}
 
 #endif // UTILS_H

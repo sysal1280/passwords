@@ -75,6 +75,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     startDebuggerMonitor(this, 10000);
 
+    checkHelpReachable([this](bool reachable){
+        if (reachable) {
+            qDebug() << "Help site reachable!";
+        } else {
+            qDebug() << "Help site NOT reachable!";
+        }
+    });
+
 //PasswordDialog::PasswordInspectorDialog inspector("testing123", this);
 //inspector.exec();
 
@@ -329,7 +337,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionOnline_Documentation, &QAction::triggered,
             this, [this]() {
+        checkHelpReachable([this](bool reachable){
+            if (reachable) {
+                QDesktopServices::openUrl(QUrl("https://sysal1280.github.io/passwords/"));
+            } else {
                 launchHelperProcess("");
+            }
+        });
             });
 
     connect(ui->actionDonate, &QAction::triggered,
