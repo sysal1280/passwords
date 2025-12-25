@@ -96,6 +96,9 @@ int main(int argc, char *argv[])
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
+    /*
+     * custom or default splash
+     */
     QPixmap pixmap(QFile::exists("splash.png")
                        ? "splash.png"
                        : ":/splash.png");
