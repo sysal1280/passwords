@@ -23,7 +23,7 @@
 
 #include "constants.h"
 #include "gpgCheck.h"
-#include "passwordDialog.h"
+#include "passworddialog.h"
 #include "randomnoisedialog.h"
 #include "settings.h"
 #include "utils.h"

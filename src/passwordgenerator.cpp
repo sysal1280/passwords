@@ -18,7 +18,7 @@
  */
 
 
-#include "passwordGenerator.h"
+#include "passwordgenerator.h"
 
 #include <QFile>
 #include <QRandomGenerator>

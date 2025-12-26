@@ -23,8 +23,8 @@
 
 #include "integerdelegate.h"
 #include "multilinedelegate.h"
-#include "passwordDialog.h"
-#include "passwordGenerator.h"
+#include "passworddialog.h"
+#include "passwordgenerator.h"
 #include "randomnoisedialog.h"
 #include "settings.h"
 

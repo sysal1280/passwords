@@ -18,8 +18,8 @@
  */
 
 
-#include "passwordDialog.h"
-#include "passwordGenerator.h"
+#include "passworddialog.h"
+#include "passwordgenerator.h"
 #include "settings.h"
 #include "utils.h"
 
