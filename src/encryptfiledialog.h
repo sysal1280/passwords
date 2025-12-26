@@ -168,16 +168,16 @@ public:
                 this, &QDialog::reject);
 
         // --- Help button connection ---
-        connect(btnBox->button(QDialogButtonBox::Help), &QPushButton::clicked,
-                this, [this]() {
+        connect(btnBox->button(QDialogButtonBox::Help),
+                &QPushButton::clicked,
+                this,
+                [this]() {
 
                     checkHelpReachable([this](bool reachable) {
-
                         if (reachable) {
                             // Open the online help page for encrypt-file
-                            QDesktopServices::openUrl(
-                                QUrl(QString(Passwords::HelpBaseUrl) + "encrypt-file")
-                                );
+                            const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("encrypt-file"));
+                            QDesktopServices::openUrl(url);
                         } else {
                             // Fallback to helper process
                             MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
@@ -190,7 +190,7 @@ public:
                                 return;
                             }
 
-                            mw->launchHelperProcess("encrypt-file");
+                            mw->launchHelperProcess(QStringLiteral("encrypt-file"));
                         }
                     });
                 });

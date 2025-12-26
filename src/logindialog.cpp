@@ -89,16 +89,16 @@ LoginDialog::LoginDialog(QWidget *parent)
     disconnect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     disconnect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-    connect(ui->buttonBox->button(QDialogButtonBox::Help), &QPushButton::clicked,
-            this, [this]() {
+    connect(ui->buttonBox->button(QDialogButtonBox::Help),
+            &QPushButton::clicked,
+            this,
+            [this]() {
 
                 checkHelpReachable([this](bool reachable) {
-
                     if (reachable) {
-                        // Open the online help page for encrypt-file
-                        QDesktopServices::openUrl(
-                            QUrl(QString(Passwords::HelpBaseUrl) + "challenge-response")
-                            );
+                        // Open the online help page for challenge-response
+                        const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("challenge-response"));
+                        QDesktopServices::openUrl(url);
                     } else {
                         // Fallback to helper process
                         MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
@@ -110,11 +110,10 @@ LoginDialog::LoginDialog(QWidget *parent)
                                 );
                             return;
                         }
-                        mw->launchHelperProcess("challenge-response");
+                        mw->launchHelperProcess(QStringLiteral("challenge-response"));
                     }
                 });
             });
-
 
     connect(ui->comboBoxLogin, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this](int index) {

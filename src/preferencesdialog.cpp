@@ -147,16 +147,16 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
             this, &PreferencesDialog::onBackupCheckStateChanged);
     connect(ui->pushButton, &QPushButton::clicked,
             this, &PreferencesDialog::openBackupDir);
-    connect(ui->buttonBox->button(QDialogButtonBox::Help), &QPushButton::clicked,
-            this, [this]() {
+    connect(ui->buttonBox->button(QDialogButtonBox::Help),
+            &QPushButton::clicked,
+            this,
+            [this]() {
 
                 checkHelpReachable([this](bool reachable) {
-
                     if (reachable) {
-                        // Open the online help page for encrypt-file
-                        QDesktopServices::openUrl(
-                            QUrl(QString(Passwords::HelpBaseUrl) + "preferences")
-                            );
+                        // Open the online help page for preferences
+                        const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("preferences"));
+                        QDesktopServices::openUrl(url);
                     } else {
                         // Fallback to helper process
                         MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
@@ -169,7 +169,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
                             return;
                         }
 
-                        mw->launchHelperProcess("preferences");
+                        mw->launchHelperProcess(QStringLiteral("preferences"));
                     }
                 });
             });

@@ -215,124 +215,209 @@ MainWindow::MainWindow(QWidget *parent)
     //Signals and slots
     autoCloseTimer = new QTimer(this);
     autoCloseTimer->setSingleShot(true);
-    connect(autoCloseTimer, &QTimer::timeout,
-            this, &MainWindow::clearScrollArea);
 
+    //auto close password timer
+    connect(autoCloseTimer,
+            &QTimer::timeout,
+            this,
+            &MainWindow::clearScrollArea);
 
-    connect(ui->actionOpen_Database, &QAction::triggered,
-            this, [this]() {
-                QString fileName = QFileDialog::getOpenFileName(
+    //open database
+    connect(ui->actionOpen_Database,
+            &QAction::triggered,
+            this,
+            [this]() {
+                const QString fileName = QFileDialog::getOpenFileName(
                     this,
                     ui->actionOpen_Database->text(),
                     QString(),
                     tr("Password Database (*.pwd)")
-                    );
-                if (!fileName.isEmpty())
+                );
+
+                if (!fileName.isEmpty()) {
                     openDatabase(fileName);
+                }
             });
 
-    connect(ui->actionNew_Password, &QAction::triggered,
-            this, [this]() {
-                if (auto item = ui->treeWidget->currentItem()) {
+    //new password
+    connect(ui->actionNew_Password,
+            &QAction::triggered,
+            this,
+            [this]() {
+                if (auto *item = ui->treeWidget->currentItem()) {
                     newPassword();
                 }
             });
 
-    connect(ui->actionOpen_Password, &QAction::triggered,
-            this, [this]() {
-                if (auto item = ui->treeWidget_2->currentItem()) {
+
+    //open password
+    connect(ui->actionOpen_Password,
+            &QAction::triggered,
+            this,
+            [this]() {
+                if (auto *item = ui->treeWidget_2->currentItem()) {
                     openPassword(item);
                 }
             });
 
-    connect(ui->actionEdit_Password, &QAction::triggered,
-            this, [this]() {
-                if (auto item = ui->treeWidget_2->currentItem()) {
+
+    //edit password
+    connect(ui->actionEdit_Password,
+            &QAction::triggered,
+            this,
+            [this]() {
+                if (auto *item = ui->treeWidget_2->currentItem()) {
                     editPassword(item);
                 }
             });
 
-    connect(ui->actionExport_Password, &QAction::triggered,
-            this, [this]() {
-                if (auto item = ui->treeWidget_2->currentItem()) {
+    //export password
+    connect(ui->actionExport_Password,
+            &QAction::triggered,
+            this,
+            [this]() {
+                if (auto *item = ui->treeWidget_2->currentItem()) {
                     exportPassword(item);
                 }
             });
 
-    connect(ui->actionAudit_Log, &QAction::triggered,
-            this, [this]() {
-                if (auto item = ui->treeWidget_2->currentItem()) {
+    //audit log
+    connect(ui->actionAudit_Log,
+            &QAction::triggered,
+            this,
+            [this]() {
+                if (auto *item = ui->treeWidget_2->currentItem()) {
                     showAuditLog(item);
                 }
             });
 
-    connect(ui->actionNew_Category, &QAction::triggered,
-            this, [this]() {
+    //new category
+    connect(ui->actionNew_Category,
+            &QAction::triggered,
+            this,
+            [this]() {
                 createCategory();  // calls with default QString()
             });
 
-    connect(ui->actionGenerate_Password, &QAction::triggered,
+    //rename category
+    connect(ui->actionRename, &QAction::triggered,
+            this, &MainWindow::renameCategory);
+
+    //delete category
+    connect(ui->actionDelete_Category,
+            &QAction::triggered,
+            this,
+            [this]() {
+                if (auto *item = ui->treeWidget->currentItem()) {
+                    deleteCategory(item);
+                }
+            });
+
+    //refresh categories
+    connect(ui->actionRefresh_Categories, &QAction::triggered,
+            this, &MainWindow::loadCategories);
+
+    //import password (into category)
+    connect(ui->actionImport, &QAction::triggered,
             this, [this]() {
+
+                QString fileName = QFileDialog::getOpenFileName(
+                    this,
+                    tr("Select JSON File to Import"),
+                    QDir::homePath(),
+                    tr("JSON Files (*.json)")
+                    );
+
+                if (fileName.isEmpty()) {
+                    return; // user cancelled
+                }
+
+                importApplicationsFromFile(fileName);
+            });
+
+    //generate password
+    connect(ui->actionGenerate_Password,
+            &QAction::triggered,
+            this,
+            [this]() {
                 PasswordDialog::showPasswordGenerator(
                     this,
                     ui->actionGenerate_Password->text(),
-                    QStringList()   // empty list
-                    );
+                    QStringList()
+                );
             });
 
-    connect(ui->actionRandom_Noise, &QAction::triggered,
+    //generate random noise
+    connect(ui->actionRandom_Noise,
+            &QAction::triggered,
             this,
             [this]() {
                 RandomNoiseDialog::showRandomNoiseGenerator(this);
             });
 
+    //encrypt file
     connect(ui->actionEncrypt_File, &QAction::triggered,
             this, &MainWindow::encryptFile);
 
+    //decrypt file
     connect(ui->actionDecrypt_File, &QAction::triggered,
             this, &MainWindow::decryptFile);
 
-    connect(ui->actionRefresh_Categories, &QAction::triggered,
-            this, &MainWindow::loadCategories);
-
-    connect(ui->actionAdd_Search, &QAction::triggered,
-            this, [this]() {
-                if (auto item = ui->treeWidget_2->currentItem()) {
+    //add search term
+    connect(ui->actionAdd_Search,
+            &QAction::triggered,
+            this,
+            [this]() {
+                if (auto *item = ui->treeWidget_2->currentItem()) {
                     addSearchTerms(item);
                 } else {
-                    QMessageBox::warning(this, tr("Add Search Term"),
-                                         tr("No application selected."));
+                    QMessageBox::warning(
+                        this,
+                        ui->actionAdd_Search->text(),
+                        tr("No application selected.")
+                    );
                 }
             });
 
+    //key List
     connect(ui->actionKey_List, &QAction::triggered,
             this, &MainWindow::keyList);
 
-    connect(ui->actionDelete_Category, &QAction::triggered,
-            this, [this]() {
-                if (auto item = ui->treeWidget->currentItem()) {
-                    deleteCategory(item);
-                }
-            });
-
-    connect(ui->actionDelete_Password, &QAction::triggered,
-            this, [this]() {
-                if (auto item = ui->treeWidget_2->currentItem()) {
+    //delete password
+    connect(ui->actionDelete_Password,
+            &QAction::triggered,
+            this,
+            [this]() {
+                if (auto *item = ui->treeWidget_2->currentItem()) {
                     deletePassword(item);
                 } else {
-                    QMessageBox::warning(this,
-                                         ui->actionDelete_Password->text(),
-                                         tr("No password selected."));
+                    QMessageBox::warning(
+                        this,
+                        ui->actionDelete_Password->text(),
+                        tr("No password selected.")
+                    );
                 }
             });
 
-    connect(ui->actionClear_GPG_Passphrase_Cache, &QAction::triggered,
-            this, [this]() {
-                bool ok = killGpgAgent();
-                if (ok)
-                    QMessageBox::information(this, "GPG Agent", "Passphrase cache cleared.");
-                else
-                    QMessageBox::warning(this, "GPG Agent", "Failed to clear passphrase cache.");
+    //clear gpg agent cache
+    connect(ui->actionClear_GPG_Passphrase_Cache,
+            &QAction::triggered,
+            this,
+            [this]() {
+                const bool ok = killGpgAgent();
+                if (ok) {
+                    QMessageBox::information(
+                        this,
+                        tr("GPG Agent"),
+                        tr("Passphrase cache cleared.")
+                    );
+                } else {
+                    QMessageBox::warning(
+                        this,
+                        tr("GPG Agent"),
+                        tr("Failed to clear passphrase cache.")
+                    );
+                }
             });
 
     // Line edit search
@@ -345,49 +430,52 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->treeWidget, &WatermarkedTreeWidget::itemDropped,
             this, &MainWindow::moveCategory);
 
-    // Menu signals
+    // just-in-time loading bookmarks
     connect(ui->menuBookmarks, &QMenu::aboutToShow,
             this, &MainWindow::populateBookmarksMenu);
 
+    //user guide
     connect(ui->actionOnline_Documentation, &QAction::triggered, this, [this]() {
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
-                QDesktopServices::openUrl(
-                    QUrl(QString(Passwords::HelpBaseUrl))
-                );
+                const QUrl url(Passwords::HelpBaseUrl);
+                QDesktopServices::openUrl(url);
             } else {
-                launchHelperProcess("");
+                launchHelperProcess(QStringLiteral(""));
             }
         });
     });
 
+    //donate
     connect(ui->actionDonate, &QAction::triggered, this, [this]() {
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
-                QDesktopServices::openUrl(QUrl(QString(Passwords::HelpBaseUrl) + "donate"));
+                const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("donate"));
+                QDesktopServices::openUrl(url);
             } else {
-                launchHelperProcess("donate");
+                launchHelperProcess(QStringLiteral("donate"));
             }
         });
     });
 
+    //system information
     connect(ui->actionSystem_Information, &QAction::triggered,
             this, [this]() {
-                SystemInfoDialog dlg(this);  // pass parent if needed
+                SystemInfoDialog dlg(this);
                 dlg.exec();
             });
 
+    //about Qt
     connect(ui->actionAbout_Qt, &QAction::triggered,
             qApp, &QApplication::aboutQt);
 
-    connect(ui->actionRename, &QAction::triggered,
-            this, &MainWindow::renameCategory);
-
+    //about Passwords
     connect(ui->actionAbout, &QAction::triggered, this, [this] {
         AboutDialog dlg(this);
         dlg.exec();
     });
 
+    //close (exit)
     connect(ui->actionClose, &QAction::triggered,
             this, &MainWindow::close);
 
@@ -405,23 +493,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionBookmark, &QAction::toggled,
             this, [this](bool checked) {
                 setBookmark(checked);
-            });
-
-    connect(ui->actionImport, &QAction::triggered,
-            this, [this]() {
-
-                QString fileName = QFileDialog::getOpenFileName(
-                    this,
-                    tr("Select JSON File to Import"),
-                    QDir::homePath(),
-                    tr("JSON Files (*.json)")
-                    );
-
-                if (fileName.isEmpty()) {
-                    return; // user cancelled
-                }
-
-                importApplicationsFromFile(fileName);
             });
 
     connect(ui->actionPreferences, &QAction::triggered,
@@ -1976,14 +2047,13 @@ void MainWindow::keyList()
                 msgBox.setStandardButtons(QMessageBox::Ok);
                 QPushButton *helpButton = msgBox.addButton(QMessageBox::Help);
 
-                connect(helpButton, &QPushButton::clicked, this, [this]() {
+                connect(helpBtn, &QPushButton::clicked, this, [this]() {
                     checkHelpReachable([this](bool reachable) {
                         if (reachable) {
-                            QDesktopServices::openUrl(
-                                QUrl(QString(Passwords::HelpBaseUrl) + "ultimate-trust")
-                            );
+                            const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("keys"));
+                            QDesktopServices::openUrl(url);
                         } else {
-                            launchHelperProcess("ultimate-trust");
+                            launchHelperProcess(QStringLiteral("keys"));
                         }
                     });
                 });
@@ -2067,7 +2137,6 @@ void MainWindow::keyList()
 
     table->resizeColumnsToContents();
 
-    // After you add all widgets and set the layout:
     dlg->layout()->setSizeConstraint(QLayout::SetFixedSize);
     dlg->setFixedSize(dlg->sizeHint());
 
@@ -2075,11 +2144,10 @@ void MainWindow::keyList()
     connect(helpBtn, &QPushButton::clicked, this, [this]() {
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
-                QDesktopServices::openUrl(
-                    QUrl(QString(Passwords::HelpBaseUrl) + "linking-keys")
-                );
+                const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("linking-keys"));
+                QDesktopServices::openUrl(url);
             } else {
-                launchHelperProcess("linking-keys");
+                launchHelperProcess(QStringLiteral("linking-keys"));
             }
         });
     });
