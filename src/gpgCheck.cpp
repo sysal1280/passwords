@@ -19,7 +19,7 @@
 
 
 #include "gpgCheck.h"
-#include "DataObfuscator.h"
+#include "dataobfuscator.h"
 #include "settings.h"
 
 #include <QApplication>

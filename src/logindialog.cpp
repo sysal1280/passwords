@@ -22,7 +22,7 @@
 #include "ui_logindialog.h"
 
 #include "constants.h"
-#include "DataObfuscator.h"
+#include "dataobfuscator.h"
 #include "dbutils.h"
 #include "mainwindow.h"
 #include "settings.h"

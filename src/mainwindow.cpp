@@ -21,7 +21,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
-#include "DataObfuscator.h"
+#include "dataobfuscator.h"
 #include "systeminfodialog.h"
 #include "aboutdialog.h"
 #include "categorydialog.h"

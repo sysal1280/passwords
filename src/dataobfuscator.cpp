@@ -18,7 +18,7 @@
  */
 
 
-#include "DataObfuscator.h"
+#include "dataobfuscator.h"
 
 #include <QCryptographicHash>
 #include <QRandomGenerator>
