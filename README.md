@@ -40,20 +40,21 @@ CMake
 GPG installed on your system
 Build steps:
 bash
-
+```
 git clone git@github.com:sysal1280/passwords.git
 cd passwords/
 mkdir build
 cd build
 cmake ../ -DCMAKE_PREFIX_PATH=/path/to/Qt/6.x.x/gcc_64 -DCMAKE_BUILD_TYPE=Release
 make
-
+```
 Replace /path/to/Qt/6.x.x/gcc_64 with your actual Qt installation path.
 
 #### Windows
 You have two options:
-Download the installer from the Releases page
-Build from source using Qt Creator
+1. Download the installer from the Releases page
+
+2. Build from source using Qt Creator
 Install Qt 6
 Open the project in Qt Creator
 Build and run
