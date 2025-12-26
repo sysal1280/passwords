@@ -51,6 +51,8 @@ make
 ```
 Replace /path/to/Qt/6.x.x/gcc_64 with your actual Qt installation path.
 
+You may also choose to Install Qt 6 and Qt Creator and build the software using the Qt Creator IDE.
+
 #### Windows
 You have two options:
 1. Download the installer from the Releases page
