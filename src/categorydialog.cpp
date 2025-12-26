@@ -19,11 +19,12 @@
 
 
 #include "categorydialog.h"
-#include <QVBoxLayout>
+
+#include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QLineEdit>
-#include <QCheckBox>
+#include <QVBoxLayout>
 
 CategoryDialog::CategoryDialog(QWidget *parent, int existingCount)
     : QDialog(parent)

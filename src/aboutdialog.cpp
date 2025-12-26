@@ -20,15 +20,16 @@
 
 #include "aboutdialog.h"
 #include "constants.h"
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QPixmap>
-#include <QApplication>
+
 #include <QCoreApplication>
-#include <QGraphicsOpacityEffect>
-#include <QPropertyAnimation>
-#include <QFrame>
 #include <QFont>
+#include <QPixmap>
+#include <QFrame>
+#include <QGraphicsOpacityEffect>
+#include <QLabel>
+#include <QPropertyAnimation>
+#include <QVBoxLayout>
+
 
 // Build metadata
 #include "gitversion.h"
@@ -95,7 +96,7 @@ QWidget* AboutDialog::createAppName(QWidget *parent)
 // ------------------------------------------------------------
 QWidget* AboutDialog::createVersion(QWidget *parent)
 {
-    QString version = QApplication::applicationVersion();
+    QString version = QCoreApplication::applicationVersion();
 
 #ifdef APP_DEBUG_BUILD
     version += "-debug";

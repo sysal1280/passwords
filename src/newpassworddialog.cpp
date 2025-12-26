@@ -20,24 +20,25 @@
 
 #include "newpassworddialog.h"
 #include "ui_newpassworddialog.h"
+
+#include "integerdelegate.h"
+#include "multilinedelegate.h"
 #include "passwordDialog.h"
 #include "passwordGenerator.h"
 #include "randomnoisedialog.h"
-#include <QJsonObject>
+#include "settings.h"
+
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <QTableWidgetItem>
+#include <QJsonObject>
+#include <QList>
+#include <QMenu>
+#include <QMessageBox>
+#include <QPushButton>
 #include <QSqlDatabase>
 #include <QSqlQuery>
-#include <QList>
-#include <QMessageBox>
-#include <QMenu>
-#include "multilinedelegate.h"
-#include "integerdelegate.h"
-#include "settings.h"
+#include <QTableWidgetItem>
 #include <QToolButton>
-#include <QMenu>
-#include <QPushButton>
 
 NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     : QDialog(parent)

@@ -19,9 +19,11 @@
 
 
 #include "passwordGenerator.h"
+
 #include <QFile>
-#include <QTextStream>
 #include <QRandomGenerator>
+#include <QTextStream>
+
 #include <algorithm>
 
 QStringList passwordGenerator::loadWordList(const QString &filePath) {

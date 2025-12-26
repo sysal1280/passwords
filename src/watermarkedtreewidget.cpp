@@ -18,9 +18,10 @@
  */
 
 #include "watermarkedtreewidget.h"
-#include <QPainter>
-#include <QPaintEvent>
+
 #include <QMimeData>
+#include <QPaintEvent>
+#include <QPainter>
 
 WatermarkedTreeWidget::WatermarkedTreeWidget(QWidget *parent)
     : QTreeWidget(parent), m_watermarkText("Default Watermark") {

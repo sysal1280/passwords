@@ -19,26 +19,27 @@
 
 
 #include "constants.h"
-#include "mainwindow.h"
 #include "debugutils.h"
 #include "gpgCheck.h"
 #include "logindialog.h"
-#include "termsdialog.h"
+#include "mainwindow.h"
 #include "settings.h"
+#include "termsdialog.h"
+
 #include <QApplication>
-#include <QPixmap>
-#include <QSplashScreen>
-#include <QTimer>
-#include <QStyleFactory>
 #include <QDebug>
-#include <QMessageBox>
-#include <QLockFile>
 #include <QDir>
-#include <QLocale>
-#include <QTranslator>
 #include <QFile>
 #include <QFileDevice>
+#include <QLocale>
+#include <QLockFile>
+#include <QMessageBox>
+#include <QPixmap>
+#include <QSplashScreen>
 #include <QStandardPaths>
+#include <QStyleFactory>
+#include <QTimer>
+#include <QTranslator>
 
 // Forward declaration of helper
 // Returns true if a database file is ready (exists or was created/copied)

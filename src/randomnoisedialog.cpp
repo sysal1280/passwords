@@ -19,20 +19,21 @@
 
 
 #include "randomnoisedialog.h"
+
+#include <QApplication>
+#include <QByteArray>
+#include <QClipboard>
+#include <QComboBox>
 #include <QDialog>
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QSpinBox>
-#include <QPushButton>
-#include <QTextEdit>
-#include <QClipboard>
-#include <QApplication>
-#include <QComboBox>
-#include <QRandomGenerator>
-#include <QByteArray>
 #include <QMainWindow>
+#include <QPushButton>
+#include <QRandomGenerator>
+#include <QSpinBox>
 #include <QStatusBar>
+#include <QTextEdit>
+#include <QVBoxLayout>
 
 namespace RandomNoiseDialog {
 

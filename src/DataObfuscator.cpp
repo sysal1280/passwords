@@ -19,8 +19,9 @@
 
 
 #include "DataObfuscator.h"
-#include <QRandomGenerator>
+
 #include <QCryptographicHash>
+#include <QRandomGenerator>
 #include <QtGlobal>
 
 static const int SALT_SIZE = 16;

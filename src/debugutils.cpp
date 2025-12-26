@@ -19,10 +19,11 @@
 
 
 #include "debugutils.h"
-#include <QtGlobal>
-#include <QTimer>
+
 #include <QCoreApplication>
 #include <QDebug>
+#include <QTimer>
+#include <QtGlobal>
 
 #if defined(Q_OS_WIN)
 #include <windows.h>

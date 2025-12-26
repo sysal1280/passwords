@@ -18,17 +18,18 @@
  */
 
 
-#include "settings.h"
 #include "dbutils.h"
-#include <QFileDialog>
-#include <QFile>
+#include "settings.h"
+
 #include <QApplication>
-#include <QDir>
-#include <QSqlQuery>
-#include <QSqlError>
 #include <QCryptographicHash>
 #include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QFileDialog>
 #include <QInputDialog>
+#include <QSqlError>
+#include <QSqlQuery>
 
 Settings::Settings()
 {

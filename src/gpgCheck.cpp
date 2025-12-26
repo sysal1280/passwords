@@ -19,21 +19,22 @@
 
 
 #include "gpgCheck.h"
-#include <QSqlDatabase>
-#include <QSqlQuery>
-#include <QSqlError>
-#include <QProcess>
-#include <QDebug>
-#include <QMessageBox>
-#include <QStandardPaths>
+#include "DataObfuscator.h"
 #include "settings.h"
+
+#include <QApplication>
+#include <QDebug>
+#include <QFileInfo>
+#include <QFutureWatcher>
+#include <QMessageBox>
+#include <QProcess>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QStandardPaths>
+#include <QTimer>
 #include <QUuid>
 #include <QtConcurrent/QtConcurrentRun>
-#include <QFutureWatcher>
-#include <QFileInfo>
-#include "DataObfuscator.h"
-#include <QApplication>
-#include <QTimer>
 
 bool isToolAvailable(const QString &toolName)
 {

@@ -20,20 +20,24 @@
 
 #include "logindialog.h"
 #include "ui_logindialog.h"
+
+#include "constants.h"
+#include "DataObfuscator.h"
+#include "dbutils.h"
 #include "mainwindow.h"
 #include "settings.h"
 #include "utils.h"
-#include "DataObfuscator.h"
-#include "dbutils.h"
+
+#include <QClipboard>
+#include <QDebug>
+#include <QDesktopServices>
+#include <QMessageBox>
+#include <QPixmap>
+#include <QPushButton>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QDebug>
 #include <QtGuiDepends>
-#include <QMessageBox>
-#include <QPushButton>
-#include <QClipboard>
-#include <QPixmap>
 
 LoginDialog::LoginDialog(QWidget *parent)
     : QDialog(parent)
@@ -85,11 +89,32 @@ LoginDialog::LoginDialog(QWidget *parent)
     disconnect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     disconnect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-    connect(ui->buttonBox, &QDialogButtonBox::helpRequested, this, [=]() {
-        if (auto mw = qobject_cast<MainWindow*>(parentWidget())) {
-            mw->launchHelperProcess("keys");
-        }
-    });
+    connect(ui->buttonBox->button(QDialogButtonBox::Help), &QPushButton::clicked,
+            this, [this]() {
+
+                checkHelpReachable([this](bool reachable) {
+
+                    if (reachable) {
+                        // Open the online help page for encrypt-file
+                        QDesktopServices::openUrl(
+                            QUrl(QString(Passwords::HelpBaseUrl) + "challenge-response")
+                            );
+                    } else {
+                        // Fallback to helper process
+                        MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
+                        if (!mw) {
+                            QMessageBox::warning(
+                                this,
+                                tr("Help Error"),
+                                tr("Help system unavailable: parent window is not MainWindow.")
+                                );
+                            return;
+                        }
+                        mw->launchHelperProcess("challenge-response");
+                    }
+                });
+            });
+
 
     connect(ui->comboBoxLogin, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this](int index) {

@@ -50,9 +50,7 @@ private:
     void restoreDefaults();
     void onBackupCheckStateChanged(int state);
     void openBackupDir();
-    void handleHelpRequested();
     Settings settings;
-
 };
 
 #endif // PREFERENCESDIALOG_H

@@ -21,9 +21,11 @@
 #ifndef ENCRYPTFILEDIALOG_H
 #define ENCRYPTFILEDIALOG_H
 
+#include "constants.h"
 #include "utils.h"
 #include <QLineEdit>
 #include <QObject>
+#include <QDesktopServices>
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -166,26 +168,34 @@ public:
         connect(btnBox->button(QDialogButtonBox::Help), &QPushButton::clicked,
                 this, [this]() {
 
-                    // Parent should be MainWindow
-                    MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
-                    if (!mw) {
-                        QMessageBox::warning(
-                            this,
-                            tr("Help Error"),
-                            tr("Help system unavailable: parent window is not MainWindow.")
-                            );
-                        return;
-                    }
+                    checkHelpReachable([this](bool reachable) {
 
-                    mw->launchHelperProcess("encrypt-file");
+                        if (reachable) {
+                            // Open the online help page for encrypt-file
+                            QDesktopServices::openUrl(
+                                QUrl(QString(Passwords::HelpBaseUrl) + "encrypt-file")
+                                );
+                        } else {
+                            // Fallback to helper process
+                            MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
+                            if (!mw) {
+                                QMessageBox::warning(
+                                    this,
+                                    tr("Help Error"),
+                                    tr("Help system unavailable: parent window is not MainWindow.")
+                                    );
+                                return;
+                            }
+
+                            mw->launchHelperProcess("encrypt-file");
+                        }
+                    });
                 });
 
         // Resize relative to parent
         if (parent) {
             int w = parent->width() * 3 / 4;
             setFixedSize(w, sizeHint().height()+20);
-
-            hasHelp(btnBox->button(QDialogButtonBox::Help));
         }
     }
 

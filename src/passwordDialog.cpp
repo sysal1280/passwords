@@ -22,30 +22,31 @@
 #include "passwordGenerator.h"
 #include "settings.h"
 #include "utils.h"
+
+#include <QApplication>
+#include <QClipboard>
+#include <QDebug>
+#include <QDir>
 #include <QDialog>
-#include <QVBoxLayout>
+#include <QFile>
+#include <QFrame>
+#include <QGraphicsOpacityEffect>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QSpinBox>
-#include <QPushButton>
 #include <QLineEdit>
-#include <QClipboard>
-#include <QApplication>
-#include <QMessageBox>
-#include <QStandardPaths>
-#include <QDir>
-#include <QFile>
-#include <QResource>
-#include <QDebug>
 #include <QMainWindow>
-#include <QStatusBar>
-#include <QFrame>
-#include <QScrollArea>
-#include <QScreen>
-#include <QtMath>
-#include <QGraphicsOpacityEffect>
-#include <QPropertyAnimation>
+#include <QMessageBox>
 #include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
+#include <QResource>
+#include <QScreen>
+#include <QScrollArea>
+#include <QSpinBox>
+#include <QStandardPaths>
+#include <QStatusBar>
+#include <QVBoxLayout>
+
+#include <QtMath>
 
 namespace PasswordDialog {
 

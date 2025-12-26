@@ -18,20 +18,22 @@
  */
 
 
-#include "preferencesdialog.h"
-#include "ui_preferencesdialog.h"
+#include "constants.h"
 #include "mainwindow.h"
+#include "preferencesdialog.h"
 #include "settings.h"
+#include "ui_preferencesdialog.h"
 #include "utils.h"
-#include <QDesktopServices>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QSpinBox>
-#include <QComboBox>
-#include <QResizeEvent>
+
 #include <QAbstractButton>
+#include <QComboBox>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QResizeEvent>
 #include <QResource>
+#include <QSpinBox>
 
 namespace {
 bool parseBool(const QVariant &v, bool fallback = false) {
@@ -145,11 +147,32 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
             this, &PreferencesDialog::onBackupCheckStateChanged);
     connect(ui->pushButton, &QPushButton::clicked,
             this, &PreferencesDialog::openBackupDir);
-    connect(ui->buttonBox, &QDialogButtonBox::helpRequested,
-            this, &PreferencesDialog::handleHelpRequested);
+    connect(ui->buttonBox->button(QDialogButtonBox::Help), &QPushButton::clicked,
+            this, [this]() {
 
-    hasHelp(ui->buttonBox->button(QDialogButtonBox::Help));
+                checkHelpReachable([this](bool reachable) {
 
+                    if (reachable) {
+                        // Open the online help page for encrypt-file
+                        QDesktopServices::openUrl(
+                            QUrl(QString(Passwords::HelpBaseUrl) + "preferences")
+                            );
+                    } else {
+                        // Fallback to helper process
+                        MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
+                        if (!mw) {
+                            QMessageBox::warning(
+                                this,
+                                tr("Help Error"),
+                                tr("Help system unavailable: parent window is not MainWindow.")
+                                );
+                            return;
+                        }
+
+                        mw->launchHelperProcess("preferences");
+                    }
+                });
+            });
 }
 
 void PreferencesDialog::restoreButtonClicked(QAbstractButton *button)
@@ -371,13 +394,6 @@ void PreferencesDialog::onBackupCheckStateChanged(int state)
             // User cancelled → restore the checkbox state
             ui->checkBoxBackupDB->setChecked(true);
         }
-    }
-}
-
-void PreferencesDialog::handleHelpRequested()
-{
-    if (auto mw = qobject_cast<MainWindow*>(parentWidget())) {
-        mw->launchHelperProcess("preferences");
     }
 }
 
