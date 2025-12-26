@@ -9,7 +9,7 @@
 TermsDialog::TermsDialog(const QString &termsText, QWidget *parent)
     : QDialog(parent)
 {
-    setWindowTitle("Terms and Conditions");
+    setWindowTitle("Terms of Use");
     setModal(true);
     resize(600, 400);
 
