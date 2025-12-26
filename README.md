@@ -1,66 +1,59 @@
 ### Passwords
 
-Managing passwords securely is critical, yet the majority of people still don’t use password managers. This leaves most users vulnerable to weak or reused passwords and the growing risk of breaches. While many commercial solutions exist, they often come with subscriptions, cloud storage requirements, or proprietary code. This project takes a different approach: a free, open‑source, GPG‑based password manager that works entirely offline and across platforms. By removing barriers like cost, internet dependency, and closed ecosystems, it aims to make strong password management accessible to everyone and encourage wider adoption of secure practices.
+A free, open‑source, offline password manager powered by GPG.
+Managing passwords securely is essential, yet many people still avoid password managers due to cost, cloud‑storage requirements, or distrust of proprietary systems. Passwords takes a different approach: it is a fully offline, cross‑platform, GPG‑based password manager designed for individuals, professionals, and high‑security environments.
+By removing subscriptions, internet dependencies, and closed ecosystems, Passwords makes strong credential management accessible to everyone — from home users to Tier‑0/Tier‑1 enterprise environments.
 
-To achieve this, the project is built on a few core principles:
+#### Key Principles
 
-- Your passwords never leave your device. No internet connection is required, reducing exposure to online threats, and fitting into your Tier zero and Tier one environments seamlessly.
-- The code is fully auditable. Anyone can inspect, verify, and contribute, ensuring trust through transparency.
-- Free to use forever. You’re not tied to a company’s servers, business model or subscription.
-- Cloud-based managers are attractive targets for hackers. By keeping everything local, this tool reduces risk.
-- Works seamlessly across Linux, macOS, and Windows, so you can manage credentials wherever you are.
-
-
+- GPG‑based encryption 
+- Your passwords never leave your device.  
+- No cloud sync, no telemetry, no network access required.
+- Fully auditable and open‑source.  
+- Anyone can inspect, verify, and contribute to the codebase.
+- Free forever.  
+- No subscriptions, no vendor lock‑in, no proprietary services.
+- Reduced attack surface.  
+- Cloud‑based managers are attractive targets; Passwords keeps everything local.
+- Cross‑platform support.  
+- Works on Linux, macOS, and Windows (64‑bit).
 
 #### Features
 
-- GPG-based encryption for maximum security and encryption configuration. 
-  - Use supported devices like smartcards and yubikeys to store private keys, making you even safer.
-  - Configure GPG to use the cipher algorithm and other settings *you* want to use.
-- Cross-platform support (Linux, macOS, Windows).
-  - 64-Bit operating system support.
-- No proprietary dependencies. Passwords is fully open-source.
+- Uses GPG for strong, proven cryptography
+- Supports hardware‑backed keys (smartcards, YubiKeys, etc.)
+- Fully configurable cipher and GPG options
+- Secure by design
+- Possessing the database alone is not enough to compromise passwords — decryption requires your private key, which can be stored on a hardware token
+- Metadata is encrypted, including entry names and structure, preventing attackers from learning anything useful even if they obtain the file
+- Cross‑platform desktop application
+- Linux, macOS, Windows (64‑bit)
+- Consistent UI built with Qt
+- No proprietary dependencies  
+- 100% open‑source, transparent, and auditable
 
+#### Linux & macOS (Build from Source)
 
+Requirements:
+Qt 6+
+CMake
+GPG installed on your system
+Build steps:
+bash
 
-#### Installation on Linux and OSX
-
-This program requires Qt.
-
-To build and install this program:
-
-```bash
 git clone git@github.com:sysal1280/passwords.git
 cd passwords/
 mkdir build
 cd build
-cmake ../ -DCMAKE_PREFIX_PATH=/home/sysal/Qt/6.9.3/gcc_64 -DCMAKE_BUILD_TYPE=Release
+cmake ../ -DCMAKE_PREFIX_PATH=/path/to/Qt/6.x.x/gcc_64 -DCMAKE_BUILD_TYPE=Release
 make
-```
 
+Replace /path/to/Qt/6.x.x/gcc_64 with your actual Qt installation path.
 
-
-#### Installation on Windows
-
-Download the setup program from Releases.
-
-Or install Qt Creator and download and build the software from source code yourself.
-
-
-
-#### License
-
-This program is licensed under **GNU GPL v3**. See LICENSE for details.
-
-
-
-#### Screenshots
-
-
-
-![image-20251212082424006](/home/sysal/.config/Typora/typora-user-images/image-20251212082424006.png)
-
-
-
-
-
+#### Windows
+You have two options:
+Download the installer from the Releases page
+Build from source using Qt Creator
+Install Qt 6
+Open the project in Qt Creator
+Build and run
