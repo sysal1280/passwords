@@ -6,7 +6,7 @@ By removing subscriptions, internet dependencies, and closed ecosystems, Passwor
 
 #### Key Principles
 
-- GPG‑based encryption 
+- GPG‑based encryption.
 - Your passwords never leave your device.  
 - No cloud sync, no telemetry, no network access required.
 - Fully auditable and open‑source.  
@@ -20,18 +20,18 @@ By removing subscriptions, internet dependencies, and closed ecosystems, Passwor
 
 #### Features
 
-- Uses GPG for strong, proven cryptography
+- Uses GPG for strong, proven cryptography.
 - Supports hardware‑backed keys (smartcards, YubiKeys, etc.)
-- Supports time‑based codes (TOTP), allowing you to store and generate 2‑factor authentication tokens directly within the application
-- Fully configurable cipher and GPG options
-- Secure by design
-- Possessing the database alone is not enough to compromise passwords — decryption requires private key(s), which can be stored on a hardware token
-- Metadata is encrypted, including entry names and structure, preventing attackers from learning anything useful even if they obtain the file
-- Cross‑platform desktop application
+- Supports time‑based codes (TOTP), allowing you to store and generate 2‑factor authentication tokens directly within the application.
+- Fully configurable cipher and GPG options.
+- Secure by design.
+- Possessing the database alone is not enough to compromise passwords — decryption requires private key(s), which can be stored on a hardware token.
+- Metadata is encrypted, including entry names and structure, preventing attackers from learning anything useful even if they obtain the file.
+- Cross‑platform desktop application.
 - Linux, macOS, Windows (64‑bit)
-- Consistent UI built with Qt
-- No proprietary dependencies  
-- 100% open‑source, transparent, and auditable
+- Consistent UI built with Qt.
+- No proprietary dependencies.
+- 100% open‑source, transparent, and auditable.
 
 #### Linux & macOS (Build from Source)
 
@@ -56,6 +56,8 @@ You have two options:
 1. Download the installer from the Releases page
 
 2. Build from source using Qt Creator
-Install Qt 6
-Open the project in Qt Creator
-Build and run
+
+  - Install Qt 6 and Qt Creator
+  - Open the CMakeLists.txt file in Qt Creator
+  - Build and run the Release version
+  - Optionally use windeploy.exe tool to gather all DLL's and other system requirements into one directory for easy bundling and distribution.
