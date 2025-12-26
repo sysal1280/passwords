@@ -59,7 +59,7 @@ You have two options:
 
 2. Build from source using Qt Creator
 
-  - Install Qt 6 and Qt Creator
-  - Open the CMakeLists.txt file in Qt Creator
-  - Build and run the Release version
+  - Install Qt 6 and Qt Creator.
+  - Open the CMakeLists.txt file in Qt Creator.
+  - Build and run the Release version.
   - Optionally use windeploy.exe tool to gather all DLL's and other system requirements into one directory for easy bundling and distribution.
