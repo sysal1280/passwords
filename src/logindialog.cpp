@@ -40,7 +40,7 @@ LoginDialog::LoginDialog(QWidget *parent)
     , ui(new Ui::LoginDialog)
 {
     ui->setupUi(this);
-    this->setWindowTitle(tr("Login"));
+    this->setWindowTitle(tr("Challenge"));
     ui->textEdit->setReadOnly(true);
 
     QPushButton *okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
