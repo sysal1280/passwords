@@ -1922,8 +1922,6 @@ void MainWindow::keyList()
     buttonLayout->addWidget(closeBtn);
     layout->addLayout(buttonLayout);
 
-    helpBtn->setEnabled(hasHelp());
-
     // Hook up import
     connect(importBtn, &QPushButton::clicked, this, [=]() {
         QDialog inputDlg(dlg);
