@@ -22,7 +22,7 @@
 #include "./ui_mainwindow.h"
 
 #include "DataObfuscator.h"
-#include "SystemInfoDialog.h"
+#include "systeminfodialog.h"
 #include "aboutdialog.h"
 #include "categorydialog.h"
 #include "constants.h"
@@ -536,24 +536,25 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionExported_Passwords, &QAction::triggered,
             this, &MainWindow::ExportedWithoutEdits);
 
+    //report: passwords older than N
     connect(ui->actionLast_Edited, &QAction::triggered, this, [this]() {
-
         QDialog dlg(this);
-        dlg.setWindowTitle("Select Cutoff Date");
+        dlg.setWindowTitle(tr("Select Cutoff Date"));
 
-        QVBoxLayout *layout = new QVBoxLayout(&dlg);
+        auto *layout = new QVBoxLayout(&dlg);
 
-        QLabel *label = new QLabel("Show passwords not edited since:", &dlg);
+        auto *label = new QLabel(tr("Show passwords not edited since:"), &dlg);
         layout->addWidget(label);
 
-        QDateEdit *dateEdit = new QDateEdit(&dlg);
+        auto *dateEdit = new QDateEdit(&dlg);
         dateEdit->setCalendarPopup(true);
         dateEdit->setDate(QDate::currentDate().addDays(-90)); // default 90 days
         layout->addWidget(dateEdit);
 
-        QHBoxLayout *btnLayout = new QHBoxLayout();
-        QPushButton *okBtn = new QPushButton("OK", &dlg);
-        QPushButton *cancelBtn = new QPushButton("Cancel", &dlg);
+        auto *btnLayout = new QHBoxLayout();
+        auto *cancelBtn = new QPushButton(tr("Cancel"), &dlg);
+        auto *okBtn = new QPushButton(tr("OK"), &dlg);
+
         btnLayout->addStretch();
         btnLayout->addWidget(cancelBtn);
         btnLayout->addWidget(okBtn);
@@ -563,7 +564,7 @@ MainWindow::MainWindow(QWidget *parent)
         connect(cancelBtn, &QPushButton::clicked, &dlg, &QDialog::reject);
 
         if (dlg.exec() == QDialog::Accepted) {
-            QDateTime cutoff = dateEdit->date().startOfDay();
+            const QDateTime cutoff = dateEdit->date().startOfDay();
             NotChangedSince(cutoff);
         }
     });
