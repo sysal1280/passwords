@@ -3,7 +3,7 @@
 namespace Passwords {
 inline constexpr const char* Name           = "Passwords";
 inline constexpr const char* Organization   = "sysal1280";
-inline constexpr const char* Version        = "1.0.0";
+inline constexpr const char* Version        = "1.1.0";
 inline constexpr const char* Icon           = ":/password.png";
 
 inline constexpr const char* HelpBaseUrl    = "https://sysal1280.github.io/passwords/";

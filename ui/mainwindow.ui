@@ -83,6 +83,7 @@
      <string>Database</string>
     </property>
     <addaction name="actionOpen_Database"/>
+    <addaction name="actionMaintenance"/>
     <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
@@ -447,6 +448,14 @@
   <action name="actionClear_GPG_Passphrase_Cache">
    <property name="text">
     <string>Clear GPG Passphrase Cache</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionMaintenance">
+   <property name="text">
+    <string>Maintenance</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

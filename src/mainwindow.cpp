@@ -180,8 +180,9 @@ MainWindow::MainWindow(QWidget *parent)
         { ui->actionDonate,                ":/menus/glyphs/favorite_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionExported_Passwords,    ":/menus/glyphs/table_view_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionLast_Edited,           ":/menus/glyphs/table_view_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
-        { ui->actionRandom_Noise,          ":/menus/glyphs/grain_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"},
-        { ui->actionClear_GPG_Passphrase_Cache, ":/menus/glyphs/lock_reset_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"},
+        { ui->actionRandom_Noise,          ":/menus/glyphs/grain_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
+        { ui->actionClear_GPG_Passphrase_Cache, ":/menus/glyphs/lock_reset_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
+        { ui->actionMaintenance,           ":/menus/glyphs/build_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionOnline_Documentation,  ":/menus/glyphs/help_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" }
     };
 
@@ -238,6 +239,29 @@ MainWindow::MainWindow(QWidget *parent)
                     openDatabase(fileName);
                 }
             });
+
+
+    //maintenance of database
+    connect(ui->actionMaintenance,
+            &QAction::triggered,
+            this,
+            [this]() {
+                // Create/open database here
+                QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+                db.setDatabaseName(qApp->property("dbFile").toString());
+
+                if (!db.open()) {
+                    qWarning() << "Failed to open database";
+                    return;  // just leave the lambda, don't try to show the dialog
+                }
+
+                DbMaintenance* dlg = new DbMaintenance(db, this);
+                dlg->setAttribute(Qt::WA_DeleteOnClose);
+                dlg->resize(500, 400);
+                dlg->show();
+            });
+
+
 
     //new password
     connect(ui->actionNew_Password,
