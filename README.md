@@ -22,9 +22,10 @@ By removing subscriptions, internet dependencies, and closed ecosystems, Passwor
 
 - Uses GPG for strong, proven cryptography
 - Supports hardware‑backed keys (smartcards, YubiKeys, etc.)
+- Supports time‑based codes (TOTP), allowing you to store and generate 2‑factor authentication tokens directly within the application
 - Fully configurable cipher and GPG options
 - Secure by design
-- Possessing the database alone is not enough to compromise passwords — decryption requires your private key, which can be stored on a hardware token
+- Possessing the database alone is not enough to compromise passwords — decryption requires private key(s), which can be stored on a hardware token
 - Metadata is encrypted, including entry names and structure, preventing attackers from learning anything useful even if they obtain the file
 - Cross‑platform desktop application
 - Linux, macOS, Windows (64‑bit)
