@@ -2076,10 +2076,10 @@ void MainWindow::keyList()
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
                 QDesktopServices::openUrl(
-                    QUrl(QString(Passwords::HelpBaseUrl) + "keys")
+                    QUrl(QString(Passwords::HelpBaseUrl) + "linking-keys")
                 );
             } else {
-                launchHelperProcess("keys");
+                launchHelperProcess("linking-keys");
             }
         });
     });
