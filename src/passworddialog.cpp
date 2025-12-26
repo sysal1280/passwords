@@ -220,6 +220,7 @@ QString PasswordInspectorDialog::symbolName(QChar c) const
     case u'|': return "Vertical line";
     case u'}': return "Right curly bracket";
     case u'~': return "Tilde";
+    case u' ': return "Space";
     default:
         return QString("Symbol (U+%1)").arg(QString::number(c.unicode(), 16).toUpper());
     }
