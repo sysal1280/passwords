@@ -21,8 +21,8 @@
 #ifndef PLAINTEXTEDIT_H
 #define PLAINTEXTEDIT_H
 
-#include <QTextEdit>
 #include <QMimeData>
+#include <QTextEdit>
 
 class PlainTextEdit : public QTextEdit
 {

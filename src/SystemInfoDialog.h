@@ -22,23 +22,24 @@
 #ifndef SYSTEMINFODIALOG_H
 #define SYSTEMINFODIALOG_H
 
-#include <QDialog>
-#include <QPlainTextEdit>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QClipboard>
-#include <QApplication>
-#include <QSysInfo>
-#include <QLibraryInfo>
-#include <QStandardPaths>
-#include <QProcess>
-#include <QProcessEnvironment>
-#include <QDir>
-#include <QFile>
-#include <QTextStream>
 #include "settings.h"
 #include "utils.h"
+
+#include <QApplication>
+#include <QClipboard>
+#include <QDir>
+#include <QFile>
+#include <QHBoxLayout>
+#include <QLibraryInfo>
+#include <QPlainTextEdit>
+#include <QProcess>
+#include <QProcessEnvironment>
+#include <QPushButton>
+#include <QStandardPaths>
+#include <QSysInfo>
+#include <QTextStream>
+#include <QVBoxLayout>
+#include <QDialog>
 
 class SystemInfoDialog : public QDialog
 {

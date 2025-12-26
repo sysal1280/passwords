@@ -20,14 +20,14 @@
 
 // categorydialog.h
 #pragma once
-#include <QVBoxLayout>
+
+#include <QCheckBox>
+#include <QDialog>
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QLineEdit>
-#include <QCheckBox>
-#include <QDialog>
 #include <QObject>
-
+#include <QVBoxLayout>
 
 class CategoryDialog : public QDialog
 {

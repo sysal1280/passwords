@@ -21,9 +21,9 @@
 #ifndef PASSWORDDIALOG_H
 #define PASSWORDDIALOG_H
 
+#include <QDialog>
 #include <QString>
 #include <QStringList>
-#include <QDialog>
 #include <QWidget>
 
 namespace PasswordDialog {

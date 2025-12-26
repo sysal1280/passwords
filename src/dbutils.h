@@ -21,11 +21,11 @@
 #ifndef DBUTILS_H
 #define DBUTILS_H
 
-#include <QSqlDatabase>
-#include <QSqlQuery>
+#include <QCoreApplication>
 #include <QMessageBox>
-#include <QApplication>
+#include <QSqlDatabase>
 #include <QSqlError>
+#include <QSqlQuery>
 
 inline void showDbNotOpenError(const QWidget *parent,
                                const QSqlDatabase &db,
@@ -38,7 +38,7 @@ inline void showDbNotOpenError(const QWidget *parent,
 
     QMessageBox::critical(
         const_cast<QWidget*>(parent),
-        QApplication::applicationName(),
+        QCoreApplication::applicationName(),
         "No database open."
         );
 }
@@ -56,7 +56,7 @@ inline void showQueryError(const QWidget *parent,
 
     QMessageBox::critical(
         const_cast<QWidget*>(parent),
-        QApplication::applicationName(),
+        QCoreApplication::applicationName(),
         QString("A database query failed.\n%1")
             .arg(query.lastError().text())
         );
@@ -73,7 +73,7 @@ inline void showTransactionError(const QWidget *parent,
 
     QMessageBox::critical(
         const_cast<QWidget*>(parent),
-        QApplication::applicationName(),
+        QCoreApplication::applicationName(),
         QString("A database transaction failed.\n%1")
             .arg(db.lastError().text())
         );

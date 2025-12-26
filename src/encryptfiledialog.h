@@ -22,27 +22,30 @@
 #define ENCRYPTFILEDIALOG_H
 
 #include "constants.h"
-#include "utils.h"
-#include <QLineEdit>
-#include <QObject>
-#include <QDesktopServices>
-#include <QLabel>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QMessageBox>
-#include <QDialog>
-#include <QFormLayout>
-#include <QFileDialog>
-#include <QDialogButtonBox>
-#include <QCheckBox>
-#include <mainwindow.h>
 #include "gpgCheck.h"
-#include "settings.h"
 #include "passwordDialog.h"
 #include "randomnoisedialog.h"
+#include "settings.h"
+#include "utils.h"
+
+#include <mainwindow.h>
+
+#include <QCheckBox>
+#include <QDesktopServices>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QFileDialog>
+#include <QFormLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
+#include <QMessageBox>
+#include <QObject>
+#include <QPushButton>
 #include <QToolButton>
+#include <QVBoxLayout>
+
 
 class EncryptFileDialog : public QDialog
 {

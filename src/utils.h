@@ -22,18 +22,19 @@
 #define UTILS_H
 
 #include "settings.h"
-#include <QMessageBox>
+
 #include <QApplication>
-#include <QResource>
-#include <QStandardPaths>
 #include <QDialogButtonBox>
-#include <QPushButton>
-#include <QTimer>
 #include <QLabel>
-#include <QStatusBar>
+#include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QPushButton>
+#include <QResource>
+#include <QStandardPaths>
+#include <QStatusBar>
+#include <QTimer>
 #include <QUrl>
 
 inline QString loadWordlistResource(const QWidget *parent, const char *caller)

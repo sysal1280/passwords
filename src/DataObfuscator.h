@@ -21,8 +21,8 @@
 #ifndef DATAOBFUSCATOR_H
 #define DATAOBFUSCATOR_H
 
-#include <QString>
 #include <QByteArray>
+#include <QString>
 
 /**
  * @brief The DataObfuscator class

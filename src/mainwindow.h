@@ -21,21 +21,22 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "keyentry.h"
+#include "settings.h"
+
+#include <QDateTime>
+#include <QIcon>
+#include <QLabel>
 #include <QMainWindow>
+#include <QMap>
+#include <QProcess>
+#include <QProgressBar>
+#include <QSplitter>
+#include <QString>
 #include <QSqlDatabase>
+#include <QTimer>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <QTimer>
-#include <QString>
-#include <QLabel>
-#include <QProgressBar>
-#include <QMap>
-#include <QSplitter>
-#include <QProcess>
-#include <QIcon>
-#include "settings.h"
-#include "keyentry.h"
-#include <QDateTime>
 
 namespace Ui {
 class MainWindow;

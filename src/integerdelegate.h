@@ -21,8 +21,8 @@
 #ifndef INTEGERDELEGATE_H
 #define INTEGERDELEGATE_H
 
-#include <QStyledItemDelegate>
 #include <QSpinBox>
+#include <QStyledItemDelegate>
 
 class IntegerDelegate : public QStyledItemDelegate {
     Q_OBJECT

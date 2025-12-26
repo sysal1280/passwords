@@ -21,9 +21,9 @@
 #ifndef DROPLABEL_H
 #define DROPLABEL_H
 
-#include <QLabel>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QLabel>
 #include <QMimeData>
 #include <QTreeWidgetItem>
 

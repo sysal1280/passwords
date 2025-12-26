@@ -21,15 +21,15 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include <QString>
-#include <QSettings>
-#include <QStandardPaths>
 #include <QDir>
-#include <QWidget>
+#include <QLineEdit>
 #include <QMainWindow>
+#include <QSettings>
 #include <QSplitter>
 #include <QSqlDatabase>
-#include <QLineEdit>
+#include <QStandardPaths>
+#include <QString>
+#include <QWidget>
 
 /**
  * @brief Settings class wraps QSettings to store/retrieve application preferences.

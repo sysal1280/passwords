@@ -21,10 +21,11 @@
 #ifndef LOGINDIALOG_H
 #define LOGINDIALOG_H
 
+#include "settings.h"
+
+#include <QAbstractButton>
 #include <QDialog>
 #include <QMap>
-#include <QAbstractButton>
-#include "settings.h"
 
 namespace Ui {
 class LoginDialog;

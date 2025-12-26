@@ -21,9 +21,9 @@
 #ifndef WATERMARKEDTREEWIDGET_H
 #define WATERMARKEDTREEWIDGET_H
 
-#include <QTreeWidget>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QTreeWidget>
 
 /**
  * A custom QTreeWidget that:

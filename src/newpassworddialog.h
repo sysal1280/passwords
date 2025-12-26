@@ -21,10 +21,11 @@
 #ifndef NEWPASSWORDDIALOG_H
 #define NEWPASSWORDDIALOG_H
 
-#include <QDialog>
-#include <QList>
 #include "keyentry.h"
 #include "settings.h"
+
+#include <QDialog>
+#include <QList>
 
 namespace Ui {
 class NewPasswordDialog;

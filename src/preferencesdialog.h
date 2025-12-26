@@ -21,10 +21,11 @@
 #ifndef PREFERENCESDIALOG_H
 #define PREFERENCESDIALOG_H
 
+#include "settings.h"
+
+#include <QAbstractButton>
 #include <QDialog>
 #include <QMap>
-#include <QAbstractButton>
-#include "settings.h"
 
 namespace Ui {
 class PreferencesDialog;
