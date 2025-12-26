@@ -18,6 +18,7 @@
  */
 
 
+#include "constants.h"
 #include "mainwindow.h"
 #include "debugutils.h"
 #include "gpgCheck.h"
@@ -56,12 +57,15 @@ int main(int argc, char *argv[])
     /*
      * Set QApplication settings
      */
-    QString applicationName = QCoreApplication::translate("main","Passwords");
-    QApplication::setWindowIcon(QIcon(":/password.png"));
-    QGuiApplication::setDesktopFileName(applicationName);
-    QApplication::setApplicationName(applicationName);
-    QApplication::setApplicationVersion("1.0.0");
-    QApplication::setOrganizationName("sysal1280");
+    QString translatedName =
+        QCoreApplication::translate("main", Passwords::Name);
+
+    QApplication::setWindowIcon(QIcon(Passwords::Icon));
+    QGuiApplication::setDesktopFileName(translatedName);
+    QApplication::setApplicationName(translatedName);
+    QApplication::setApplicationVersion(Passwords::Version);
+    QApplication::setOrganizationName(Passwords::Organization);
+
     if (auto *style = QStyleFactory::create("Fusion")) {
         QApplication::setStyle(style);
     }

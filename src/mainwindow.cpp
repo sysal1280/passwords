@@ -21,6 +21,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "watermarkedtreewidget.h"
+#include "constants.h"
 #include "droplabel.h"
 #include "debugutils.h"
 #include "aboutdialog.h"
@@ -344,21 +345,27 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->menuBookmarks, &QMenu::aboutToShow,
             this, &MainWindow::populateBookmarksMenu);
 
-    connect(ui->actionOnline_Documentation, &QAction::triggered,
-            this, [this]() {
-        checkHelpReachable([this](bool reachable){
+    connect(ui->actionOnline_Documentation, &QAction::triggered, this, [this]() {
+        checkHelpReachable([this](bool reachable) {
             if (reachable) {
-                QDesktopServices::openUrl(QUrl("https://sysal1280.github.io/passwords/"));
+                QDesktopServices::openUrl(
+                    QUrl(QString(Passwords::HelpBaseUrl))
+                );
             } else {
                 launchHelperProcess("");
             }
         });
-            });
+    });
 
-    connect(ui->actionDonate, &QAction::triggered,
-            this, [this]() {
+    connect(ui->actionDonate, &QAction::triggered, this, [this]() {
+        checkHelpReachable([this](bool reachable) {
+            if (reachable) {
+                QDesktopServices::openUrl(QUrl(QString(Passwords::HelpBaseUrl) + "donate"));
+            } else {
                 launchHelperProcess("donate");
-            });
+            }
+        });
+    });
 
     connect(ui->actionSystem_Information, &QAction::triggered,
             this, [this]() {
@@ -532,12 +539,6 @@ MainWindow::MainWindow(QWidget *parent)
     // ui->treeWidget_2->setStyleSheet(
     //     "QTreeWidget::item { padding-top: 6px; padding-bottom: 6px; }"
     //     );
-
-    if (!hasHelp())
-    {
-        ui->actionOnline_Documentation->setEnabled(false);
-        ui->actionDonate->setEnabled(false);
-    }
 
     setupDebugWarnings(this, ui->statusbar);
 }
@@ -1972,9 +1973,19 @@ void MainWindow::keyList()
                                   "Untrusted keys cannot be used to encrypt passwords."));
                 msgBox.setStandardButtons(QMessageBox::Ok);
                 QPushButton *helpButton = msgBox.addButton(QMessageBox::Help);
+
                 connect(helpButton, &QPushButton::clicked, this, [this]() {
-                    launchHelperProcess("ultimate-trust");
+                    checkHelpReachable([this](bool reachable) {
+                        if (reachable) {
+                            QDesktopServices::openUrl(
+                                QUrl(QString(Passwords::HelpBaseUrl) + "ultimate-trust")
+                            );
+                        } else {
+                            launchHelperProcess("ultimate-trust");
+                        }
+                    });
                 });
+
                 msgBox.exec();
                 return;
             }
@@ -2059,8 +2070,16 @@ void MainWindow::keyList()
     dlg->setFixedSize(dlg->sizeHint());
 
     // Hook up help
-    connect(helpBtn, &QPushButton::clicked, this, [=]() {
-        launchHelperProcess("keys");
+    connect(helpBtn, &QPushButton::clicked, this, [this]() {
+        checkHelpReachable([this](bool reachable) {
+            if (reachable) {
+                QDesktopServices::openUrl(
+                    QUrl(QString(Passwords::HelpBaseUrl) + "keys")
+                );
+            } else {
+                launchHelperProcess("keys");
+            }
+        });
     });
 
     connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::accept);
@@ -5054,6 +5073,19 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::launchHelperProcess(const QString &page)
 {
+    if (!hasHelp())
+    {
+        QMessageBox::warning(
+            this,
+            QApplication::applicationName(),
+            tr("No help available.\n\n"
+               "You can either allow access to %1 or download offline help from %2.")
+                .arg(Passwords::HelpBaseUrl,
+                     Passwords::GitUrl)
+        );
+        return;
+    }
+
     QApplication::setOverrideCursor(Qt::BusyCursor);
 
     QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation)

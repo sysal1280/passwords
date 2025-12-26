@@ -19,6 +19,7 @@
 
 
 #include "aboutdialog.h"
+#include "constants.h"
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QPixmap>
@@ -144,8 +145,9 @@ QWidget* AboutDialog::createWebsite(QWidget *parent)
 {
     QLabel *label = new QLabel(
         tr("Website: %1")
-            .arg("<a href=\"https://github.com/sysal1280/passwords\">https://github.com/sysal1280/passwords</a>"),
-        parent);
+            .arg(QString("<a href=\"%1\">%1</a>").arg(Passwords::GitUrl)),
+        parent
+        );
 
     label->setAlignment(Qt::AlignCenter);
     label->setTextFormat(Qt::RichText);
@@ -184,9 +186,12 @@ QLayout* AboutDialog::createCredits(QWidget *parent)
     };
 
     // Minimal required attributions (no hyperlinks)
-    layout->addWidget(makePlain("Wordlists by Sam Schlinkert (MIT License)"));
-    layout->addWidget(makePlain("Material Symbols by Google (Apache 2.0 License)"));
-    layout->addWidget(makePlain(QString("%1 icon by Iconic Panda (Flaticon)").arg(QCoreApplication::applicationName())));
+    layout->addWidget(makePlain(Passwords::WordlistsCredit));
+    layout->addWidget(makePlain(Passwords::MaterialSymbolsCredit));
+    layout->addWidget(makePlain(
+        QString(Passwords::IconCreditFormat).arg(QCoreApplication::applicationName())
+        ));
+
 
     layout->addSpacing(4);
 
@@ -198,14 +203,9 @@ QLayout* AboutDialog::createCredits(QWidget *parent)
     layout->addSpacing(4);
 
     // GPL notice (friendly wording + clickable link)
-    layout->addWidget(makeLink(
-        "Licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPLv3 License</a> or later."));
+    layout->addWidget(makeLink(Passwords::License));
 
-    layout->addWidget(makePlain(
-        "This program is distributed in the hope that it will be useful, but it is provided without any warranty; "
-        "including without the implied warranties of merchantability or fitness for a particular purpose. "
-        "For full details, see the GNU General Public License."
-        ));
+    layout->addWidget(makePlain(Passwords::WarrantyDisclaimer));
 
     return layout;
 }
