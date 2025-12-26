@@ -22,6 +22,7 @@
 #include "debugutils.h"
 #include "gpgCheck.h"
 #include "logindialog.h"
+#include "termsdialog.h"
 #include "settings.h"
 #include <QApplication>
 #include <QPixmap>
@@ -253,6 +254,21 @@ Ensure it is accessible in your PATH.
         }
     }
 
+    /*
+     * Terms - optional dialog
+     */
+    QString termsPath = QCoreApplication::applicationDirPath() + "/conditions.txt";
+
+    if (Q_UNLIKELY(QFile::exists(termsPath))) {
+        QFile f(termsPath);
+        if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QString termsText = f.readAll();
+
+            TermsDialog dlg(termsText,splash);
+            if (dlg.exec() != QDialog::Accepted)
+                return 0;   // User declined
+        }
+    }
 
     /*
      * GPG key checking — only if DB is opened
