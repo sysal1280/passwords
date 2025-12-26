@@ -20,7 +20,7 @@
 
 #include "constants.h"
 #include "debugutils.h"
-#include "gpgCheck.h"
+#include "gpgcheck.h"
 #include "logindialog.h"
 #include "mainwindow.h"
 #include "settings.h"

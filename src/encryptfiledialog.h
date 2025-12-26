@@ -22,7 +22,7 @@
 #define ENCRYPTFILEDIALOG_H
 
 #include "constants.h"
-#include "gpgCheck.h"
+#include "gpgcheck.h"
 #include "passworddialog.h"
 #include "randomnoisedialog.h"
 #include "settings.h"

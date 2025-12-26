@@ -31,7 +31,7 @@
 #include "droplabel.h"
 #include "encryptfiledialog.h"
 #include "gitversion.h"
-#include "gpgCheck.h"
+#include "gpgcheck.h"
 #include "newpassworddialog.h"
 #include "passworddialog.h"
 #include "passwordgenerator.h"

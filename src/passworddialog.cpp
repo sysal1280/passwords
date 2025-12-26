@@ -303,10 +303,11 @@ QString PasswordInspectorDialog::formatAnalysisSummary(const PasswordAnalysis &a
     QString summary;
 
     summary += QString("Entropy: %1 bits (%2)\n")
-                   .arg(QString::number(a.entropyBits, 'f', 1))
-                   .arg(a.entropyLabel);
+                   .arg(QString::number(a.entropyBits, 'f', 1),
+                        a.entropyLabel);
 
-    summary += QString("Length: %1 characters\n").arg(a.length);
+    summary += QString("Length: %1 characters\n")
+                   .arg(a.length);
 
     summary += QString("Character classes: %1 uppercase, %2 lowercase, %3 digits, %4 symbols\n")
                    .arg(a.upperCount)
@@ -314,10 +315,12 @@ QString PasswordInspectorDialog::formatAnalysisSummary(const PasswordAnalysis &a
                    .arg(a.digitCount)
                    .arg(a.symbolCount);
 
-    summary += QString("Segmentation: %1").arg(a.segmentation);
+    summary += QString("Segmentation: %1")
+                   .arg(a.segmentation);
 
     return summary;
 }
+
 
 void showPasswordGenerator(QWidget *parent,
                            const QString &title,

@@ -18,7 +18,7 @@
  */
 
 
-#include "gpgCheck.h"
+#include "gpgcheck.h"
 #include "dataobfuscator.h"
 #include "settings.h"
 
