@@ -1524,6 +1524,7 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
             QLabel* noteLabel = new QLabel(content);
             noteLabel->setWordWrap(true); // allow multi-line wrapping
             noteLabel->setStyleSheet("padding: 4px;"); // optional styling
+            noteLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
             gridLayout->addWidget(noteLabel, row, 0, 1, -1);
             row++;
         }
