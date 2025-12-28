@@ -14,7 +14,7 @@
 CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     : QDialog(parent), selectedId(selectedCategoryId)
 {
-    setWindowTitle("Category Breakdown");
+    setWindowTitle("Properties");
     resize(600, 400);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -242,7 +242,7 @@ void CategoryProperties::buildPieChart()
 
     auto* chart = new QChart();
     chart->addSeries(series);
-    chart->setTitle("Applications by Category");
+    chart->setTitle("Passwords by Category");
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignRight);
 
