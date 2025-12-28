@@ -129,24 +129,29 @@ int CategoryProperties::computeTotals(CategoryNode* node)
     return sum;
 }
 
+void CategoryProperties::collectAll(CategoryNode* node, QList<CategoryNode*>& out)
+{
+    out.append(node);
+
+    for (auto* child : node->children)
+        collectAll(child, out);
+}
+
 void CategoryProperties::buildPieChart()
 {
     auto* series = new QPieSeries();
 
-    // Selected level (root) + one level down (direct children)
-    QList<CategoryNode*> nodesForChart;
-    nodesForChart.append(root);               // level selected
-    for (auto* child : root->children) {      // down 1
-        nodesForChart.append(child);
-    }
+    // Collect selected node + ALL descendants
+    QList<CategoryNode*> allNodes;
+    collectAll(root, allNodes);
 
     qDebug() << "Building chart for selectedId =" << selectedId;
-    for (auto* node : nodesForChart) {
+    for (auto* node : allNodes) {
         qDebug() << " - id:" << node->id
                  << "name:" << node->name
                  << "directCount:" << node->directCount;
 
-        // If you want to hide zeros, uncomment this:
+        // If you want to hide zero-count categories, uncomment:
         // if (node->directCount == 0)
         //     continue;
 
@@ -187,3 +192,4 @@ void CategoryProperties::buildPieChart()
 
     chartView->setChart(chart);
 }
+
