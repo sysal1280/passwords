@@ -334,6 +334,7 @@ MainWindow::MainWindow(QWidget *parent)
             this,
             [this]() {
                 if (auto *item = ui->treeWidget->currentItem()) {
+
                     deleteCategory(item);
                 }
             });

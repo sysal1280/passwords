@@ -2,18 +2,22 @@
 #define CATEGORYPROPERTIES_H
 
 #include <QDialog>
-#include <QSqlDatabase>
 #include <QMap>
+#include <QList>
+#include <QSqlDatabase>
+#include <QChartView>
 
-class QChartView;
+QT_BEGIN_NAMESPACE
 class QPieSeries;
+QT_END_NAMESPACE
 
 struct CategoryNode {
-    int id;
+    int id = 0;
+    int parentId = 0;
     QString name;
+    int directCount = 0;      // rows directly in this category
+    int totalCount = 0;       // not needed for chart, but kept if useful later
     QList<CategoryNode*> children;
-    int directCount = 0;
-    int totalCount = 0;
 };
 
 class CategoryProperties : public QDialog
@@ -25,20 +29,22 @@ public:
     ~CategoryProperties();
 
 private:
-    int selectedId = 0;
-
-    QSqlDatabase db;
-    QMap<int, CategoryNode*> nodes;
-    CategoryNode* root = nullptr;
-
-    QChartView* chartView = nullptr;
-
     bool loadDatabase();
     void loadCategories();
     void loadApplicationCounts();
-    int computeTotals(CategoryNode* node);
+
+    int computeTotals(CategoryNode* node);   // optional, not used by chart
+
     void buildPieChart();
-    void addToSeries(CategoryNode* node, QPieSeries* series);
+
+private:
+    int selectedId = 0;
+    CategoryNode* root = nullptr;
+
+    QMap<int, CategoryNode*> nodes;
+    QSqlDatabase db;
+
+    QChartView* chartView = nullptr;
 };
 
 #endif // CATEGORYPROPERTIES_H

@@ -28,8 +28,8 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     }
 
     loadCategories();
+    loadApplicationCounts();
 
-    // Set the selected category as the root of the subtree
     if (!nodes.contains(selectedId)) {
         qWarning() << "Selected category ID not found:" << selectedId;
         return;
@@ -37,8 +37,7 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
 
     root = nodes[selectedId];
 
-    loadApplicationCounts();
-    computeTotals(root);
+    // Optional: computeTotals(root); // not used for chart now
     buildPieChart();
 }
 
@@ -62,8 +61,6 @@ bool CategoryProperties::loadDatabase()
 
 void CategoryProperties::loadCategories()
 {
-    QString appKey = qApp->property("appKey").toString();
-
     QSqlQuery q(db);
     q.prepare("SELECT id, parent_id, text FROM categories ORDER BY id");
 
@@ -72,33 +69,38 @@ void CategoryProperties::loadCategories()
         return;
     }
 
-    // First pass: create all nodes
     while (q.next()) {
         int id = q.value(0).toInt();
+        int parentId = q.value(1).isNull() ? 0 : q.value(1).toInt();
+
         QString encryptedText = q.value(2).toString();
         QString decryptedText = DataObfuscator::deobfuscate(
             encryptedText,
             qApp->property("appKey").toByteArray()
             );
 
-        nodes[id] = new CategoryNode{id, decryptedText};
+        auto* node = new CategoryNode;
+        node->id = id;
+        node->parentId = parentId;
+        node->name = decryptedText;
+
+        nodes[id] = node;
     }
 
-    // Second pass: attach children
-    q.first();
-    q.previous();
-
-    while (q.next()) {
-        int id = q.value(0).toInt();
-        int parent = q.value(1).isNull() ? -1 : q.value(1).toInt();
-
-        if (parent != -1 && nodes.contains(parent))
-            nodes[parent]->children.append(nodes[id]);
+    // Build tree relationships
+    for (auto* node : nodes) {
+        if (node->parentId != 0 && nodes.contains(node->parentId)) {
+            nodes[node->parentId]->children.append(node);
+        }
     }
 }
 
 void CategoryProperties::loadApplicationCounts()
 {
+    // Reset all direct counts
+    for (auto* node : nodes)
+        node->directCount = 0;
+
     QSqlQuery q(db);
     q.prepare("SELECT category_id, COUNT(*) FROM application GROUP BY category_id");
 
@@ -127,43 +129,61 @@ int CategoryProperties::computeTotals(CategoryNode* node)
     return sum;
 }
 
-void CategoryProperties::addToSeries(CategoryNode* node, QPieSeries* series)
-{
-    if (node->totalCount > 0)
-        series->append(node->name, node->totalCount);
-
-    for (auto* child : node->children)
-        addToSeries(child, series);
-}
-
 void CategoryProperties::buildPieChart()
 {
-    QPieSeries* series = new QPieSeries();
-    addToSeries(root, series);
+    auto* series = new QPieSeries();
 
-    // Apply distinct colors
+    // Selected level (root) + one level down (direct children)
+    QList<CategoryNode*> nodesForChart;
+    nodesForChart.append(root);               // level selected
+    for (auto* child : root->children) {      // down 1
+        nodesForChart.append(child);
+    }
+
+    qDebug() << "Building chart for selectedId =" << selectedId;
+    for (auto* node : nodesForChart) {
+        qDebug() << " - id:" << node->id
+                 << "name:" << node->name
+                 << "directCount:" << node->directCount;
+
+        // If you want to hide zeros, uncomment this:
+        // if (node->directCount == 0)
+        //     continue;
+
+        series->append(node->name, node->directCount);
+    }
+
     static const QVector<QColor> COLORS = {
-        QColor("#e6194B"), QColor("#3cb44b"), QColor("#ffe119"),
-        QColor("#4363d8"), QColor("#f58231"), QColor("#911eb4"),
-        QColor("#46f0f0"), QColor("#f032e6"), QColor("#bcf60c"),
-        QColor("#fabebe"), QColor("#008080"), QColor("#e6beff"),
-        QColor("#9A6324"), QColor("#fffac8"), QColor("#800000"),
-        QColor("#aaffc3"), QColor("#808000"), QColor("#ffd8b1"),
-        QColor("#000075"), QColor("#808080")
+        QColor(255, 179, 186), QColor(255, 223, 186), QColor(255, 255, 186),
+        QColor(186, 255, 201), QColor(186, 225, 255), QColor(255, 204, 204),
+        QColor(204, 255, 229), QColor(204, 229, 255), QColor(229, 204, 255),
+        QColor(255, 204, 229), QColor(255, 240, 245), QColor(240, 255, 240),
+        QColor(255, 250, 240), QColor(240, 248, 255), QColor(245, 245, 220),
+        QColor(255, 228, 225), QColor(224, 255, 255), QColor(255, 239, 213),
+        QColor(255, 228, 196), QColor(230, 230, 250)
     };
 
     int colorIndex = 0;
-    for (auto slice : series->slices()) {
+    for (auto* slice : series->slices()) {
         slice->setBrush(COLORS[colorIndex % COLORS.size()]);
         slice->setLabelColor(Qt::black);
         colorIndex++;
     }
 
-    QChart* chart = new QChart();
+    auto* chart = new QChart();
     chart->addSeries(series);
-    chart->setTitle("Applications by Category (Recursive)");
+    chart->setTitle("Applications by Category");
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignRight);
+
+    chart->setBackgroundVisible(false);
+    chart->setBackgroundBrush(Qt::NoBrush);
+    chart->setPlotAreaBackgroundVisible(false);
+    chart->setPlotAreaBackgroundBrush(Qt::NoBrush);
+
+    chartView->setStyleSheet("background: transparent");
+    chartView->setAttribute(Qt::WA_TranslucentBackground);
+    chartView->setBackgroundBrush(Qt::NoBrush);
 
     chartView->setChart(chart);
 }
