@@ -10,6 +10,7 @@
 #include <QPieSeries>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QToolTip>
 
 CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     : QDialog(parent), selectedId(selectedCategoryId)
@@ -32,6 +33,8 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     tableWidget->horizontalHeader()->setStretchLastSection(true);
     tableWidget->setSortingEnabled(true);
     tableWidget->setAlternatingRowColors(false);
+    tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     layout->addWidget(tableWidget);
 
@@ -60,6 +63,13 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
 
     loadCategories();
     loadApplicationCounts();
+
+    /*
+     * Close db
+     */
+    db.close();
+    db = QSqlDatabase();
+    QSqlDatabase::removeDatabase("categoryprops_conn");
 
     if (!nodes.contains(selectedId)) {
         qWarning() << "Selected category ID not found:" << selectedId;
@@ -179,6 +189,20 @@ void CategoryProperties::buildPieChart()
         if (node->directCount > 0)   // skip empty categories
             series->append(node->name, node->directCount);
     }
+
+    connect(series, &QPieSeries::hovered,
+            this, [](QPieSlice* slice, bool state) {
+                if (state) {
+                    QString text = QString("%1: %2 (%3%)")
+                    .arg(slice->label())
+                        .arg(slice->value())
+                        .arg(slice->percentage() * 100.0, 0, 'f', 1);
+
+                    QToolTip::showText(QCursor::pos(), text);
+                } else {
+                    QToolTip::hideText();
+                }
+            });
 
     static const QVector<QColor> COLORS = {
         QColor(33, 150, 243),   // Blue
