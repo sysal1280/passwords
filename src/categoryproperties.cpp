@@ -175,17 +175,44 @@ void CategoryProperties::buildPieChart()
     QList<CategoryNode*> allNodes;
     collectAll(root, allNodes);
 
-    for (auto* node : allNodes)
-        series->append(node->name, node->directCount);
+    for (auto* node : allNodes) {
+        if (node->directCount > 0)   // skip empty categories
+            series->append(node->name, node->directCount);
+    }
 
     static const QVector<QColor> COLORS = {
-        QColor(255, 179, 186), QColor(255, 223, 186), QColor(255, 255, 186),
-        QColor(186, 255, 201), QColor(186, 225, 255), QColor(255, 204, 204),
-        QColor(204, 255, 229), QColor(204, 229, 255), QColor(229, 204, 255),
-        QColor(255, 204, 229), QColor(255, 240, 245), QColor(240, 255, 240),
-        QColor(255, 250, 240), QColor(240, 248, 255), QColor(245, 245, 220),
-        QColor(255, 228, 225), QColor(224, 255, 255), QColor(255, 239, 213),
-        QColor(255, 228, 196), QColor(230, 230, 250)
+        QColor(33, 150, 243),   // Blue
+        QColor(255, 87, 34),    // Deep Orange
+        QColor(156, 39, 176),   // Purple
+        QColor(76, 175, 80),    // Green
+        QColor(244, 67, 54),    // Red
+        QColor(0, 188, 212),    // Cyan
+        QColor(255, 193, 7),    // Amber
+        QColor(63, 81, 181),    // Indigo
+        QColor(121, 85, 72),    // Brown
+        QColor(96, 125, 139),   // Blue Grey
+
+        QColor(229, 57, 53),    // Red Dark
+        QColor(25, 118, 210),   // Blue Dark
+        QColor(56, 142, 60),    // Green Dark
+        QColor(255, 160, 0),    // Amber Dark
+        QColor(123, 31, 162),   // Purple Dark
+        QColor(0, 151, 167),    // Cyan Dark
+        QColor(230, 74, 25),    // Deep Orange Dark
+        QColor(93, 64, 55),     // Brown Dark
+        QColor(48, 63, 159),    // Indigo Dark
+        QColor(69, 90, 100),    // Blue Grey Dark
+
+        QColor(255, 138, 128),  // Red Light
+        QColor(144, 202, 249),  // Blue Light
+        QColor(165, 214, 167),  // Green Light
+        QColor(255, 224, 130),  // Amber Light
+        QColor(206, 147, 216),  // Purple Light
+        QColor(128, 222, 234),  // Cyan Light
+        QColor(255, 171, 145),  // Deep Orange Light
+        QColor(161, 136, 127),  // Brown Light
+        QColor(159, 168, 218),  // Indigo Light
+        QColor(176, 190, 197)   // Blue Grey Light
     };
 
     int colorIndex = 0;
