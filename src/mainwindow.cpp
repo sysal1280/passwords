@@ -24,6 +24,7 @@
 #include "dataobfuscator.h"
 #include "systeminfodialog.h"
 #include "aboutdialog.h"
+#include "categoryproperties.h"
 #include "categorydialog.h"
 #include "constants.h"
 #include "dbutils.h"
@@ -341,6 +342,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionRefresh_Categories, &QAction::triggered,
             this, &MainWindow::loadCategories);
 
+    //catgory properties
+    connect(ui->actionProperties, &QAction::triggered, this, [this]() {
+
+        QTreeWidgetItem* item = ui->treeWidget->currentItem();
+        if (!item)
+            return;
+
+        int categoryId = item->data(0, Qt::UserRole).toInt();
+
+        CategoryProperties dlg(categoryId, this);
+        dlg.exec();
+    });
+
     //import password (into category)
     connect(ui->actionImport, &QAction::triggered,
             this, [this]() {
@@ -625,6 +639,7 @@ MainWindow::MainWindow(QWidget *parent)
                         menu.addAction(ui->actionDelete_Category);
                         menu.addAction(ui->actionImport);
                         menu.addAction(ui->actionRefresh_Categories);
+                        menu.addAction(ui->actionProperties);
                     }
                     else
                     {
