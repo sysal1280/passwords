@@ -70,6 +70,8 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
 
     buildPieChart();
     buildTable();
+
+    setMaximumSize(450,550);
 }
 
 CategoryProperties::~CategoryProperties()
