@@ -32,6 +32,8 @@ private:
     bool loadDatabase();
     void loadCategories();
     void loadApplicationCounts();
+
+    int computeTotals(CategoryNode* node);   // optional, not used by chart
     void collectAll(CategoryNode* node, QList<CategoryNode*>& out);
 
     void buildPieChart();
