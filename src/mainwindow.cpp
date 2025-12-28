@@ -106,7 +106,7 @@ MainWindow::MainWindow(QWidget *parent)
 #else
     userName = QString::fromLocal8Bit(qgetenv("USER"));
 #endif
-    showGpgKeyListDialog(GpgKeyType::Secret, this->userName, this);
+    //showGpgKeyListDialog(GpgKeyType::Secret, this->userName, this);
 
     closedIcon = QIcon(":/menus/glyphs/folder_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg");
     openIcon   = QIcon(":/menus/glyphs/folder_open_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg");
