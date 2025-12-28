@@ -6,6 +6,8 @@
 #include <QList>
 #include <QSqlDatabase>
 #include <QChartView>
+#include <QTableWidget>
+#include <QDialogButtonBox>
 
 QT_BEGIN_NAMESPACE
 class QPieSeries;
@@ -15,8 +17,8 @@ struct CategoryNode {
     int id = 0;
     int parentId = 0;
     QString name;
-    int directCount = 0;      // rows directly in this category
-    int totalCount = 0;       // not needed for chart, but kept if useful later
+    int directCount = 0;
+    int totalCount = 0;
     QList<CategoryNode*> children;
 };
 
@@ -32,11 +34,15 @@ private:
     bool loadDatabase();
     void loadCategories();
     void loadApplicationCounts();
-
-    int computeTotals(CategoryNode* node);   // optional, not used by chart
+    int computeTotals(CategoryNode* node);
     void collectAll(CategoryNode* node, QList<CategoryNode*>& out);
 
     void buildPieChart();
+    void buildTable();
+    void adjustTableHeightForVisibleRows(int visibleRows);
+
+private slots:
+    void onHelpRequested();
 
 private:
     int selectedId = 0;
@@ -46,6 +52,8 @@ private:
     QSqlDatabase db;
 
     QChartView* chartView = nullptr;
+    QTableWidget* tableWidget = nullptr;
+    QDialogButtonBox* buttonBox = nullptr;
 };
 
 #endif // CATEGORYPROPERTIES_H

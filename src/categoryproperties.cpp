@@ -7,21 +7,52 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QChart>
-#include <QChartView>
 #include <QPieSeries>
+#include <QHeaderView>
+#include <QMessageBox>
 
 CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     : QDialog(parent), selectedId(selectedCategoryId)
 {
     setWindowTitle("Properties");
-    resize(600, 400);
+    resize(700, 600);
 
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    auto* layout = new QVBoxLayout(this);
 
+    // --- Chart ---
     chartView = new QChartView(this);
     chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(chartView);
 
+    // --- Table ---
+    tableWidget = new QTableWidget(this);
+    tableWidget->setColumnCount(2);
+    tableWidget->setHorizontalHeaderLabels(QStringList() << "Category" << "Count");
+    tableWidget->horizontalHeader()->setStretchLastSection(true);
+    tableWidget->setSortingEnabled(true);
+    tableWidget->setAlternatingRowColors(false);
+    tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    layout->addWidget(tableWidget);
+
+    // --- Button box ---
+    buttonBox = new QDialogButtonBox(
+        QDialogButtonBox::Ok | QDialogButtonBox::Help,
+        Qt::Horizontal,
+        this
+        );
+    layout->addWidget(buttonBox);
+
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::helpRequested,
+            this, &CategoryProperties::onHelpRequested);
+
+    // Let chart dominate; table and buttons take minimal space
+    layout->setStretch(0, 4); // chart
+    layout->setStretch(1, 0); // table (fixed height)
+    layout->setStretch(2, 0); // buttons
+
+    // --- Load data ---
     if (!loadDatabase()) {
         qWarning() << "Database failed to open";
         return;
@@ -37,8 +68,8 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
 
     root = nodes[selectedId];
 
-    // Optional: computeTotals(root); // not used for chart now
     buildPieChart();
+    buildTable();
 }
 
 CategoryProperties::~CategoryProperties()
@@ -87,17 +118,15 @@ void CategoryProperties::loadCategories()
         nodes[id] = node;
     }
 
-    // Build tree relationships
+    // Build tree
     for (auto* node : nodes) {
-        if (node->parentId != 0 && nodes.contains(node->parentId)) {
+        if (node->parentId != 0 && nodes.contains(node->parentId))
             nodes[node->parentId]->children.append(node);
-        }
     }
 }
 
 void CategoryProperties::loadApplicationCounts()
 {
-    // Reset all direct counts
     for (auto* node : nodes)
         node->directCount = 0;
 
@@ -141,22 +170,11 @@ void CategoryProperties::buildPieChart()
 {
     auto* series = new QPieSeries();
 
-    // Collect selected node + ALL descendants
     QList<CategoryNode*> allNodes;
     collectAll(root, allNodes);
 
-    qDebug() << "Building chart for selectedId =" << selectedId;
-    for (auto* node : allNodes) {
-        qDebug() << " - id:" << node->id
-                 << "name:" << node->name
-                 << "directCount:" << node->directCount;
-
-        // If you want to hide zero-count categories, uncomment:
-        // if (node->directCount == 0)
-        //     continue;
-
+    for (auto* node : allNodes)
         series->append(node->name, node->directCount);
-    }
 
     static const QVector<QColor> COLORS = {
         QColor(255, 179, 186), QColor(255, 223, 186), QColor(255, 255, 186),
@@ -182,14 +200,76 @@ void CategoryProperties::buildPieChart()
     chart->legend()->setAlignment(Qt::AlignRight);
 
     chart->setBackgroundVisible(false);
-    chart->setBackgroundBrush(Qt::NoBrush);
     chart->setPlotAreaBackgroundVisible(false);
-    chart->setPlotAreaBackgroundBrush(Qt::NoBrush);
-
-    chartView->setStyleSheet("background: transparent");
-    chartView->setAttribute(Qt::WA_TranslucentBackground);
-    chartView->setBackgroundBrush(Qt::NoBrush);
 
     chartView->setChart(chart);
 }
 
+void CategoryProperties::buildTable()
+{
+    QList<CategoryNode*> allNodes;
+    collectAll(root, allNodes);
+
+    tableWidget->clearContents();
+    tableWidget->setRowCount(allNodes.size() + 1);
+
+    int row = 0;
+    int total = 0;
+
+    for (auto* node : allNodes) {
+        auto* nameItem = new QTableWidgetItem(node->name);
+        auto* countItem = new QTableWidgetItem(QString::number(node->directCount));
+
+        countItem->setData(Qt::UserRole, node->directCount);
+
+        tableWidget->setItem(row, 0, nameItem);
+        tableWidget->setItem(row, 1, countItem);
+
+        total += node->directCount;
+        row++;
+    }
+
+    // Total row
+    auto* totalLabelItem = new QTableWidgetItem("Total");
+    auto* totalValueItem = new QTableWidgetItem(QString::number(total));
+    totalValueItem->setData(Qt::UserRole, total);
+
+    QFont boldFont = tableWidget->font();
+    boldFont.setBold(true);
+    totalLabelItem->setFont(boldFont);
+    totalValueItem->setFont(boldFont);
+
+    tableWidget->setItem(row, 0, totalLabelItem);
+    tableWidget->setItem(row, 1, totalValueItem);
+
+    tableWidget->resizeColumnsToContents();
+
+    // Show about 4 rows visibly
+    adjustTableHeightForVisibleRows(4);
+}
+
+void CategoryProperties::adjustTableHeightForVisibleRows(int visibleRows)
+{
+    visibleRows = qMax(1, visibleRows);
+
+    int rowCount = tableWidget->rowCount();
+    int rowsToShow = qMin(visibleRows, rowCount);
+
+    int headerHeight = tableWidget->horizontalHeader()->height();
+    int rowHeight = tableWidget->verticalHeader()->defaultSectionSize();
+    int frame = 2 * tableWidget->frameWidth();
+
+    int totalHeight = headerHeight + rowHeight * rowsToShow + frame;
+
+    tableWidget->setMinimumHeight(totalHeight);
+    tableWidget->setMaximumHeight(totalHeight);
+}
+
+void CategoryProperties::onHelpRequested()
+{
+    QMessageBox::information(
+        this,
+        tr("Category Properties Help"),
+        tr("This dialog shows a pie chart and table of passwords by category.")
+        );
+}
