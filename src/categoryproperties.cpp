@@ -9,6 +9,7 @@
 #include <QChart>
 #include <QChartView>
 #include <QPieSeries>
+#include <QToolTip>
 
 CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     : QDialog(parent), selectedId(selectedCategoryId)
@@ -88,7 +89,7 @@ void CategoryProperties::loadCategories()
     }
 
     // Build tree relationships
-    for (auto* node : nodes) {
+    for (CategoryNode* node : std::as_const(nodes)) {
         if (node->parentId != 0 && nodes.contains(node->parentId)) {
             nodes[node->parentId]->children.append(node);
         }
@@ -98,8 +99,9 @@ void CategoryProperties::loadCategories()
 void CategoryProperties::loadApplicationCounts()
 {
     // Reset all direct counts
-    for (auto* node : nodes)
+    for (CategoryNode* node : std::as_const(nodes)) {
         node->directCount = 0;
+    }
 
     QSqlQuery q(db);
     q.prepare("SELECT category_id, COUNT(*) FROM application GROUP BY category_id");
@@ -118,24 +120,65 @@ void CategoryProperties::loadApplicationCounts()
     }
 }
 
-int CategoryProperties::computeTotals(CategoryNode* node)
-{
-    int sum = node->directCount;
-
-    for (auto* child : node->children)
-        sum += computeTotals(child);
-
-    node->totalCount = sum;
-    return sum;
-}
-
 void CategoryProperties::collectAll(CategoryNode* node, QList<CategoryNode*>& out)
 {
     out.append(node);
 
-    for (auto* child : node->children)
+    for (CategoryNode* child : std::as_const(node->children))
         collectAll(child, out);
 }
+
+// void CategoryProperties::buildPieChart()
+// {
+//     auto* series = new QPieSeries();
+
+//     // Collect selected node + ALL descendants
+//     QList<CategoryNode*> allNodes;
+//     collectAll(root, allNodes);
+
+//     qDebug() << "Building chart for selectedId =" << selectedId;
+//     for (CategoryNode* node : std::as_const(allNodes)) {
+//         qDebug() << " - id:" << node->id
+//                  << "name:" << node->name
+//                  << "directCount:" << node->directCount;
+
+//         series->append(node->name, node->directCount);
+//     }
+
+//     static const QVector<QColor> COLORS = {
+//         QColor(255, 179, 186), QColor(255, 223, 186), QColor(255, 255, 186),
+//         QColor(186, 255, 201), QColor(186, 225, 255), QColor(255, 204, 204),
+//         QColor(204, 255, 229), QColor(204, 229, 255), QColor(229, 204, 255),
+//         QColor(255, 204, 229), QColor(255, 240, 245), QColor(240, 255, 240),
+//         QColor(255, 250, 240), QColor(240, 248, 255), QColor(245, 245, 220),
+//         QColor(255, 228, 225), QColor(224, 255, 255), QColor(255, 239, 213),
+//         QColor(255, 228, 196), QColor(230, 230, 250)
+//     };
+
+//     int colorIndex = 0;
+//     for (auto* slice : series->slices()) {
+//         slice->setBrush(COLORS[colorIndex % COLORS.size()]);
+//         slice->setLabelColor(Qt::black);
+//         colorIndex++;
+//     }
+
+//     auto* chart = new QChart();
+//     chart->addSeries(series);
+//     chart->setTitle("Applications by Category");
+//     chart->legend()->setVisible(true);
+//     chart->legend()->setAlignment(Qt::AlignRight);
+
+//     chart->setBackgroundVisible(false);
+//     chart->setBackgroundBrush(Qt::NoBrush);
+//     chart->setPlotAreaBackgroundVisible(false);
+//     chart->setPlotAreaBackgroundBrush(Qt::NoBrush);
+
+//     chartView->setStyleSheet("background: transparent");
+//     chartView->setAttribute(Qt::WA_TranslucentBackground);
+//     chartView->setBackgroundBrush(Qt::NoBrush);
+
+//     chartView->setChart(chart);
+// }
 
 void CategoryProperties::buildPieChart()
 {
@@ -146,14 +189,10 @@ void CategoryProperties::buildPieChart()
     collectAll(root, allNodes);
 
     qDebug() << "Building chart for selectedId =" << selectedId;
-    for (auto* node : allNodes) {
+    for (CategoryNode* node : std::as_const(allNodes)) {
         qDebug() << " - id:" << node->id
                  << "name:" << node->name
                  << "directCount:" << node->directCount;
-
-        // If you want to hide zero-count categories, uncomment:
-        // if (node->directCount == 0)
-        //     continue;
 
         series->append(node->name, node->directCount);
     }
@@ -172,6 +211,32 @@ void CategoryProperties::buildPieChart()
     for (auto* slice : series->slices()) {
         slice->setBrush(COLORS[colorIndex % COLORS.size()]);
         slice->setLabelColor(Qt::black);
+        slice->setLabelVisible(false);
+
+        // --- Hover effect (Qt 6.9 compatible) ---
+        connect(slice, &QPieSlice::hovered, this, [slice](bool state) {
+            slice->setExploded(state);
+            slice->setLabelVisible(state);
+
+            if (state) {
+                QToolTip::showText(
+                    QCursor::pos(),
+                    QString("%1: %2 apps")
+                        .arg(slice->label())
+                        .arg(slice->value())
+                    );
+            } else {
+                QToolTip::hideText();
+            }
+        });
+
+        // --- Click effect (toggle exploded) ---
+        connect(slice, &QPieSlice::clicked, this, [slice]() {
+            bool newState = !slice->isExploded();
+            slice->setExploded(newState);
+            slice->setPen(QPen(Qt::black, newState ? 3 : 1));
+        });
+
         colorIndex++;
     }
 
@@ -182,9 +247,7 @@ void CategoryProperties::buildPieChart()
     chart->legend()->setAlignment(Qt::AlignRight);
 
     chart->setBackgroundVisible(false);
-    chart->setBackgroundBrush(Qt::NoBrush);
     chart->setPlotAreaBackgroundVisible(false);
-    chart->setPlotAreaBackgroundBrush(Qt::NoBrush);
 
     chartView->setStyleSheet("background: transparent");
     chartView->setAttribute(Qt::WA_TranslucentBackground);
@@ -192,4 +255,3 @@ void CategoryProperties::buildPieChart()
 
     chartView->setChart(chart);
 }
-
