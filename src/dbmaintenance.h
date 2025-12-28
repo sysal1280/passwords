@@ -32,6 +32,8 @@
 #include <QSqlQuery>
 #include <QThread>
 #include <QVBoxLayout>
+#include <QCloseEvent>
+#include <QDialogButtonBox>
 
 class DbMaintenance : public QDialog
 {
@@ -58,25 +60,57 @@ public:
         m_progress->setValue(0);
         m_progress->setFixedHeight(18);
         layout->addWidget(m_progress);
+        layout->addSpacing(20);   // lifts the progress bar upward by 20px
 
-        // Buttons aligned to the right, smaller and more professional
-        QHBoxLayout* btnLayout = new QHBoxLayout();
-        btnLayout->addStretch();  // pushes buttons to the right
+        // Buttons aligned to the right using QDialogButtonBox
+        QDialogButtonBox* buttonBox = new QDialogButtonBox(this);
 
-        m_startBtn = new QPushButton("Start", this);
-        m_closeBtn = new QPushButton("Close", this);
+        // Add standard buttons
+        buttonBox->setStandardButtons(QDialogButtonBox::Help | QDialogButtonBox::Close);
 
-        // Make buttons smaller and tighter
-        m_startBtn->setFixedSize(70, 26);
-        m_closeBtn->setFixedSize(70, 26);
+        // Add custom Start button
+        m_startBtn = buttonBox->addButton("Start", QDialogButtonBox::ActionRole);
 
-        btnLayout->addWidget(m_startBtn);
-        btnLayout->addWidget(m_closeBtn);
+        // Retrieve pointers to the standard buttons
+        m_closeBtn = buttonBox->button(QDialogButtonBox::Close);
+        m_helpBtn  = buttonBox->button(QDialogButtonBox::Help);
 
-        layout->addLayout(btnLayout);
+        // Add to layout
+        layout->addWidget(buttonBox);
 
-        connect(m_startBtn, &QPushButton::clicked, this, &DbMaintenance::startMaintenance);
-        connect(m_closeBtn, &QPushButton::clicked, this, &QDialog::close);
+        connect(m_startBtn, &QPushButton::clicked,
+                this, &DbMaintenance::startMaintenance);
+
+        connect(m_closeBtn, &QPushButton::clicked,
+                this, &QDialog::close);
+
+        connect(m_helpBtn, &QPushButton::clicked,
+                this, [this]() {
+                    QMessageBox::information(
+                        this,
+                        tr("Database Maintenance Help"),
+                        tr("This maintenance process performs:\n"
+                           "• Integrity check\n"
+                           "• Quick check\n"
+                           "• ANALYZE\n"
+                           "• REINDEX\n"
+                           "• WAL checkpoint (if applicable)\n"
+                           "• VACUUM\n\n"
+                           "These operations help ensure the database remains healthy and optimized.")
+                        );
+                });
+    }
+
+protected:
+    void closeEvent(QCloseEvent* event) override
+    {
+        // If Start is disabled, maintenance is running
+        if (!m_startBtn->isEnabled()) {
+            QMessageBox::warning(this,"Maintenance","Maintenance in progress. Please wait..");
+            event->ignore();
+            return;
+        }
+        QDialog::closeEvent(event);
     }
 
 private slots:
@@ -203,6 +237,7 @@ private:
     QProgressBar* m_progress;
     QPushButton* m_startBtn;
     QPushButton* m_closeBtn;
+    QPushButton* m_helpBtn;
 };
 
 #endif // DBMAINTENANCE_H
