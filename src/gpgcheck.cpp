@@ -35,6 +35,14 @@
 #include <QTimer>
 #include <QUuid>
 #include <QtConcurrent/QtConcurrentRun>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QDialogButtonBox>
+#include <QPushButton>
+#include <QLabel>
+#include <QClipboard>
+#include <QRegularExpression>
+
 
 bool isToolAvailable(const QString &toolName)
 {
@@ -304,3 +312,156 @@ bool warmupGpg(const QString &recipientKey, QWidget *parent)
     return ok;
 }
 
+void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *parent)
+{
+    // --- Build dialog dynamically ---
+    QDialog* dlg = new QDialog(parent);
+    dlg->setWindowTitle(type == GpgKeyType::Public
+                            ? QObject::tr("GPG Public Keys")
+                            : QObject::tr("GPG Secret Keys"));
+    dlg->resize(650, 550);
+
+    QVBoxLayout* layout = new QVBoxLayout(dlg);
+
+    // --- Add label at the top ---
+    QString keyTypeText = (type == GpgKeyType::Public)
+                              ? QObject::tr("public")
+                              : QObject::tr("private");
+
+    QLabel* infoLabel = new QLabel(
+        QObject::tr("These are the installed %1 keys for %2\nWhen linking keys, use the Key ID or Fingerprint.")
+            .arg(keyTypeText, userName),
+        dlg
+        );
+    infoLabel->setWordWrap(true);
+    layout->addWidget(infoLabel);
+
+    // --- Create text edit inside dialog ---
+    QTextEdit* textEdit = new QTextEdit(dlg);
+    textEdit->setReadOnly(true);
+    layout->addWidget(textEdit);
+
+    // --- Button box ---
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(dlg);
+    QPushButton* closeBtn = buttonBox->addButton(QDialogButtonBox::Close);
+    QPushButton* copyBtn  = buttonBox->addButton(QObject::tr("Copy"), QDialogButtonBox::ActionRole);
+    QPushButton* helpBtn  = buttonBox->addButton(QDialogButtonBox::Help);
+
+    layout->addWidget(buttonBox);
+
+    // --- Button actions ---
+    QObject::connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::close);
+
+    QObject::connect(copyBtn, &QPushButton::clicked, dlg, [textEdit]() {
+        QApplication::clipboard()->setText(textEdit->toPlainText());
+    });
+
+    QObject::connect(helpBtn, &QPushButton::clicked, dlg, [dlg]() {
+        QMessageBox::information(dlg,
+                                 QObject::tr("GPG Key Help"),
+                                 QObject::tr("This dialog lists your GPG keys.\n\n"
+                                             "• Public keys are used to encrypt data.\n"
+                                             "• Private keys are used to decrypt and sign.\n\n"
+                                             "You can copy the key details using the Copy button."));
+    });
+
+    // --- Create process ---
+    QProcess* proc = new QProcess(dlg);
+
+    QObject::connect(proc, &QProcess::readyReadStandardOutput, dlg, [textEdit, proc]() {
+        textEdit->append(QString::fromUtf8(proc->readAllStandardOutput()));
+    });
+
+    QObject::connect(proc, &QProcess::readyReadStandardError, dlg, [textEdit, proc]() {
+        textEdit->append("<span style='color:red'>" +
+                         QString::fromUtf8(proc->readAllStandardError()) +
+                         "</span>");
+    });
+
+    // --- When finished, prettify output ---
+    QObject::connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+                     dlg, [textEdit, type](int, QProcess::ExitStatus) {
+
+                         QString raw = textEdit->toPlainText();
+                         textEdit->clear();
+
+                         QStringList lines = raw.split('\n');
+                         QString out;
+
+                         QString keyId;
+                         QString fingerprint;
+                         QString created;
+
+                         const QString primaryType =
+                             (type == GpgKeyType::Public) ? "pub" : "sec";
+
+                         for (const QString& line : lines) {
+                             QStringList p = line.split(':');
+                             if (p.size() < 10)
+                                 continue;
+
+                             const QString recordType = p[0];
+
+                             if (recordType == primaryType) {
+                                 keyId.clear();
+                                 fingerprint.clear();
+                                 created.clear();
+
+                                 keyId = p[4];
+
+                                 if (!p[5].isEmpty()) {
+                                     created = QDateTime::fromSecsSinceEpoch(
+                                                   p[5].toLongLong())
+                                                   .toString("yyyy-MM-dd");
+                                 }
+                             }
+                             else if (recordType == "fpr") {
+                                 if (fingerprint.isEmpty())
+                                     fingerprint = p[9].trimmed();
+                             }
+                             else if (recordType == "uid") {
+                                 if (keyId.isEmpty())
+                                     continue;
+
+                                 QString uid = p[9];
+                                 QString user;
+                                 QString email;
+
+                                 QRegularExpression re(R"(^(.*)\s+<(.*)>)");
+                                 auto m = re.match(uid);
+                                 if (m.hasMatch()) {
+                                     user = m.captured(1).trimmed();
+                                     email = m.captured(2).trimmed();
+                                 } else {
+                                     user = uid.trimmed();
+                                 }
+
+                                 out += QString(
+                                            "User:         %1\n"
+                                            "Email:        %2\n"
+                                            "Key ID:       %3\n"
+                                            "Fingerprint:  %4\n"
+                                            "Created:      %5\n"
+                                            "--------------------------------\n"
+                                            ).arg(user,
+                                                 email,
+                                                 keyId,
+                                                 fingerprint.isEmpty() ? "(none)" : fingerprint,
+                                                 created);
+                             }
+                         }
+
+                         textEdit->setPlainText(out);
+                     });
+
+    // --- Start GPG asynchronously ---
+    QStringList args;
+    if (type == GpgKeyType::Public)
+        args << "--list-public-keys" << "--with-colons";
+    else
+        args << "--list-secret-keys" << "--with-colons";
+
+    proc->start("gpg", args);
+
+    dlg->show();
+}

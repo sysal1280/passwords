@@ -11,6 +11,7 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QToolTip>
+#include <QUuid>
 
 CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     : QDialog(parent), selectedId(selectedCategoryId)
@@ -92,7 +93,7 @@ CategoryProperties::~CategoryProperties()
 
 bool CategoryProperties::loadDatabase()
 {
-    db = QSqlDatabase::addDatabase("QSQLITE", "categoryprops_conn");
+    db = QSqlDatabase::addDatabase("QSQLITE", QUuid::createUuid().toString(QUuid::WithoutBraces));
     db.setDatabaseName(qApp->property("dbFile").toString());
 
     if (!db.open()) {

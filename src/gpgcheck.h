@@ -23,6 +23,11 @@
 
 #include <QWidget>
 
+enum class GpgKeyType {
+    Public,
+    Secret
+};
+
 void checkGpgKeys(QWidget* parent = nullptr);
 bool isToolAvailable(const QString &toolName);
 bool isStrong(const QString &str);
@@ -30,5 +35,7 @@ bool hasUltimateTrust(const QString &keyId);
 bool warnAndContinue();
 bool warmupGpg(const QString &recipientKey, QWidget *parent);
 static QStringList checkKeysWithGpg(const QStringList &keys);
+void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *parent = nullptr);
+
 
 #endif // GPGCHECK_H

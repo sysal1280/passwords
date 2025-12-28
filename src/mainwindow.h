@@ -24,6 +24,7 @@
 #include "dbmaintenance.h"
 #include "keyentry.h"
 #include "settings.h"
+#include "gpgcheck.h"
 
 #include <QDateTime>
 #include <QIcon>
