@@ -465,3 +465,108 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
 
     dlg->show();
 }
+
+bool createGpgEncryptionKey(const QString &name, QWidget *parent)
+{
+    if (name.isEmpty()) {
+        QMessageBox::warning(parent, "Missing Information",
+                             "A name is required to create a GPG key.");
+        return false;
+    }
+
+    QString userId = name;
+
+    //
+    // STEP 1 — Create Ed25519 primary key
+    //
+    {
+        QProcess proc;
+        proc.setProgram("gpg");
+        proc.setArguments({
+            "--batch",
+            "--quick-generate-key",
+            userId,
+            "ed25519",
+            "sign",
+            "0"
+        });
+
+        proc.start();
+        if (!proc.waitForFinished(15000) ||
+            proc.exitCode() != 0) {
+
+            QMessageBox::critical(parent, "GPG Error",
+                                  "Failed to create primary key:\n\n" +
+                                      proc.readAllStandardError());
+            return false;
+        }
+    }
+
+    //
+    // STEP 2 — Extract fingerprint
+    //
+    QString fingerprint;
+    {
+        QProcess proc;
+        proc.setProgram("gpg");
+        proc.setArguments({
+            "--with-colons",
+            "--fingerprint",
+            userId
+        });
+
+        proc.start();
+        if (!proc.waitForFinished(5000)) {
+            QMessageBox::critical(parent, "GPG Error",
+                                  "Failed to read fingerprint.");
+            return false;
+        }
+
+        QString output = proc.readAllStandardOutput();
+        for (const QString &line : output.split('\n')) {
+            if (line.startsWith("fpr:")) {
+                QStringList parts = line.split(':');
+                if (parts.size() > 9) {
+                    fingerprint = parts[9];
+                    break;
+                }
+            }
+        }
+
+        if (fingerprint.isEmpty()) {
+            QMessageBox::critical(parent, "GPG Error",
+                                  "Could not extract fingerprint.");
+            return false;
+        }
+    }
+
+    //
+    // STEP 3 — Add Curve25519 encryption subkey using fingerprint
+    //
+    {
+        QProcess proc;
+        proc.setProgram("gpg");
+        proc.setArguments({
+            "--batch",
+            "--quick-add-key",
+            fingerprint,
+            "cv25519",
+            "encrypt",
+            "0"
+        });
+
+        proc.start();
+        if (!proc.waitForFinished(15000) ||
+            proc.exitCode() != 0) {
+
+            QMessageBox::critical(parent, "GPG Error",
+                                  "Failed to add encryption subkey:\n\n" +
+                                      proc.readAllStandardError());
+            return false;
+        }
+    }
+
+    QMessageBox::information(parent, "Success",
+                             "Your new GPG encryption keypair has been created.");
+    return true;
+}
