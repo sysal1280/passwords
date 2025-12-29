@@ -197,6 +197,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionClose->setMenuRole(QAction::QuitRole);
     ui->actionPreferences->setMenuRole(QAction::PreferencesRole);
 
+    ui->actionOpen_Database->setStatusTip(tr("Open an existing database"));
+    ui->actionPreferences->setStatusTip(tr("Change application settings"));
+    ui->actionMaintenance->setStatusTip(tr("Verify database integrity and perform optimization tasks"));
+    ui->actionDelete_Category->setStatusTip(tr("Delete the selected category"));
+    ui->actionClose->setStatusTip(tr("Exit the application"));
+
+    ui->actionGenerate_Password->setStatusTip(tr("Generate a new secure password"));
+
+
     // OTP countdown widgets (progress bar + label)
     countdownProgress = new QProgressBar(this);
     countdownProgress->setRange(0, 30);
@@ -636,10 +645,12 @@ MainWindow::MainWindow(QWidget *parent)
                     {
                         menu.addAction(ui->actionNew_Category);
                         menu.addAction(ui->actionNew_Password);
+                        menu.addSeparator();
                         menu.addAction(ui->actionRename);
                         menu.addAction(ui->actionDelete_Category);
                         menu.addAction(ui->actionImport);
                         menu.addAction(ui->actionRefresh_Categories);
+                        menu.addSeparator();
                         menu.addAction(ui->actionProperties);
                     }
                     else
@@ -2084,7 +2095,7 @@ void MainWindow::keyList()
     //
     connect(newKeyBtn, &QPushButton::clicked, this, [=]() {
         QDialog inputDlg(dlg);
-        inputDlg.setWindowTitle(tr("Create New GPG Key"));
+        inputDlg.setWindowTitle(tr("New GPG Key"));
 
         QVBoxLayout *vbox = new QVBoxLayout(&inputDlg);
 
@@ -2098,12 +2109,12 @@ void MainWindow::keyList()
 
         // Instruction label
         QLabel *infoLabel = new QLabel(
-            tr("Enter a name for the new key. This name identifies the key in your GPG keyring.\n\n"
-               "Examples: \"%1\", \"Work passwords\", \"Personal vault\".")
+            tr("Enter a name for the new key.\nThis name identifies the key in your GPG keyring.\n\n"
+               "Examples: \"%1\", \"Work passwords\", \"Personal vault\".\n")
                 .arg(suggestedName),
             &inputDlg
         );
-        infoLabel->setWordWrap(true);
+        infoLabel->setWordWrap(false);
         vbox->addWidget(infoLabel);
 
         // Form layout

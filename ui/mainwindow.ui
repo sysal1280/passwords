@@ -251,7 +251,7 @@
   </action>
   <action name="actionKey_List">
    <property name="text">
-    <string>Key List</string>
+    <string>Linked Keys</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+K</string>
@@ -326,7 +326,7 @@
   </action>
   <action name="actionDelete_Category">
    <property name="text">
-    <string>Delete Category</string>
+    <string>Delete</string>
    </property>
    <property name="shortcut">
     <string>Del</string>

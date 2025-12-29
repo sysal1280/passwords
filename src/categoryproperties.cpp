@@ -37,6 +37,8 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    tableWidget->verticalHeader()->setDefaultSectionSize(20);
     layout->addWidget(tableWidget);
 
     // --- Button box ---
