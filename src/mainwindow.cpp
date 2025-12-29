@@ -204,7 +204,23 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionClose->setStatusTip(tr("Exit the application"));
 
     ui->actionGenerate_Password->setStatusTip(tr("Generate a new secure password"));
+    ui->actionRandom_Noise->setStatusTip(tr("Generate random data in various formats"));
+    ui->actionEncrypt_File->setStatusTip(tr("Encrypt a file using a password"));
+    ui->actionDecrypt_File->setStatusTip(tr("Decrypt a password‑encrypted file"));
+    ui->actionEncrypt_message->setStatusTip(tr("Encrypt a message using a password"));
+    ui->actionDecrypt_message->setStatusTip(tr("Decrypt a password‑encrypted message"));
+    ui->actionKey_List->setStatusTip(tr("Manage the list of keys allowed to encrypt passwords"));
+    ui->actionClear_GPG_Passphrase_Cache->setStatusTip(tr("Clear cached GPG passphrases"));
+    ui->actionExported_Passwords->setStatusTip(tr("View passwords that remain unchanged since being exported"));
+    ui->actionLast_Edited->setStatusTip(tr("Identify passwords that may be outdated or insecure"));
+    ui->actionRecent->setStatusTip(tr("Show the most recently accessed passwords"));
+    ui->actionPopular->setStatusTip(tr("Show the most frequently accessed passwords"));
 
+    ui->actionOnline_Documentation->setStatusTip(tr("Open the user guide in your web browser"));
+    ui->actionSystem_Information->setStatusTip(tr("View detailed system and application information"));
+    ui->actionDonate->setStatusTip(tr("Learn how to support the project"));
+    ui->actionAbout->setStatusTip(tr("View information about this application"));
+    ui->actionAbout_Qt->setStatusTip(tr("View information about the Qt framework"));
 
     // OTP countdown widgets (progress bar + label)
     countdownProgress = new QProgressBar(this);

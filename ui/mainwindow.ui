@@ -447,7 +447,7 @@
   </action>
   <action name="actionClear_GPG_Passphrase_Cache">
    <property name="text">
-    <string>Clear GPG Passphrase Cache</string>
+    <string>Clear Passphrase Cache</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
