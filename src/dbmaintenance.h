@@ -34,6 +34,7 @@
 #include <QVBoxLayout>
 #include <QCloseEvent>
 #include <QDialogButtonBox>
+#include <QDesktopServices>
 
 class DbMaintenance : public QDialog
 {
@@ -66,14 +67,13 @@ public:
         QDialogButtonBox* buttonBox = new QDialogButtonBox(this);
 
         // Add standard buttons
-        buttonBox->setStandardButtons(QDialogButtonBox::Help | QDialogButtonBox::Close);
+        buttonBox->setStandardButtons(QDialogButtonBox::Close);
 
         // Add custom Start button
         m_startBtn = buttonBox->addButton("Start", QDialogButtonBox::ActionRole);
 
         // Retrieve pointers to the standard buttons
         m_closeBtn = buttonBox->button(QDialogButtonBox::Close);
-        m_helpBtn  = buttonBox->button(QDialogButtonBox::Help);
 
         // Add to layout
         layout->addWidget(buttonBox);
@@ -84,21 +84,6 @@ public:
         connect(m_closeBtn, &QPushButton::clicked,
                 this, &QDialog::close);
 
-        connect(m_helpBtn, &QPushButton::clicked,
-                this, [this]() {
-                    QMessageBox::information(
-                        this,
-                        tr("Database Maintenance Help"),
-                        tr("This maintenance process performs:\n"
-                           "• Integrity check\n"
-                           "• Quick check\n"
-                           "• ANALYZE\n"
-                           "• REINDEX\n"
-                           "• WAL checkpoint (if applicable)\n"
-                           "• VACUUM\n\n"
-                           "These operations help ensure the database remains healthy and optimized.")
-                        );
-                });
     }
 
 protected:
@@ -237,7 +222,6 @@ private:
     QProgressBar* m_progress;
     QPushButton* m_startBtn;
     QPushButton* m_closeBtn;
-    QPushButton* m_helpBtn;
 };
 
 #endif // DBMAINTENANCE_H
