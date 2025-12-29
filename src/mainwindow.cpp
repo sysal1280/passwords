@@ -1498,6 +1498,7 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 
         QAction *showPasswordAction = new QAction(tr("Show Password"), passwordEdit);
         showPasswordAction->setCheckable(true);
+        showPasswordAction->setStatusTip(tr("Show or hide the password text"));
         passwordEdit->addAction(showPasswordAction);
 
         connect(showPasswordAction, &QAction::toggled,
@@ -1507,10 +1508,9 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
                 });
 
 
-
-
         QAction *inspectPasswordAction = new QAction(tr("Inspect Password"), this);
         passwordEdit->addAction(inspectPasswordAction, QLineEdit::TrailingPosition);
+        inspectPasswordAction->setStatusTip("Analyze this password character by character");
 
         connect(inspectPasswordAction, &QAction::triggered,
                 this, [passwordEdit]() {
