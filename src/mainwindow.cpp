@@ -5910,7 +5910,7 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
 
     connect(table, &QTableWidget::itemDoubleClicked, dlg, [selectRow]() {
         selectRow();
-        // ❗ Do NOT close the dialog — user wants it to stay open
+        // ❗ Do NOT close the dialog — user will want it to stay open
     });
 
     // Center dialog
@@ -5923,18 +5923,4 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
     dlg->setGeometry(x, y, w, h);
 
     dlg->show();   // MODELLESS
-}
-
-void MainWindow::inspectPassword()
-{
-    auto *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-
-    auto *edit = action->parent()->findChild<QLineEdit*>();
-    if (!edit)
-        return;
-
-    PasswordDialog::PasswordInspectorDialog dlg(edit->text(), nullptr);
-    dlg.exec();
 }

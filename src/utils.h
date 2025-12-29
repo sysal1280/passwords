@@ -22,6 +22,7 @@
 #define UTILS_H
 
 #include "settings.h"
+#include "constants.h"
 
 #include <QApplication>
 #include <QDialogButtonBox>
@@ -95,7 +96,7 @@ inline void setupDebugWarnings(QWidget *parent, QStatusBar *statusBar)
 {
 #ifdef APP_DEBUG_BUILD
     // Permanent status bar warning
-    QLabel *debugWarning = new QLabel("📛 WARNING: Debug version — Do NOT use for real passwords 📛");
+    QLabel *debugWarning = new QLabel(Passwords::debugWarningSB);
     debugWarning->setStyleSheet("color: red; font-weight: bold;");
     statusBar->addPermanentWidget(debugWarning);
 
@@ -105,9 +106,7 @@ inline void setupDebugWarnings(QWidget *parent, QStatusBar *statusBar)
         QMessageBox::critical(
             nullptr,
             QApplication::applicationName(),
-            "This is a DEBUG build.\n\n"
-            "It is not safe for production use. It is intended for testing purposes only. "
-            "Do not store real passwords or other proper data in this database.\n\nIf this program has been installed for you, uninstall it immediately."
+            Passwords::debugWarningMB
             );
     });
     debugTimer->start(5 * 60 * 1000); // 5 minutes

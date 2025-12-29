@@ -19,4 +19,11 @@ inline constexpr const char* WordlistsCredit = "Wordlists by Sam Schlinkert (MIT
 inline constexpr const char* MaterialSymbolsCredit = "Material Symbols by Google (Apache 2.0 License)";
 inline constexpr const char* IconCreditFormat = "%1 icon by Iconic Panda (Flaticon)";
 
+inline constexpr const char* debugWarningSB = "WARNING: Debug Version Only";
+inline constexpr const char* debugWarningMB =
+    "This is a DEBUG build.\n\n"
+    "It is not safe for production use. It is intended for testing purposes only. "
+    "Do not store real passwords or other proper data in this database.\n\n"
+    "If this program has been installed for you, uninstall it immediately.";
+
 }
