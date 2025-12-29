@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>412</width>
-    <height>476</height>
+    <height>503</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
    <item row="1" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -64,6 +64,28 @@
            <widget class="QCheckBox" name="checkBoxAskClose">
             <property name="text">
              <string>Prompt before closing</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QGroupBox" name="groupBox_9">
+         <property name="title">
+          <string>Echo mode</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_16">
+          <item row="1" column="0">
+           <widget class="QComboBox" name="comboBoxEchoMode"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>When prompting for passwords what should be displayed?</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -107,16 +129,6 @@
             </item>
            </layout>
           </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Backups are stored chronolgically for easy restore to any point in time.</string>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0" colspan="2">
            <widget class="QLabel" name="label">
             <property name="text">
@@ -127,27 +139,45 @@
             </property>
            </widget>
           </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QGroupBox" name="groupBox_9">
-         <property name="title">
-          <string>Echo mode</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_16">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_11">
+          <item row="1" column="0" colspan="2">
+           <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>When prompting for passwords what should be displayed?</string>
+             <string>Backups are stored chronolgically for easy restore to any point in time.</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QComboBox" name="comboBoxEchoMode"/>
+          <item row="4" column="0">
+           <layout class="QFormLayout" name="formLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_12">
+              <property name="text">
+               <string>Maximum number of backups</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="spinBoxMaxBackups">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="specialValueText">
+               <string>Unlimited</string>
+              </property>
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+              <property name="singleStep">
+               <number>5</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>

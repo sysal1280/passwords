@@ -248,6 +248,18 @@ int Settings::getGeneratedPasswordLength()
     return val;
 }
 
+int Settings::getMaxBackups()
+{
+    if (!settings)
+        return 2;
+
+    settings->beginGroup("General");
+    int val = settings->value("MaxBackups", 0).toInt();
+    settings->endGroup();
+
+    return val;
+}
+
 QLineEdit::EchoMode Settings::getEchoMode()
 {
     if (!settings)
