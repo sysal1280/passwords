@@ -36,6 +36,11 @@ bool warnAndContinue();
 bool warmupGpg(const QString &recipientKey, QWidget *parent);
 static QStringList checkKeysWithGpg(const QStringList &keys);
 void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *parent = nullptr);
-bool createGpgEncryptionKey(const QString &name, QWidget *parent = nullptr);
+void createGpgEncryptionKeyAsync(
+    const QString &name,
+    QWidget *parent,
+    std::function<void(bool)> done
+    );
+
 
 #endif // GPGCHECK_H

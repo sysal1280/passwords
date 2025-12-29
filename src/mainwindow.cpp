@@ -1971,11 +1971,12 @@ void MainWindow::keyList()
 
     QVBoxLayout *layout = new QVBoxLayout(dlg);
 
-    // Instruction label at the top
+    // Instruction label
     QLabel *instruction = new QLabel(
-        "Keys are linked by Key ID only. They are not imported. Neither public or private keys\nare stored in the database.\n\nGPG Keys:",
+        "Keys are linked only by their Key ID or fingerprint. No public or private keys\n are ever stored in this database.\n\nGPG Keys:",
         dlg
-        );
+    );
+
     instruction->setWordWrap(false);
     instruction->setAlignment(Qt::AlignLeft);
     layout->addWidget(instruction);
@@ -1989,7 +1990,7 @@ void MainWindow::keyList()
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
     table->verticalHeader()->setDefaultSectionSize(20);
-    // make header font non‑bold
+
     QFont headerFont = table->horizontalHeader()->font();
     headerFont.setBold(false);
     table->horizontalHeader()->setFont(headerFont);
@@ -1998,8 +1999,7 @@ void MainWindow::keyList()
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "fetchkeys");
         db.setDatabaseName(dbFile);
-        if (!db.open())
-        {
+        if (!db.open()) {
             showDbNotOpenError(this, db, Q_FUNC_INFO);
             return;
         }
@@ -2009,33 +2009,113 @@ void MainWindow::keyList()
             int row = 0;
             while (query.next()) {
                 table->insertRow(row);
-                table->setItem(row, 0, new QTableWidgetItem(DataObfuscator::deobfuscate(query.value(1).toString(),this->appKey)));
-                table->setItem(row, 1,new QTableWidgetItem(DataObfuscator::deobfuscate(query.value(2).toString(),this->appKey)));
-                table->item(row,1)->setData(Qt::UserRole,query.value(0).toInt());
+                table->setItem(row, 0, new QTableWidgetItem(
+                    DataObfuscator::deobfuscate(query.value(1).toString(), this->appKey)
+                ));
+                table->setItem(row, 1, new QTableWidgetItem(
+                    DataObfuscator::deobfuscate(query.value(2).toString(), this->appKey)
+                ));
+                table->item(row, 1)->setData(Qt::UserRole, query.value(0).toInt());
                 row++;
             }
         } else {
-            showQueryError(this,query,Q_FUNC_INFO);
+            showQueryError(this, query, Q_FUNC_INFO);
         }
     }
     QSqlDatabase::removeDatabase("fetchkeys");
 
     layout->addWidget(table);
 
-    // Buttons
+    //
+    // BUTTONS
+    //
     QHBoxLayout *buttonLayout = new QHBoxLayout;
+
+    // NEW KEY BUTTON
+    QPushButton *newKeyBtn = new QPushButton("&New Key", dlg);
+
+    // SHOW TOOLBUTTON
+    QToolButton *showBtn = new QToolButton(dlg);
+    showBtn->setText("Show");
+    showBtn->setPopupMode(QToolButton::MenuButtonPopup);
+
+    QMenu *showMenu = new QMenu(showBtn);
+    QAction *showPublicAct = showMenu->addAction("Public Keys");
+    QAction *showSecretAct = showMenu->addAction("Secret Keys");
+    showBtn->setMenu(showMenu);
+
+    // EXISTING BUTTONS
     QPushButton *importBtn = new QPushButton("&Link Key", dlg);
     QPushButton *deleteBtn = new QPushButton("&Delete", dlg);
     QPushButton *helpBtn   = new QPushButton("&Help", dlg);
     QPushButton *closeBtn  = new QPushButton("&Close", dlg);
+
+    buttonLayout->addWidget(newKeyBtn);
+    buttonLayout->addWidget(showBtn);
     buttonLayout->addWidget(importBtn);
     buttonLayout->addWidget(deleteBtn);
     buttonLayout->addWidget(helpBtn);
     buttonLayout->addStretch();
     buttonLayout->addWidget(closeBtn);
+
     layout->addLayout(buttonLayout);
 
-    // Hook up import
+    //
+    // NEW KEY HANDLER
+    //
+    connect(newKeyBtn, &QPushButton::clicked, this, [=]() {
+        QDialog inputDlg(dlg);
+        inputDlg.setWindowTitle("Create New GPG Key");
+
+        QFormLayout form(&inputDlg);
+
+        QLineEdit *nameEdit = new QLineEdit(&inputDlg);
+        nameEdit->setPlaceholderText("Enter name (UID)");
+
+        form.addRow("Name:", nameEdit);
+
+        QDialogButtonBox buttonBox(
+            QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+            Qt::Horizontal,
+            &inputDlg
+        );
+        form.addRow(&buttonBox);
+
+        connect(&buttonBox, &QDialogButtonBox::accepted, &inputDlg, &QDialog::accept);
+        connect(&buttonBox, &QDialogButtonBox::rejected, &inputDlg, &QDialog::reject);
+
+        if (inputDlg.exec() == QDialog::Accepted) {
+            QString name = nameEdit->text().trimmed();
+            if (name.isEmpty()) {
+                QMessageBox::warning(dlg, "Invalid Input", "Name is required.");
+                return;
+            }
+
+            // 🔥 ASYNCHRONOUS KEY CREATION — NO UI FREEZE
+            createGpgEncryptionKeyAsync(name, dlg, [dlg](bool ok) {
+                if (ok) {
+                    QMessageBox::information(dlg, "Success", "New GPG key created.");
+                }
+                // Errors are already shown inside the async function
+            });
+        }
+    });
+
+
+    //
+    // SHOW PUBLIC / SECRET KEYS
+    //
+    connect(showPublicAct, &QAction::triggered, this, [=]() {
+        showGpgKeyListDialog(GpgKeyType::Public, this->userName, dlg);
+    });
+
+    connect(showSecretAct, &QAction::triggered, this, [=]() {
+        showGpgKeyListDialog(GpgKeyType::Secret, this->userName, dlg);
+    });
+
+    //
+    // EXISTING IMPORT BUTTON
+    //
     connect(importBtn, &QPushButton::clicked, this, [=]() {
         QDialog inputDlg(dlg);
         inputDlg.setWindowTitle(tr("Link Key"));
@@ -2055,10 +2135,9 @@ void MainWindow::keyList()
                                    Qt::Horizontal, &inputDlg);
         form.addRow(&buttonBox);
 
-        QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &inputDlg, &QDialog::accept);
-        QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &inputDlg, &QDialog::reject);
+        connect(&buttonBox, &QDialogButtonBox::accepted, &inputDlg, &QDialog::accept);
+        connect(&buttonBox, &QDialogButtonBox::rejected, &inputDlg, &QDialog::reject);
         inputDlg.setFixedSize(dlg->width()/2, inputDlg.sizeHint().height());
-
 
         if (inputDlg.exec() == QDialog::Accepted) {
             QString keyId = keyEdit->text().trimmed();
@@ -2089,7 +2168,7 @@ void MainWindow::keyList()
                 msgBox.setStandardButtons(QMessageBox::Ok);
                 QPushButton *helpButton = msgBox.addButton(QMessageBox::Help);
 
-                connect(helpBtn, &QPushButton::clicked, this, [this]() {
+                connect(helpButton, &QPushButton::clicked, this, [this]() {
                     checkHelpReachable([this](bool reachable) {
                         if (reachable) {
                             const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("keys"));
@@ -2111,14 +2190,13 @@ void MainWindow::keyList()
                 if (db.open()) {
                     QSqlQuery insert(db);
                     insert.prepare("INSERT INTO keys (label, key) VALUES (:label, :key)");
-                    insert.bindValue(":label", DataObfuscator::obfuscate(name,this->appKey));
-                    insert.bindValue(":key", DataObfuscator::obfuscate(keyId,this->appKey));
+                    insert.bindValue(":label", DataObfuscator::obfuscate(name, this->appKey));
+                    insert.bindValue(":key", DataObfuscator::obfuscate(keyId, this->appKey));
                     if (!insert.exec()) {
-                        showQueryError(this,insert,Q_FUNC_INFO);
+                        showQueryError(this, insert, Q_FUNC_INFO);
                         return;
                     }
-                } else
-                {
+                } else {
                     showDbNotOpenError(this, db, Q_FUNC_INFO);
                 }
             }
@@ -2132,7 +2210,9 @@ void MainWindow::keyList()
         }
     });
 
-    // Hook up delete
+    //
+    // DELETE BUTTON
+    //
     connect(deleteBtn, &QPushButton::clicked, this, [=]() {
         int row = table->currentRow();
         if (row < 0) {
@@ -2152,29 +2232,27 @@ void MainWindow::keyList()
         {
             QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "deletekeys");
             db.setDatabaseName(qApp->property("dbFile").toString());
-            if (db.open())
-            {
+            if (db.open()) {
 
-            if (!settings.verifyDeleteAllowed(db, this)) {
-                QMessageBox::warning(this, tr("Error"), tr("Delete not permitted."));
-                return; // bail out early
-            }
+                if (!settings.verifyDeleteAllowed(db, this)) {
+                    QMessageBox::warning(this, tr("Error"), tr("Delete not permitted."));
+                    return;
+                }
 
-            QSqlQuery remove(db);
-            remove.prepare("DELETE FROM keys WHERE id = :id");
-            remove.bindValue(":id",table->item(row,1)->data(Qt::UserRole).toInt());
-            if (!remove.exec()) {
-                showQueryError(this,remove,Q_FUNC_INFO);
-                return;
-            }
-            } else
-            {
+                QSqlQuery remove(db);
+                remove.prepare("DELETE FROM keys WHERE id = :id");
+                remove.bindValue(":id", table->item(row, 1)->data(Qt::UserRole).toInt());
+                if (!remove.exec()) {
+                    showQueryError(this, remove, Q_FUNC_INFO);
+                    return;
+                }
+            } else {
                 showDbNotOpenError(this, db, Q_FUNC_INFO);
             }
         }
         QSqlDatabase::removeDatabase("deletekeys");
 
-        table->removeRow(row); // remove from table view
+        table->removeRow(row);
     });
 
     table->resizeColumnsToContents();
@@ -2182,7 +2260,7 @@ void MainWindow::keyList()
     dlg->layout()->setSizeConstraint(QLayout::SetFixedSize);
     dlg->setFixedSize(dlg->sizeHint());
 
-    // Hook up help
+    // HELP BUTTON
     connect(helpBtn, &QPushButton::clicked, this, [this]() {
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
