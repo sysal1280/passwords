@@ -27,4 +27,27 @@ QLineEdit {
     background-color: white;
 }
 
+QLabel#labelNameHeading {
+    background-color: #2299d4;
+    padding: 6px;
+    color: white;
+    font-weight: bold;
+}
 
+QLabel#labelNotesHeading {
+    background-color: #2299d4;
+    padding: 6px;
+    color: white;
+    font-weight: bold;
+}
+
+QLabel#labelAboutPasswordHeading {
+    background-color: #2299d4;
+    padding: 6px;
+    color: white;
+    font-weight: bold;
+}
+
+QLabel#labelPasswordURL {
+    padding-bottom: 16px;
+}

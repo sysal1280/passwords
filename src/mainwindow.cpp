@@ -1460,7 +1460,8 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 
     if (!labelText.isEmpty()) {
         QLabel* fullWidthLabel = new QLabel(labelText);
-        fullWidthLabel->setStyleSheet("background-color: #0064b9; padding: 6px; color: white; font-weight: bold;");
+        fullWidthLabel->setObjectName("labelNameHeading");
+        fullWidthLabel->setStyleSheet("background-color: #2299d4; padding: 6px; color: white; font-weight: bold;");
         gridLayout->addWidget(fullWidthLabel, 0, 0, 1, -1); // span all columns
     }
 
@@ -1469,11 +1470,10 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     if (root.contains("url")) {
         QString url = root.value("url").toString();
         QLabel* fullWidthLabel_url = new QLabel("<a href=\"" + url + "\">" + url + "</a>");
+        fullWidthLabel_url->setObjectName("labelPasswordURL");
         fullWidthLabel_url->setTextFormat(Qt::RichText);
         fullWidthLabel_url->setTextInteractionFlags(Qt::TextBrowserInteraction);
         fullWidthLabel_url->setOpenExternalLinks(true);
-        fullWidthLabel_url->setStyleSheet("padding-bottom: 16px");
-
         gridLayout->addWidget(fullWidthLabel_url, 1, 0, 1, -1); // span all columns
     }
 
@@ -1605,7 +1605,7 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 
         // Section header
         QLabel* notesHeader = new QLabel("Notes");
-        notesHeader->setStyleSheet("background-color: lightgray; padding: 6px; margin-top: 16px;");
+        notesHeader->setObjectName("labelNotesHeading");
         gridLayout->addWidget(notesHeader, row, 0, 1, -1);
         row++;
 
@@ -1627,7 +1627,7 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     // Add a full-width label in the next row for Password/Object Details
 
         QLabel* fullWidthLabel = new QLabel("About this password");
-        fullWidthLabel->setStyleSheet("background-color: lightgray; padding: 6px; margin-top: 16px;");
+        fullWidthLabel->setObjectName("labelAboutPasswordHeading");
         gridLayout->addWidget(fullWidthLabel, row, 0, 1, -1); // span all columns
 
 row++;
