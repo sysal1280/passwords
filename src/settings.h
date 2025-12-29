@@ -70,7 +70,7 @@ public:
      bool verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent);
      int getHelpPort();
      QLineEdit::EchoMode getEchoMode();
-     int Settings::getMaxBackups();
+     int getMaxBackups();
 
 private:
     QString configDir;

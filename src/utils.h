@@ -36,6 +36,7 @@
 #include <QStatusBar>
 #include <QTimer>
 #include <QUrl>
+#include <QProgressDialog>
 
 inline QString loadWordlistResource(const QWidget *parent, const char *caller)
 {
@@ -126,6 +127,62 @@ inline void checkHelpReachable(std::function<void(bool)> callback,
         callback(ok);
         reply->deleteLater();
     });
+}
+
+inline void manageBackups(const QString &directory, int maxFiles, QWidget *parent = nullptr)
+{
+    if (maxFiles <= 0)
+        return;
+
+    QDir dir(directory);
+    if (!dir.exists())
+        return;
+
+    QFileInfoList files = dir.entryInfoList(
+        QDir::Files | QDir::NoDotAndDotDot,
+        QDir::Time | QDir::Reversed   // Oldest first
+        );
+
+    if (files.size() <= maxFiles)
+        return;
+
+    int toDelete = files.size() - maxFiles;
+
+    QProgressDialog *progress = nullptr;
+    QElapsedTimer timer;
+    timer.start();
+
+    for (int i = 0; i < toDelete; ++i) {
+
+        // Show progress dialog only if operation takes > 1 second
+        if (!progress && parent && timer.elapsed() > 1000) {
+            progress = new QProgressDialog(
+                QObject::tr("Cleaning old backups…"),
+                QObject::tr("Cancel"),
+                0,
+                toDelete,
+                parent
+                );
+            progress->setWindowModality(Qt::WindowModal);
+            progress->setValue(i);
+            progress->show();
+        }
+
+        if (progress) {
+            progress->setValue(i);
+            QCoreApplication::processEvents();
+
+            if (progress->wasCanceled())
+                break;
+        }
+
+        QFile::remove(files[i].absoluteFilePath());
+    }
+
+    if (progress) {
+        progress->setValue(toDelete);
+        progress->deleteLater();
+    }
 }
 
 #endif // UTILS_H

@@ -672,9 +672,24 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
     }
 
+    // Delete unnecessary backups
+    const QString dbPath = qApp->property("dbFile").toString();
+    QFileInfo dbInfo(dbPath);
+
+    if (dbInfo.exists()) {
+        const QString backupDir = dbInfo.absolutePath() + "/backups";
+
+        if (QDir(backupDir).exists()) {
+            manageBackups(backupDir,
+                          settings.getMaxBackups(),
+                          this);   // parent for optional progress dialog
+        }
+    }
+
+    // Close local help server
     if (settings.getCloseHelpServer()) {
         if (helperProcess) {
-            // Disconnect error handler so no spurious popup
+            // Disconnect error handler so no spurious pop)up
             disconnect(helperProcess, &QProcess::errorOccurred, nullptr, nullptr);
             if (helperProcess->state() != QProcess::NotRunning) {
                 helperProcess->terminate();
@@ -2059,6 +2074,10 @@ void MainWindow::keyList()
     buttonLayout->addWidget(closeBtn);
 
     layout->addLayout(buttonLayout);
+
+    connect(showBtn, &QPushButton::clicked, this, [=]() {
+        showGpgKeyListDialog(GpgKeyType::Public, this->userName, dlg);
+    });
 
     //
     // NEW KEY HANDLER
