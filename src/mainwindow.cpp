@@ -229,6 +229,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionRefresh_Categories->setStatusTip(tr("Reload the current view from the database"));
     ui->actionProperties->setStatusTip(tr("View statistics and details for the selected category"));
 
+    ui->actionOpen_Password->setStatusTip(tr("Decrypt and display the selected password"));
+    ui->actionEdit_Password->setStatusTip(tr("Decrypt and edit the selected password"));
+    ui->actionExport_Password->setStatusTip(tr("Export the selected password as a JSON file"));
+    ui->actionAdd_Search->setStatusTip(tr("Add additional search keywords for this password"));
+    ui->actionDelete_Password->setStatusTip(tr("Delete the selected password permanently"));
+    ui->actionBookmark->setStatusTip(tr("Add or remove this password from your bookmarks"));
+    ui->actionAudit_Log->setStatusTip(tr("View the full activity history for this password"));
+
 
     // OTP countdown widgets (progress bar + label)
     countdownProgress = new QProgressBar(this);
@@ -1933,6 +1941,14 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
         actionCloseCredential->setIcon(
             QIcon(":/menus/glyphs/lock_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
         actionCloseCredential->setShortcut(Qt::Key_Escape);
+        actionCloseCredential->setStatusTip(tr("Hide the password and clear its decrypted details"));
+        connect(actionCloseCredential, &QAction::hovered, [this, actionCloseCredential]() {
+            statusBar()->showMessage(actionCloseCredential->statusTip());
+        });
+
+        connect(&menu, &QMenu::aboutToHide, [this]() {
+            statusBar()->clearMessage();
+        });
         connect(actionCloseCredential, &QAction::triggered,
                 this, &MainWindow::clearScrollArea);
 
