@@ -2065,41 +2065,64 @@ void MainWindow::keyList()
     //
     connect(newKeyBtn, &QPushButton::clicked, this, [=]() {
         QDialog inputDlg(dlg);
-        inputDlg.setWindowTitle("Create New GPG Key");
+        inputDlg.setWindowTitle(tr("Create New GPG Key"));
 
-        QFormLayout form(&inputDlg);
+        QVBoxLayout *vbox = new QVBoxLayout(&inputDlg);
 
+        // Build a suggested name based on the current user
+        QString suggestedName;
+        if (!this->userName.isEmpty()) {
+            suggestedName = this->userName + tr("'s passwords");
+        } else {
+            suggestedName = tr("My passwords");
+        }
+
+        // Instruction label
+        QLabel *infoLabel = new QLabel(
+            tr("Enter a name for the new key. This name identifies the key in your GPG keyring.\n\n"
+               "Examples: \"%1\", \"Work passwords\", \"Personal vault\".")
+                .arg(suggestedName),
+            &inputDlg
+        );
+        infoLabel->setWordWrap(true);
+        vbox->addWidget(infoLabel);
+
+        // Form layout
+        QFormLayout *form = new QFormLayout();
         QLineEdit *nameEdit = new QLineEdit(&inputDlg);
-        nameEdit->setPlaceholderText("Enter name (UID)");
+        nameEdit->setPlaceholderText(suggestedName);
+        form->addRow(tr("Name:"), nameEdit);
+        vbox->addLayout(form);
 
-        form.addRow("Name:", nameEdit);
-
-        QDialogButtonBox buttonBox(
+        // Buttons
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(
             QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
             Qt::Horizontal,
             &inputDlg
         );
-        form.addRow(&buttonBox);
+        vbox->addWidget(buttonBox);
 
-        connect(&buttonBox, &QDialogButtonBox::accepted, &inputDlg, &QDialog::accept);
-        connect(&buttonBox, &QDialogButtonBox::rejected, &inputDlg, &QDialog::reject);
+        connect(buttonBox, &QDialogButtonBox::accepted, &inputDlg, &QDialog::accept);
+        connect(buttonBox, &QDialogButtonBox::rejected, &inputDlg, &QDialog::reject);
 
         if (inputDlg.exec() == QDialog::Accepted) {
             QString name = nameEdit->text().trimmed();
             if (name.isEmpty()) {
-                QMessageBox::warning(dlg, "Invalid Input", "Name is required.");
-                return;
+                // If user leaves it blank, fall back to the suggested name
+                name = suggestedName;
             }
 
-            // 🔥 ASYNCHRONOUS KEY CREATION — NO UI FREEZE
+            // Asynchronous key creation — UI stays responsive
             createGpgEncryptionKeyAsync(name, dlg, [dlg](bool ok) {
                 if (ok) {
-                    QMessageBox::information(dlg, "Success", "New GPG key created.");
+                    QMessageBox::information(dlg, tr("Success"), tr("New GPG key created."));
                 }
                 // Errors are already shown inside the async function
             });
         }
     });
+
+
 
 
     //
@@ -2120,24 +2143,41 @@ void MainWindow::keyList()
         QDialog inputDlg(dlg);
         inputDlg.setWindowTitle(tr("Link Key"));
 
-        QFormLayout form(&inputDlg);
+        QVBoxLayout *vbox = new QVBoxLayout(&inputDlg);
 
+        // 🔹 Warning label at the top
+        QLabel *warnLabel = new QLabel(
+            tr("Ensure the private key is available in your GPG keyring or on a hardware token. "
+               "Without it, passwords encrypted with this key cannot be decrypted."),
+            &inputDlg
+        );
+        warnLabel->setWordWrap(true);
+        warnLabel->setStyleSheet("color:#b22222;"); // optional: subtle warning color
+        vbox->addWidget(warnLabel);
+
+        // 🔹 Form layout
+        QFormLayout *form = new QFormLayout();
         QLineEdit *keyEdit  = new QLineEdit(&inputDlg);
         QLineEdit *nameEdit = new QLineEdit(&inputDlg);
 
-        keyEdit->setPlaceholderText(tr("Enter GPG Key ID"));
-        nameEdit->setPlaceholderText(tr("Enter label/name"));
+        keyEdit->setPlaceholderText(tr("Enter GPG Key ID or fingerprint"));
+        nameEdit->setPlaceholderText(tr("Enter name / label"));
 
-        form.addRow(tr("GPG Key ID:"), keyEdit);
-        form.addRow(tr("Name:"), nameEdit);
+        form->addRow(tr("GPG Key:"), keyEdit);
+        form->addRow(tr("Name:"), nameEdit);
 
-        QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                                   Qt::Horizontal, &inputDlg);
-        form.addRow(&buttonBox);
+        vbox->addLayout(form);
 
-        connect(&buttonBox, &QDialogButtonBox::accepted, &inputDlg, &QDialog::accept);
-        connect(&buttonBox, &QDialogButtonBox::rejected, &inputDlg, &QDialog::reject);
-        inputDlg.setFixedSize(dlg->width()/2, inputDlg.sizeHint().height());
+        // 🔹 Buttons
+        QDialogButtonBox *buttonBox =
+            new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                                 Qt::Horizontal, &inputDlg);
+        vbox->addWidget(buttonBox);
+
+        connect(buttonBox, &QDialogButtonBox::accepted, &inputDlg, &QDialog::accept);
+        connect(buttonBox, &QDialogButtonBox::rejected, &inputDlg, &QDialog::reject);
+
+        inputDlg.setFixedSize((dlg->width() / 4)*3, inputDlg.sizeHint().height());
 
         if (inputDlg.exec() == QDialog::Accepted) {
             QString keyId = keyEdit->text().trimmed();
@@ -2209,6 +2249,7 @@ void MainWindow::keyList()
             table->setItem(row, 1, new QTableWidgetItem(keyId));
         }
     });
+
 
     //
     // DELETE BUTTON
