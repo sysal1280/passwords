@@ -21,6 +21,9 @@
 #include "gpgcheck.h"
 #include "dataobfuscator.h"
 #include "settings.h"
+#include "utils.h"
+#include "mainwindow.h"
+#include "constants.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -41,6 +44,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QClipboard>
+#include <QDesktopServices>
 #include <QRegularExpression>
 
 
@@ -356,14 +360,34 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
         QApplication::clipboard()->setText(textEdit->toPlainText());
     });
 
-    QObject::connect(helpBtn, &QPushButton::clicked, dlg, [dlg]() {
-        QMessageBox::information(dlg,
-                                 QObject::tr("GPG Key Help"),
-                                 QObject::tr("This dialog lists your GPG keys.\n\n"
-                                             "• Public keys are used to encrypt data.\n"
-                                             "• Private keys are used to decrypt and sign.\n\n"
-                                             "You can copy the key details using the Copy button."));
-    });
+    QObject::connect(helpBtn,
+                     &QPushButton::clicked,
+                     dlg,
+                     [dlg]() {
+
+                         checkHelpReachable([dlg](bool reachable) {
+                             if (reachable) {
+                                 // Open the online help page for linking keys
+                                 const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("keys-listing"));
+                                 QDesktopServices::openUrl(url);
+                             } else {
+                                 // Fallback to helper process
+                                 MainWindow *mw = qobject_cast<MainWindow*>(dlg->parentWidget());
+                                 if (!mw) {
+                                     QMessageBox::warning(
+                                         dlg,
+                                         QObject::tr("Help Error"),
+                                         QObject::tr("Help system unavailable: parent window is not MainWindow.")
+                                         );
+                                     return;
+                                 }
+
+                                 mw->launchHelperProcess(QStringLiteral("keys-listing"));
+                             }
+                         });
+                     });
+
+
 
     // --- Create process ---
     QProcess* proc = new QProcess(dlg);
