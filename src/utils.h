@@ -37,6 +37,8 @@
 #include <QTimer>
 #include <QUrl>
 #include <QProgressDialog>
+#include <QElapsedTimer>
+
 
 inline QString loadWordlistResource(const QWidget *parent, const char *caller)
 {
