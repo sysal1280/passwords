@@ -367,6 +367,22 @@ bool Settings::getAskClose()
     return truthy.contains(val);
 }
 
+bool Settings::openCategoryDblClick()
+{
+    if (!settings)
+        return true; // safe default
+
+    settings->beginGroup("Categories");
+    QString val = settings->value("DoubleClickOpen", "false")
+                      .toString()
+                      .trimmed()
+                      .toLower();
+    settings->endGroup();
+
+    static const QSet<QString> truthy = {"1", "true", "yes", "on"};
+    return truthy.contains(val);
+}
+
 void Settings::setGeneratedPasswordLength(int i)
 {
     if (!settings)

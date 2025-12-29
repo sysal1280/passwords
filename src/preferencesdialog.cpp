@@ -129,6 +129,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     widgetMap.insert("General/EchoMode", ui->comboBoxEchoMode);
     widgetMap.insert("Passwords/KillGPGAgentOnExit", ui->checkBoxKillGPGAgentExit);
     widgetMap.insert("General/MaxBackups", ui->spinBoxMaxBackups);
+    widgetMap.insert("Categories/DoubleClickOpen", ui->checkBoxDblClickCategories);
 
 
     /*

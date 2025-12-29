@@ -71,6 +71,7 @@ public:
      int getHelpPort();
      QLineEdit::EchoMode getEchoMode();
      int getMaxBackups();
+     bool openCategoryDblClick();
 
 private:
     QString configDir;

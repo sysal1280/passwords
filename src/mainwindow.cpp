@@ -565,10 +565,29 @@ MainWindow::MainWindow(QWidget *parent)
             &MainWindow::showPasswordsContextMenu);
 
 
+    if (settings.openCategoryDblClick())
+    {
     connect(ui->treeWidget,
             &QTreeWidget::itemActivated,
             this,
             &MainWindow::openCategory);
+    }
+    else
+    {
+
+    connect(ui->treeWidget,
+            &QTreeWidget::itemClicked,
+            this,
+            &MainWindow::openCategory);
+
+    // Add arrow‑key / focus‑change behavior
+    connect(ui->treeWidget,
+            &QTreeWidget::currentItemChanged,
+            this,
+            &MainWindow::openCategoryFromCurrent);
+    }
+
+
 
     connect(ui->actionBookmark, &QAction::toggled,
             this, [this](bool checked) {
@@ -5923,4 +5942,13 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
     dlg->setGeometry(x, y, w, h);
 
     dlg->show();   // MODELLESS
+}
+
+void MainWindow::openCategoryFromCurrent(QTreeWidgetItem* current, QTreeWidgetItem*)
+{
+    if (!current)
+        return;
+
+    // Call your existing slot with a default column (usually 0)
+    openCategory(current, 0);
 }

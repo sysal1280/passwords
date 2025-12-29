@@ -146,6 +146,8 @@ private:
     void initDbMetadata();
 
     void openCategory(QTreeWidgetItem *item, int column);
+    void openCategoryFromCurrent(QTreeWidgetItem* current, QTreeWidgetItem*);
+
     void setBookmark(bool checked);
 
     QString formatOtp(const QString& otp);
