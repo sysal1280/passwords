@@ -200,7 +200,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionOpen_Database->setStatusTip(tr("Open an existing database"));
     ui->actionPreferences->setStatusTip(tr("Change application settings"));
     ui->actionMaintenance->setStatusTip(tr("Verify database integrity and perform optimization tasks"));
-    ui->actionDelete_Category->setStatusTip(tr("Delete the selected category"));
     ui->actionClose->setStatusTip(tr("Exit the application"));
 
     ui->actionGenerate_Password->setStatusTip(tr("Generate a new secure password"));
@@ -220,7 +219,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionSystem_Information->setStatusTip(tr("View detailed system and application information"));
     ui->actionDonate->setStatusTip(tr("Learn how to support the project"));
     ui->actionAbout->setStatusTip(tr("View information about this application"));
-    ui->actionAbout_Qt->setStatusTip(tr("View information about the Qt framework"));
+    ui->actionAbout_Qt->setStatusTip(tr("View information about the Qt toolkit"));
+
+    ui->actionNew_Category->setStatusTip(tr("Create a new category for organizing passwords"));
+    ui->actionNew_Password->setStatusTip(tr("Create a new password entry"));
+    ui->actionDelete_Category->setStatusTip(tr("Delete the selected category"));
+    ui->actionRename->setStatusTip(tr("Rename the selected category"));
+    ui->actionImport->setStatusTip(tr("Import passwords from a JSON file into the selected category"));
+    ui->actionRefresh_Categories->setStatusTip(tr("Reload the current view from the database"));
+    ui->actionProperties->setStatusTip(tr("View statistics and details for the selected category"));
+
 
     // OTP countdown widgets (progress bar + label)
     countdownProgress = new QProgressBar(this);
