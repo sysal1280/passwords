@@ -1575,7 +1575,8 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         QAction *copyPasswordAction = new QAction(tr("Copy Password"), passwordEdit);
         copyPasswordAction->setIcon(QIcon(":/menus/glyphs/content_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
         copyPasswordAction->setStatusTip("Password ony remains in clipboard for 15 seconds");
-        passwordEdit->addAction(copyPasswordAction);
+        passwordEdit->addAction(copyPasswordAction, QLineEdit::TrailingPosition);
+
 
         connect(copyPasswordAction, &QAction::triggered, this, [passwordEdit]() {
             QClipboard *clipboard = QGuiApplication::clipboard();
