@@ -1991,6 +1991,9 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
         return;
     }
 
+    menu.addAction(ui->actionNew_Password);
+    menu.addSeparator();
+
     // 3. Password item selected
     QTreeWidgetItem *item = selectedItems.first();
     const int selectedId = item->data(0, Qt::UserRole).toInt();
@@ -2019,9 +2022,10 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
 
     // 3b. Core actions
     menu.addAction(ui->actionEdit_Password);
-    menu.addAction(ui->actionExport_Password);
     menu.addAction(ui->actionAdd_Search);
+    menu.addSeparator();
     menu.addAction(ui->actionDelete_Password);
+    menu.addAction(ui->actionExport_Password);
     menu.addSeparator();
 
     // 4. Bookmark state
