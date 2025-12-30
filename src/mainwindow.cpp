@@ -705,14 +705,18 @@ MainWindow::MainWindow(QWidget *parent)
                 {
                     if (hasDb)
                     {
-                        menu.addAction(ui->actionNew_Category);
                         menu.addAction(ui->actionNew_Password);
+                        menu.addAction(ui->actionNew_Category);
                         menu.addSeparator();
+
                         menu.addAction(ui->actionRename);
                         menu.addAction(ui->actionDelete_Category);
-                        menu.addAction(ui->actionImport);
-                        menu.addAction(ui->actionRefresh_Categories);
                         menu.addSeparator();
+
+                        menu.addAction(ui->actionRefresh_Categories);
+                        menu.addAction(ui->actionImport);
+                        menu.addSeparator();
+
                         menu.addAction(ui->actionProperties);
                     }
                     else
