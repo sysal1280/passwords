@@ -141,7 +141,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeWidget->setDropIndicatorShown(true);
     ui->treeWidget->setAnimated(true);
     ui->treeWidget->setWatermarkText("No Categories");
-    ui->treeWidget->setFocusPolicy(Qt::NoFocus);
 
     ui->treeWidget_2->setHeaderLabels({ tr("Passwords") });
     ui->treeWidget_2->header()->setStretchLastSection(true);
@@ -150,7 +149,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeWidget_2->setDragDropMode(QAbstractItemView::DragOnly);
     ui->treeWidget_2->setAnimated(true);
     ui->treeWidget_2->setWatermarkText("No Passwords");
-    ui->treeWidget_2->setFocusPolicy(Qt::NoFocus);
 
     //setup glyphs
     QHash<QAction*, QString> actionIcons = {
@@ -5373,43 +5371,45 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     }
 
     // CTRL+F
-    if (event->key() == Qt::Key_F && event->modifiers() == Qt::ControlModifier)
-    {
+    if (event->key() == Qt::Key_F && event->modifiers() == Qt::ControlModifier) {
         ui->lineEditSearch->setFocus();
         event->accept();
         return;
     }
 
-    // F2 — open About dialog
-    if (event->key() == Qt::Key_F2)
-    {
+    // F2 — open new password dialog
+    if (event->key() == Qt::Key_F2) {
         newPassword();
         event->accept();
         return;
     }
 
-    // Del — either initate del category or del password
-    //depending on focus.
-    if (event->key() == Qt::Key_Delete)
-    {
+    // Delete — delete category or password depending on focus
+    if (event->key() == Qt::Key_Delete) {
+        qDebug() << "Got Delete Key";
+
         QWidget *focus = QApplication::focusWidget();
+
         if (focus == ui->treeWidget) {
             deleteCategory(ui->treeWidget->currentItem());
             event->accept();
             return;
         }
+
         if (focus == ui->treeWidget_2) {
             deletePassword(ui->treeWidget_2->currentItem());
             event->accept();
             return;
         }
 
+        // If Delete was pressed but no relevant widget had focus
+        event->accept();
+        return;
     }
 
     // Pass unhandled keys to base class
     QMainWindow::keyPressEvent(event);
 }
-
 
 void MainWindow::launchHelperProcess(const QString &page)
 {

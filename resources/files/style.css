@@ -203,3 +203,56 @@ QTreeWidget#treeWidget::item:alternate {
     background: #f7f7f7;
 }
 
+/* ============================================================
+   SCROLL AREA (scrollArea)
+   ============================================================ */
+
+QScrollArea#scrollArea {
+    border: none;
+    background: #ffffff;
+}
+
+/* Vertical scrollbar */
+QScrollArea#scrollArea QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 2px;
+}
+
+QScrollArea#scrollArea QScrollBar::handle:vertical {
+    background: #c8c8c8;
+    border-radius: 4px;
+}
+
+QScrollArea#scrollArea QScrollBar::handle:vertical:hover {
+    background: #a0a0a0;
+}
+
+QScrollArea#scrollArea QScrollBar::add-line:vertical,
+QScrollArea#scrollArea QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+QScrollArea#scrollArea QScrollBar::add-page:vertical,
+QScrollArea#scrollArea QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+
+/* ============================================================
+   STATUS BAR (statusbar)
+   ============================================================ */
+
+QStatusBar#statusbar {
+    background: #f5f5f5;
+    border-top: 1px solid #d0d0d0;
+    padding: 4px 8px;
+}
+
+QStatusBar#statusbar::item {
+    border: none;
+    padding: 0 6px;
+}
+
+
+
