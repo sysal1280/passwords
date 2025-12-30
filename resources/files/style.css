@@ -1,13 +1,14 @@
 /* ============================================================
-   GLOBAL SELECTION COLORS
+   GLOBAL
    ============================================================ */
-
-QTreeWidget::item:selected,
-QTableView::item:selected {
-    background-color: #2299d4;
-    color: white;
+   
+QLineEdit {
+    background-color: white;
 }
 
+QListWidget {
+    background-color: white;
+}
 
 /* ============================================================
    MENU BAR
@@ -48,7 +49,7 @@ QMenu {
 }
 
 QMenu::item {
-    padding: 6px 14px 6px 8px;  /* top, right, bottom, left */
+    padding: 6px 14px 6px 8px;
     border-radius: 4px;
     color: #333;
 }
@@ -72,10 +73,6 @@ QMenu::separator {
 /* ============================================================
    LINE EDITS
    ============================================================ */
-
-QLineEdit {
-    background-color: white;
-}
 
 QLineEdit#lineEditSearch {
     background: #ffffff;
@@ -110,47 +107,99 @@ QLabel#labelPasswordURL {
 
 
 /* ============================================================
-   TREE WIDGET
+   TREE WIDGET 2 ONLY
    ============================================================ */
 
-QTreeWidget {
+QTreeWidget#treeWidget_2 {
     background: #ffffff;
     border: 1px solid #c8c8c8;
     border-radius: 6px;
-    show-decoration-selected: 1;
+    show-decoration-selected: 0;
 }
 
-QTreeWidget::item {
-    padding: 6px 8px;
-    border-radius: 4px;
-    color: #333;
+QTreeView#treeWidget_2::viewport {
+    background: #ffffff;
 }
 
-QTreeWidget::item:hover {
-    background: #e6f4fb;
+/* Branch area */
+QTreeView#treeWidget_2::branch {
+    background: transparent;
+    margin: 0;
+    padding: 0;
 }
 
-/* FIX: restore simple selected rule for correct appearance */
-QTreeWidget::item:selected {
-    background-color: #2299d4;
-    color: white;
-}
-
-QTreeWidget::item:selected:!active {
-    background: #7bbfe3;
-    color: white;
-}
-
-QTreeWidget::item:alternate {
-    background: #f7f7f7;
-}
-
-/* Branch indicators */
-QTreeView::branch:closed:has-children {
+QTreeView#treeWidget_2::branch:closed:has-children {
     image: url(:/menus/glyphs/east_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg);
 }
 
-QTreeView::branch:open:has-children {
+QTreeView#treeWidget_2::branch:open:has-children {
     image: url(:/menus/glyphs/south_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg);
+}
+
+QTreeView#treeWidget_2::branch:selected,
+QTreeView#treeWidget_2::branch:selected:open,
+QTreeView#treeWidget_2::branch:selected:closed,
+QTreeView#treeWidget_2::branch:selected:has-children {
+    background: transparent;
+}
+
+/* Items */
+QTreeWidget#treeWidget_2::item {
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 0;
+}
+
+QTreeWidget#treeWidget_2::item:hover {
+    background: #e6f4fb;
+}
+
+QTreeWidget#treeWidget_2::item:selected {
+    background: #2299d4;
+    color: white;
+}
+
+QTreeWidget#treeWidget_2::item:selected:hover {
+    background: #2299d4;
+}
+
+QTreeWidget#treeWidget_2::item:alternate {
+    background: #f7f7f7;
+}
+
+
+/* ============================================================
+   TREE WIDGET (treeWidget)
+   ============================================================ */
+
+QTreeWidget#treeWidget {
+    background: #ffffff;
+    border: 1px solid #c8c8c8;
+    border-radius: 6px;
+}
+
+QTreeWidget#treeWidget::item {
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 0;
+}
+
+QTreeWidget#treeWidget::item:hover {
+    background: #e6f4fb;
+}
+
+QTreeWidget#treeWidget::item:selected {
+    background: #2299d4;
+    color: white;
+}
+
+QTreeWidget#treeWidget::item:selected:hover {
+    background: #2299d4;
+}
+
+QTreeWidget#treeWidget::item:alternate {
+    background: #f7f7f7;
 }
 

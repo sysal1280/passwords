@@ -17,6 +17,9 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="1" column="0">
      <widget class="WatermarkedTreeWidget" name="treeWidget">
+      <property name="indentation">
+       <number>20</number>
+      </property>
       <property name="animated">
        <bool>true</bool>
       </property>

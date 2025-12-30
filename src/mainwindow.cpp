@@ -141,6 +141,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeWidget->setDropIndicatorShown(true);
     ui->treeWidget->setAnimated(true);
     ui->treeWidget->setWatermarkText("No Categories");
+    ui->treeWidget->setFocusPolicy(Qt::NoFocus);
 
     ui->treeWidget_2->setHeaderLabels({ tr("Passwords") });
     ui->treeWidget_2->header()->setStretchLastSection(true);
@@ -149,6 +150,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeWidget_2->setDragDropMode(QAbstractItemView::DragOnly);
     ui->treeWidget_2->setAnimated(true);
     ui->treeWidget_2->setWatermarkText("No Passwords");
+    ui->treeWidget_2->setFocusPolicy(Qt::NoFocus);
 
     //setup glyphs
     QHash<QAction*, QString> actionIcons = {
