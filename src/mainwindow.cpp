@@ -124,7 +124,7 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *central = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(central);
     layout->setContentsMargins(8, 8, 8, 8);   // gap around edges
-    layout->addWidget(ui->lineEdit);
+    layout->addWidget(ui->lineEditSearch);
     layout->addWidget(vSplitter);
     setCentralWidget(central);
 
@@ -501,9 +501,9 @@ MainWindow::MainWindow(QWidget *parent)
             });
 
     // Line edit search
-    connect(ui->lineEdit, &QLineEdit::returnPressed,
+    connect(ui->lineEditSearch, &QLineEdit::returnPressed,
             this, [this]() {
-                search(ui->lineEdit->text().trimmed());
+                search(ui->lineEditSearch->text().trimmed());
             });
 
     // Tree widget custom signals
@@ -1461,7 +1461,6 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     if (!labelText.isEmpty()) {
         QLabel* fullWidthLabel = new QLabel(labelText);
         fullWidthLabel->setObjectName("labelNameHeading");
-        fullWidthLabel->setStyleSheet("background-color: #2299d4; padding: 6px; color: white; font-weight: bold;");
         gridLayout->addWidget(fullWidthLabel, 0, 0, 1, -1); // span all columns
     }
 
@@ -3369,8 +3368,8 @@ void MainWindow::search(const QString &text)
 
     if (results.isEmpty()) {
         QMessageBox::information(this, tr("Search"), tr("No matches found."));
-        ui->lineEdit->setFocus();
-        ui->lineEdit->selectAll();
+        ui->lineEditSearch->setFocus();
+        ui->lineEditSearch->selectAll();
         return;
     }
 
@@ -3442,7 +3441,7 @@ void MainWindow::search(const QString &text)
         }
     }
 
-    ui->lineEdit->clear();
+    ui->lineEditSearch->clear();
 }
 
 void MainWindow::selectInTreeWidgets(int categoryId, int appId)
@@ -5355,7 +5354,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     // CTRL+F
     if (event->key() == Qt::Key_F && event->modifiers() == Qt::ControlModifier)
     {
-        ui->lineEdit->setFocus();
+        ui->lineEditSearch->setFocus();
         event->accept();
         return;
     }

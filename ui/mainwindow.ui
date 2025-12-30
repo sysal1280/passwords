@@ -28,7 +28,7 @@
      </widget>
     </item>
     <item row="0" column="0" colspan="2">
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="lineEditSearch">
       <property name="placeholderText">
        <string>Find a password...</string>
       </property>
@@ -39,6 +39,9 @@
     </item>
     <item row="1" column="1">
      <widget class="WatermarkedTreeWidget" name="treeWidget_2">
+      <property name="indentation">
+       <number>0</number>
+      </property>
       <property name="animated">
        <bool>true</bool>
       </property>
@@ -478,7 +481,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>lineEdit</tabstop>
+  <tabstop>lineEditSearch</tabstop>
   <tabstop>treeWidget</tabstop>
   <tabstop>treeWidget_2</tabstop>
   <tabstop>scrollArea</tabstop>
