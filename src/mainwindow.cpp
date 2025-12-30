@@ -1972,54 +1972,62 @@ QByteArray MainWindow::base32Decode(const QString &base32) {
 
 void MainWindow::showPasswordsContextMenu(const QPoint &pos)
 {
-    // 1. Selection check
-    const auto selectedItems = ui->treeWidget_2->selectedItems();
-    if (selectedItems.isEmpty())
-        return;
-
-    QTreeWidgetItem *item = selectedItems.first();
-    const int selectedId = item->data(0, Qt::UserRole).toInt();
-
-    // 2. Prepare menu
     QMenu menu;
     const QPoint globalPos = ui->treeWidget_2->viewport()->mapToGlobal(pos);
 
-    // 2a. Open / Close Password action
-    if (openedCredentialID == selectedId) {
-        auto *actionCloseCredential = new QAction(tr("Close Password"), &menu);
-        actionCloseCredential->setIcon(
-            QIcon(":/menus/glyphs/lock_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
-        actionCloseCredential->setShortcut(Qt::Key_Escape);
-        actionCloseCredential->setStatusTip(tr("Hide the password and clear its decrypted details"));
-        connect(actionCloseCredential, &QAction::hovered, [this, actionCloseCredential]() {
-            statusBar()->showMessage(actionCloseCredential->statusTip());
-        });
+    const auto selectedItems    = ui->treeWidget_2->selectedItems();
+    const auto selectedCategory = ui->treeWidget->selectedItems();
 
+    // 1. Nothing selected at all → no menu
+    if (selectedItems.isEmpty() && selectedCategory.isEmpty()) {
+        return;
+    }
+
+    // 2. Category selected, but no password item selected
+    if (selectedItems.isEmpty()) {
+        qDebug() << "Hello"; // Placeholder for category-only actions
+        menu.addAction(ui->actionNew_Password);
+        menu.exec(globalPos);
+        return;
+    }
+
+    // 3. Password item selected
+    QTreeWidgetItem *item = selectedItems.first();
+    const int selectedId = item->data(0, Qt::UserRole).toInt();
+
+    // 3a. Open / Close Password action
+    if (openedCredentialID == selectedId) {
+        auto *actionClose = new QAction(tr("Close Password"), &menu);
+        actionClose->setIcon(QIcon(":/menus/glyphs/lock_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+        actionClose->setShortcut(Qt::Key_Escape);
+        actionClose->setStatusTip(tr("Hide the password and clear its decrypted details"));
+
+        connect(actionClose, &QAction::hovered, [this, actionClose]() {
+            statusBar()->showMessage(actionClose->statusTip());
+        });
         connect(&menu, &QMenu::aboutToHide, [this]() {
             statusBar()->clearMessage();
         });
-        connect(actionCloseCredential, &QAction::triggered,
-                this, &MainWindow::clearScrollArea);
+        connect(actionClose, &QAction::triggered, this, &MainWindow::clearScrollArea);
 
-        menu.addAction(actionCloseCredential);
-        menu.setDefaultAction(actionCloseCredential);
+        menu.addAction(actionClose);
+        menu.setDefaultAction(actionClose);
     } else {
         menu.addAction(ui->actionOpen_Password);
         menu.setDefaultAction(ui->actionOpen_Password);
     }
 
-    // 2b. Core actions
+    // 3b. Core actions
     menu.addAction(ui->actionEdit_Password);
     menu.addAction(ui->actionExport_Password);
     menu.addAction(ui->actionAdd_Search);
     menu.addAction(ui->actionDelete_Password);
     menu.addSeparator();
 
-    // 3. Bookmark state (DB lookup + action setup)
-        QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-
-        {
-            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+    // 4. Bookmark state
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
 
         bool isBookmarked = false;
@@ -2030,11 +2038,10 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
             query.prepare(QStringLiteral(
                 "SELECT 1 FROM favourite "
                 "WHERE username = :username AND application_id = :id"));
-            query.bindValue(QStringLiteral(":username"), this->userName);
-            query.bindValue(QStringLiteral(":id"), selectedId);
+            query.bindValue(":username", this->userName);
+            query.bindValue(":id", selectedId);
 
             isBookmarked = (query.exec() && query.next());
-            db.close();
         } else {
             showDbNotOpenError(this, db, Q_FUNC_INFO);
             return;
@@ -2050,12 +2057,13 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
     menu.addAction(ui->actionBookmark);
     menu.addSeparator();
 
-    // 4. Audit log
+    // 5. Audit log
     menu.addAction(ui->actionAudit_Log);
 
-    // 5. Show menu
+    // 6. Show menu
     menu.exec(globalPos);
 }
+
 
 
 QTreeWidgetItem* MainWindow::makeItemFromApplication(QSqlQuery& query) {
