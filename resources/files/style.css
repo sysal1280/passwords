@@ -69,6 +69,17 @@ QMenu::separator {
     margin: 6px 4px;
 }
 
+QLabel#actionCloseLabel {
+    background: #ffdddd;
+    color: #b00000;
+    padding: 6px 14px;
+    border-radius: 4px;
+}
+
+QLabel#actionCloseLabel:hover {
+    background: #ff6666;
+    color: white;
+}
 
 /* ============================================================
    LINE EDITS

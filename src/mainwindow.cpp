@@ -86,6 +86,7 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 #include <QtSql/qsqlquerymodel.h>
+#include <QWidgetAction>
 
 const QMap<QString, QString> MainWindow::headerMap = {
     { "application", "Passwords" },
@@ -161,7 +162,6 @@ MainWindow::MainWindow(QWidget *parent)
         { ui->actionAbout,                 ":/menus/glyphs/lock_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionAbout_Qt,              ":/menus/glyphs/qt.svg" },
         { ui->actionPreferences,           ":/menus/glyphs/settings_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
-        { ui->actionClose,                 ":/menus/glyphs/exit_to_app_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionOpen_Database,         ":/menus/glyphs/database_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionDelete_Password,       ":/menus/glyphs/delete_forever_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionEdit_Password,         ":/menus/glyphs/edit_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
@@ -191,16 +191,27 @@ MainWindow::MainWindow(QWidget *parent)
         it.key()->setIcon(QIcon(it.value()));
     }
 
+    /*
+     * Close button.
+     * Handled differently so it can be styled separate.
+     */
+    QLabel *closeLabel = new QLabel("Close");
+    closeLabel->setObjectName("actionCloseLabel");
+    QWidgetAction *closeAction = new QWidgetAction(this);
+    closeAction->setMenuRole(QAction::QuitRole);
+    closeAction->setIcon(QIcon(":/menus/glyphs/exit_to_app_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+    closeAction->setDefaultWidget(closeLabel);
+    closeAction->setStatusTip(tr("Exit the application"));
+    ui->menuDatabase->addAction(closeAction);
+
     //properties
     ui->actionAbout->setMenuRole(QAction::AboutQtRole);
     ui->actionAbout_Qt->setMenuRole(QAction::AboutQtRole);
-    ui->actionClose->setMenuRole(QAction::QuitRole);
     ui->actionPreferences->setMenuRole(QAction::PreferencesRole);
 
     ui->actionOpen_Database->setStatusTip(tr("Open an existing database"));
     ui->actionPreferences->setStatusTip(tr("Change application settings"));
     ui->actionMaintenance->setStatusTip(tr("Verify database integrity and perform optimization tasks"));
-    ui->actionClose->setStatusTip(tr("Exit the application"));
 
     ui->actionGenerate_Password->setStatusTip(tr("Generate a new secure password"));
     ui->actionRandom_Noise->setStatusTip(tr("Generate random data in various formats"));
@@ -556,7 +567,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     //close (exit)
-    connect(ui->actionClose, &QAction::triggered,
+    connect(closeAction, &QAction::triggered,
             this, &MainWindow::close);
 
     connect(ui->treeWidget_2,
