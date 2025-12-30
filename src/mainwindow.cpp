@@ -1487,24 +1487,32 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 
         // Username
         QLabel* usernameLabel = new QLabel("Username");
+
         QLineEdit* usernameEdit = new QLineEdit();
         usernameEdit->setText(username);
         usernameEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
         usernameEdit->setReadOnly(true);
 
+        // Inline "copy username" action
         QAction *copyUsernameAction = new QAction(tr("Copy Username"), usernameEdit);
-        copyUsernameAction->setStatusTip("Username ony remains in clipboard for 15 seconds");
-        usernameEdit->addAction(copyUsernameAction);
+        copyUsernameAction->setIcon(QIcon(":/menus/glyphs/content_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+        copyUsernameAction->setStatusTip(tr("Username only remains in clipboard for 15 seconds"));
 
+        // Add the icon at the end of the line edit
+        usernameEdit->addAction(copyUsernameAction, QLineEdit::TrailingPosition);
+
+        // Copy to clipboard when clicked
         connect(copyUsernameAction, &QAction::triggered, this, [usernameEdit]() {
             QClipboard *clipboard = QGuiApplication::clipboard();
             clipboard->setText(usernameEdit->text());
+
             QTimer::singleShot(15000, qApp, [clipboard]() {
                 clipboard->clear();
                 clipboard->setText("");
                 qDebug() << "clipboard cleared";
             });
         });
+
 
         // Password
         QLabel* passwordLabel = new QLabel("Password");
@@ -1527,8 +1535,9 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 
 
         QAction *inspectPasswordAction = new QAction(tr("Inspect Password"), this);
-        passwordEdit->addAction(inspectPasswordAction, QLineEdit::TrailingPosition);
+        inspectPasswordAction->setIcon(QIcon(":/menus/glyphs/preview_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
         inspectPasswordAction->setStatusTip("Analyze this password character by character");
+        passwordEdit->addAction(inspectPasswordAction, QLineEdit::TrailingPosition);
 
         connect(inspectPasswordAction, &QAction::triggered,
                 this, [passwordEdit]() {
@@ -1553,6 +1562,7 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 
 
         QAction *copyPasswordAction = new QAction(tr("Copy Password"), passwordEdit);
+        copyPasswordAction->setIcon(QIcon(":/menus/glyphs/content_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
         copyPasswordAction->setStatusTip("Password ony remains in clipboard for 15 seconds");
         passwordEdit->addAction(copyPasswordAction);
 
@@ -1568,20 +1578,29 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 
         // OTP Code (optional)
         QLabel* otpLabel = new QLabel("OTP Code");
+
         QLineEdit* otpEdit = new QLineEdit();
         otpEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
         otpEdit->setText(formatOtp(otp));
         otpEdit->setPlaceholderText(formatOtp(otp));
-        otpEdit->setObjectName("otpEdit"+QString::number(row));
-        otpEdit->setProperty("otpLength",otpLength);
+        otpEdit->setObjectName("otpEdit" + QString::number(row));
+        otpEdit->setProperty("otpLength", otpLength);
         otpEdit->setReadOnly(true);
 
-        QAction *copyOTPAction = new QAction(tr("Copy OTP"), passwordEdit);
+        // Inline "copy OTP" action
+        QAction *copyOTPAction = new QAction(tr("Copy Code"), otpEdit);
+        copyOTPAction->setIcon(QIcon(":/menus/glyphs/content_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+        copyOTPAction->setStatusTip(tr("Copy the TOTP code to your clipboard"));
+
+        // Add the icon at the end of the line edit
+        otpEdit->addAction(copyOTPAction, QLineEdit::TrailingPosition);
+
+        // Copy to clipboard when clicked
         connect(copyOTPAction, &QAction::triggered, this, [otpEdit]() {
             QClipboard *clipboard = QGuiApplication::clipboard();
             clipboard->setText(otpEdit->text().remove("-").trimmed());
         });
-        otpEdit->addAction(copyOTPAction);
+
 
         // Add to grid: labels in one row, edits in the next row
         gridLayout->addWidget(usernameLabel, row,     0);
