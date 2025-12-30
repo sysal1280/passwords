@@ -70,7 +70,7 @@
           <item row="2" column="0">
            <widget class="QCheckBox" name="checkBoxDblClickCategories">
             <property name="text">
-             <string>Require Double Click to open Cateogies</string>
+             <string>Require Double Click to open Categories</string>
             </property>
            </widget>
           </item>
