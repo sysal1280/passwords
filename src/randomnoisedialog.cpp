@@ -137,6 +137,7 @@ void showRandomNoiseGenerator(QWidget *parent, const QString &title)
 
     // Output
     QTextEdit *outputEdit = new QTextEdit(&dlg);
+    outputEdit->setObjectName("textEditRandomNoise");
     outputEdit->setReadOnly(true);
     outputEdit->setMinimumHeight(80);
     layout->addWidget(outputEdit);

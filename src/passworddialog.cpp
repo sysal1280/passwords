@@ -58,21 +58,6 @@ PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
     setModal(true);
     setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
 
-    // Material-style tile theming
-    setStyleSheet(
-        "QFrame[tileType='upper'] { background-color: #1976D2; color: white; border-radius: 8px; padding: 4px; }"
-        "QFrame[tileType='upper']:hover { background-color: #1E88E5; }"
-
-        "QFrame[tileType='lower'] { background-color: #388E3C; color: white; border-radius: 8px; padding: 4px; }"
-        "QFrame[tileType='lower']:hover { background-color: #43A047; }"
-
-        "QFrame[tileType='digit'] { background-color: #7B1FA2; color: white; border-radius: 8px; padding: 4px; }"
-        "QFrame[tileType='digit']:hover { background-color: #8E24AA; }"
-
-        "QFrame[tileType='symbol'] { background-color: #F57C00; color: white; border-radius: 8px; padding: 4px; }"
-        "QFrame[tileType='symbol']:hover { background-color: #FB8C00; }"
-        );
-
     QVBoxLayout *main = new QVBoxLayout(this);
 
     // Big password label
@@ -107,7 +92,7 @@ PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
 
     legendLayout->addWidget(makeLegendItem("#1976D2", "Uppercase"));
     legendLayout->addWidget(makeLegendItem("#388E3C", "Lowercase"));
-    legendLayout->addWidget(makeLegendItem("#7B1FA2", "Digit"));
+    legendLayout->addWidget(makeLegendItem("#7B1FA2", "Number"));
     legendLayout->addWidget(makeLegendItem("#F57C00", "Symbol"));
 
     main->addWidget(legend);
@@ -230,7 +215,7 @@ QString PasswordInspectorDialog::characterDescription(QChar c) const
 {
     if (c.isUpper()) return QString("Uppercase %1").arg(c);
     if (c.isLower()) return QString("Lowercase %1").arg(c);
-    if (c.isDigit()) return QString("Digit %1").arg(c);
+    if (c.isDigit()) return QString("Number %1").arg(c);
     return symbolName(c);
 }
 
@@ -309,7 +294,7 @@ QString PasswordInspectorDialog::formatAnalysisSummary(const PasswordAnalysis &a
     summary += QString("Length: %1 characters\n")
                    .arg(a.length);
 
-    summary += QString("Character classes: %1 uppercase, %2 lowercase, %3 digits, %4 symbols\n")
+    summary += QString("Character classes: %1 uppercase, %2 lowercase, %3 Numbers, %4 symbols\n")
                    .arg(a.upperCount)
                    .arg(a.lowerCount)
                    .arg(a.digitCount)
@@ -381,6 +366,7 @@ void showPasswordGenerator(QWidget *parent,
     layout->addLayout(controlLayout);
 
     QLineEdit *passwordEdit = new QLineEdit(&dlg);
+    passwordEdit->setObjectName("editGenerateNewPassword");
     passwordEdit->setReadOnly(true);
     layout->addWidget(passwordEdit);
 

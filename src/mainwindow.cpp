@@ -2635,6 +2635,7 @@ void MainWindow::encryptMessage()
 
     // Dialog and layout
     QDialog *dlg = new QDialog(this);
+
     dlg->setWindowTitle(ui->actionEncrypt_message->text());
     QVBoxLayout *layout = new QVBoxLayout(dlg);
 
@@ -2649,6 +2650,7 @@ void MainWindow::encryptMessage()
 
     // Plaintext input
     QTextEdit *plainTextEdit = new PlainTextEdit(dlg);
+    plainTextEdit->setObjectName("plainTextInput");
     plainTextEdit->setPlaceholderText("Enter text to encrypt...");
     plainTextEdit->setAcceptRichText(false);
     layout->addWidget(plainTextEdit);
