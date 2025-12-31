@@ -30,7 +30,7 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     // --- Table ---
     tableWidget = new QTableWidget(this);
     tableWidget->setColumnCount(2);
-    tableWidget->setHorizontalHeaderLabels(QStringList() << "Category" << "Count");
+    tableWidget->setHorizontalHeaderLabels(QStringList() << "Category" << "Number of passwords");
     tableWidget->horizontalHeader()->setStretchLastSection(true);
     tableWidget->setSortingEnabled(true);
     tableWidget->setAlternatingRowColors(false);

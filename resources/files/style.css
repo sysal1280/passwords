@@ -87,7 +87,7 @@ QTableWidget {
     gridline-color: #e0e0e0;
     selection-background-color: #4a90e2;
     selection-color: white;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 QHeaderView::section {
@@ -192,17 +192,37 @@ QLineEdit#lineEditSearch:focus {
    LABEL HEADINGS
    ============================================================ */
 
-QLabel#labelNameHeading,
-QLabel#labelNotesHeading,
-QLabel#labelAboutPasswordHeading {
+QLabel#labelNameHeading {
     background-color: #2299d4;
     padding: 6px;
     color: white;
     font-weight: bold;
+    border: 1px solid #1a7bb0;
+    border-radius: 1px;
 }
 
+
+QLabel#labelNotesHeading {
+    background-color: #2299d4;
+    padding: 6px;
+    color: white;
+    font-weight: bold;
+    border: 1px solid #1a7bb0;
+    border-radius: 1px;
+}
+
+QLabel#labelAboutPasswordHeading {
+    background-color: #ffffdc;      /* tooltip yellow */
+    padding: 6px;
+    color: black;
+    font-weight: bold;
+    border: 1px solid #d4c878;      /* darker yellow/gold border */
+    border-radius: 1px;             /* optional, but looks nicer */
+}
+
+
 QLabel#labelPasswordURL {
-    padding-bottom: 16px;
+    padding-bottom: 6px;
 }
 
 
@@ -441,6 +461,3 @@ QFrame[tileType="symbol"] {
 QFrame[tileType="symbol"]:hover {
     background-color: #FB8C00;
 }
-
-
-

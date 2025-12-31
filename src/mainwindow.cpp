@@ -1420,6 +1420,7 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
 
 
 void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui) {
+
     // Ensure scrollArea has a widget
     if (!ui->scrollArea->widget()) {
         QWidget *container = new QWidget;
@@ -1427,14 +1428,18 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         ui->scrollArea->setWidgetResizable(true);
     }
 
-    setupAlignedTimer();
-
     // Get or create grid layout
     QGridLayout* gridLayout = qobject_cast<QGridLayout*>(ui->scrollArea->widget()->layout());
     if (!gridLayout) {
         gridLayout = new QGridLayout(ui->scrollArea->widget());
         ui->scrollArea->widget()->setLayout(gridLayout);
     }
+
+    // Set left and right margin to 0.
+    int left, top, right, bottom;
+    gridLayout->getContentsMargins(&left, &top, &right, &bottom);
+    gridLayout->setContentsMargins(3, top, 3, bottom);
+
 
     // Clear existing widgets
     while (QLayoutItem* item = gridLayout->takeAt(0)) {
@@ -1453,7 +1458,6 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     QJsonObject root = doc.object();
     QJsonArray credentials = root.value("credentials").toArray();
 
-    // Add a full-width label in the next row for description
     // Add a full-width label in the next row for name/description
     QString name        = root.value("private_name").toString().trimmed();
     QString description = root.value("description").toString().trimmed();
@@ -1470,37 +1474,43 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     } else if (!description.isEmpty()) {
         labelText = description;
     } else {
-        labelText = ""; // nothing to show
+        labelText = "(No name)"; // nothing to show
     }
 
-    if (!labelText.isEmpty()) {
-        QLabel* fullWidthLabel = new QLabel(labelText);
-        fullWidthLabel->setObjectName("labelNameHeading");
-        gridLayout->addWidget(fullWidthLabel, 0, 0, 1, -1); // span all columns
-    }
+    int row = 0;
 
+    QLabel* fullWidthLabelName = new QLabel(labelText);
+    fullWidthLabelName->setObjectName("labelNameHeading");
+    gridLayout->addWidget(fullWidthLabelName, 0, 0, 1, -1); // span all columns
+    row++;
 
-    // Add a full-width label in the next row for description
+    // Add a full-width label in the next row for url (optional)
     if (root.contains("url")) {
-        QString url = root.value("url").toString();
-        QLabel* fullWidthLabel_url = new QLabel("<a href=\"" + url + "\">" + url + "</a>");
-        fullWidthLabel_url->setObjectName("labelPasswordURL");
-        fullWidthLabel_url->setTextFormat(Qt::RichText);
-        fullWidthLabel_url->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        fullWidthLabel_url->setOpenExternalLinks(true);
-        gridLayout->addWidget(fullWidthLabel_url, 1, 0, 1, -1); // span all columns
+        QString url = root.value("url").toString().trimmed();
+
+        if (!url.isEmpty()) {
+            QLabel* fullWidthLabel_url = new QLabel("<a href=\"" + url + "\">" + url + "</a>");
+            fullWidthLabel_url->setObjectName("labelPasswordURL");
+            fullWidthLabel_url->setTextFormat(Qt::RichText);
+            fullWidthLabel_url->setTextInteractionFlags(Qt::TextBrowserInteraction);
+            fullWidthLabel_url->setOpenExternalLinks(true);
+
+            gridLayout->addWidget(fullWidthLabel_url, row, 0, 1, -1);
+            row++;
+        }
     }
 
-    int row = 2;
     for (const QJsonValue &val : std::as_const(credentials)) {
         QJsonObject credObj = val.toObject();
         QString username = credObj.value("username").toString();
         QString password = credObj.value("password").toString();
         QString otp      = credObj.value("secretOtpCode").toString();
-        int otpLength      = credObj.value("length").toInt(6);
+        int otpLength    = credObj.value("length").toInt(6);
         qDebug() << "length " << otpLength;
 
+        //
         // Username
+        //
         QLabel* usernameLabel = new QLabel("Username");
 
         QLineEdit* usernameEdit = new QLineEdit();
@@ -1508,19 +1518,14 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         usernameEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
         usernameEdit->setReadOnly(true);
 
-        // Inline "copy username" action
         QAction *copyUsernameAction = new QAction(tr("Copy Username"), usernameEdit);
         copyUsernameAction->setIcon(QIcon(":/menus/glyphs/content_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
         copyUsernameAction->setStatusTip(tr("Username only remains in clipboard for 15 seconds"));
-
-        // Add the icon at the end of the line edit
         usernameEdit->addAction(copyUsernameAction, QLineEdit::TrailingPosition);
 
-        // Copy to clipboard when clicked
         connect(copyUsernameAction, &QAction::triggered, this, [usernameEdit]() {
             QClipboard *clipboard = QGuiApplication::clipboard();
             clipboard->setText(usernameEdit->text());
-
             QTimer::singleShot(15000, qApp, [clipboard]() {
                 clipboard->clear();
                 clipboard->setText("");
@@ -1528,9 +1533,11 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
             });
         });
 
-
+        //
         // Password
+        //
         QLabel* passwordLabel = new QLabel("Password");
+
         QLineEdit* passwordEdit = new QLineEdit();
         passwordEdit->setText(password);
         passwordEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -1548,7 +1555,6 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
                                                       : settings.getEchoMode());
                 });
 
-
         QAction *inspectPasswordAction = new QAction(tr("Inspect Password"), this);
         inspectPasswordAction->setIcon(QIcon(":/menus/glyphs/preview_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
         inspectPasswordAction->setStatusTip("Analyze this password character by character");
@@ -1556,31 +1562,22 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 
         connect(inspectPasswordAction, &QAction::triggered,
                 this, [passwordEdit]() {
-                    // Copy OUT the data you need *now*
                     const QString password = passwordEdit->text();
-
-                    // Defer dialog creation to the next event loop turn
                     QMetaObject::invokeMethod(
-                        qApp,  // or `passwordEdit`, or `this` – any living QObject
+                        qApp,
                         [password]() {
                             auto *dlg = new PasswordDialog::PasswordInspectorDialog(password, nullptr);
                             dlg->setAttribute(Qt::WA_DeleteOnClose);
                             dlg->setWindowModality(Qt::NonModal);
-                            dlg->show();   // non-blocking
+                            dlg->show();
                         },
                         Qt::QueuedConnection);
                 });
 
-
-
-
-
-
         QAction *copyPasswordAction = new QAction(tr("Copy Password"), passwordEdit);
         copyPasswordAction->setIcon(QIcon(":/menus/glyphs/content_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
-        copyPasswordAction->setStatusTip("Password ony remains in clipboard for 15 seconds");
+        copyPasswordAction->setStatusTip("Password only remains in clipboard for 15 seconds");
         passwordEdit->addAction(copyPasswordAction, QLineEdit::TrailingPosition);
-
 
         connect(copyPasswordAction, &QAction::triggered, this, [passwordEdit]() {
             QClipboard *clipboard = QGuiApplication::clipboard();
@@ -1592,7 +1589,9 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
             });
         });
 
-        // OTP Code (optional)
+        //
+        // OTP
+        //
         QLabel* otpLabel = new QLabel("OTP Code");
 
         QLineEdit* otpEdit = new QLineEdit();
@@ -1603,56 +1602,74 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         otpEdit->setProperty("otpLength", otpLength);
         otpEdit->setReadOnly(true);
 
-        // Inline "copy OTP" action
         QAction *copyOTPAction = new QAction(tr("Copy Code"), otpEdit);
         copyOTPAction->setIcon(QIcon(":/menus/glyphs/content_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
         copyOTPAction->setStatusTip(tr("Copy the TOTP code to your clipboard"));
-
-        // Add the icon at the end of the line edit
         otpEdit->addAction(copyOTPAction, QLineEdit::TrailingPosition);
 
-        // Copy to clipboard when clicked
         connect(copyOTPAction, &QAction::triggered, this, [otpEdit]() {
             QClipboard *clipboard = QGuiApplication::clipboard();
             clipboard->setText(otpEdit->text().remove("-").trimmed());
         });
 
+        //
+        // Compact two-row layout for this credential
+        //
+        QWidget *credWidget = new QWidget();
+        QGridLayout *credLayout = new QGridLayout(credWidget);
 
-        // Add to grid: labels in one row, edits in the next row
-        gridLayout->addWidget(usernameLabel, row,     0);
-        gridLayout->addWidget(passwordLabel, row,     1);
-        gridLayout->addWidget(otpLabel,      row,     2);
+        credLayout->setContentsMargins(0, 0, 0, 0);
+        credLayout->setHorizontalSpacing(12);
+        credLayout->setVerticalSpacing(2);
 
-        gridLayout->addWidget(usernameEdit,  row + 1, 0);
-        gridLayout->addWidget(passwordEdit,  row + 1, 1);
-        gridLayout->addWidget(otpEdit,       row + 1, 2);
+        // Row 0: labels
+        credLayout->addWidget(usernameLabel, 0, 0);
+        credLayout->addWidget(passwordLabel, 0, 1);
+        credLayout->addWidget(otpLabel,      0, 2);
 
-        // Advance row counter by 2
-        row += 2;
+        // Row 1: edits
+        credLayout->addWidget(usernameEdit,  1, 0);
+        credLayout->addWidget(passwordEdit,  1, 1);
+        credLayout->addWidget(otpEdit,       1, 2);
+
+        //
+        // Insert into main grid
+        //
+        gridLayout->addWidget(credWidget, row, 0, 1, -1);
+
+        row += 1;
     }
 
-
+    gridLayout->setRowMinimumHeight(row, 32);
+    row++;
 
     // --- Notes section ---
     if (root.contains("notes")) {
         QJsonArray notesArray = root.value("notes").toArray();
 
-        // Section header
-        QLabel* notesHeader = new QLabel("Notes");
-        notesHeader->setObjectName("labelNotesHeading");
-        gridLayout->addWidget(notesHeader, row, 0, 1, -1);
-        row++;
+        if (!notesArray.isEmpty()) {
 
-        // Each note as a full-width label
-        for (const QJsonValue &noteVal : std::as_const(notesArray)) {
-            QJsonObject noteObj = noteVal.toObject();
-            QString content = noteObj.value("content").toString();
+            // Section header (only created when notes exist)
+            QLabel* notesHeader = new QLabel("Notes");
+            notesHeader->setObjectName("labelNotesHeading");
+            gridLayout->addWidget(notesHeader, row, 0, 1, -1);
+            row++;
 
-            QLabel* noteLabel = new QLabel(content);
-            noteLabel->setWordWrap(true); // allow multi-line wrapping
-            noteLabel->setStyleSheet("padding: 4px;"); // optional styling
-            noteLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-            gridLayout->addWidget(noteLabel, row, 0, 1, -1);
+            // Each note as a full-width label
+            for (const QJsonValue &noteVal : std::as_const(notesArray)) {
+                QJsonObject noteObj = noteVal.toObject();
+                QString content = noteObj.value("content").toString();
+
+                QLabel* noteLabel = new QLabel(content);
+                noteLabel->setWordWrap(true);
+                noteLabel->setStyleSheet("padding: 4px;");
+                noteLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+
+                gridLayout->addWidget(noteLabel, row, 0, 1, -1);
+                row++;
+            }
+
+            gridLayout->setRowMinimumHeight(row, 32);
             row++;
         }
     }
@@ -1660,14 +1677,11 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 
     // Add a full-width label in the next row for Password/Object Details
 
-        QLabel* fullWidthLabel = new QLabel("About this password");
-        fullWidthLabel->setObjectName("labelAboutPasswordHeading");
-        gridLayout->addWidget(fullWidthLabel, row, 0, 1, -1); // span all columns
+    QLabel* fullWidthLabel = new QLabel("About this password");
+    fullWidthLabel->setObjectName("labelAboutPasswordHeading");
+    gridLayout->addWidget(fullWidthLabel, row, 0, 1, -1); // span all columns
 
-row++;
-
-
-
+    row++;
 
     /*
      * Now get the data for this application from the application_views table
@@ -1737,7 +1751,6 @@ row++;
                         lastAccessByLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
                         gridLayout->addWidget(lastAccessByLabel, row, 0, 1, -1);
                         row++;
-
                     } else
                     {
                         showQueryError(this,query,Q_FUNC_INFO);
@@ -1757,13 +1770,13 @@ row++;
 
     // Finally add a vertical spacer to push everything up
     QSpacerItem *verticalSpacer = new QSpacerItem(
-        20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        20, 1, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
     gridLayout->addItem(verticalSpacer, row+1, 0, 1, -1);
 
 
 
-    updateFields();
-
+setupAlignedTimer();
+updateFields();
 
     /*
      * Setup any autoclose singlshot timer
