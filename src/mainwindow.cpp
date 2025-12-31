@@ -5895,7 +5895,6 @@ void MainWindow::renameCategory()
 void MainWindow::addSearchTerms(QTreeWidgetItem *item)
 {
     // Find the currently selected application in your tree
-
     int appId = item->data(0, Qt::UserRole).toInt();
     if (appId <= 0) {
         QMessageBox::warning(this, tr("Add Search Term"), tr("Invalid application selection."));
@@ -5925,24 +5924,33 @@ void MainWindow::addSearchTerms(QTreeWidgetItem *item)
     btnLayout->addWidget(cancelBtn);
     layout->addLayout(btnLayout);
 
+    // Helper lambda to check duplicates
+    auto isDuplicate = [listWidget](const QString &text) {
+        QString t = text.trimmed().toLower();
+        for (int i = 0; i < listWidget->count(); ++i) {
+            if (listWidget->item(i)->text().trimmed().toLower() == t)
+                return true;
+        }
+        return false;
+    };
+
     connect(addBtn, &QPushButton::clicked,
-            addBtn,   // context object
-            [lineEdit, listWidget]() {
+            addBtn,
+            [lineEdit, listWidget, isDuplicate]() {
                 QString text = lineEdit->text().trimmed();
-                if (!text.isEmpty()) {
+                if (!text.isEmpty() && !isDuplicate(text)) {
                     listWidget->addItem(text);
-                    lineEdit->clear();
                 }
+                lineEdit->clear();
             });
 
-
     connect(okBtn, &QPushButton::clicked,
-            &dlg, [lineEdit, listWidget, &dlg]() {
+            &dlg, [lineEdit, listWidget, &dlg, isDuplicate]() {
                 QString text = lineEdit->text().trimmed();
-                if (!text.isEmpty()) {
+                if (!text.isEmpty() && !isDuplicate(text)) {
                     listWidget->addItem(text);
-                    lineEdit->clear();
                 }
+                lineEdit->clear();
                 dlg.accept();
             });
 
