@@ -2284,7 +2284,7 @@ void MainWindow::keyList()
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
-    table->verticalHeader()->setDefaultSectionSize(20);
+    table->verticalHeader()->setDefaultSectionSize(22);
 
     QFont headerFont = table->horizontalHeader()->font();
     headerFont.setBold(false);
@@ -2320,6 +2320,8 @@ void MainWindow::keyList()
     QSqlDatabase::removeDatabase("fetchkeys");
 
     layout->addWidget(table);
+    table->setCurrentItem(nullptr);
+    table->clearSelection();
 
     //
     // BUTTONS
@@ -2651,7 +2653,7 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
-    table->verticalHeader()->setDefaultSectionSize(20);
+    table->verticalHeader()->setDefaultSectionSize(22);
 
     // Populate from DB
     int appId = item->data(0, Qt::UserRole).toInt();
@@ -2693,6 +2695,8 @@ void MainWindow::showAuditLog(QTreeWidgetItem *item)
 
     layout->addWidget(table);
     table->resizeColumnsToContents();
+    table->setCurrentItem(nullptr);
+    table->clearSelection();
 
     // Buttons layout
     QHBoxLayout *buttonLayout = new QHBoxLayout;
@@ -3689,7 +3693,7 @@ void MainWindow::search(const QString &text)
         table->setEditTriggers(QAbstractItemView::NoEditTriggers);
         table->setSelectionBehavior(QAbstractItemView::SelectRows);
         table->setSelectionMode(QAbstractItemView::SingleSelection);
-        table->verticalHeader()->setDefaultSectionSize(20);
+        table->verticalHeader()->setDefaultSectionSize(22);
 
         for (int row = 0; row < results.size(); ++row) {
             QTableWidgetItem *appItem = new QTableWidgetItem(results[row].appName);
@@ -4373,7 +4377,7 @@ void MainWindow::searchPopular()
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
-    table->verticalHeader()->setDefaultSectionSize(20);
+    table->verticalHeader()->setDefaultSectionSize(22);
 
     for (int row = 0; row < results.size(); ++row) {
         QTableWidgetItem *appItem = new QTableWidgetItem(results[row].appName);
@@ -4508,7 +4512,7 @@ void MainWindow::searchRecent()
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
-    table->verticalHeader()->setDefaultSectionSize(20);
+    table->verticalHeader()->setDefaultSectionSize(22);
 
     for (int row = 0; row < results.size(); ++row) {
         QTableWidgetItem *appItem = new QTableWidgetItem(results[row].appName);
@@ -6327,7 +6331,7 @@ void MainWindow::ExportedWithoutEdits()
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
-    table->verticalHeader()->setDefaultSectionSize(20);
+    table->verticalHeader()->setDefaultSectionSize(22);
 
     // 🔥 Prevent Qt from auto‑closing the dialog on double‑click
     disconnect(table, &QTableWidget::itemActivated, nullptr, nullptr);
@@ -6531,7 +6535,7 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
-    table->verticalHeader()->setDefaultSectionSize(20);
+    table->verticalHeader()->setDefaultSectionSize(22);
 
     // 🔥 Prevent Qt from auto‑closing the dialog on double‑click
     disconnect(table, &QTableWidget::itemActivated, nullptr, nullptr);
