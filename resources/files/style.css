@@ -143,7 +143,6 @@ QProgressBar::chunk {
     margin: 1px;                         /* gives a nice inset look */
 }
 
-
 QTableWidget {
     background: #ffffff;
     border: 1px solid #d0d0d0;
@@ -868,7 +867,7 @@ QTextEdit#textEditRandomNoise:focus {
 
 
 /* ============================================================
-   PASSWORD INSPECOR
+   PASSWORD INSPECTOR
    ============================================================ */
 
 QFrame[tileType="upper"] {
@@ -909,5 +908,56 @@ QFrame[tileType="symbol"] {
 }
 QFrame[tileType="symbol"]:hover {
     background-color: #FB8C00;
+}
+
+
+/* ============================================================
+   TOTP PROGRESSBAR (progressTOTP)
+   ============================================================ */
+
+QProgressBar#progressTOTP {
+    background: #f0f0f0;                 /* soft grey, matches your theme */
+    border: 1px solid #d0d0d0;           /* same border as tables/statusbar */
+    border-radius: 0;                    /* square edges */
+    padding: 0px;
+    height: 14px;                        /* compact for status bar */
+    text-align: center;
+    color: #333;
+}
+
+/* --- BLUE (normal) --- */
+QProgressBar#progressTOTP[toptState="normal"]::chunk {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0   #4a90e2,
+        stop:0.5 #2299d4,
+        stop:1   #1a7bb0
+    );
+    border-radius: 0;
+    margin: 0px;
+}
+
+/* --- ORANGE (warning) --- */
+QProgressBar#progressTOTP[toptState="warning"]::chunk {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0   #ffb74d,
+        stop:0.5 #ff9800,
+        stop:1   #ef6c00
+    );
+    border-radius: 0;
+    margin: 0px;
+}
+
+/* --- RED (critical) --- */
+QProgressBar#progressTOTP[toptState="critical"]::chunk {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0   #ef5350,
+        stop:0.5 #e53935,
+        stop:1   #b71c1c
+    );
+    border-radius: 0;
+    margin: 0px;
 }
 

@@ -251,6 +251,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // OTP countdown widgets (progress bar + label)
     countdownProgress = new QProgressBar(this);
+    countdownProgress->setObjectName("progressTOTP");
     countdownProgress->setRange(0, 30);
     countdownProgress->setValue(30);
     countdownProgress->setFixedHeight(ui->statusbar->height() - 14);
@@ -2011,6 +2012,19 @@ void MainWindow::updateCountdown()
 
     countdownLabel->setVisible(true);
     countdownProgress->setVisible(true);
+
+    if (remaining > 15) {
+        countdownProgress->setProperty("toptState", "normal");
+    } else if (remaining > 5) {
+        countdownProgress->setProperty("toptState", "warning");
+    } else {
+        countdownProgress->setProperty("toptState", "critical");
+    }
+
+    countdownProgress->style()->unpolish(countdownProgress);
+    countdownProgress->style()->polish(countdownProgress);
+    countdownProgress->update();
+
 
     updateFields();
 }
