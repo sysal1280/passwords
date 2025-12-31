@@ -172,6 +172,13 @@ private:
     void NotChangedSince(const QDateTime &cutoff);
     void showPasswordsContextMenu(const QPoint &pos);
 
+    void decryptWithGpg(
+        const QByteArray &encrypted,
+        std::function<void(const QByteArray&)> onSuccess,
+        std::function<void(const QString&)> onMissingKey,
+        std::function<void(const QString&)> onFailure
+        );
+
     // Members
     static const QMap<QString, QString> headerMap;
     QSplitter *vSplitter = nullptr;

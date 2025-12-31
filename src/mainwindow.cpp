@@ -1290,6 +1290,154 @@ void MainWindow::clearScrollArea()
     openedCredentialID = -1;
 }
 
+// void MainWindow::openPassword(QTreeWidgetItem *item)
+// {
+//     if (settings.getKillGpgAgent()) {
+//         killGpgAgent();
+//     }
+
+//     int parentId = item->data(0, Qt::UserRole).toInt();
+
+//     if (openedCredentialID == parentId)
+//     {
+//         clearScrollArea();
+//         return;
+//     }
+
+//     QApplication::setOverrideCursor(Qt::WaitCursor);
+//     QApplication::processEvents();
+
+//     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+//     // --- Step 0: Map mode to table/column names ---
+//     QString viewTable, idColumn, credTable;
+
+//     viewTable      = "application_views";
+//     idColumn       = "application_id";
+//     credTable      = "application";
+
+//     // --- Step 1: Retrieve encrypted data ---
+//     ui->statusbar->showMessage("Reading database..");
+//     QApplication::processEvents();
+
+//     QByteArray data;
+//     {
+//         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+//         db.setDatabaseName(qApp->property("dbFile").toString());
+//         if (db.open()) {
+//             QSqlQuery query(db);
+//             query.prepare(QString("SELECT data FROM application WHERE id = :id"));
+//             query.bindValue(":id", parentId);
+//             if (query.exec() && query.first()) {
+//                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
+//             } else {
+//                 showQueryError(this,query,Q_FUNC_INFO);
+//             }
+//         } else {
+//             showDbNotOpenError(this, db, Q_FUNC_INFO);
+//             QApplication::restoreOverrideCursor();
+//             QApplication::processEvents();
+//             return;
+//         }
+//     }
+//     QSqlDatabase::removeDatabase(connName);
+//     ui->statusbar->clearMessage();
+
+//     // --- Step 2: Decrypt the data (async, non-blocking) ---
+//     ui->statusbar->showMessage("Decrypting data..");
+//     QApplication::processEvents();
+
+//     QProcess* gpg = new QProcess(this);
+//     gpg->setProcessChannelMode(QProcess::SeparateChannels);
+
+//     connect(gpg, &QProcess::started, this, [gpg, data]() mutable {
+//         gpg->write(data);
+//         data.fill(0);
+//         gpg->closeWriteChannel();
+//     });
+
+//     // Handle stdout (decrypted JSON)
+//     connect(gpg, &QProcess::readyReadStandardOutput, this, [this, gpg, item]() {
+//         QByteArray decrypted_data = gpg->readAllStandardOutput();
+//         if (!decrypted_data.isEmpty()) {
+//             ui->statusbar->clearMessage();
+//             populateFromJsonApplication(decrypted_data, ui);
+//             decrypted_data.fill(0);
+//         }
+//     });
+
+//     // Handle stderr
+//     bool *noKeyShown = new bool(false);
+
+//     connect(gpg, &QProcess::readyReadStandardError, this, [this, gpg, noKeyShown]() {
+//         QByteArray errors = gpg->readAllStandardError();
+//         if (!errors.isEmpty()) {
+
+//             QString errStr = QString::fromUtf8(errors);
+
+//             ui->statusbar->showMessage(errStr);
+//             qDebug().noquote() << "GPG stderr:" << errors;
+
+//             if (errStr.contains("no secret key", Qt::CaseInsensitive) && !*noKeyShown) {
+//                 *noKeyShown = true;
+//                 QMessageBox::critical(
+//                             this,
+//                             tr("GPG Error"),
+//                             errStr
+//                             );
+//             }
+//         }
+//     });
+
+//     // --- Step 4: Handle completion ---
+//     connect(gpg, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+//             this, [this, gpg, parentId, connName, viewTable, idColumn, noKeyShown]
+//             (int exitCode, QProcess::ExitStatus status) {
+
+//         delete noKeyShown;
+//         if (status == QProcess::NormalExit && exitCode == 0) {
+//             openedCredentialID = parentId;
+
+//             // Upsert into views table only after successful decryption
+//             {
+//                 QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+//                 db.setDatabaseName(qApp->property("dbFile").toString());
+//                 if (db.open()) {
+//                     QSqlQuery upsert(db);
+//                     upsert.prepare(QString(
+//                                        "INSERT INTO %1(%2, view_count, dt, user, host) "
+//                                        "VALUES (:id, 1, :ts, :user, :host) "
+//                                        "ON CONFLICT(%2) DO UPDATE SET "
+//                                        "view_count = view_count + 1, dt = :ts, user = :user, host = :host"
+//                                        ).arg(viewTable, idColumn));
+
+//                     upsert.bindValue(":id", parentId);
+//                     upsert.bindValue(":ts", QDateTime::currentSecsSinceEpoch());
+//                     upsert.bindValue(":user", userName);
+//                     upsert.bindValue(":host", QSysInfo::machineHostName());
+//                     if (!upsert.exec()) {
+//                         showQueryError(this,upsert,Q_FUNC_INFO);
+//                     }
+//                 } else
+//                 {
+//                     showDbNotOpenError(this, db, Q_FUNC_INFO);
+//                     QApplication::restoreOverrideCursor();
+//                     QApplication::processEvents();
+//                     return;
+//                 }
+//             }
+//             QSqlDatabase::removeDatabase(connName);
+
+//         }
+//         gpg->deleteLater();
+//         QApplication::restoreOverrideCursor();
+//         QApplication::processEvents();
+//     });
+
+//     gpg->start("gpg", QStringList() << "--decrypt");
+// }
+
+
 void MainWindow::openPassword(QTreeWidgetItem *item)
 {
     if (settings.getKillGpgAgent()) {
@@ -1298,8 +1446,7 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
 
     int parentId = item->data(0, Qt::UserRole).toInt();
 
-    if (openedCredentialID == parentId)
-    {
+    if (openedCredentialID == parentId) {
         clearScrollArea();
         return;
     }
@@ -1310,28 +1457,30 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     // --- Step 0: Map mode to table/column names ---
-    QString viewTable, idColumn, credTable;
-
-    viewTable      = "application_views";
-    idColumn       = "application_id";
-    credTable      = "application";
+    QString viewTable      = "application_views";
+    QString idColumn       = "application_id";
+    QString credTable      = "application";
 
     // --- Step 1: Retrieve encrypted data ---
     ui->statusbar->showMessage("Reading database..");
     QApplication::processEvents();
 
-    QByteArray data;
+    QByteArray encdata;
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
+
         if (db.open()) {
             QSqlQuery query(db);
-            query.prepare(QString("SELECT data FROM application WHERE id = :id"));
+            query.prepare("SELECT data FROM application WHERE id = :id");
             query.bindValue(":id", parentId);
+
             if (query.exec() && query.first()) {
-                data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
+                encdata = DataObfuscator::deobfuscate(
+                              query.value(0).toString(), appKey
+                          ).toUtf8();
             } else {
-                showQueryError(this,query,Q_FUNC_INFO);
+                showQueryError(this, query, Q_FUNC_INFO);
             }
         } else {
             showDbNotOpenError(this, db, Q_FUNC_INFO);
@@ -1340,101 +1489,74 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
             return;
         }
     }
+
     QSqlDatabase::removeDatabase(connName);
     ui->statusbar->clearMessage();
 
-    // --- Step 2: Decrypt the data (async, non-blocking) ---
+    // --- Step 2: Decrypt using reusable helper ---
     ui->statusbar->showMessage("Decrypting data..");
     QApplication::processEvents();
 
-    QProcess* gpg = new QProcess(this);
-    gpg->setProcessChannelMode(QProcess::SeparateChannels);
+    decryptWithGpg(
+        encdata,
 
-    connect(gpg, &QProcess::started, this, [gpg, data]() mutable {
-        gpg->write(data);
-        data.fill(0);
-        gpg->closeWriteChannel();
-    });
-
-    // Handle stdout (decrypted JSON)
-    connect(gpg, &QProcess::readyReadStandardOutput, this, [this, gpg, item]() {
-        QByteArray decrypted_data = gpg->readAllStandardOutput();
-        if (!decrypted_data.isEmpty()) {
+        // --- onSuccess ---
+        [this, parentId, connName, viewTable, idColumn](const QByteArray &json) {
             ui->statusbar->clearMessage();
-            populateFromJsonApplication(decrypted_data, ui);
-            decrypted_data.fill(0);
-        }
-    });
+            populateFromJsonApplication(json, ui);
 
-    // Handle stderr
-    bool *noKeyShown = new bool(false);
-
-    connect(gpg, &QProcess::readyReadStandardError, this, [this, gpg, noKeyShown]() {
-        QByteArray errors = gpg->readAllStandardError();
-        if (!errors.isEmpty()) {
-
-            QString errStr = QString::fromUtf8(errors);
-
-            ui->statusbar->showMessage(errStr);
-            qDebug().noquote() << "GPG stderr:" << errors;
-
-            if (errStr.contains("no secret key", Qt::CaseInsensitive) && !*noKeyShown) {
-                *noKeyShown = true;
-                QMessageBox::critical(
-                            this,
-                            tr("GPG Error"),
-                            errStr
-                            );
-            }
-        }
-    });
-
-    // --- Step 4: Handle completion ---
-    connect(gpg, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-            this, [this, gpg, parentId, connName, viewTable, idColumn, noKeyShown]
-            (int exitCode, QProcess::ExitStatus status) {
-
-        delete noKeyShown;
-        if (status == QProcess::NormalExit && exitCode == 0) {
+            // Mark as opened
             openedCredentialID = parentId;
 
-            // Upsert into views table only after successful decryption
+            // Upsert into views table
             {
                 QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
                 db.setDatabaseName(qApp->property("dbFile").toString());
+
                 if (db.open()) {
                     QSqlQuery upsert(db);
                     upsert.prepare(QString(
-                                       "INSERT INTO %1(%2, view_count, dt, user, host) "
-                                       "VALUES (:id, 1, :ts, :user, :host) "
-                                       "ON CONFLICT(%2) DO UPDATE SET "
-                                       "view_count = view_count + 1, dt = :ts, user = :user, host = :host"
-                                       ).arg(viewTable, idColumn));
+                        "INSERT INTO %1(%2, view_count, dt, user, host) "
+                        "VALUES (:id, 1, :ts, :user, :host) "
+                        "ON CONFLICT(%2) DO UPDATE SET "
+                        "view_count = view_count + 1, dt = :ts, user = :user, host = :host"
+                    ).arg(viewTable, idColumn));
 
                     upsert.bindValue(":id", parentId);
                     upsert.bindValue(":ts", QDateTime::currentSecsSinceEpoch());
                     upsert.bindValue(":user", userName);
                     upsert.bindValue(":host", QSysInfo::machineHostName());
+
                     if (!upsert.exec()) {
-                        showQueryError(this,upsert,Q_FUNC_INFO);
+                        showQueryError(this, upsert, Q_FUNC_INFO);
                     }
-                } else
-                {
+                } else {
                     showDbNotOpenError(this, db, Q_FUNC_INFO);
-                    QApplication::restoreOverrideCursor();
-                    QApplication::processEvents();
-                    return;
                 }
             }
+
             QSqlDatabase::removeDatabase(connName);
+            QApplication::restoreOverrideCursor();
+            QApplication::processEvents();
+        },
 
+        // --- onMissingKey ---
+        [this](const QString &err) {
+            ui->statusbar->clearMessage();
+            QMessageBox::critical(this, tr("GPG Error"), err);
+            clearScrollArea();
+            QApplication::restoreOverrideCursor();
+            QApplication::processEvents();
+        },
+
+        // --- onFailure ---
+        [this](const QString &err) {
+            ui->statusbar->showMessage(err);
+            clearScrollArea();
+            QApplication::restoreOverrideCursor();
+            QApplication::processEvents();
         }
-        gpg->deleteLater();
-        QApplication::restoreOverrideCursor();
-        QApplication::processEvents();
-    });
-
-    gpg->start("gpg", QStringList() << "--decrypt");
+    );
 }
 
 
@@ -4368,6 +4490,199 @@ QString MainWindow::buildCategoryPath(int categoryId, const QString &appKey, QSq
     return parts.join(settings.getPathSeparator());
 }
 
+// void MainWindow::editPassword(QTreeWidgetItem *item)
+// {
+//     if (settings.getKillGpgAgent()) {
+//         killGpgAgent();
+//     }
+
+//     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+//     QByteArray data;
+
+//     // --- Step 1: Retrieve encrypted data from DB ---
+//     ui->statusbar->showMessage(tr("Reading database.."));
+//     QApplication::processEvents();
+
+//     {
+//         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+//         db.setDatabaseName(qApp->property("dbFile").toString());
+//         if (db.open()) {
+//             QSqlQuery query(db);
+//             query.setForwardOnly(true);
+//             query.prepare("SELECT data FROM application WHERE id = :id");
+//             query.bindValue(":id", item->data(0,Qt::UserRole).toInt());
+//             if (query.exec() && query.first()) {
+//                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
+//             } else {
+//                 showQueryError(this,query,Q_FUNC_INFO);
+//             }
+//         } else {
+//             qCritical().noquote() << Q_FUNC_INFO << db.lastError().text();
+//             QMessageBox::critical(this,QApplication::applicationName(),"No database open.");
+//             return;
+//         }
+//     }
+//     QSqlDatabase::removeDatabase(connName);
+//     ui->statusbar->clearMessage();
+
+//     // --- Step 2: Decrypt asynchronously ---
+//     ui->statusbar->showMessage(tr("Decrypting data.."));
+//     QApplication::processEvents();
+
+// auto decBuffer = QSharedPointer<QByteArray>::create();
+// QProcess *gpg = new QProcess(this);
+// gpg->setProcessChannelMode(QProcess::SeparateChannels);
+
+// connect(gpg, &QProcess::started, this, [gpg, data]() mutable {
+//     gpg->write(data);
+//     data.fill(0);
+//     gpg->closeWriteChannel();
+// });
+
+// connect(gpg, &QProcess::readyReadStandardOutput, this, [gpg, decBuffer]() {
+//     decBuffer->append(gpg->readAllStandardOutput());
+// });
+
+// connect(gpg,
+//         QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+//         this,
+//         [this, gpg, item, decBuffer](int exitCode, QProcess::ExitStatus status) {
+//             if (status == QProcess::NormalExit && exitCode == 0) {
+//                 QByteArray decrypted_data = *decBuffer;  // use accumulated buffer
+//                 if (!decrypted_data.isEmpty()) {
+//                     ui->statusbar->clearMessage();
+
+//                     // --- Step 3: Populate dialog with decrypted JSON ---
+//                     QJsonDocument doc = QJsonDocument::fromJson(decrypted_data);
+//                     QJsonObject obj = doc.object();
+
+//                     NewPasswordDialog dlg(this);
+//                     dlg.setWindowTitle("Edit Password");
+
+//                     QList<KeyEntry> keys = fetchKeys();
+//                     dlg.setKeys(keys);
+
+//                     // Fill dialog fields from JSON
+//                     dlg.AppName       = obj.value("private_name").toString();
+//                     dlg.PublicAppName = item->text(0);
+//                     dlg.Description   = obj.value("description").toString();
+//                     dlg.URL           = obj.value("url").toString();
+//                     dlg.openPassword();
+
+//                     // --- Traverse credentials ---
+//                     QJsonArray creds = obj.value("credentials").toArray();
+//                     for (int i = 0; i < creds.size(); ++i) {
+//                         QJsonObject credObj = creds.at(i).toObject();
+//                         QString username  = credObj.value("username").toString();
+//                         QString password  = credObj.value("password").toString();
+//                         QString secretOpt = credObj.value("secretOtpCode").toString();
+//                         int length        = credObj.value("length").toInt();
+
+//                         qDebug().noquote() << "Credential:"
+//                                  << "username=" << username
+//                                  << "password=" << password
+//                                  << "secretOtpCode=" << secretOpt
+//                                  << "length=" << length;
+
+//                         dlg.openCredentials(username, password, secretOpt, length);
+//                     }
+
+//                     // --- Traverse notes ---
+//                     QJsonArray notes = obj.value("notes").toArray();
+//                     for (const QJsonValue &val : std::as_const(notes)) {
+//                         QJsonObject noteObj = val.toObject();
+//                         QString body  = noteObj.value("content").toString();
+//                         dlg.openNote(body);
+//                     }
+
+//                     if (dlg.exec() == QDialog::Accepted) {
+//                         QByteArray newJson = dlg.toJson();
+
+//                         QString baseDir = "/dev/shm";
+//                         if (!QFileInfo::exists(baseDir) || !QFileInfo(baseDir).isWritable()) {
+//                             baseDir = QDir::tempPath();
+//                         }
+
+//                         QString tempFile = baseDir + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".asc";
+
+//                         QStringList args;
+//                         const QStringList keys = dlg.getCheckedKeys();
+//                         for (const QString &key : keys) {
+//                             args << "--recipient" << key;
+//                         }
+//                         args << "--encrypt" << "--armor" << "--output" << tempFile;
+
+//                         QProcess enc;
+//                         enc.start("gpg", args);
+//                         enc.waitForStarted();
+//                         enc.write(newJson);
+//                         enc.closeWriteChannel();
+//                         enc.waitForFinished();
+
+//                         QFile f(tempFile);
+//                         if (f.open(QIODevice::ReadOnly)) {
+//                             QByteArray newEncrypted = f.readAll();
+//                             f.close();
+//                             wipeFile(tempFile);
+//                             {
+//                                 QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE","sqlEditPassword");
+//                                 db.setDatabaseName(qApp->property("dbFile").toString());
+//                                 if (db.open()) {
+//                                     if (!db.transaction()) {
+//                                         showTransactionError(this,db,Q_FUNC_INFO);
+//                                     }
+//                                     bool ok = true;
+
+//                                     // Update application
+//                                     QSqlQuery update(db);
+//                                     update.prepare(R"(
+//                                         UPDATE application
+//                                         SET application_name = :name,
+//                                             data = :data
+//                                         WHERE id = :id)");
+//                                     update.bindValue(":name", DataObfuscator::obfuscate(dlg.PublicAppName, appKey));
+//                                     update.bindValue(":data", DataObfuscator::obfuscate(QString::fromUtf8(newEncrypted), appKey));
+//                                     update.bindValue(":id", item->data(0, Qt::UserRole).toInt());
+//                                     if (!update.exec()) {
+//                                         qDebug() << "Update failed:" << update.lastError().text();
+//                                         ok = false;
+//                                     } else
+//                                     {
+//                                         ok = true;
+//                                     }
+
+//                                     if (ok) { if (!db.commit()) qCritical().noquote() << Q_FUNC_INFO << "Commit failed:" << db.lastError().text(); }
+//                                     else { if (!db.rollback()) qDebug().noquote() << Q_FUNC_INFO << "Rollback failed:" << db.lastError().text(); }
+//                                     if (ok)
+//                                         insertAuditRow(item->data(0, Qt::UserRole).toInt(),
+//                                                        userName,
+//                                                        QSysInfo::machineHostName(),
+//                                                        "EDITED");
+//                                 }
+//                                 db.close();
+//                             }
+//                             QSqlDatabase::removeDatabase("sqlEditPassword");
+//                         }
+//                     }
+//                     decrypted_data.fill(0);
+//                 }
+//             }
+//             gpg->deleteLater();
+//             QApplication::restoreOverrideCursor();
+//         });
+
+//     // Handle stderr
+//     connect(gpg, &QProcess::readyReadStandardError, this, [this, gpg]() {
+//         QByteArray errors = gpg->readAllStandardError();
+//         if (!errors.isEmpty()) {
+//             ui->statusbar->showMessage(QString::fromUtf8(errors),10000);
+//             qCritical().noquote() << Q_FUNC_INFO << "GPG stderr:" << errors;
+//         }
+//     });
+
+//     gpg->start("gpg", QStringList() << "--decrypt");
+// }
+
 void MainWindow::editPassword(QTreeWidgetItem *item)
 {
     if (settings.getKillGpgAgent()) {
@@ -4375,7 +4690,7 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
     }
 
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-    QByteArray data;
+    QByteArray encdata;
 
     // --- Step 1: Retrieve encrypted data from DB ---
     ui->statusbar->showMessage(tr("Reading database.."));
@@ -4384,182 +4699,323 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
+
         if (db.open()) {
             QSqlQuery query(db);
             query.setForwardOnly(true);
             query.prepare("SELECT data FROM application WHERE id = :id");
-            query.bindValue(":id", item->data(0,Qt::UserRole).toInt());
+            query.bindValue(":id", item->data(0, Qt::UserRole).toInt());
+
             if (query.exec() && query.first()) {
-                data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
+                encdata = DataObfuscator::deobfuscate(
+                              query.value(0).toString(), appKey
+                          ).toUtf8();
             } else {
-                showQueryError(this,query,Q_FUNC_INFO);
+                showQueryError(this, query, Q_FUNC_INFO);
             }
         } else {
             qCritical().noquote() << Q_FUNC_INFO << db.lastError().text();
-            QMessageBox::critical(this,QApplication::applicationName(),"No database open.");
+            QMessageBox::critical(this, QApplication::applicationName(),
+                                  "No database open.");
             return;
         }
     }
+
     QSqlDatabase::removeDatabase(connName);
     ui->statusbar->clearMessage();
 
-    // --- Step 2: Decrypt asynchronously ---
+    // --- Step 2: Decrypt using shared helper ---
     ui->statusbar->showMessage(tr("Decrypting data.."));
     QApplication::processEvents();
 
-auto decBuffer = QSharedPointer<QByteArray>::create();
-QProcess *gpg = new QProcess(this);
-gpg->setProcessChannelMode(QProcess::SeparateChannels);
+    decryptWithGpg(
+        encdata,
 
-connect(gpg, &QProcess::started, this, [gpg, data]() mutable {
-    gpg->write(data);
-    data.fill(0);
-    gpg->closeWriteChannel();
-});
+        // --- onSuccess ---
+        [this, item](const QByteArray &json) {
+            ui->statusbar->clearMessage();
 
-connect(gpg, &QProcess::readyReadStandardOutput, this, [gpg, decBuffer]() {
-    decBuffer->append(gpg->readAllStandardOutput());
-});
+            // --- Step 3: Populate dialog with decrypted JSON ---
+            QJsonDocument doc = QJsonDocument::fromJson(json);
+            QJsonObject obj = doc.object();
 
-connect(gpg,
-        QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-        this,
-        [this, gpg, item, decBuffer](int exitCode, QProcess::ExitStatus status) {
-            if (status == QProcess::NormalExit && exitCode == 0) {
-                QByteArray decrypted_data = *decBuffer;  // use accumulated buffer
-                if (!decrypted_data.isEmpty()) {
-                    ui->statusbar->clearMessage();
+            NewPasswordDialog dlg(this);
+            dlg.setWindowTitle("Edit Password");
 
-                    // --- Step 3: Populate dialog with decrypted JSON ---
-                    QJsonDocument doc = QJsonDocument::fromJson(decrypted_data);
-                    QJsonObject obj = doc.object();
+            QList<KeyEntry> keys = fetchKeys();
+            dlg.setKeys(keys);
 
-                    NewPasswordDialog dlg(this);
-                    dlg.setWindowTitle("Edit Password");
+            dlg.AppName       = obj.value("private_name").toString();
+            dlg.PublicAppName = item->text(0);
+            dlg.Description   = obj.value("description").toString();
+            dlg.URL           = obj.value("url").toString();
+            dlg.openPassword();
 
-                    QList<KeyEntry> keys = fetchKeys();
-                    dlg.setKeys(keys);
+            // --- Traverse credentials ---
+            QJsonArray creds = obj.value("credentials").toArray();
+            for (int i = 0; i < creds.size(); ++i) {
+                QJsonObject credObj = creds.at(i).toObject();
+                dlg.openCredentials(
+                    credObj.value("username").toString(),
+                    credObj.value("password").toString(),
+                    credObj.value("secretOtpCode").toString(),
+                    credObj.value("length").toInt()
+                );
+            }
 
-                    // Fill dialog fields from JSON
-                    dlg.AppName       = obj.value("private_name").toString();
-                    dlg.PublicAppName = item->text(0);
-                    dlg.Description   = obj.value("description").toString();
-                    dlg.URL           = obj.value("url").toString();
-                    dlg.openPassword();
+            // --- Traverse notes ---
+            QJsonArray notes = obj.value("notes").toArray();
+            for (const QJsonValue &val : notes) {
+                dlg.openNote(val.toObject().value("content").toString());
+            }
 
-                    // --- Traverse credentials ---
-                    QJsonArray creds = obj.value("credentials").toArray();
-                    for (int i = 0; i < creds.size(); ++i) {
-                        QJsonObject credObj = creds.at(i).toObject();
-                        QString username  = credObj.value("username").toString();
-                        QString password  = credObj.value("password").toString();
-                        QString secretOpt = credObj.value("secretOtpCode").toString();
-                        int length        = credObj.value("length").toInt();
+            // --- If user saves changes ---
+            if (dlg.exec() == QDialog::Accepted) {
+                QByteArray newJson = dlg.toJson();
 
-                        qDebug().noquote() << "Credential:"
-                                 << "username=" << username
-                                 << "password=" << password
-                                 << "secretOtpCode=" << secretOpt
-                                 << "length=" << length;
+                QString baseDir = "/dev/shm";
+                if (!QFileInfo::exists(baseDir) || !QFileInfo(baseDir).isWritable()) {
+                    baseDir = QDir::tempPath();
+                }
 
-                        dlg.openCredentials(username, password, secretOpt, length);
-                    }
+                QString tempFile = baseDir + "/" +
+                                   QUuid::createUuid().toString(QUuid::WithoutBraces) +
+                                   ".asc";
 
-                    // --- Traverse notes ---
-                    QJsonArray notes = obj.value("notes").toArray();
-                    for (const QJsonValue &val : std::as_const(notes)) {
-                        QJsonObject noteObj = val.toObject();
-                        QString body  = noteObj.value("content").toString();
-                        dlg.openNote(body);
-                    }
+                QStringList args;
+                const QStringList keys = dlg.getCheckedKeys();
+                for (const QString &key : keys) {
+                    args << "--recipient" << key;
+                }
+                args << "--encrypt" << "--armor" << "--output" << tempFile;
 
-                    if (dlg.exec() == QDialog::Accepted) {
-                        QByteArray newJson = dlg.toJson();
+                QProcess enc;
+                enc.start("gpg", args);
+                enc.waitForStarted();
+                enc.write(newJson);
+                enc.closeWriteChannel();
+                enc.waitForFinished();
 
-                        QString baseDir = "/dev/shm";
-                        if (!QFileInfo::exists(baseDir) || !QFileInfo(baseDir).isWritable()) {
-                            baseDir = QDir::tempPath();
-                        }
+                QFile f(tempFile);
+                if (f.open(QIODevice::ReadOnly)) {
+                    QByteArray newEncrypted = f.readAll();
+                    f.close();
+                    wipeFile(tempFile);
 
-                        QString tempFile = baseDir + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".asc";
+                    {
+                        QSqlDatabase db = QSqlDatabase::addDatabase(
+                                              "QSQLITE", "sqlEditPassword");
+                        db.setDatabaseName(qApp->property("dbFile").toString());
 
-                        QStringList args;
-                        const QStringList keys = dlg.getCheckedKeys();
-                        for (const QString &key : keys) {
-                            args << "--recipient" << key;
-                        }
-                        args << "--encrypt" << "--armor" << "--output" << tempFile;
-
-                        QProcess enc;
-                        enc.start("gpg", args);
-                        enc.waitForStarted();
-                        enc.write(newJson);
-                        enc.closeWriteChannel();
-                        enc.waitForFinished();
-
-                        QFile f(tempFile);
-                        if (f.open(QIODevice::ReadOnly)) {
-                            QByteArray newEncrypted = f.readAll();
-                            f.close();
-                            wipeFile(tempFile);
-                            {
-                                QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE","sqlEditPassword");
-                                db.setDatabaseName(qApp->property("dbFile").toString());
-                                if (db.open()) {
-                                    if (!db.transaction()) {
-                                        showTransactionError(this,db,Q_FUNC_INFO);
-                                    }
-                                    bool ok = true;
-
-                                    // Update application
-                                    QSqlQuery update(db);
-                                    update.prepare(R"(
-                                        UPDATE application
-                                        SET application_name = :name,
-                                            data = :data
-                                        WHERE id = :id)");
-                                    update.bindValue(":name", DataObfuscator::obfuscate(dlg.PublicAppName, appKey));
-                                    update.bindValue(":data", DataObfuscator::obfuscate(QString::fromUtf8(newEncrypted), appKey));
-                                    update.bindValue(":id", item->data(0, Qt::UserRole).toInt());
-                                    if (!update.exec()) {
-                                        qDebug() << "Update failed:" << update.lastError().text();
-                                        ok = false;
-                                    } else
-                                    {
-                                        ok = true;
-                                    }
-
-                                    if (ok) { if (!db.commit()) qCritical().noquote() << Q_FUNC_INFO << "Commit failed:" << db.lastError().text(); }
-                                    else { if (!db.rollback()) qDebug().noquote() << Q_FUNC_INFO << "Rollback failed:" << db.lastError().text(); }
-                                    if (ok)
-                                        insertAuditRow(item->data(0, Qt::UserRole).toInt(),
-                                                       userName,
-                                                       QSysInfo::machineHostName(),
-                                                       "EDITED");
-                                }
-                                db.close();
+                        if (db.open()) {
+                            if (!db.transaction()) {
+                                showTransactionError(this, db, Q_FUNC_INFO);
                             }
-                            QSqlDatabase::removeDatabase("sqlEditPassword");
+
+                            bool ok = true;
+
+                            QSqlQuery update(db);
+                            update.prepare(R"(
+                                UPDATE application
+                                SET application_name = :name,
+                                    data = :data
+                                WHERE id = :id)");
+                            update.bindValue(":name",
+                                DataObfuscator::obfuscate(dlg.PublicAppName, appKey));
+                            update.bindValue(":data",
+                                DataObfuscator::obfuscate(
+                                    QString::fromUtf8(newEncrypted), appKey));
+                            update.bindValue(":id",
+                                item->data(0, Qt::UserRole).toInt());
+
+                            if (!update.exec()) {
+                                qDebug() << "Update failed:" << update.lastError().text();
+                                ok = false;
+                            }
+
+                            if (ok) {
+                                if (!db.commit())
+                                    qCritical().noquote() << Q_FUNC_INFO
+                                                          << "Commit failed:"
+                                                          << db.lastError().text();
+                            } else {
+                                if (!db.rollback())
+                                    qDebug().noquote() << Q_FUNC_INFO
+                                                       << "Rollback failed:"
+                                                       << db.lastError().text();
+                            }
+
+                            if (ok)
+                                insertAuditRow(
+                                    item->data(0, Qt::UserRole).toInt(),
+                                    userName,
+                                    QSysInfo::machineHostName(),
+                                    "EDITED"
+                                );
                         }
+                        db.close();
                     }
-                    decrypted_data.fill(0);
+
+                    QSqlDatabase::removeDatabase("sqlEditPassword");
                 }
             }
-            gpg->deleteLater();
+        },
+
+        // --- onMissingKey ---
+        [this](const QString &err) {
+            ui->statusbar->clearMessage();
+            QMessageBox::critical(this, tr("GPG Error"), err);
             QApplication::restoreOverrideCursor();
-        });
+        },
 
-    // Handle stderr
-    connect(gpg, &QProcess::readyReadStandardError, this, [this, gpg]() {
-        QByteArray errors = gpg->readAllStandardError();
-        if (!errors.isEmpty()) {
-            ui->statusbar->showMessage(QString::fromUtf8(errors),10000);
-            qCritical().noquote() << Q_FUNC_INFO << "GPG stderr:" << errors;
+        // --- onFailure ---
+        [this](const QString &err) {
+            ui->statusbar->showMessage(err);
+            QApplication::restoreOverrideCursor();
         }
-    });
-
-    gpg->start("gpg", QStringList() << "--decrypt");
+    );
 }
+
+
+// void MainWindow::exportPassword(QTreeWidgetItem *item)
+// {
+//     if (!item) return;
+
+//     // --- WARNING prompt ---
+//     QMessageBox msgBox(this);
+//     msgBox.setIcon(QMessageBox::Warning);
+//     msgBox.setWindowTitle(tr("Security Warning"));
+
+//     msgBox.setText(
+//         tr("<div style='line-height:135%; margin:4px 0 6px 0;'>"
+//            "<b><span style='color:#8c0000;'>You are about to export your password data in unencrypted form.</span></b>"
+//            "<div style='margin-top:8px;'>"
+//            "<ul style='margin:0; padding-left:20px;'>"
+//            "<li style='margin-bottom:6px;'>Anyone with access to the file can read your passwords.</li>"
+//            "<li style='margin-bottom:6px;'>The exported file will <b>not</b> be protected by GPG or any other encryption.</li>"
+//            "</ul>"
+//            "</div>"
+//            "<b>Only continue if you fully understand and accept the security risks.</b>"
+//            "</div>")
+//     );
+
+//     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+//     msgBox.button(QMessageBox::Yes)->setText(tr("Export Anyway"));
+//     msgBox.button(QMessageBox::Cancel)->setText(tr("Cancel"));
+
+//     QMessageBox::StandardButton reply =
+//         static_cast<QMessageBox::StandardButton>(msgBox.exec());
+
+
+
+//     if (reply != QMessageBox::Yes) return;
+
+//     if (settings.getKillGpgAgent()) {
+//         killGpgAgent();
+//     }
+
+//     // --- Step 1: Retrieve encrypted data from DB ---
+//     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+//     QByteArray data;
+//     ui->statusbar->showMessage(tr("Reading database.."));
+//     {
+//         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+//         db.setDatabaseName(qApp->property("dbFile").toString());
+//         if (db.open()) {
+//             QSqlQuery query(db);
+//             query.prepare("SELECT data FROM application WHERE id = :id");
+//             query.bindValue(":id", item->data(0, Qt::UserRole).toInt());
+//             if (query.exec() && query.first()) {
+//                 data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
+//             } else {
+//                 showQueryError(this,query,Q_FUNC_INFO);
+//             }
+//         } else {
+//             qCritical().noquote() << "Database not opened." << db.lastError().text();
+//             QMessageBox::critical(this,QApplication::applicationName(),"No database open.");
+//         }
+//     }
+//     QSqlDatabase::removeDatabase(connName);
+//     ui->statusbar->clearMessage();
+
+//     // --- Step 2: Decrypt asynchronously ---
+//     ui->statusbar->showMessage(tr("Decrypting data.."));
+//     QApplication::processEvents();
+
+//     auto decBuffer = QSharedPointer<QByteArray>::create();
+//     QProcess *gpg = new QProcess(this);
+//     gpg->setProcessChannelMode(QProcess::SeparateChannels);
+
+//     connect(gpg, &QProcess::started, this, [gpg, data]() mutable {
+//         gpg->write(data);
+//         data.fill(0);
+//         gpg->closeWriteChannel();
+//     });
+
+//     connect(gpg, &QProcess::readyReadStandardOutput, this, [gpg, decBuffer]() {
+//         decBuffer->append(gpg->readAllStandardOutput());
+//     });
+
+//     connect(gpg, &QProcess::readyReadStandardError, this, [this, gpg]() {
+//         QByteArray errors = gpg->readAllStandardError();
+//         if (!errors.isEmpty()) {
+//             ui->statusbar->showMessage(QString::fromUtf8(errors));
+//             qCritical().noquote() << Q_FUNC_INFO << "GPG stderr:" << errors;
+//         }
+//     });
+
+//     connect(gpg,
+//             QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+//             this,
+//             [this, gpg, item, decBuffer](int exitCode, QProcess::ExitStatus status) {
+//                 if (status == QProcess::NormalExit && exitCode == 0) {
+//                     QByteArray decrypted_data = *decBuffer;
+//                     if (!decrypted_data.isEmpty()) {
+//                         ui->statusbar->clearMessage();
+
+//                         // Build suggested filename: <item text>_<date>.json
+//                         QString baseName = item->text(0);
+//                         QString dateStr  = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+//                         QString suggestedName = QDir::homePath() + "/" + baseName + "_" + dateStr + ".json";
+
+//                         QString fileName = QFileDialog::getSaveFileName(
+//                             this,
+//                             tr("Save Decrypted JSON"),
+//                             suggestedName,
+//                             tr("JSON Files (*.json);;All Files (*)")
+//                             );
+
+//                         if (!fileName.isEmpty()) {
+//                             QFile outFile(fileName);
+//                             if (outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+//                                 outFile.write(decrypted_data);
+//                                 outFile.close();
+
+//                                 insertAuditRow(item->data(0, Qt::UserRole).toInt(),
+//                                                userName,
+//                                                QSysInfo::machineHostName(),
+//                                                "EXPORTED");
+
+//                                 QMessageBox::information(this, ui->actionExport_Password->text(),
+//                                                          tr("Decrypted JSON saved to:\n") + fileName);
+
+//                             } else {
+//                                 QMessageBox::critical(this, ui->actionExport_Password->text(),
+//                                                       tr("Could not open file for writing:\n") + fileName);
+//                             }
+//                         }
+
+//                         decrypted_data.fill(0);
+//                     }
+//                     openedCredentialID = item->text(1).toInt();
+//                 }
+//                 gpg->deleteLater();
+//                 QApplication::restoreOverrideCursor();
+//                 QApplication::processEvents();
+//             });
+
+//     gpg->start("gpg", QStringList() << "--decrypt");
+// }
 
 void MainWindow::exportPassword(QTreeWidgetItem *item)
 {
@@ -4587,12 +5043,8 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
     msgBox.button(QMessageBox::Yes)->setText(tr("Export Anyway"));
     msgBox.button(QMessageBox::Cancel)->setText(tr("Cancel"));
 
-    QMessageBox::StandardButton reply =
-        static_cast<QMessageBox::StandardButton>(msgBox.exec());
-
-
-
-    if (reply != QMessageBox::Yes) return;
+    if (msgBox.exec() != QMessageBox::Yes)
+        return;
 
     if (settings.getKillGpgAgent()) {
         killGpgAgent();
@@ -4600,105 +5052,111 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
 
     // --- Step 1: Retrieve encrypted data from DB ---
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-    QByteArray data;
+    QByteArray encdata;
+
     ui->statusbar->showMessage(tr("Reading database.."));
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
+
         if (db.open()) {
             QSqlQuery query(db);
             query.prepare("SELECT data FROM application WHERE id = :id");
             query.bindValue(":id", item->data(0, Qt::UserRole).toInt());
+
             if (query.exec() && query.first()) {
-                data = DataObfuscator::deobfuscate(query.value(0).toString(), appKey).toUtf8();
+                encdata = DataObfuscator::deobfuscate(
+                              query.value(0).toString(), appKey
+                          ).toUtf8();
             } else {
-                showQueryError(this,query,Q_FUNC_INFO);
+                showQueryError(this, query, Q_FUNC_INFO);
             }
         } else {
             qCritical().noquote() << "Database not opened." << db.lastError().text();
-            QMessageBox::critical(this,QApplication::applicationName(),"No database open.");
+            QMessageBox::critical(this, QApplication::applicationName(),
+                                  "No database open.");
         }
     }
+
     QSqlDatabase::removeDatabase(connName);
     ui->statusbar->clearMessage();
 
-    // --- Step 2: Decrypt asynchronously ---
+    // --- Step 2: Decrypt using shared helper ---
     ui->statusbar->showMessage(tr("Decrypting data.."));
     QApplication::processEvents();
 
-    auto decBuffer = QSharedPointer<QByteArray>::create();
-    QProcess *gpg = new QProcess(this);
-    gpg->setProcessChannelMode(QProcess::SeparateChannels);
+    decryptWithGpg(
+        encdata,
 
-    connect(gpg, &QProcess::started, this, [gpg, data]() mutable {
-        gpg->write(data);
-        data.fill(0);
-        gpg->closeWriteChannel();
-    });
+        // --- onSuccess ---
+        [this, item](const QByteArray &json) {
+            ui->statusbar->clearMessage();
 
-    connect(gpg, &QProcess::readyReadStandardOutput, this, [gpg, decBuffer]() {
-        decBuffer->append(gpg->readAllStandardOutput());
-    });
+            QByteArray decrypted_data = json;
+            if (decrypted_data.isEmpty())
+                return;
 
-    connect(gpg, &QProcess::readyReadStandardError, this, [this, gpg]() {
-        QByteArray errors = gpg->readAllStandardError();
-        if (!errors.isEmpty()) {
-            ui->statusbar->showMessage(QString::fromUtf8(errors));
-            qCritical().noquote() << Q_FUNC_INFO << "GPG stderr:" << errors;
-        }
-    });
+            // Build suggested filename: <item text>_<date>.json
+            QString baseName = item->text(0);
+            QString dateStr  = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+            QString suggestedName =
+                QDir::homePath() + "/" + baseName + "_" + dateStr + ".json";
 
-    connect(gpg,
-            QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-            this,
-            [this, gpg, item, decBuffer](int exitCode, QProcess::ExitStatus status) {
-                if (status == QProcess::NormalExit && exitCode == 0) {
-                    QByteArray decrypted_data = *decBuffer;
-                    if (!decrypted_data.isEmpty()) {
-                        ui->statusbar->clearMessage();
+            QString fileName = QFileDialog::getSaveFileName(
+                this,
+                tr("Save Decrypted JSON"),
+                suggestedName,
+                tr("JSON Files (*.json);;All Files (*)")
+            );
 
-                        // Build suggested filename: <item text>_<date>.json
-                        QString baseName = item->text(0);
-                        QString dateStr  = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
-                        QString suggestedName = QDir::homePath() + "/" + baseName + "_" + dateStr + ".json";
+            if (!fileName.isEmpty()) {
+                QFile outFile(fileName);
+                if (outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    outFile.write(decrypted_data);
+                    outFile.close();
 
-                        QString fileName = QFileDialog::getSaveFileName(
-                            this,
-                            tr("Save Decrypted JSON"),
-                            suggestedName,
-                            tr("JSON Files (*.json);;All Files (*)")
-                            );
+                    insertAuditRow(item->data(0, Qt::UserRole).toInt(),
+                                   userName,
+                                   QSysInfo::machineHostName(),
+                                   "EXPORTED");
 
-                        if (!fileName.isEmpty()) {
-                            QFile outFile(fileName);
-                            if (outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                                outFile.write(decrypted_data);
-                                outFile.close();
+                    QMessageBox::information(
+                        this,
+                        ui->actionExport_Password->text(),
+                        tr("Decrypted JSON saved to:\n") + fileName
+                    );
 
-                                insertAuditRow(item->data(0, Qt::UserRole).toInt(),
-                                               userName,
-                                               QSysInfo::machineHostName(),
-                                               "EXPORTED");
-
-                                QMessageBox::information(this, ui->actionExport_Password->text(),
-                                                         tr("Decrypted JSON saved to:\n") + fileName);
-
-                            } else {
-                                QMessageBox::critical(this, ui->actionExport_Password->text(),
-                                                      tr("Could not open file for writing:\n") + fileName);
-                            }
-                        }
-
-                        decrypted_data.fill(0);
-                    }
-                    openedCredentialID = item->text(1).toInt();
+                } else {
+                    QMessageBox::critical(
+                        this,
+                        ui->actionExport_Password->text(),
+                        tr("Could not open file for writing:\n") + fileName
+                    );
                 }
-                gpg->deleteLater();
-                QApplication::restoreOverrideCursor();
-                QApplication::processEvents();
-            });
+            }
 
-    gpg->start("gpg", QStringList() << "--decrypt");
+            decrypted_data.fill(0);
+            openedCredentialID = item->text(1).toInt();
+
+            QApplication::restoreOverrideCursor();
+            QApplication::processEvents();
+        },
+
+        // --- onMissingKey ---
+        [this](const QString &err) {
+            ui->statusbar->clearMessage();
+            QMessageBox::critical(this, tr("GPG Error"), err);
+            QApplication::restoreOverrideCursor();
+            QApplication::processEvents();
+        },
+
+        // --- onFailure ---
+        [this](const QString &err) {
+            ui->statusbar->showMessage(err);
+            QApplication::restoreOverrideCursor();
+            QApplication::processEvents();
+        }
+    );
 }
 
 QString MainWindow::getItemPath(QTreeWidgetItem *item, int column)
@@ -6045,4 +6503,65 @@ void MainWindow::openCategoryFromCurrent(QTreeWidgetItem* current, QTreeWidgetIt
 
     // Call your existing slot with a default column (usually 0)
     openCategory(current, 0);
+}
+
+
+void MainWindow::decryptWithGpg(
+        const QByteArray &encrypted,
+        std::function<void(const QByteArray&)> onSuccess,
+        std::function<void(const QString&)> onMissingKey,
+        std::function<void(const QString&)> onFailure)
+{
+    QProcess *gpg = new QProcess(this);
+    gpg->setProcessChannelMode(QProcess::SeparateChannels);
+
+    // Track whether we've shown the missing-key dialog
+    bool *noKeyShown = new bool(false);
+
+    // Feed data when ready
+    connect(gpg, &QProcess::started, this, [gpg, encrypted]() {
+        gpg->write(encrypted);
+        gpg->closeWriteChannel();
+    });
+
+    // Handle stdout (successful decrypt)
+    connect(gpg, &QProcess::readyReadStandardOutput, this, [gpg, onSuccess]() {
+        QByteArray out = gpg->readAllStandardOutput();
+        if (!out.isEmpty()) {
+            onSuccess(out);
+        }
+    });
+
+    // Handle stderr
+    connect(gpg, &QProcess::readyReadStandardError, this,
+            [this, gpg, noKeyShown, onMissingKey, onFailure]() {
+
+        QByteArray err = gpg->readAllStandardError();
+        if (err.isEmpty()) return;
+
+        QString errStr = QString::fromUtf8(err);
+
+        // NEW: show stderr in the status bar (restores original behavior)
+        ui->statusbar->showMessage(errStr);
+
+        qDebug().noquote() << "GPG stderr:" << errStr;
+
+        if (errStr.contains("no secret key", Qt::CaseInsensitive)) {
+            if (!*noKeyShown) {
+                *noKeyShown = true;
+                onMissingKey(errStr);
+            }
+        } else {
+            onFailure(errStr);
+        }
+    });
+
+    // Cleanup
+    connect(gpg, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this, [gpg, noKeyShown](int, QProcess::ExitStatus) {
+        delete noKeyShown;
+        gpg->deleteLater();
+    });
+
+    gpg->start("gpg", QStringList() << "--decrypt");
 }
