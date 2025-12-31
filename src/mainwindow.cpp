@@ -4547,16 +4547,32 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
     if (!item) return;
 
     // --- WARNING prompt ---
-    QMessageBox::StandardButton reply = QMessageBox::warning(
-        this,
-        tr("WARNING, WARNING, WARNING"),
-        tr("<b><span style='color:red;'>If you continue, you will create an UNENCRYPTED copy of your password data on disk.</span></b><br><br>"
-           "This is how password leaks occur.<br><br>"
-           "This file will <b>NOT</b> be protected by GPG.<br><br>"
-           "Do you really want to continue?"),
-        QMessageBox::Yes | QMessageBox::No,
-        QMessageBox::No
-        );
+    QMessageBox msgBox(this);
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setWindowTitle(tr("Security Warning"));
+
+    msgBox.setText(
+        tr("<div style='line-height:135%; margin:4px 0 6px 0;'>"
+           "<b><span style='color:#8c0000;'>You are about to export your password data in unencrypted form.</span></b>"
+           "<div style='margin-top:8px;'>"
+           "<ul style='margin:0; padding-left:20px;'>"
+           "<li style='margin-bottom:6px;'>Anyone with access to the file can read your passwords.</li>"
+           "<li style='margin-bottom:6px;'>The exported file will <b>not</b> be protected by GPG or any other encryption.</li>"
+           "</ul>"
+           "</div>"
+           "<b>Only continue if you fully understand and accept the security risks.</b>"
+           "</div>")
+    );
+
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    msgBox.button(QMessageBox::Yes)->setText(tr("Export Anyway"));
+    msgBox.button(QMessageBox::Cancel)->setText(tr("Cancel"));
+
+    QMessageBox::StandardButton reply =
+        static_cast<QMessageBox::StandardButton>(msgBox.exec());
+
+
+
     if (reply != QMessageBox::Yes) return;
 
     if (settings.getKillGpgAgent()) {
