@@ -60,20 +60,473 @@ QPlainTextEdit:focus {
     background: white;
 }
 
+/*
+ * passwords — Application Stylesheet
+ * ----------------------------------
+ * Visual theme and component styling for the
+ * GnuPG‑based password manager "passwords".
+ *
+ * Copyright (C) 2026  Adam.Lanzafame <sysal@tuta.io>
+ *
+ * This stylesheet is part of the passwords project and is
+ * distributed under the terms of the GNU General Public License,
+ * version 3 or later.
+ *
+ * It is provided in the hope that it enhances the user interface,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * For full license details, see the GNU General Public License:
+ * https://www.gnu.org/licenses/
+ */
+
+
+/* ============================================================
+   GLOBAL
+   ============================================================ */
+   
+QLineEdit {
+    background: white;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    padding: 4px 6px;
+    color: #222;
+}
+
+QLineEdit:focus {
+    border: 1px solid #4a90e2;
+}
+
+
+QListWidget {
+    background-color: white;
+}
+
+PlainTextEdit,
+QTextEdit,
+QPlainTextEdit {
+    background: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 12px;
+    padding: 12px;
+    color: #1a1a1a;
+    font-size: 13px;
+    outline: none; /* prevents native focus rings */
+}
+
+/* Focus state */
+PlainTextEdit:focus,
+QTextEdit:focus,
+QPlainTextEdit:focus {
+    border: 1px solid #4da3ff;
+    background: white;
+}
+
 QProgressBar {
-    background: #e8e8e8;
-    border-radius: 7px;
+    background: #f0f0f0;                 /* softer, lighter grey */
+    border: 1px solid #d0d0d0;           /* matches table borders */
+    border-radius: 8px;
     padding: 3px;
     text-align: center;
     color: #333;
-    height: 16px;
-    border: none;
+    height: 18px;
 }
 
 QProgressBar::chunk {
-    background: #b0b0b0;
-    border-radius: 12px;
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0   #4a90e2,               /* your highlight blue */
+        stop:0.5 #2299d4,               /* main brand blue */
+        stop:1   #1a7bb0                /* darker base blue */
+    );
+    border-radius: 6px;
+    margin: 1px;                         /* gives a nice inset look */
 }
+
+
+QTableWidget {
+    background: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    gridline-color: #e0e0e0;
+    selection-background-color: #4a90e2;
+    selection-color: white;
+    font-size: 13px;
+}
+
+QHeaderView::section {
+    background: #f5f5f5;
+    padding: 6px;
+    border: none;
+    border-bottom: 1px solid #d0d0d0;
+    font-weight: normal;
+    color: #333;
+}
+
+
+/* ============================================================
+   MENU BAR
+   ============================================================ */
+
+QMenuBar {
+    background: transparent;
+    padding: 4px;
+}
+
+QMenuBar::item {
+    padding: 4px 7px;
+    background: transparent;
+    color: #333;
+    border-radius: 4px;
+}
+
+QMenuBar::item:selected {
+    background: #2299d4;
+    color: white;
+}
+
+QMenuBar::item:pressed {
+    background: #1c87bd;
+    color: white;
+}
+
+
+/* ============================================================
+   DROP‑DOWN MENUS
+   ============================================================ */
+
+QMenu {
+    background: #ffffff;
+    border: 1px solid #c8c8c8;
+    padding: 4px;
+}
+
+QMenu::item {
+    padding: 4px 14px 4px 8px;
+    border-radius: 4px;
+    color: #333;
+}
+
+QMenu::item:selected {
+    background: #2299d4;
+    color: white;
+}
+
+QMenu::item:disabled {
+    color: #999;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: #dcdcdc;
+    margin: 6px 4px;
+}
+
+QLabel#actionCloseLabel {
+    background: #ffdddd;
+    color: #b00000;
+    padding: 6px 14px;
+    border-radius: 4px;
+}
+
+QLabel#actionCloseLabel:hover {
+    background: #ff6666;
+    color: white;
+}
+
+
+/* ============================================================
+   LINE EDITS
+   ============================================================ */
+
+QLineEdit#lineEditSearch {
+    background: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+QLineEdit#lineEditSearch:focus {
+    border: 1px solid #448aff;
+    background: #f3f7ff;
+}
+
+
+/* ============================================================
+   LABEL HEADINGS
+   ============================================================ */
+
+QLabel#labelNameHeading {
+    background-color: #2299d4;
+    padding: 6px;
+    color: white;
+    font-weight: bold;
+    border: 1px solid #1a7bb0;
+    border-radius: 1px;
+}
+
+
+QLabel#labelNotesHeading {
+    background-color: #2299d4;
+    padding: 6px;
+    color: white;
+    font-weight: bold;
+    border: 1px solid #1a7bb0;
+    border-radius: 1px;
+}
+
+QLabel#labelAboutPasswordHeading {
+    background-color: #ffffdc;      /* tooltip yellow */
+    padding: 6px;
+    color: black;
+    font-weight: bold;
+    border: 1px solid #d4c878;      /* darker yellow/gold border */
+    border-radius: 1px;             /* optional, but looks nicer */
+}
+
+
+QLabel#labelPasswordURL {
+    padding-bottom: 6px;
+}
+
+
+/* ============================================================
+   TREE WIDGET 2 ONLY
+   ============================================================ */
+
+QTreeWidget#treeWidget_2 {
+    background: #ffffff;
+    border: 1px solid #c8c8c8;
+    border-radius: 6px;
+    show-decoration-selected: 0;
+}
+
+QTreeView#treeWidget_2::viewport {
+    background: #ffffff;
+}
+
+/* Branch area */
+QTreeView#treeWidget_2::branch {
+    background: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+QTreeView#treeWidget_2::branch:closed:has-children {
+    image: url(:/menus/glyphs/east_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg);
+}
+
+QTreeView#treeWidget_2::branch:open:has-children {
+    image: url(:/menus/glyphs/south_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg);
+}
+
+QTreeView#treeWidget_2::branch:selected,
+QTreeView#treeWidget_2::branch:selected:open,
+QTreeView#treeWidget_2::branch:selected:closed,
+QTreeView#treeWidget_2::branch:selected:has-children {
+    background: transparent;
+}
+
+/* Items */
+QTreeWidget#treeWidget_2::item {
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 0;
+}
+
+QTreeWidget#treeWidget_2::item:hover {
+    background: #e6f4fb;
+}
+
+QTreeWidget#treeWidget_2::item:selected {
+    background: #2299d4;
+    color: white;
+}
+
+QTreeWidget#treeWidget_2::item:selected:hover {
+    background: #2299d4;
+}
+
+QTreeWidget#treeWidget_2::item:alternate {
+    background: #f7f7f7;
+}
+
+
+/* ============================================================
+   TREE WIDGET (treeWidget)
+   ============================================================ */
+
+QTreeWidget#treeWidget {
+    background: #ffffff;
+    border: 1px solid #c8c8c8;
+    border-radius: 6px;
+}
+
+QTreeWidget#treeWidget::item {
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 0;
+}
+
+QTreeWidget#treeWidget::item:hover {
+    background: #e6f4fb;
+}
+
+QTreeWidget#treeWidget::item:selected {
+    background: #2299d4;
+    color: white;
+}
+
+QTreeWidget#treeWidget::item:selected:hover {
+    background: #2299d4;
+}
+
+QTreeWidget#treeWidget::item:alternate {
+    background: #f7f7f7;
+}
+
+
+/* ============================================================
+   SCROLL AREA (scrollArea)
+   ============================================================ */
+
+QScrollArea#scrollArea {
+    border: none;
+    background: #ffffff;
+}
+
+/* Vertical scrollbar */
+QScrollArea#scrollArea QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 2px;
+}
+
+QScrollArea#scrollArea QScrollBar::handle:vertical {
+    background: #c8c8c8;
+    border-radius: 4px;
+}
+
+QScrollArea#scrollArea QScrollBar::handle:vertical:hover {
+    background: #a0a0a0;
+}
+
+QScrollArea#scrollArea QScrollBar::add-line:vertical,
+QScrollArea#scrollArea QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+QScrollArea#scrollArea QScrollBar::add-page:vertical,
+QScrollArea#scrollArea QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+
+/* ============================================================
+   STATUS BAR (statusbar)
+   ============================================================ */
+
+QStatusBar#statusbar {
+    background: #f5f5f5;
+    border-top: 1px solid #d0d0d0;
+    padding: 4px 8px;
+}
+
+QStatusBar#statusbar::item {
+    border: none;
+    padding: 0 6px;
+}
+
+
+/* ============================================================
+   PASSWORD GENERATOR (editGenerateNewPassword)
+   ============================================================ */
+
+QLineEdit#editGenerateNewPassword {
+    background: #f5fff7;
+    color: #2e7d32;
+    border: 2px solid #81c784;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-family: Consolas, "Courier New", monospace;
+    letter-spacing: 1px;
+}
+
+QLineEdit#editGenerateNewPassword:focus {
+    border-color: #4caf50;
+    background: #ffffff;
+}
+
+
+/* ============================================================
+   RANDOM NOISE OUTPUT (textEditRandomNoise)
+   ============================================================ */
+
+QTextEdit#textEditRandomNoise {
+    background: #f5fff7;
+    color: #2e7d32;
+    border: 2px solid #81c784;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+/* Focus state */
+QTextEdit#textEditRandomNoise:focus {
+    border-color: #4caf50;
+    background: #ffffff;
+}
+
+
+/* ============================================================
+   PASSWORD INSPECOR
+   ============================================================ */
+
+QFrame[tileType="upper"] {
+    background-color: #1976D2;
+    color: white;
+    border-radius: 8px;
+    padding: 4px;
+}
+QFrame[tileType="upper"]:hover {
+    background-color: #1E88E5;
+}
+
+QFrame[tileType="lower"] {
+    background-color: #388E3C;
+    color: white;
+    border-radius: 8px;
+    padding: 4px;
+}
+QFrame[tileType="lower"]:hover {
+    background-color: #43A047;
+}
+
+QFrame[tileType="digit"] {
+    background-color: #7B1FA2;
+    color: white;
+    border-radius: 8px;
+    padding: 4px;
+}
+QFrame[tileType="digit"]:hover {
+    background-color: #8E24AA;
+}
+
+QFrame[tileType="symbol"] {
+    background-color: #F57C00;
+    color: white;
+    border-radius: 8px;
+    padding: 4px;
+}
+QFrame[tileType="symbol"]:hover {
+    background-color: #FB8C00;
+}
+
 
 QTableWidget {
     background: #ffffff;

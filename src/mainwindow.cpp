@@ -1543,10 +1543,10 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
         // --- onMissingKey ---
         [this](const QString &err) {
             ui->statusbar->clearMessage();
-            QMessageBox::critical(this, tr("GPG Error"), err);
-            clearScrollArea();
             QApplication::restoreOverrideCursor();
             QApplication::processEvents();
+            QMessageBox::critical(this, tr("GPG Error"), err);
+            clearScrollArea();
         },
 
         // --- onFailure ---
@@ -4952,8 +4952,9 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
         // --- onMissingKey ---
         [this](const QString &err) {
             ui->statusbar->clearMessage();
-            QMessageBox::critical(this, tr("GPG Error"), err);
             QApplication::restoreOverrideCursor();
+            QMessageBox::critical(this, tr("GPG Error"), err);
+
         },
 
         // --- onFailure ---
@@ -5233,9 +5234,9 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
         // --- onMissingKey ---
         [this](const QString &err) {
             ui->statusbar->clearMessage();
-            QMessageBox::critical(this, tr("GPG Error"), err);
             QApplication::restoreOverrideCursor();
             QApplication::processEvents();
+            QMessageBox::critical(this, tr("GPG Error"), err);
         },
 
         // --- onFailure ---
