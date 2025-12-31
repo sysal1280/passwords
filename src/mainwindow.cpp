@@ -2551,9 +2551,13 @@ void MainWindow::keyList()
         QString name  = table->item(row, 0)->text();
         QString keyId = table->item(row, 1)->text();
 
-        if (QMessageBox::question(dlg, tr("Confirm Delete"),
-                                  QString(tr("Delete key '%1' (%2)?")).arg(name, keyId))
-            != QMessageBox::Yes) {
+        if (QMessageBox::question(
+                dlg,
+                tr("Unlink Key"),
+                QString(tr("Remove key '%1' (%2) from the list of available keys?\n\nThis will not affect existing passwords, and the key will remain in your GPG keyring."))
+                    .arg(name, keyId))
+            != QMessageBox::Yes)
+        {
             return;
         }
 
@@ -6659,7 +6663,9 @@ void MainWindow::decryptWithGpg(
     QProcess *gpg = new QProcess(this);
     gpg->setProcessChannelMode(QProcess::SeparateChannels);
 
-    bool *noKeyShown = new bool(false);
+    // Collect status lines and human-readable errors
+    QStringList *statusLines = new QStringList();
+    QStringList *humanErrors = new QStringList();
 
     connect(gpg, &QProcess::started, this, [gpg, encrypted]() {
         gpg->write(encrypted);
@@ -6669,13 +6675,12 @@ void MainWindow::decryptWithGpg(
     connect(gpg, &QProcess::readyReadStandardOutput, this,
             [gpg, onSuccess]() {
         QByteArray out = gpg->readAllStandardOutput();
-        if (!out.isEmpty()) {
+        if (!out.isEmpty())
             onSuccess(out);
-        }
     });
 
     connect(gpg, &QProcess::readyReadStandardError, this,
-            [this, gpg, noKeyShown, onMissingKey, onFailure]() {
+            [this, gpg, statusLines, humanErrors]() {
 
         QByteArray err = gpg->readAllStandardError();
         if (err.isEmpty())
@@ -6683,47 +6688,67 @@ void MainWindow::decryptWithGpg(
 
         QString errStr = QString::fromUtf8(err);
 
-        // Original behavior
         ui->statusbar->showMessage(errStr);
         qDebug().noquote() << "GPG stderr:" << errStr;
 
-        //
-        // REQUIRED CHANGE:
-        // Locale‑independent detection of missing secret key
-        //
-        if (errStr.contains("[GNUPG:] NO_SECKEY")) {
-            if (!*noKeyShown) {
-                *noKeyShown = true;
-                onMissingKey(errStr);
+        const QStringList lines = errStr.split('\n', Qt::SkipEmptyParts);
+
+        for (const QString &raw : lines) {
+            QString line = raw.trimmed();
+            if (line.startsWith("[GNUPG:]")) {
+                statusLines->append(line);
+            } else {
+                humanErrors->append(line);
             }
-            return; // Do NOT treat this as failure
         }
-
-        //
-        // IMPORTANT:
-        // Ignore all other [GNUPG:] status lines
-        //
-        if (errStr.contains("[GNUPG:]"))
-            return;
-
-        //
-        // Original logic: any other stderr is failure
-        //
-        onFailure(errStr);
     });
 
     connect(gpg,
             QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this,
-            [gpg, noKeyShown](int, QProcess::ExitStatus) {
-        delete noKeyShown;
+            [gpg, statusLines, humanErrors,
+             onMissingKey, onFailure](int exitCode, QProcess::ExitStatus status) {
+
+        bool sawNoSecKey = false;
+        int pkErrorCode = 0;
+
+        // Parse collected status lines
+        for (const QString &line : *statusLines) {
+            if (line.contains("NO_SECKEY"))
+                sawNoSecKey = true;
+
+            if (line.contains("ERROR pkdecrypt_failed")) {
+                QStringList parts = line.split(' ', Qt::SkipEmptyParts);
+                bool ok = false;
+                int code = parts.last().toInt(&ok);
+                if (ok)
+                    pkErrorCode = code;
+            }
+        }
+
+        // Case 1: True missing secret key
+        if (sawNoSecKey && pkErrorCode == 33554449) {
+            onMissingKey("The secret key is not present.");
+        }
+        // Case 2: User cancelled
+        else if (sawNoSecKey && pkErrorCode == 83886179) {
+            // User cancelled — must call onFailure so cursor restores
+            onFailure("Operation cancelled");
+        }
+
+        // Case 3: Other failure
+        else if (status != QProcess::NormalExit || exitCode != 0) {
+            if (!humanErrors->isEmpty())
+                onFailure(humanErrors->join("\n"));
+            else
+                onFailure("GPG failed");
+        }
+
+        delete statusLines;
+        delete humanErrors;
         gpg->deleteLater();
     });
 
-    //
-    // REQUIRED CHANGE:
-    // Enable machine-readable status codes
-    //
     gpg->start("gpg", QStringList()
                << "--status-fd" << "2"
                << "--decrypt");
