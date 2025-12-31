@@ -4765,7 +4765,8 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
 
             // --- Traverse notes ---
             QJsonArray notes = obj.value("notes").toArray();
-            for (const QJsonValue &val : notes) {
+            for (int i = 0; i < notes.size(); ++i) {
+                const QJsonValue &val = notes.at(i);
                 dlg.openNote(val.toObject().value("content").toString());
             }
 
