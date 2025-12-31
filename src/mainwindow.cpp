@@ -3319,7 +3319,7 @@ void MainWindow::decryptFile()
         ui->actionDecrypt_File->text(),
         QString(),
         tr("Encrypted Files (*.gpg *.asc);;All Files (*)")
-        );
+    );
     if (inputFile.isEmpty())
         return;
 
@@ -3342,21 +3342,22 @@ void MainWindow::decryptFile()
     layout.addWidget(&passEdit);
     layout.addLayout(&btnLayout);
 
-    QObject::connect(&okBtn, &QPushButton::clicked, &passDlg, &QDialog::accept);
-    QObject::connect(&cancelBtn, &QPushButton::clicked, &passDlg, &QDialog::reject);
+    connect(&okBtn, &QPushButton::clicked, &passDlg, &QDialog::accept);
+    connect(&cancelBtn, &QPushButton::clicked, &passDlg, &QDialog::reject);
 
     if (passDlg.exec() != QDialog::Accepted)
         return;
 
     QString password = passEdit.text();
     if (password.isEmpty()) {
-        QMessageBox::warning(this,ui->actionDecrypt_File->text(), tr("You must enter a password."));
+        QMessageBox::warning(this, ui->actionDecrypt_File->text(),
+                             tr("You must enter a password."));
         return;
     }
 
-    ui->statusbar->showMessage(QString(tr("Decrypting %1 in the background...")).arg(inputFile), 0);
+    ui->statusbar->showMessage(
+        QString(tr("Decrypting %1 in the background...")).arg(inputFile), 0);
 
-    // Create QProcess on heap so it lives until finished
     QProcess *process = new QProcess(this);
 
     QStringList args;
@@ -3370,32 +3371,118 @@ void MainWindow::decryptFile()
 
     process->setWorkingDirectory(QFileInfo(inputFile).absolutePath());
 
-    // Connect finished signal
-    connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-            this, [this, process](int exitCode, QProcess::ExitStatus status) {
-                QString errorOutput = process->readAllStandardError();
-                if (status == QProcess::NormalExit && exitCode == 0) {
-                    ui->statusbar->showMessage("Decryption complete", 5000);
-                    QMessageBox::information(this,
-                                             ui->actionDecrypt_File->text(),
-                                             tr("File decrypted successfully."));
-                } else {
-                    ui->statusbar->showMessage(tr("Decryption failed"), 5000);
-                    QMessageBox::critical(this,  ui->actionDecrypt_File->text(),
-                                          "Decryption failed:\n" + errorOutput);
-                }
-                process->deleteLater(); // clean up
+    // Capture stdout and stderr
+    QByteArray *stdoutBuffer = new QByteArray;
+    QByteArray *stderrBuffer = new QByteArray;
+
+    connect(process, &QProcess::readyReadStandardOutput, this,
+            [process, stdoutBuffer]() {
+                stdoutBuffer->append(process->readAllStandardOutput());
             });
 
-    // Handle start errors
+    connect(process, &QProcess::readyReadStandardError, this,
+            [process, stderrBuffer, this]() {
+                QByteArray err = process->readAllStandardError();
+                if (!err.isEmpty()) {
+                    stderrBuffer->append(err);
+                    ui->statusbar->showMessage(QString::fromUtf8(err));
+                }
+            });
+
+    connect(process,
+            QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this,
+            [this, process, inputFile, stdoutBuffer, stderrBuffer]
+            (int exitCode, QProcess::ExitStatus status) {
+
+        QString stderrText = QString::fromUtf8(*stderrBuffer);
+
+        bool success = (status == QProcess::NormalExit && exitCode == 0);
+
+        // Detect embedded filename from stderr
+        QString embeddedOutputPath;
+        QRegularExpression re("writing to '([^']+)'");
+        QRegularExpressionMatch m = re.match(stderrText);
+        if (m.hasMatch()) {
+            embeddedOutputPath = m.captured(1);
+        }
+
+        if (success) {
+            if (!embeddedOutputPath.isEmpty()) {
+                // Case 1: GPG wrote to a file
+                ui->statusbar->showMessage("Decryption complete", 5000);
+                QMessageBox::information(this,
+                                         ui->actionDecrypt_File->text(),
+                                         tr("File decrypted successfully:\n") +
+                                         embeddedOutputPath);
+            }
+            else if (!stdoutBuffer->isEmpty()) {
+                // Case 2: No embedded filename → plaintext in stdout
+                QString suggestedName =
+                    QFileInfo(inputFile).absolutePath() + "/" +
+                    QFileInfo(inputFile).completeBaseName() + ".decrypted";
+
+                QString savePath = QFileDialog::getSaveFileName(
+                    this,
+                    tr("Save Decrypted Output"),
+                    suggestedName,
+                    tr("All Files (*)")
+                );
+
+                if (!savePath.isEmpty()) {
+                    QFile out(savePath);
+                    if (out.open(QIODevice::WriteOnly)) {
+                        out.write(*stdoutBuffer);
+                        out.close();
+
+                        ui->statusbar->showMessage("Decryption complete", 5000);
+                        QMessageBox::information(this,
+                                                 ui->actionDecrypt_File->text(),
+                                                 tr("Decrypted data saved to:\n") +
+                                                 savePath);
+                    } else {
+                        QMessageBox::critical(this,
+                                              ui->actionDecrypt_File->text(),
+                                              tr("Could not write output file:\n") +
+                                              savePath);
+                    }
+                } else {
+                    QMessageBox::warning(this,
+                                         ui->actionDecrypt_File->text(),
+                                         tr("Decryption succeeded, but no file was saved."));
+                }
+            }
+            else {
+                // Rare: success but no output
+                QMessageBox::warning(this,
+                                     ui->actionDecrypt_File->text(),
+                                     tr("Decryption succeeded, check your source directory."));
+            }
+        }
+        else {
+            // Real failure
+            ui->statusbar->showMessage(tr("Decryption failed"), 5000);
+            QMessageBox::critical(this,
+                                  ui->actionDecrypt_File->text(),
+                                  tr("Decryption failed:\n") + stderrText);
+        }
+
+        delete stdoutBuffer;
+        delete stderrBuffer;
+        process->deleteLater();
+    });
+
     connect(process, &QProcess::errorOccurred, this,
             [this](QProcess::ProcessError) {
                 ui->statusbar->showMessage(tr("Failed to start gpg process"), 5000);
-                QMessageBox::critical(this, ui->actionDecrypt_File->text(), tr("Failed to start gpg process."));
+                QMessageBox::critical(this,
+                                      ui->actionDecrypt_File->text(),
+                                      tr("Failed to start gpg process."));
             });
 
     process->start("gpg", args);
 }
+
 
 bool MainWindow::openDatabase(const QString &fileName)
 {
