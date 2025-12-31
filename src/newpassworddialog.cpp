@@ -350,6 +350,7 @@ QByteArray NewPasswordDialog::toJson() const
 
     // --- Finalize ---
     QJsonDocument doc(root);
+    qDebug() << doc.toJson(QJsonDocument::Indented);
     return doc.toJson(QJsonDocument::Indented);
 }
 
