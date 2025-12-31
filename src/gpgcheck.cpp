@@ -223,22 +223,25 @@ bool warnAndContinue()
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.setWindowTitle("Weak Password");
 
-    msgBox.setText("Your password appears to be weak.");
-
-    msgBox.setInformativeText(
-        "A strong password should be at least 10 characters long and include:\n"
-        "• Lowercase letters\n"
-        "• Uppercase letters\n"
-        "• Digits\n"
-        "• Special characters\n\n"
-        "Weak passwords can be cracked quickly.\n"
-        "Do you want to continue anyway?"
+    msgBox.setText(
+        "<div style='line-height:135%; margin:4px 0 6px 0;'>"
+        "<b><span style='color:#8c0000;'>Your password is weak.</span></b>"
+        "<div style='margin-top:8px;'>"
+        "<ul style='margin:0; padding-left:20px;'>"
+        "<li style='margin-bottom:6px;'>A strong password should be at least 10 characters long.</li>"
+        "<li style='margin-bottom:6px;'>Include lowercase and uppercase letters.</li>"
+        "<li style='margin-bottom:6px;'>Include numbers.</li>"
+        "<li style='margin-bottom:6px;'>Include special characters.</li>"
+        "</ul>"
+        "</div>"
+        "<b>Weak passwords can be cracked quickly.</b><br>"
+        "<div style='margin-top:8px;'>Do you want to continue anyway?</div>"
+        "</div>"
         );
 
     msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Cancel);
 
-    // Optional: clearer button labels
     msgBox.button(QMessageBox::Ok)->setText("Continue");
     msgBox.button(QMessageBox::Cancel)->setText("Go Back");
 

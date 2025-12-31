@@ -2327,9 +2327,11 @@ void MainWindow::keyList()
 
     // EXISTING BUTTONS
     QPushButton *importBtn = new QPushButton("&Link Key", dlg);
-    QPushButton *deleteBtn = new QPushButton("&Delete", dlg);
+    QPushButton *deleteBtn = new QPushButton("&Unlink", dlg);
     QPushButton *helpBtn   = new QPushButton("&Help", dlg);
     QPushButton *closeBtn  = new QPushButton("&Close", dlg);
+
+    importBtn->setDefault(true);
 
     buttonLayout->addWidget(newKeyBtn);
     buttonLayout->addWidget(showBtn);
@@ -2863,6 +2865,7 @@ void MainWindow::encryptMessage()
     QPushButton *saveBtn    = new QPushButton("&Save", dlg);
     QPushButton *closeBtn   = new QPushButton("&Close", dlg);
     saveBtn->setEnabled(false);
+    encryptBtn->setDefault(true);
     buttonLayout->addWidget(encryptBtn);
     buttonLayout->addWidget(copyBtn);
     buttonLayout->addWidget(saveBtn);
@@ -3081,6 +3084,7 @@ void MainWindow::decryptMessage()
     QPushButton *closeBtn   = new QPushButton("&Close", dlg);
 
     copyBtn->setEnabled(false);
+    decryptBtn->setDefault(true);
 
     buttonLayout->addWidget(decryptBtn);
     buttonLayout->addWidget(copyBtn);

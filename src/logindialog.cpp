@@ -49,6 +49,7 @@ LoginDialog::LoginDialog(QWidget *parent)
 
     QPushButton *okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     okButton->setEnabled(false);
+    okButton->setDefault(true);
 
     QString connectionName = QUuid::createUuid().toString();
         {

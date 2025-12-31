@@ -40,7 +40,6 @@ QListWidget {
     background-color: white;
 }
 
-
 PlainTextEdit,
 QTextEdit,
 QPlainTextEdit {
@@ -61,7 +60,6 @@ QPlainTextEdit:focus {
     background: white;
 }
 
-
 QProgressBar {
     background: #e8e8e8;
     border-radius: 7px;
@@ -76,9 +74,6 @@ QProgressBar::chunk {
     background: #b0b0b0;
     border-radius: 12px;
 }
-
-
-
 
 QTableWidget {
     background: #ffffff;
@@ -98,6 +93,7 @@ QHeaderView::section {
     font-weight: normal;
     color: #333;
 }
+
 
 /* ============================================================
    MENU BAR
@@ -168,6 +164,7 @@ QLabel#actionCloseLabel:hover {
     background: #ff6666;
     color: white;
 }
+
 
 /* ============================================================
    LINE EDITS
@@ -322,6 +319,7 @@ QTreeWidget#treeWidget::item:alternate {
     background: #f7f7f7;
 }
 
+
 /* ============================================================
    SCROLL AREA (scrollArea)
    ============================================================ */
@@ -419,7 +417,6 @@ QTextEdit#textEditRandomNoise:focus {
 /* ============================================================
    PASSWORD INSPECOR
    ============================================================ */
-
 
 QFrame[tileType="upper"] {
     background-color: #1976D2;
