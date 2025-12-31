@@ -3007,16 +3007,25 @@ void MainWindow::encryptMessage()
                     QObject::tr("ASCII-armored Files (*.asc);;Text Files (*.txt);;All Files (*)")
                 );
 
-                if (!fileName.isEmpty()) {
-                    QFile file(fileName);
-                    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                        QTextStream out(&file);
-                        out << text;
-                        file.close();
-                        QMessageBox::information(dlg, "Saved", "Encrypted text saved successfully.");
-                    } else {
-                        QMessageBox::critical(dlg, "Error", "Could not save file.");
-                    }
+                if (fileName.isEmpty())
+                    return;
+
+                // --- Ensure .asc extension if none provided ---
+                QFileInfo fi(fileName);
+                if (fi.suffix().isEmpty()) {
+                    fileName += ".asc";
+                }
+
+                QFile file(fileName);
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QTextStream out(&file);
+                    out << text;
+                    file.close();
+                    QMessageBox::information(dlg, "Saved",
+                                             "Encrypted text saved successfully.");
+                } else {
+                    QMessageBox::critical(dlg, "Error",
+                                          "Could not save file.");
                 }
             });
 
