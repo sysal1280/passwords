@@ -1662,7 +1662,6 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 
                 QLabel* noteLabel = new QLabel(content);
                 noteLabel->setWordWrap(true);
-                noteLabel->setStyleSheet("padding: 4px;");
                 noteLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
                 gridLayout->addWidget(noteLabel, row, 0, 1, -1);
@@ -1718,43 +1717,40 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
                     query.bindValue(":id", id);
 
                     if (query.exec() && query.first()) {
-                        qDebug() << query.value(0).toString()
-                        << query.value(1).toString()
-                        << query.value(2).toString()
-                        << query.value(3).toString()
-                        << query.value(4).toString();
 
-
-                        // Accessed count (formatted with thousands separators)
                         QLocale locale = QLocale::system();
+
+                        // Accessed count
                         QString accessedText = QString("Accessed: %1 times")
                                                    .arg(locale.toString(query.value(0).toLongLong()));
-                        QLabel* accessedLabel = new QLabel(accessedText);
-                        accessedLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-                        gridLayout->addWidget(accessedLabel, row, 0, 1, -1);
-                        row++;
 
-                        // Last accessed datetime (convert from Unix epoch)
+                        // Last accessed datetime
                         qint64 epoch = query.value(1).toLongLong();
                         QDateTime dt = QDateTime::fromSecsSinceEpoch(epoch);
                         QString lastAccessedText = QString("Last access: %1")
                                                        .arg(locale.toString(dt, QLocale::ShortFormat));
-                        QLabel* lastAccessedLabel = new QLabel(lastAccessedText);
-                        lastAccessedLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-                        gridLayout->addWidget(lastAccessedLabel, row, 0, 1, -1);
+
+                        // Last access by
+                        QString lastAccessByText = QString("Last access by: %1 on %2")
+                                                       .arg(query.value(2).toString(),
+                                                            query.value(3).toString());
+
+                        // Combine into one multi-line label
+                        QString combined =
+                            accessedText + "\n" +
+                            lastAccessedText + "\n" +
+                            lastAccessByText;
+
+                        QLabel* infoLabel = new QLabel(combined);
+                        infoLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+                        infoLabel->setWordWrap(true); // important for multi-line
+                        gridLayout->addWidget(infoLabel, row, 0, 1, -1);
                         row++;
 
-                        // Last access by (assuming column 4 holds the username)
-                        QString lastAccessByText = QString("Last access by: %1 on %2")
-                                                       .arg(query.value(2).toString(), query.value(3).toString());
-                        QLabel* lastAccessByLabel = new QLabel(lastAccessByText);
-                        lastAccessByLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-                        gridLayout->addWidget(lastAccessByLabel, row, 0, 1, -1);
-                        row++;
-                    } else
-                    {
-                        showQueryError(this,query,Q_FUNC_INFO);
+                    } else {
+                        showQueryError(this, query, Q_FUNC_INFO);
                     }
+
                 } // query destroyed here
             }
         }
