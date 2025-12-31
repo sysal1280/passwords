@@ -1335,6 +1335,8 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
             }
         } else {
             showDbNotOpenError(this, db, Q_FUNC_INFO);
+            QApplication::restoreOverrideCursor();
+            QApplication::processEvents();
             return;
         }
     }
@@ -1359,61 +1361,78 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
         QByteArray decrypted_data = gpg->readAllStandardOutput();
         if (!decrypted_data.isEmpty()) {
             ui->statusbar->clearMessage();
-
-            //parseJsonApplication(decrypted_data);
             populateFromJsonApplication(decrypted_data, ui);
-
             decrypted_data.fill(0);
         }
     });
 
     // Handle stderr
-    connect(gpg, &QProcess::readyReadStandardError, this, [this, gpg]() {
+    bool *noKeyShown = new bool(false);
+
+    connect(gpg, &QProcess::readyReadStandardError, this, [this, gpg, noKeyShown]() {
         QByteArray errors = gpg->readAllStandardError();
         if (!errors.isEmpty()) {
-            ui->statusbar->showMessage(QString::fromUtf8(errors));
+
+            QString errStr = QString::fromUtf8(errors);
+
+            ui->statusbar->showMessage(errStr);
             qDebug().noquote() << "GPG stderr:" << errors;
+
+            if (errStr.contains("no secret key", Qt::CaseInsensitive) && !*noKeyShown) {
+                *noKeyShown = true;
+                QMessageBox::critical(
+                            this,
+                            tr("GPG Error"),
+                            errStr
+                            );
+            }
         }
     });
 
     // --- Step 4: Handle completion ---
     connect(gpg, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-            this, [this, gpg, parentId, connName, viewTable, idColumn](int exitCode, QProcess::ExitStatus status) {
-                if (status == QProcess::NormalExit && exitCode == 0) {
-                    openedCredentialID = parentId;
+            this, [this, gpg, parentId, connName, viewTable, idColumn, noKeyShown]
+            (int exitCode, QProcess::ExitStatus status) {
 
-                    // Upsert into views table only after successful decryption
-                    {
-                        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
-                        db.setDatabaseName(qApp->property("dbFile").toString());
-                        if (db.open()) {
-                            QSqlQuery upsert(db);
-                            upsert.prepare(QString(
-                                               "INSERT INTO %1(%2, view_count, dt, user, host) "
-                                               "VALUES (:id, 1, :ts, :user, :host) "
-                                               "ON CONFLICT(%2) DO UPDATE SET "
-                                               "view_count = view_count + 1, dt = :ts, user = :user, host = :host"
-                                               ).arg(viewTable, idColumn));
+        delete noKeyShown;
+        if (status == QProcess::NormalExit && exitCode == 0) {
+            openedCredentialID = parentId;
 
-                            upsert.bindValue(":id", parentId);
-                            upsert.bindValue(":ts", QDateTime::currentSecsSinceEpoch());
-                            upsert.bindValue(":user", userName);
-                            upsert.bindValue(":host", QSysInfo::machineHostName());
-                            if (!upsert.exec()) {
-                                showQueryError(this,upsert,Q_FUNC_INFO);
-                            }
-                        } else
-                        {
-                            showDbNotOpenError(this, db, Q_FUNC_INFO);
-                        }
+            // Upsert into views table only after successful decryption
+            {
+                QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+                db.setDatabaseName(qApp->property("dbFile").toString());
+                if (db.open()) {
+                    QSqlQuery upsert(db);
+                    upsert.prepare(QString(
+                                       "INSERT INTO %1(%2, view_count, dt, user, host) "
+                                       "VALUES (:id, 1, :ts, :user, :host) "
+                                       "ON CONFLICT(%2) DO UPDATE SET "
+                                       "view_count = view_count + 1, dt = :ts, user = :user, host = :host"
+                                       ).arg(viewTable, idColumn));
+
+                    upsert.bindValue(":id", parentId);
+                    upsert.bindValue(":ts", QDateTime::currentSecsSinceEpoch());
+                    upsert.bindValue(":user", userName);
+                    upsert.bindValue(":host", QSysInfo::machineHostName());
+                    if (!upsert.exec()) {
+                        showQueryError(this,upsert,Q_FUNC_INFO);
                     }
-                    QSqlDatabase::removeDatabase(connName);
-
+                } else
+                {
+                    showDbNotOpenError(this, db, Q_FUNC_INFO);
+                    QApplication::restoreOverrideCursor();
+                    QApplication::processEvents();
+                    return;
                 }
-                gpg->deleteLater();
-                QApplication::restoreOverrideCursor();
-                QApplication::processEvents();
-            });
+            }
+            QSqlDatabase::removeDatabase(connName);
+
+        }
+        gpg->deleteLater();
+        QApplication::restoreOverrideCursor();
+        QApplication::processEvents();
+    });
 
     gpg->start("gpg", QStringList() << "--decrypt");
 }
