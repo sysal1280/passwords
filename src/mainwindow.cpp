@@ -100,7 +100,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    startDebuggerMonitor(this, 10000);
+    startDebuggerMonitor(this, 7000);
 
 #ifdef Q_OS_WIN
     userName = QString::fromLocal8Bit(qgetenv("USERNAME"));

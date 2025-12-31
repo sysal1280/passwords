@@ -83,7 +83,6 @@ void startDebuggerMonitor(QObject *parent, int intervalMs)
             QCoreApplication::exit(0);
         }
     });
-
     timer->start(intervalMs);
 }
 

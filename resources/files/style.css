@@ -141,8 +141,6 @@ QTableWidget::item:selected:hover {
     color: white;
 }
 
-
-
 QHeaderView::section {
     background: #f5f5f5;
     padding: 6px;

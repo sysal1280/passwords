@@ -210,6 +210,31 @@ Ensure it is accessible in your PATH.
     QApplication::processEvents();
 
     QString stylePath = QCoreApplication::applicationDirPath() + "/style.css";
+
+
+    // populate empty style.css with internal default if present.
+    // allows developers and power users to easily tinker with styling.
+    if (QFile::exists(stylePath)) {
+        QFile checkFile(stylePath);
+        if (checkFile.open(QFile::ReadOnly | QFile::Text)) {
+            QString content = QString::fromUtf8(checkFile.readAll());
+            checkFile.close();
+
+            if (content.trimmed().isEmpty()) {
+                QFile internalFile(":/files/style.css");
+                if (internalFile.open(QFile::ReadOnly | QFile::Text)) {
+                    if (checkFile.open(QFile::WriteOnly | QFile::Text)) {
+                        checkFile.write(internalFile.readAll());
+                        checkFile.close();
+                        qInfo().noquote() << "Populated empty style.css with default internal stylesheet.";
+                    } else {
+                        qWarning().noquote() << "Failed to write to style.css (insufficient permissions?).";
+                    }
+                }
+            }
+        }
+    }
+
     QFile styleFile(QFile::exists(stylePath) ? stylePath : QString(":/files/style.css"));
 
     if (styleFile.open(QFile::ReadOnly | QFile::Text)) {
