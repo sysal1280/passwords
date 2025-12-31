@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
                        : ":/splash.png");
     QSplashScreen *splash = new QSplashScreen(pixmap);
     splash->showMessage(QCoreApplication::translate("main", "Setting language.."),
-                        Qt::AlignBottom | Qt::AlignLeft,Qt::white);
+                        Qt::AlignBottom | Qt::AlignLeft,QColor(0x21, 0x4d, 0x68));
     splash->show();
 
     QApplication::processEvents();
@@ -136,12 +136,12 @@ int main(int argc, char *argv[])
      * is in an installed path
      */
     splash->showMessage(QCoreApplication::translate("main", "Checking installation.."),
-                        Qt::AlignBottom | Qt::AlignLeft,Qt::white);
+                        Qt::AlignBottom | Qt::AlignLeft,QColor(0x21, 0x4d, 0x68));
     QApplication::processEvents();
     settings.createUserDesktopFile();
 
     splash->showMessage(QCoreApplication::translate("main", "Checking GPG.."),
-                        Qt::AlignBottom | Qt::AlignLeft, Qt::white);
+                        Qt::AlignBottom | Qt::AlignLeft, QColor(0x21, 0x4d, 0x68));
     QApplication::processEvents();
 
 
@@ -206,7 +206,7 @@ Ensure it is accessible in your PATH.
      */
 
     splash->showMessage(QCoreApplication::translate("main", "Setting style.."),
-                        Qt::AlignBottom | Qt::AlignLeft,Qt::white);
+                        Qt::AlignBottom | Qt::AlignLeft,QColor(0x21, 0x4d, 0x68));
     QApplication::processEvents();
 
     QString stylePath = QCoreApplication::applicationDirPath() + "/style.css";
@@ -230,7 +230,7 @@ Ensure it is accessible in your PATH.
      * Opening is done by MainWindow since initDb/openDatabase are its methods.
      */
     splash->showMessage(QCoreApplication::translate("main", "Setting up database file.."),
-                        Qt::AlignBottom | Qt::AlignLeft, Qt::white);
+                        Qt::AlignBottom | Qt::AlignLeft, QColor(0x21, 0x4d, 0x68));
     QApplication::processEvents();
     bool dbFileReady = setupDatabaseFile(splash);
 
@@ -238,7 +238,7 @@ Ensure it is accessible in your PATH.
      * Create main window (needed to call its DB methods)
      */
     splash->showMessage(QCoreApplication::translate("main", "Loading main window"),
-                        Qt::AlignBottom | Qt::AlignLeft, Qt::white);
+                        Qt::AlignBottom | Qt::AlignLeft, QColor(0x21, 0x4d, 0x68));
     QApplication::processEvents();
     MainWindow *w = new MainWindow;
     w->setWindowTitle(QApplication::applicationDisplayName());
@@ -281,7 +281,7 @@ Ensure it is accessible in your PATH.
     if (dbOpened) {
 
         splash->showMessage(QCoreApplication::translate("main", "Checking keys.."),
-                            Qt::AlignBottom | Qt::AlignLeft, Qt::white);
+                            Qt::AlignBottom | Qt::AlignLeft, QColor(0x21, 0x4d, 0x68));
         QApplication::processEvents();
 
         checkGpgKeys(splash);
