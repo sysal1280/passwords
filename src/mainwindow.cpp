@@ -6590,6 +6590,66 @@ void MainWindow::openCategoryFromCurrent(QTreeWidgetItem* current, QTreeWidgetIt
 }
 
 
+// void MainWindow::decryptWithGpg(
+//         const QByteArray &encrypted,
+//         std::function<void(const QByteArray&)> onSuccess,
+//         std::function<void(const QString&)> onMissingKey,
+//         std::function<void(const QString&)> onFailure)
+// {
+//     QProcess *gpg = new QProcess(this);
+//     gpg->setProcessChannelMode(QProcess::SeparateChannels);
+
+//     // Track whether we've shown the missing-key dialog
+//     bool *noKeyShown = new bool(false);
+
+//     // Feed data when ready
+//     connect(gpg, &QProcess::started, this, [gpg, encrypted]() {
+//         gpg->write(encrypted);
+//         gpg->closeWriteChannel();
+//     });
+
+//     // Handle stdout (successful decrypt)
+//     connect(gpg, &QProcess::readyReadStandardOutput, this, [gpg, onSuccess]() {
+//         QByteArray out = gpg->readAllStandardOutput();
+//         if (!out.isEmpty()) {
+//             onSuccess(out);
+//         }
+//     });
+
+//     // Handle stderr
+//     connect(gpg, &QProcess::readyReadStandardError, this,
+//             [this, gpg, noKeyShown, onMissingKey, onFailure]() {
+
+//         QByteArray err = gpg->readAllStandardError();
+//         if (err.isEmpty()) return;
+
+//         QString errStr = QString::fromUtf8(err);
+
+//         // NEW: show stderr in the status bar (restores original behavior)
+//         ui->statusbar->showMessage(errStr);
+
+//         qDebug().noquote() << "GPG stderr:" << errStr;
+
+//         if (errStr.contains("no secret key", Qt::CaseInsensitive)) {
+//             if (!*noKeyShown) {
+//                 *noKeyShown = true;
+//                 onMissingKey(errStr);
+//             }
+//         } else {
+//             onFailure(errStr);
+//         }
+//     });
+
+//     // Cleanup
+//     connect(gpg, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+//             this, [gpg, noKeyShown](int, QProcess::ExitStatus) {
+//         delete noKeyShown;
+//         gpg->deleteLater();
+//     });
+
+//     gpg->start("gpg", QStringList() << "--decrypt");
+// }
+
 void MainWindow::decryptWithGpg(
         const QByteArray &encrypted,
         std::function<void(const QByteArray&)> onSuccess,
@@ -6599,53 +6659,72 @@ void MainWindow::decryptWithGpg(
     QProcess *gpg = new QProcess(this);
     gpg->setProcessChannelMode(QProcess::SeparateChannels);
 
-    // Track whether we've shown the missing-key dialog
     bool *noKeyShown = new bool(false);
 
-    // Feed data when ready
     connect(gpg, &QProcess::started, this, [gpg, encrypted]() {
         gpg->write(encrypted);
         gpg->closeWriteChannel();
     });
 
-    // Handle stdout (successful decrypt)
-    connect(gpg, &QProcess::readyReadStandardOutput, this, [gpg, onSuccess]() {
+    connect(gpg, &QProcess::readyReadStandardOutput, this,
+            [gpg, onSuccess]() {
         QByteArray out = gpg->readAllStandardOutput();
         if (!out.isEmpty()) {
             onSuccess(out);
         }
     });
 
-    // Handle stderr
     connect(gpg, &QProcess::readyReadStandardError, this,
             [this, gpg, noKeyShown, onMissingKey, onFailure]() {
 
         QByteArray err = gpg->readAllStandardError();
-        if (err.isEmpty()) return;
+        if (err.isEmpty())
+            return;
 
         QString errStr = QString::fromUtf8(err);
 
-        // NEW: show stderr in the status bar (restores original behavior)
+        // Original behavior
         ui->statusbar->showMessage(errStr);
-
         qDebug().noquote() << "GPG stderr:" << errStr;
 
-        if (errStr.contains("no secret key", Qt::CaseInsensitive)) {
+        //
+        // REQUIRED CHANGE:
+        // Locale‑independent detection of missing secret key
+        //
+        if (errStr.contains("[GNUPG:] NO_SECKEY")) {
             if (!*noKeyShown) {
                 *noKeyShown = true;
                 onMissingKey(errStr);
             }
-        } else {
-            onFailure(errStr);
+            return; // Do NOT treat this as failure
         }
+
+        //
+        // IMPORTANT:
+        // Ignore all other [GNUPG:] status lines
+        //
+        if (errStr.contains("[GNUPG:]"))
+            return;
+
+        //
+        // Original logic: any other stderr is failure
+        //
+        onFailure(errStr);
     });
 
-    // Cleanup
-    connect(gpg, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-            this, [gpg, noKeyShown](int, QProcess::ExitStatus) {
+    connect(gpg,
+            QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this,
+            [gpg, noKeyShown](int, QProcess::ExitStatus) {
         delete noKeyShown;
         gpg->deleteLater();
     });
 
-    gpg->start("gpg", QStringList() << "--decrypt");
+    //
+    // REQUIRED CHANGE:
+    // Enable machine-readable status codes
+    //
+    gpg->start("gpg", QStringList()
+               << "--status-fd" << "2"
+               << "--decrypt");
 }

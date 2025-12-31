@@ -225,7 +225,7 @@ bool warnAndContinue()
 
     msgBox.setText(
         "<div style='line-height:135%; margin:4px 0 6px 0;'>"
-        "<b><span style='color:#8c0000;'>Your password is weak.</span></b>"
+        "<b><span style='color:#8c0000;'>Your password is too weak.</span></b>"
         "<div style='margin-top:8px;'>"
         "<ul style='margin:0; padding-left:20px;'>"
         "<li style='margin-bottom:6px;'>A strong password should be at least 10 characters long.</li>"
