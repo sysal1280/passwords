@@ -1220,6 +1220,8 @@ void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
 
     // Unblock signals after processing is complete
     ui->treeWidget_2->blockSignals(false);
+    ui->treeWidget_2->clearSelection();
+    ui->treeWidget_2->setCurrentItem(nullptr);
 
     // Reset openedCredentialID
     openedCredentialID = -1;
