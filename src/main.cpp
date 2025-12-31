@@ -211,7 +211,6 @@ Ensure it is accessible in your PATH.
 
     QString stylePath = QCoreApplication::applicationDirPath() + "/style.css";
 
-
     // populate empty style.css with internal default if present.
     // allows developers and power users to easily tinker with styling.
     if (QFile::exists(stylePath)) {
@@ -230,6 +229,8 @@ Ensure it is accessible in your PATH.
                     } else {
                         qWarning().noquote() << "Failed to write to style.css (insufficient permissions?).";
                     }
+                } else {
+                    qWarning().noquote() << "Failed to open internal stylesheet resource.";
                 }
             }
         }
