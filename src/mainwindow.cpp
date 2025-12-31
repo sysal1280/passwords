@@ -2796,32 +2796,28 @@ void MainWindow::encryptMessage()
 {
     /*
      * Encrypt Message Dialog (GPG symmetric, ASCII-armored)
-     * Uses --pinentry-mode loopback to pass the dialog-entered password to gpg.
+     * Now uses secure stdin passphrase (no command-line exposure).
      */
 
-    // Dialog and layout
     QDialog *dlg = new QDialog(this);
-
     dlg->setWindowTitle(ui->actionEncrypt_message->text());
     QVBoxLayout *layout = new QVBoxLayout(dlg);
 
-    // Instruction
     QLabel *instruction = new QLabel(
         "Enter the message and a password to encrypt with GPG (symmetric, ASCII-armored).\n"
         "The encrypted text will appear below.",
         dlg
-        );
+    );
     instruction->setWordWrap(true);
     layout->addWidget(instruction);
 
-    // Plaintext input
     QTextEdit *plainTextEdit = new PlainTextEdit(dlg);
     plainTextEdit->setObjectName("plainTextInput");
     plainTextEdit->setPlaceholderText("Enter text to encrypt...");
     plainTextEdit->setAcceptRichText(false);
     layout->addWidget(plainTextEdit);
 
-    // Password entry row (two fields + generate button)
+    // Password row
     QHBoxLayout *passLayout = new QHBoxLayout;
 
     QLabel *passLabel1 = new QLabel("Password:", dlg);
@@ -2834,12 +2830,10 @@ void MainWindow::encryptMessage()
     passEdit2->setEchoMode(settings.getEchoMode());
     passEdit2->setPlaceholderText("Re-enter password");
 
-    // ✅ REPLACED QPushButton WITH QToolButton
     QToolButton *generateBtn = new QToolButton(dlg);
     generateBtn->setText("Generate Password");
     generateBtn->setPopupMode(QToolButton::MenuButtonPopup);
 
-    // ✅ Dropdown menu
     QMenu *menu = new QMenu(generateBtn);
     QAction *optA = menu->addAction("Generate Password");
     QAction *optB = menu->addAction("Random Noise");
@@ -2861,14 +2855,14 @@ void MainWindow::encryptMessage()
     encryptedTextEdit->setPlaceholderText("Encrypted text will appear here...");
     layout->addWidget(encryptedTextEdit);
 
-    // Encrypt + Copy + Save + Close buttons side by side at bottom
+    // Buttons
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
     QPushButton *encryptBtn = new QPushButton("&Encrypt", dlg);
     QPushButton *copyBtn    = new QPushButton("Copy", dlg);
     QPushButton *saveBtn    = new QPushButton("&Save", dlg);
     QPushButton *closeBtn   = new QPushButton("&Close", dlg);
-    saveBtn->setEnabled(false);  // disabled until text is present
+    saveBtn->setEnabled(false);
     buttonLayout->addWidget(encryptBtn);
     buttonLayout->addWidget(copyBtn);
     buttonLayout->addWidget(saveBtn);
@@ -2877,9 +2871,9 @@ void MainWindow::encryptMessage()
 
     connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::accept);
 
-    // ✅ Default click (left side of split button)
+    // Password generator actions
     connect(generateBtn, &QToolButton::clicked, this,
-            [this, passEdit1, passEdit2]() {
+            [this]() {
                 PasswordDialog::showPasswordGenerator(
                     this,
                     ui->actionGenerate_Password->text(),
@@ -2887,7 +2881,6 @@ void MainWindow::encryptMessage()
                 );
             });
 
-    // ✅ Menu option A
     connect(optA, &QAction::triggered, this,
             [this]() {
                 QStringList wordList = passwordGenerator::loadWordList(settings.getWordListFile());
@@ -2896,111 +2889,112 @@ void MainWindow::encryptMessage()
                                                       wordList);
             });
 
-    // ✅ Menu option B
     connect(optB, &QAction::triggered, this,
             [this]() {
                 RandomNoiseDialog::showRandomNoiseGenerator(this);
             });
 
-    // Encrypt action
+    // --- SECURE ENCRYPTION ACTION ---
     connect(encryptBtn, &QPushButton::clicked, this,
             [plainTextEdit, passEdit1, passEdit2, encryptedTextEdit]() {
-                const QString inputText = plainTextEdit->toPlainText();
-                const QString pass1 = passEdit1->text();
-                const QString pass2 = passEdit2->text();
 
-                if (inputText.isEmpty()) {
-                    QMessageBox::warning(nullptr, "No Input", "Please enter some text to encrypt.");
-                    return;
-                }
-                if (pass1.isEmpty() || pass2.isEmpty()) {
-                    QMessageBox::warning(nullptr, "No Password", "Please enter and confirm a password.");
-                    return;
-                }
-                if (pass1 != pass2) {
-                    QMessageBox::warning(nullptr, "Mismatch", "Passwords do not match. Please re-enter.");
-                    return;
-                }
+        const QString inputText = plainTextEdit->toPlainText();
+        QString pass1 = passEdit1->text();
+        QString pass2 = passEdit2->text();
 
-                if (!isStrong(pass1)) {
-                    if (!warnAndContinue())
-                        return;
-                }
+        if (inputText.isEmpty()) {
+            QMessageBox::warning(nullptr, "No Input", "Please enter some text to encrypt.");
+            return;
+        }
+        if (pass1.isEmpty() || pass2.isEmpty()) {
+            QMessageBox::warning(nullptr, "No Password", "Please enter and confirm a password.");
+            return;
+        }
+        if (pass1 != pass2) {
+            QMessageBox::warning(nullptr, "Mismatch", "Passwords do not match. Please re-enter.");
+            return;
+        }
 
-                // Prepare gpg process
-                QApplication::setOverrideCursor(Qt::WaitCursor);
-                QApplication::processEvents();
-                QProcess process;
-                QStringList args;
-                args << "--batch"
-                     << "--yes"
-                     << "--pinentry-mode" << "loopback"
-                     << "--symmetric"
-                     << "-a"
-                     << "--passphrase" << pass1;
+        if (!isStrong(pass1)) {
+            if (!warnAndContinue())
+                return;
+        }
 
-                process.start("gpg", args);
-                if (!process.waitForStarted()) {
-                    QApplication::restoreOverrideCursor();
-                    QApplication::processEvents();
-                    QMessageBox::critical(nullptr, "Error", "Failed to start gpg process.");
-                    return;
-                }
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        QApplication::processEvents();
 
-                process.write(inputText.toUtf8());
-                process.closeWriteChannel();
+        QProcess process;
+        QStringList args;
+        args << "--batch"
+             << "--yes"
+             << "--pinentry-mode" << "loopback"
+             << "--symmetric"
+             << "-a"
+             << "--passphrase-fd" << "0";   // SECURE: passphrase via stdin
 
-                if (!process.waitForFinished()) {
-                    QApplication::restoreOverrideCursor();
-                    QApplication::processEvents();
-                    QMessageBox::critical(nullptr, "Error", "gpg process did not finish.");
-                    return;
-                }
+        process.start("gpg", args);
+        if (!process.waitForStarted()) {
+            QApplication::restoreOverrideCursor();
+            QMessageBox::critical(nullptr, "Error", "Failed to start gpg process.");
+            return;
+        }
 
-                const QString encryptedOutput = process.readAllStandardOutput();
-                const QString errorOutput = process.readAllStandardError();
+        // --- Write password securely ---
+        QByteArray passBytes = pass1.toUtf8();
+        passBytes.append('\n');
+        process.write(passBytes);
 
-                if (!encryptedOutput.isEmpty()) {
-                    encryptedTextEdit->setPlainText(encryptedOutput);
-                } else {
-                    encryptedTextEdit->setPlainText("Encryption failed:\n" + errorOutput);
-                }
-                QApplication::restoreOverrideCursor();
-                QApplication::processEvents();
-            });
+        // Wipe password from memory
+        std::fill(passBytes.begin(), passBytes.end(), 0);
+        std::fill(pass1.begin(), pass1.end(), QChar(0));
+        std::fill(pass2.begin(), pass2.end(), QChar(0));
 
-    // Copy action
+        // --- Write plaintext ---
+        process.write(inputText.toUtf8());
+        process.closeWriteChannel();
+
+        if (!process.waitForFinished()) {
+            QApplication::restoreOverrideCursor();
+            QMessageBox::critical(nullptr, "Error", "gpg process did not finish.");
+            return;
+        }
+
+        const QString encryptedOutput = process.readAllStandardOutput();
+        const QString errorOutput     = process.readAllStandardError();
+
+        if (!encryptedOutput.isEmpty()) {
+            encryptedTextEdit->setPlainText(encryptedOutput);
+        } else {
+            encryptedTextEdit->setPlainText("Encryption failed:\n" + errorOutput);
+        }
+
+        QApplication::restoreOverrideCursor();
+    });
+
+    // Copy
     connect(copyBtn, &QPushButton::clicked, this,
             [this, encryptedTextEdit]() {
                 const QString text = encryptedTextEdit->toPlainText();
                 if (!text.isEmpty()) {
-
-                    QClipboard *clipboard = QGuiApplication::clipboard();
-                    clipboard->setText(text);
-
-                    // Direct access — you're already in MainWindow
+                    QGuiApplication::clipboard()->setText(text);
                     statusBar()->showMessage("Encrypted text copied to clipboard.", 3000);
-
                 } else {
-
                     statusBar()->showMessage("There is no encrypted text to copy.", 3000);
                 }
             });
 
     connect(plainTextEdit, &QTextEdit::textChanged, this,
             [plainTextEdit, encryptedTextEdit]() {
-                if (plainTextEdit->toPlainText().isEmpty()) {
+                if (plainTextEdit->toPlainText().isEmpty())
                     encryptedTextEdit->clear();
-                }
             });
 
-    // Enable Save only when encrypted text is present
     connect(encryptedTextEdit, &QTextEdit::textChanged, this,
             [encryptedTextEdit, saveBtn]() {
                 saveBtn->setEnabled(!encryptedTextEdit->toPlainText().isEmpty());
             });
 
-    // Save action
+    // Save
     connect(saveBtn, &QPushButton::clicked, this,
             [encryptedTextEdit, dlg]() {
                 const QString text = encryptedTextEdit->toPlainText();
@@ -3011,7 +3005,8 @@ void MainWindow::encryptMessage()
                     QObject::tr("Save Encrypted Text"),
                     QString(),
                     QObject::tr("ASCII-armored Files (*.asc);;Text Files (*.txt);;All Files (*)")
-                    );
+                );
+
                 if (!fileName.isEmpty()) {
                     QFile file(fileName);
                     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -3030,33 +3025,30 @@ void MainWindow::encryptMessage()
     dlg->exec();
 }
 
+
 void MainWindow::decryptMessage()
 {
     /*
      * Decrypt Message Dialog (GPG symmetric, ASCII-armored)
-     * Uses --pinentry-mode loopback to pass the dialog-entered password to gpg.
+     * Now uses secure stdin passphrase (no command-line exposure).
      */
 
-    // Dialog and layout
     QDialog *dlg = new QDialog(this);
     dlg->setWindowTitle(ui->actionDecrypt_message->text());
     QVBoxLayout *layout = new QVBoxLayout(dlg);
 
-    // Instruction
     QLabel *instruction = new QLabel(
         "Paste the encrypted message below and enter the password used to encrypt it.\n"
         "The decrypted plaintext will appear underneath.",
         dlg
-        );
+    );
     instruction->setWordWrap(true);
     layout->addWidget(instruction);
 
-    // Encrypted input
     QTextEdit *encryptedInputEdit = new QTextEdit(dlg);
     encryptedInputEdit->setPlaceholderText("Paste encrypted text here...");
     layout->addWidget(encryptedInputEdit);
 
-    // Password entry row (password only)
     QHBoxLayout *passLayout = new QHBoxLayout;
     QLabel *passLabel = new QLabel("Password:", dlg);
     QLineEdit *passEdit = new QLineEdit(dlg);
@@ -3067,19 +3059,17 @@ void MainWindow::decryptMessage()
     passLayout->addWidget(passEdit);
     layout->addLayout(passLayout);
 
-    // Decrypted output
     QTextEdit *decryptedTextEdit = new QTextEdit(dlg);
     decryptedTextEdit->setReadOnly(true);
     decryptedTextEdit->setPlaceholderText("Decrypted text will appear here...");
     layout->addWidget(decryptedTextEdit);
 
-    // Bottom button row: Copy | Decrypt | Close
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
 
-    QPushButton *copyBtn  = new QPushButton("Copy", dlg);
+    QPushButton *copyBtn    = new QPushButton("Copy", dlg);
     QPushButton *decryptBtn = new QPushButton("&Decrypt", dlg);
-    QPushButton *closeBtn = new QPushButton("&Close", dlg);
+    QPushButton *closeBtn   = new QPushButton("&Close", dlg);
 
     copyBtn->setEnabled(false);
 
@@ -3090,55 +3080,64 @@ void MainWindow::decryptMessage()
 
     connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::accept);
 
-    // Decrypt action
+    // --- SECURE DECRYPT ACTION ---
     connect(decryptBtn, &QPushButton::clicked, this,
             [encryptedInputEdit, passEdit, decryptedTextEdit]() {
-                const QString encryptedText = encryptedInputEdit->toPlainText();
-                const QString pass = passEdit->text();
 
-                if (encryptedText.isEmpty()) {
-                    QMessageBox::warning(nullptr, "No Input", "Please paste some encrypted text.");
-                    return;
-                }
-                if (pass.isEmpty()) {
-                    QMessageBox::warning(nullptr, "No Password", "Please enter a password.");
-                    return;
-                }
+        const QString encryptedText = encryptedInputEdit->toPlainText();
+        QString pass = passEdit->text();
 
-                // Prepare gpg process for decryption
-                QProcess process;
-                QStringList args;
-                args << "--batch"
-                     << "--yes"
-                     << "--pinentry-mode" << "loopback"
-                     << "--decrypt"
-                     << "--passphrase" << pass;
+        if (encryptedText.isEmpty()) {
+            QMessageBox::warning(nullptr, "No Input", "Please paste some encrypted text.");
+            return;
+        }
+        if (pass.isEmpty()) {
+            QMessageBox::warning(nullptr, "No Password", "Please enter a password.");
+            return;
+        }
 
-                process.start("gpg", args);
-                if (!process.waitForStarted()) {
-                    QMessageBox::critical(nullptr, "Error", "Failed to start gpg process.");
-                    return;
-                }
+        QProcess process;
+        QStringList args;
+        args << "--batch"
+             << "--yes"
+             << "--pinentry-mode" << "loopback"
+             << "--decrypt"
+             << "--passphrase-fd" << "0";   // SECURE: passphrase via stdin
 
-                process.write(encryptedText.toUtf8());
-                process.closeWriteChannel();
+        process.start("gpg", args);
+        if (!process.waitForStarted()) {
+            QMessageBox::critical(nullptr, "Error", "Failed to start gpg process.");
+            return;
+        }
 
-                if (!process.waitForFinished()) {
-                    QMessageBox::critical(nullptr, "Error", "gpg process did not finish.");
-                    return;
-                }
+        // --- Write password securely ---
+        QByteArray passBytes = pass.toUtf8();
+        passBytes.append('\n');
+        process.write(passBytes);
 
-                const QString decryptedOutput = process.readAllStandardOutput();
-                const QString errorOutput = process.readAllStandardError();
+        // Wipe password from memory
+        std::fill(passBytes.begin(), passBytes.end(), 0);
+        std::fill(pass.begin(), pass.end(), QChar(0));
 
-                if (!decryptedOutput.isEmpty()) {
-                    decryptedTextEdit->setPlainText(decryptedOutput);
-                } else {
-                    decryptedTextEdit->setPlainText("Decryption failed:\n" + errorOutput);
-                }
-            });
+        // --- Write encrypted text ---
+        process.write(encryptedText.toUtf8());
+        process.closeWriteChannel();
 
-    // Enable/disable Copy button based on decrypted text presence
+        if (!process.waitForFinished()) {
+            QMessageBox::critical(nullptr, "Error", "gpg process did not finish.");
+            return;
+        }
+
+        const QString decryptedOutput = process.readAllStandardOutput();
+        const QString errorOutput     = process.readAllStandardError();
+
+        if (!decryptedOutput.isEmpty()) {
+            decryptedTextEdit->setPlainText(decryptedOutput);
+        } else {
+            decryptedTextEdit->setPlainText("Decryption failed:\n" + errorOutput);
+        }
+    });
+
     connect(decryptedTextEdit, &QTextEdit::textChanged, this,
             [decryptedTextEdit, copyBtn]() {
                 copyBtn->setEnabled(!decryptedTextEdit->toPlainText().isEmpty());
@@ -3146,18 +3145,15 @@ void MainWindow::decryptMessage()
 
     connect(encryptedInputEdit, &QTextEdit::textChanged, this,
             [encryptedInputEdit, decryptedTextEdit]() {
-                if (encryptedInputEdit->toPlainText().isEmpty()) {
+                if (encryptedInputEdit->toPlainText().isEmpty())
                     decryptedTextEdit->clear();
-                }
             });
 
-    // Copy action
     connect(copyBtn, &QPushButton::clicked, this,
             [decryptedTextEdit, dlg]() {
                 const QString text = decryptedTextEdit->toPlainText();
                 if (!text.isEmpty()) {
-                    QClipboard *clipboard = QGuiApplication::clipboard();
-                    clipboard->setText(text);
+                    QGuiApplication::clipboard()->setText(text);
                     QMessageBox::information(dlg, "Copied", "Decrypted text copied to clipboard.");
                 }
             });
@@ -3171,18 +3167,18 @@ void MainWindow::encryptFile()
 {
     /*
      * Encrypt File Dialog (GPG symmetric, binary or ascii output)
-     * Uses --pinentry-mode loopback and a temporary passphrase file.
+     * Uses --pinentry-mode loopback and a passphrase provided via stdin.
      * Single dialog for file selection + password (with confirmation).
      */
 
-    EncryptFileDialog dlg(this,ui->actionEncrypt_File->text());
+    EncryptFileDialog dlg(this, ui->actionEncrypt_File->text());
     if (dlg.exec() != QDialog::Accepted)
         return; // user cancelled
 
     QString inputFile  = dlg.inputFile();
     QString outputFile = dlg.outputFile();
     QString password   = dlg.password();
-    bool asciiArmor = dlg.asciiArmor();
+    bool asciiArmor    = dlg.asciiArmor();
 
     // Warn if output already exists
     if (QFileInfo::exists(outputFile)) {
@@ -3195,7 +3191,7 @@ void MainWindow::encryptFile()
                     .arg(outputFile),
                 QMessageBox::Yes | QMessageBox::No,
                 QMessageBox::No
-                );
+            );
 
         if (reply != QMessageBox::Yes)
             return;
@@ -3203,49 +3199,7 @@ void MainWindow::encryptFile()
 
     ui->statusbar->showMessage(
         tr("Encrypting %1 in the background...").arg(inputFile)
-        );
-
-    // Decide base dir for temp file
-    QString baseDir = "/dev/shm";
-    if (!QFileInfo::exists(baseDir) || !QFileInfo(baseDir).isWritable()) {
-        baseDir = QDir::tempPath();
-    }
-
-    // Build a unique temp file path
-    QString tempFile = baseDir + "/" +
-                       QUuid::createUuid().toString(QUuid::WithoutBraces) +
-                       ".pass";
-
-    // Create and write passphrase file
-    QFile file(tempFile);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        QMessageBox::critical(this, ui->actionEncrypt_File->text(),
-                              tr("Failed to create temporary passphrase file:\n%1")
-                                  .arg(tempFile));
-        return;
-    }
-
-    // Restrict permissions to owner read/write (0600)
-    if (!file.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner)) {
-        file.remove();
-        QMessageBox::critical(this, ui->actionEncrypt_File->text(),
-                              tr("Failed to set secure permissions on temporary passphrase file."));
-        return;
-    }
-
-    file.write(password.toUtf8());
-    file.flush();
-    file.close();
-
-    // Sanity check: verify the file exists and is readable BEFORE starting gpg
-    QFileInfo fi(tempFile);
-    if (!fi.exists() || !fi.isReadable()) {
-        QMessageBox::critical(this, ui->actionEncrypt_File->text(),
-                              tr("Temporary passphrase file is not readable by this process:\n%1")
-                                  .arg(tempFile));
-        wipeFile(tempFile);
-        return;
-    }
+    );
 
     // Create process
     QProcess *process = new QProcess(this);
@@ -3255,23 +3209,21 @@ void MainWindow::encryptFile()
          << "--yes"
          << "--pinentry-mode" << "loopback"
          << "--symmetric"
-         << "--passphrase-file" << tempFile;
+         << "--passphrase-fd" << "0";   // SECURE: passphrase via stdin
 
     if (asciiArmor)
         args << "--armor";
 
     //args << "-o" << outputFile
-       args << QFileInfo(inputFile).fileName();
+    args << QFileInfo(inputFile).fileName();
 
-       process->setWorkingDirectory(QFileInfo(inputFile).absolutePath());
+    process->setWorkingDirectory(QFileInfo(inputFile).absolutePath());
 
     // Handle completion (success or failure)
     connect(process,
             QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this,
-            [this, process, outputFile, tempFile](int exitCode, QProcess::ExitStatus status) {
-                wipeFile(tempFile);
-
+            [this, process, outputFile](int exitCode, QProcess::ExitStatus status) {
                 QString err = process->readAllStandardError();
                 if (status == QProcess::NormalExit && exitCode == 0) {
                     QMessageBox::information(this, ui->actionEncrypt_File->text(),
@@ -3287,26 +3239,34 @@ void MainWindow::encryptFile()
     // Handle start errors
     connect(process, &QProcess::errorOccurred,
             this,
-            [this, process, tempFile](QProcess::ProcessError error) {
-                wipeFile(tempFile);
+            [this, process](QProcess::ProcessError error) {
                 QMessageBox::critical(
                     this,
                     tr("Error"),
                     tr("Failed to start gpg process (process error code %1).")
                         .arg(QString::number(error))
-                    );
+                );
                 process->deleteLater();
             });
 
     process->start("gpg", args);
     if (process->state() == QProcess::NotRunning) {
-        wipeFile(tempFile);
         QMessageBox::critical(this, ui->actionEncrypt_File->text(),
                               tr("Failed to start gpg process."));
         process->deleteLater();
         return;
     }
 
+    // --- Send password securely via stdin ---
+    QByteArray passBytes = password.toUtf8();
+    passBytes.append('\n');  // GPG expects newline for passphrase input
+
+    process->write(passBytes);
+    process->closeWriteChannel();
+
+    // Wipe password from memory
+    std::fill(passBytes.begin(), passBytes.end(), 0);
+    std::fill(password.begin(), password.end(), QChar(0));
 }
 
 
@@ -3314,7 +3274,7 @@ void MainWindow::encryptFile()
 
 void MainWindow::decryptFile()
 {
-    QString inputFile = QFileDialog::getOpenFileName(
+    const QString inputFile = QFileDialog::getOpenFileName(
         this,
         ui->actionDecrypt_File->text(),
         QString(),
@@ -3323,13 +3283,15 @@ void MainWindow::decryptFile()
     if (inputFile.isEmpty())
         return;
 
-    // Prompt for password
+    // --- Password dialog ---
     QDialog passDlg(this);
     passDlg.setWindowTitle(ui->actionDecrypt_File->text());
+
     QVBoxLayout layout(&passDlg);
     QLabel label(tr("Enter the password to decrypt the file:"), &passDlg);
     QLineEdit passEdit(&passDlg);
     passEdit.setEchoMode(settings.getEchoMode());
+
     QPushButton okBtn("&OK", &passDlg);
     QPushButton cancelBtn("&Cancel", &passDlg);
 
@@ -3350,30 +3312,33 @@ void MainWindow::decryptFile()
 
     QString password = passEdit.text();
     if (password.isEmpty()) {
-        QMessageBox::warning(this, ui->actionDecrypt_File->text(),
+        QMessageBox::warning(this,
+                             ui->actionDecrypt_File->text(),
                              tr("You must enter a password."));
         return;
     }
 
     ui->statusbar->showMessage(
-        QString(tr("Decrypting %1 in the background...")).arg(inputFile), 0);
+        tr("Decrypting %1 in the background...").arg(inputFile), 0);
 
-    QProcess *process = new QProcess(this);
+    // --- GPG process ---
+    auto *process = new QProcess(this);
 
     QStringList args;
     args << "--batch"
          << "--yes"
          << "--pinentry-mode" << "loopback"
          << "--decrypt"
-         << "--passphrase" << password
+         << "--passphrase-fd" << "0"
          << "--use-embedded-filename"
          << inputFile;
 
-    process->setWorkingDirectory(QFileInfo(inputFile).absolutePath());
+    const QFileInfo fi(inputFile);
+    process->setWorkingDirectory(fi.absolutePath());
 
-    // Capture stdout and stderr
-    QByteArray *stdoutBuffer = new QByteArray;
-    QByteArray *stderrBuffer = new QByteArray;
+    // Buffers (RAII)
+    auto stdoutBuffer = std::make_shared<QByteArray>();
+    auto stderrBuffer = std::make_shared<QByteArray>();
 
     connect(process, &QProcess::readyReadStandardOutput, this,
             [process, stdoutBuffer]() {
@@ -3382,7 +3347,7 @@ void MainWindow::decryptFile()
 
     connect(process, &QProcess::readyReadStandardError, this,
             [process, stderrBuffer, this]() {
-                QByteArray err = process->readAllStandardError();
+                const QByteArray err = process->readAllStandardError();
                 if (!err.isEmpty()) {
                     stderrBuffer->append(err);
                     ui->statusbar->showMessage(QString::fromUtf8(err));
@@ -3393,36 +3358,36 @@ void MainWindow::decryptFile()
             QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this,
             [this, process, inputFile, stdoutBuffer, stderrBuffer]
-            (int exitCode, QProcess::ExitStatus status) {
+            (int exitCode, QProcess::ExitStatus status)
+    {
+        const QString stderrText = QString::fromUtf8(*stderrBuffer);
+        const bool success = (status == QProcess::NormalExit && exitCode == 0);
 
-        QString stderrText = QString::fromUtf8(*stderrBuffer);
-
-        bool success = (status == QProcess::NormalExit && exitCode == 0);
-
-        // Detect embedded filename from stderr
+        // Detect embedded filename
         QString embeddedOutputPath;
-        QRegularExpression re("writing to '([^']+)'");
-        QRegularExpressionMatch m = re.match(stderrText);
-        if (m.hasMatch()) {
-            embeddedOutputPath = m.captured(1);
+        {
+            static const QRegularExpression re("writing to '([^']+)'");
+            const QRegularExpressionMatch m = re.match(stderrText);
+            if (m.hasMatch())
+                embeddedOutputPath = m.captured(1);
         }
 
         if (success) {
             if (!embeddedOutputPath.isEmpty()) {
-                // Case 1: GPG wrote to a file
                 ui->statusbar->showMessage("Decryption complete", 5000);
-                QMessageBox::information(this,
-                                         ui->actionDecrypt_File->text(),
-                                         tr("File decrypted successfully:\n") +
-                                         embeddedOutputPath);
+                QMessageBox::information(
+                    this,
+                    ui->actionDecrypt_File->text(),
+                    tr("File decrypted successfully:\n") + embeddedOutputPath
+                );
             }
             else if (!stdoutBuffer->isEmpty()) {
-                // Case 2: No embedded filename → plaintext in stdout
-                QString suggestedName =
-                    QFileInfo(inputFile).absolutePath() + "/" +
-                    QFileInfo(inputFile).completeBaseName() + ".decrypted";
+                const QFileInfo fi(inputFile);
+                const QString suggestedName =
+                    fi.absolutePath() + "/" +
+                    fi.completeBaseName() + ".decrypted";
 
-                QString savePath = QFileDialog::getSaveFileName(
+                const QString savePath = QFileDialog::getSaveFileName(
                     this,
                     tr("Save Decrypted Output"),
                     suggestedName,
@@ -3436,51 +3401,69 @@ void MainWindow::decryptFile()
                         out.close();
 
                         ui->statusbar->showMessage("Decryption complete", 5000);
-                        QMessageBox::information(this,
-                                                 ui->actionDecrypt_File->text(),
-                                                 tr("Decrypted data saved to:\n") +
-                                                 savePath);
+                        QMessageBox::information(
+                            this,
+                            ui->actionDecrypt_File->text(),
+                            tr("Decrypted data saved to:\n") + savePath
+                        );
                     } else {
-                        QMessageBox::critical(this,
-                                              ui->actionDecrypt_File->text(),
-                                              tr("Could not write output file:\n") +
-                                              savePath);
+                        QMessageBox::critical(
+                            this,
+                            ui->actionDecrypt_File->text(),
+                            tr("Could not write output file:\n") + savePath
+                        );
                     }
                 } else {
-                    QMessageBox::warning(this,
-                                         ui->actionDecrypt_File->text(),
-                                         tr("Decryption succeeded, but no file was saved."));
+                    QMessageBox::warning(
+                        this,
+                        ui->actionDecrypt_File->text(),
+                        tr("Decryption succeeded, but no file was saved.")
+                    );
                 }
             }
             else {
-                // Rare: success but no output
-                QMessageBox::warning(this,
-                                     ui->actionDecrypt_File->text(),
-                                     tr("Decryption succeeded, check your source directory."));
+                QMessageBox::information(
+                    this,
+                    ui->actionDecrypt_File->text(),
+                    tr("Decryption succeeded, check your source directory.")
+                );
             }
         }
         else {
-            // Real failure
             ui->statusbar->showMessage(tr("Decryption failed"), 5000);
-            QMessageBox::critical(this,
-                                  ui->actionDecrypt_File->text(),
-                                  tr("Decryption failed:\n") + stderrText);
+            QMessageBox::critical(
+                this,
+                ui->actionDecrypt_File->text(),
+                tr("Decryption failed:\n") + stderrText
+            );
         }
 
-        delete stdoutBuffer;
-        delete stderrBuffer;
         process->deleteLater();
     });
 
     connect(process, &QProcess::errorOccurred, this,
             [this](QProcess::ProcessError) {
                 ui->statusbar->showMessage(tr("Failed to start gpg process"), 5000);
-                QMessageBox::critical(this,
-                                      ui->actionDecrypt_File->text(),
-                                      tr("Failed to start gpg process."));
+                QMessageBox::critical(
+                    this,
+                    ui->actionDecrypt_File->text(),
+                    tr("Failed to start gpg process.")
+                );
             });
 
+    // --- Start process ---
     process->start("gpg", args);
+
+    // --- Send password securely via stdin ---
+    QByteArray passBytes = password.toUtf8();
+    passBytes.append('\n');  // GPG expects newline
+
+    process->write(passBytes);
+    process->closeWriteChannel();
+
+    // Wipe password from memory
+    std::fill(passBytes.begin(), passBytes.end(), 0);
+    std::fill(password.begin(), password.end(), QChar(0));
 }
 
 
