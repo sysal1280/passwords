@@ -134,7 +134,6 @@ QMenu {
     background: #ffffff;
     border: 1px solid #c8c8c8;
     padding: 4px;
-    border-radius: 6px;
 }
 
 QMenu::item {
@@ -461,3 +460,4 @@ QFrame[tileType="symbol"] {
 QFrame[tileType="symbol"]:hover {
     background-color: #FB8C00;
 }
+
