@@ -2269,7 +2269,7 @@ void MainWindow::keyList()
 
     // Instruction label
     QLabel *instruction = new QLabel(
-        "Keys are linked only by their Key ID or fingerprint. No public or private keys\n are ever stored in this database.\n\nGPG Keys:",
+        "Keys are linked only by their Key ID or fingerprint. No public or private keys are ever\nstored in this database.\n\nCurrently Linked Keys:",
         dlg
     );
 
