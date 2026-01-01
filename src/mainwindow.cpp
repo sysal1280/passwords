@@ -69,6 +69,7 @@
 #include <QPushButton>
 #include <QRandomGenerator>
 #include <QResource>
+#include <QScrollBar>
 #include <QShortcut>
 #include <QSpinBox>
 #include <QSplitter>
@@ -4304,6 +4305,7 @@ void MainWindow::deleteCategory(QTreeWidgetItem *item)
     QSqlDatabase::removeDatabase(connName);
 }
 
+
 void MainWindow::searchPopular()
 {
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -4318,21 +4320,21 @@ void MainWindow::searchPopular()
         }
 
         QString sql = QString(
-                          "SELECT a.id AS application_id, "
-                          "       a.category_id, "
-                          "       a.application_name, "
-                          "       COUNT(av.audit_id) AS view_count, "
-                          "       MAX(av.dt) AS last_viewed "
-                          "FROM application_views_audit av "
-                          "JOIN application a ON av.application_id = a.id "
-                          "GROUP BY a.id, a.category_id, a.application_name "
-                          "ORDER BY view_count DESC, last_viewed DESC "
-                          "LIMIT %1"
-                          ).arg(settings.getMaxPopularResults());
+            "SELECT a.id AS application_id, "
+            "       a.category_id, "
+            "       a.application_name, "
+            "       COUNT(av.audit_id) AS view_count, "
+            "       MAX(av.dt) AS last_viewed "
+            "FROM application_views_audit av "
+            "JOIN application a ON av.application_id = a.id "
+            "GROUP BY a.id, a.category_id, a.application_name "
+            "ORDER BY view_count DESC, last_viewed DESC "
+            "LIMIT %1"
+        ).arg(settings.getMaxPopularResults());
 
         QSqlQuery query(db);
         if (!query.exec(sql)) {
-            showQueryError(this,query,Q_FUNC_INFO);
+            showQueryError(this, query, Q_FUNC_INFO);
             return;
         }
 
@@ -4340,84 +4342,99 @@ void MainWindow::searchPopular()
             SearchResult r;
             r.id         = query.value("application_id").toInt();
             r.categoryId = query.value("category_id").toInt();
-            r.appName    = DataObfuscator::deobfuscate(query.value("application_name").toString(), this->appKey);
-
-            // Build full category path
+            r.appName    = DataObfuscator::deobfuscate(
+                               query.value("application_name").toString(), this->appKey);
             r.categoryName = buildCategoryPath(r.categoryId, this->appKey, db);
-
-            // Just store the numeric view count
-            r.description = query.value("view_count").toString();
-
+            r.description  = query.value("view_count").toString();
             results.append(r);
         }
     }
     QSqlDatabase::removeDatabase(connName);
 
-    if (Q_UNLIKELY(results.isEmpty())) {
-        QMessageBox::information(this, ui->actionPopular->text(), "No popular applications found.");
+    if (results.isEmpty()) {
+        QMessageBox::information(this, ui->actionPopular->text(),
+                                 tr("No popular applications found."));
         return;
     }
 
-    QDialog dlg(this);
-    dlg.setWindowTitle(ui->actionPopular->text());
+    // --- NON-MODAL DIALOG ---
+    QDialog *dlg = new QDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->setWindowTitle(ui->actionPopular->text());
 
-    QVBoxLayout *layout = new QVBoxLayout(&dlg);
-    QTableWidget *table = new QTableWidget(results.size(), 3, &dlg);
+    auto *layout = new QVBoxLayout(dlg);
+    layout->setContentsMargins(8, 8, 8, 8);
+    layout->setSpacing(6);
+
+    auto *table = new QTableWidget(results.size(), 3, dlg);
     table->setHorizontalHeaderLabels({ tr("Application"), tr("Category"), tr("Views") });
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
     table->verticalHeader()->setDefaultSectionSize(22);
+    table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     for (int row = 0; row < results.size(); ++row) {
-        QTableWidgetItem *appItem = new QTableWidgetItem(results[row].appName);
-        appItem->setData(Qt::UserRole, results[row].id);
+        auto *appItem = new QTableWidgetItem(results[row].appName);
+        appItem->setData(Qt::UserRole,     results[row].id);
         appItem->setData(Qt::UserRole + 1, results[row].categoryId);
         table->setItem(row, 0, appItem);
 
         table->setItem(row, 1, new QTableWidgetItem(results[row].categoryName));
 
-        // Views column as integer
-        QTableWidgetItem *viewsItem = new QTableWidgetItem(results[row].description);
+        auto *viewsItem = new QTableWidgetItem(results[row].description);
         viewsItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         table->setItem(row, 2, viewsItem);
     }
 
+    // Let the table size its columns to contents
     table->resizeColumnsToContents();
-    table->horizontalHeader()->setStretchLastSection(true);
+    table->horizontalHeader()->setStretchLastSection(false);
     table->setSortingEnabled(false);
+
     layout->addWidget(table);
 
-    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    // Buttons
+    auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
-    QPushButton *cancelBtn = new QPushButton("Cancel", &dlg);
-    QPushButton *okBtn     = new QPushButton("Select", &dlg);
-    buttonLayout->addWidget(cancelBtn);
-    buttonLayout->addWidget(okBtn);
+    auto *closeBtn = new QPushButton(tr("Close"), dlg);
+    buttonLayout->addWidget(closeBtn);
     layout->addLayout(buttonLayout);
 
-    connect(okBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
-    connect(cancelBtn, &QPushButton::clicked, &dlg, &QDialog::reject);
-    connect(table, &QTableWidget::itemDoubleClicked, &dlg, &QDialog::accept);
+    connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::close);
 
-    QSize parentSize = this->size();
-    int w = static_cast<int>(parentSize.width() * 0.75);
-    int h = static_cast<int>(parentSize.height() * 0.75);
-    QPoint parentPos = this->pos();
-    int x = parentPos.x() + (parentSize.width() - w) / 2;
-    int y = parentPos.y() + (parentSize.height() - h) / 2;
-    dlg.setGeometry(x, y, w, h);
-
-    if (dlg.exec() == QDialog::Accepted) {
-        int row = table->currentRow();
-        if (row >= 0) {
-            QTableWidgetItem *item = table->item(row, 0);
-            int appId      = item->data(Qt::UserRole).toInt();
-            int categoryId = item->data(Qt::UserRole + 1).toInt();
+    // Activate items without closing the dialog
+    connect(table, &QTableWidget::itemDoubleClicked, this,
+        [this, table](QTableWidgetItem *item) {
+            int row       = item->row();
+            auto *appItem = table->item(row, 0);
+            if (!appItem)
+                return;
+            int appId      = appItem->data(Qt::UserRole).toInt();
+            int categoryId = appItem->data(Qt::UserRole + 1).toInt();
             selectInTreeWidgets(categoryId, appId);
-        }
-    }
+        });
+
+    // --- EXPLICIT WIDTH CALCULATION (same fix as searchRecent) ---
+    layout->activate();
+
+    int totalWidth = table->verticalHeader()->width();
+    for (int c = 0; c < table->columnCount(); ++c)
+        totalWidth += table->columnWidth(c);
+
+    totalWidth += table->frameWidth() * 2;
+
+    QMargins m = layout->contentsMargins();
+    totalWidth += m.left() + m.right();
+
+    totalWidth += 16; // padding
+
+    dlg->resize(totalWidth, dlg->sizeHint().height());
+    // --- END WIDTH FIX ---
+
+    dlg->show();
 }
+
 
 void MainWindow::searchRecent()
 {
@@ -4472,89 +4489,106 @@ void MainWindow::searchRecent()
             SearchResult r;
             r.id           = query.value("application_id").toInt();
             r.categoryId   = query.value("category_id").toInt();
-            r.appName      = DataObfuscator::deobfuscate(query.value("application_name").toString(), this->appKey);
-
-            // Build and deobfuscate full category path segment-by-segment
+            r.appName      = DataObfuscator::deobfuscate(
+                                 query.value("application_name").toString(), this->appKey);
             r.categoryName = buildCategoryPath(r.categoryId, this->appKey, db);
 
-            // Only show the unix datetime stamp in "Last Viewed"
             QString dt = query.value("dt").toString();
             r.description = dt;
 
             results.append(r);
         }
-
-
     }
     QSqlDatabase::removeDatabase(connName);
 
-    if (Q_UNLIKELY(results.isEmpty())) {
-        QMessageBox::information(this, ui->actionRecent->text(), "No recent applications found.");
+    if (results.isEmpty()) {
+        QMessageBox::information(this, ui->actionRecent->text(),
+                                 tr("No recent applications found."));
         return;
     }
 
-    QDialog dlg(this);
-    dlg.setWindowTitle(ui->actionRecent->text());
+    // --- NON-MODAL DIALOG ---
+    QDialog *dlg = new QDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->setWindowTitle(ui->actionRecent->text());
 
-    QVBoxLayout *layout = new QVBoxLayout(&dlg);
-    QTableWidget *table = new QTableWidget(results.size(), 3, &dlg);
+    auto *layout = new QVBoxLayout(dlg);
+    layout->setContentsMargins(8, 8, 8, 8);
+    layout->setSpacing(6);
+
+    auto *table = new QTableWidget(results.size(), 3, dlg);
     table->setHorizontalHeaderLabels({ tr("Application"), tr("Category"), tr("Last Viewed") });
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
     table->verticalHeader()->setDefaultSectionSize(22);
+    table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     for (int row = 0; row < results.size(); ++row) {
-        QTableWidgetItem *appItem = new QTableWidgetItem(results[row].appName);
-        appItem->setData(Qt::UserRole, results[row].id);
+        auto *appItem = new QTableWidgetItem(results[row].appName);
+        appItem->setData(Qt::UserRole,     results[row].id);
         appItem->setData(Qt::UserRole + 1, results[row].categoryId);
         table->setItem(row, 0, appItem);
 
-        // Category column (index 1)
         table->setItem(row, 1, new QTableWidgetItem(results[row].categoryName));
 
-        // Last Viewed column (index 2) – format Unix timestamp
         qint64 unixTime = results[row].description.toLongLong();
         QDateTime ts = QDateTime::fromSecsSinceEpoch(unixTime);
         QString formatted = ts.toString(Qt::TextDate);
         table->setItem(row, 2, new QTableWidgetItem(formatted));
     }
 
+    // Let the table size its columns to contents
     table->resizeColumnsToContents();
-    table->horizontalHeader()->setStretchLastSection(true);
+    table->horizontalHeader()->setStretchLastSection(false);
     table->setSortingEnabled(false);
+
     layout->addWidget(table);
 
-    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    // Buttons
+    auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
-    QPushButton *cancelBtn = new QPushButton("Cancel", &dlg);
-    QPushButton *okBtn     = new QPushButton("Select", &dlg);
-    buttonLayout->addWidget(cancelBtn);
-    buttonLayout->addWidget(okBtn);
+    auto *closeBtn = new QPushButton(tr("Close"), dlg);
+    buttonLayout->addWidget(closeBtn);
     layout->addLayout(buttonLayout);
 
-    connect(okBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
-    connect(cancelBtn, &QPushButton::clicked, &dlg, &QDialog::reject);
-    connect(table, &QTableWidget::itemDoubleClicked, &dlg, &QDialog::accept);
+    connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::close);
 
-    QSize parentSize = this->size();
-    int w = static_cast<int>(parentSize.width() * 0.75);
-    int h = static_cast<int>(parentSize.height() * 0.75);
-    QPoint parentPos = this->pos();
-    int x = parentPos.x() + (parentSize.width() - w) / 2;
-    int y = parentPos.y() + (parentSize.height() - h) / 2;
-    dlg.setGeometry(x, y, w, h);
-
-    if (dlg.exec() == QDialog::Accepted) {
-        int row = table->currentRow();
-        if (row >= 0) {
-            QTableWidgetItem *item = table->item(row, 0);
-            int appId      = item->data(Qt::UserRole).toInt();
-            int categoryId = item->data(Qt::UserRole + 1).toInt();
+    // Activate items without closing the dialog
+    connect(table, &QTableWidget::itemDoubleClicked, this,
+        [this, table](QTableWidgetItem *item) {
+            int row       = item->row();
+            auto *appItem = table->item(row, 0);
+            if (!appItem)
+                return;
+            int appId      = appItem->data(Qt::UserRole).toInt();
+            int categoryId = appItem->data(Qt::UserRole + 1).toInt();
             selectInTreeWidgets(categoryId, appId);
-        }
-    }
+        });
+
+    // --- EXPLICITLY RESIZE DIALOG WIDTH TO FIT TABLE ---
+    // Make sure layout is aware of all children
+    layout->activate();
+
+    int totalWidth = table->verticalHeader()->width();
+    for (int c = 0; c < table->columnCount(); ++c)
+        totalWidth += table->columnWidth(c);
+
+    totalWidth += table->frameWidth() * 2;
+
+    QMargins m = layout->contentsMargins();
+    totalWidth += m.left() + m.right();
+
+    // A little extra padding so it doesn't look cramped
+    totalWidth += 16;
+
+    // Keep current height (Qt's default / platform size)
+    dlg->resize(totalWidth, dlg->sizeHint().height());
+    // --- END WIDTH RESIZE ---
+
+    dlg->show();
 }
+
 
 QString MainWindow::buildCategoryPath(int categoryId, const QString &appKey, QSqlDatabase &db)
 {
