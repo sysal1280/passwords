@@ -199,7 +199,6 @@ MainWindow::MainWindow(QWidget *parent)
     closeLabel->setObjectName("actionCloseLabel");
     QWidgetAction *closeAction = new QWidgetAction(this);
     closeAction->setMenuRole(QAction::QuitRole);
-    closeAction->setIcon(QIcon(":/menus/glyphs/exit_to_app_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
     closeAction->setDefaultWidget(closeLabel);
     closeAction->setStatusTip(tr("Exit the application"));
     ui->menuDatabase->addAction(closeAction);

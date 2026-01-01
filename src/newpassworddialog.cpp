@@ -39,6 +39,7 @@
 #include <QSqlQuery>
 #include <QTableWidgetItem>
 #include <QToolButton>
+#include <QTimer>
 
 NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     : QDialog(parent)
@@ -78,13 +79,22 @@ NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     connect(ui->tableWidgetNotes, &QTableWidget::customContextMenuRequested,
             this, &NewPasswordDialog::onNotesContextMenu);
 
-    // 🔑 Install the multi-line delegate
+    // Install the multi-line delegate
     ui->tableWidgetNotes->setItemDelegate(new MultiLineDelegate(ui->tableWidgetNotes));
-
-    // Optional: enable word wrap in the table itself
+    ui->tableWidgetNotes->verticalHeader()->setDefaultSectionSize(100);
     ui->tableWidgetNotes->setWordWrap(true);
     ui->tableWidgetNotes->horizontalHeader()->setStretchLastSection(true);
 
+    connect(ui->tableWidgetNotes, &QTableWidget::itemChanged,
+            ui->tableWidgetNotes, &QTableWidget::resizeRowsToContents);
+
+    connect(ui->tableWidgetNotes->model(), &QAbstractItemModel::rowsInserted,
+            this, [this](const QModelIndex &, int first, int last) {
+                QTimer::singleShot(0, this, [this, first, last]() {
+                    for (int r = first; r <= last; ++r)
+                        ui->tableWidgetNotes->setRowHeight(r, 100);
+                });
+            });
 
     ui->tableWidgetCredentials->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tableWidgetCredentials, &QTableWidget::customContextMenuRequested,
@@ -144,7 +154,6 @@ NewPasswordDialog::NewPasswordDialog(QWidget *parent)
         accept(); // explicitly accept the dialog
     });
 
-
 }
 
 void NewPasswordDialog::openPassword()
@@ -179,6 +188,7 @@ void NewPasswordDialog::openCredentials(QString username,
 
     // Optional: adjust column widths
     ui->tableWidgetCredentials->resizeColumnsToContents();
+
 }
 
 void NewPasswordDialog::openNote(QString note)

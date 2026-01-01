@@ -115,20 +115,14 @@ QProgressBar::chunk {
     margin: 1px;
 }
 
-
-
 QTableWidget {
     background: #ffffff;
     border: 1px solid #d0d0d0;
-    border-radius: 8px;
+    border-radius: 1px;
     gridline-color: #e0e0e0;
     selection-background-color: #4a90e2;
     selection-color: white;
     font-size: 13px;
-}
-
-QTableWidget::item {
-    padding: 3px 4px;   /* similar vertical thickness */
 }
 
 QTableWidget::item:selected {
@@ -139,6 +133,11 @@ QTableWidget::item:selected {
 QTableWidget::item:selected:hover {
     background: #2299d4;   /* keep it stable on hover */
     color: white;
+}
+
+QTableWidget::item:focus {
+    outline: none;
+    border: none;
 }
 
 QHeaderView::section {
@@ -545,4 +544,3 @@ QFrame[tileType="symbol"] {
 QFrame[tileType="symbol"]:hover {
     background-color: #FB8C00;
 }
-
