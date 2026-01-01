@@ -19,10 +19,6 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-
-     <!-- ===================================== -->
-     <!-- Tab 1: General                        -->
-     <!-- ===================================== -->
      <widget class="QWidget" name="tab">
       <attribute name="title">
        <string>General</string>
@@ -58,14 +54,29 @@
          </layout>
         </widget>
        </item>
-
        <item>
         <widget class="QGroupBox" name="groupBox_9">
          <property name="title">
           <string>Echo mode</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_16">
-          <item row="0" column="0">
+          <item row="1" column="0">
+           <widget class="QComboBox" name="comboBoxEchoMode"/>
+          </item>
+          <item row="1" column="1">
+           <spacer name="horizontalSpacer_8">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="0" colspan="2">
            <widget class="QLabel" name="label_11">
             <property name="text">
              <string>When prompting for passwords what should be displayed?</string>
@@ -75,13 +86,9 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QComboBox" name="comboBoxEchoMode"/>
-          </item>
          </layout>
         </widget>
        </item>
-
        <item>
         <widget class="QGroupBox" name="groupBox_5">
          <property name="title">
@@ -118,7 +125,6 @@
          </layout>
         </widget>
        </item>
-
        <item>
         <widget class="QCheckBox" name="checkboxDragDropPrompt">
          <property name="text">
@@ -126,7 +132,6 @@
          </property>
         </widget>
        </item>
-
        <item>
         <spacer name="verticalSpacer_general">
          <property name="orientation">
@@ -142,10 +147,6 @@
        </item>
       </layout>
      </widget>
-
-     <!-- ===================================== -->
-     <!-- Tab 2: Security                       -->
-     <!-- ===================================== -->
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
        <string>Security</string>
@@ -156,8 +157,11 @@
          <property name="title">
           <string>Backup</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="0" colspan="2">
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0" colspan="3">
            <widget class="QLabel" name="label">
             <property name="text">
              <string>The passwords database can be backed up at the start of each session.</string>
@@ -167,30 +171,23 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <layout class="QFormLayout" name="formLayout_2">
+          <item row="2" column="0">
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>Open Backups..</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="3">
+           <layout class="QGridLayout" name="gridLayout_2">
             <item row="0" column="0">
-             <widget class="QCheckBox" name="checkBoxBackupDB">
-              <property name="text">
-               <string>Backup database</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="pushButton">
-              <property name="text">
-               <string>Open Backups..</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
              <widget class="QLabel" name="label_12">
               <property name="text">
                <string>Maximum number of backups</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
+            <item row="0" column="1">
              <widget class="QSpinBox" name="spinBoxMaxBackups">
               <property name="specialValueText">
                <string>Unlimited</string>
@@ -203,10 +200,23 @@
               </property>
              </widget>
             </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
           </item>
-          <item row="1" column="2">
-           <spacer name="horizontalSpacer">
+          <item row="2" column="1" colspan="2">
+           <spacer name="horizontalSpacer_7">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -221,7 +231,6 @@
          </layout>
         </widget>
        </item>
-
        <item>
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
@@ -279,7 +288,6 @@
          </layout>
         </widget>
        </item>
-
        <item>
         <spacer name="verticalSpacer_security">
          <property name="orientation">
@@ -295,10 +303,6 @@
        </item>
       </layout>
      </widget>
-
-     <!-- ===================================== -->
-     <!-- Tab 3: Passwords                      -->
-     <!-- ===================================== -->
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
        <string>Passwords</string>
@@ -340,7 +344,6 @@
          </layout>
         </widget>
        </item>
-
        <item>
         <widget class="QGroupBox" name="groupBox_6">
          <property name="title">
@@ -374,7 +377,6 @@
          </layout>
         </widget>
        </item>
-
        <item>
         <spacer name="verticalSpacer_passwords">
          <property name="orientation">
@@ -390,10 +392,6 @@
        </item>
       </layout>
      </widget>
-
-     <!-- ===================================== -->
-     <!-- Tab 4: Advanced                       -->
-     <!-- ===================================== -->
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
        <string>Advanced</string>
@@ -445,7 +443,6 @@
          </layout>
         </widget>
        </item>
-
        <item>
         <widget class="QGroupBox" name="groupBox_8">
          <property name="title">
@@ -506,7 +503,6 @@
          </layout>
         </widget>
        </item>
-
        <item>
         <spacer name="verticalSpacer_advanced">
          <property name="orientation">
@@ -522,10 +518,8 @@
        </item>
       </layout>
      </widget>
-
     </widget>
    </item>
-
    <item row="2" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
@@ -538,7 +532,6 @@
    </item>
   </layout>
  </widget>
-
  <resources/>
  <connections>
   <connection>
@@ -575,4 +568,3 @@
   </connection>
  </connections>
 </ui>
-

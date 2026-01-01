@@ -65,8 +65,6 @@ bool parseBool(const QVariant &v, bool fallback = false) {
 }
 }
 
-
-
 PreferencesDialog::PreferencesDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::PreferencesDialog)
 {
@@ -107,13 +105,16 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     ui->comboBoxEchoMode->addItem(tr("Password"), QLineEdit::Password);
     ui->comboBoxEchoMode->addItem(tr("Password Echo On Edit"), QLineEdit::PasswordEchoOnEdit);
 
-
+    ui->tabWidget->setTabIcon(0,QIcon(":/menus/glyphs/tune_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+    ui->tabWidget->setTabIcon(1,QIcon(":/menus/glyphs/verified_user_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+    ui->tabWidget->setTabIcon(2,QIcon(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+    ui->tabWidget->setTabIcon(3,QIcon(":/menus/glyphs/settings_applications_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
 
     /*
      * Build the settings map
      */
 
-    widgetMap.insert("General/BackupDatabase", ui->checkBoxBackupDB);
+    widgetMap.insert("General/BackupDatabase", ui->groupBox);
     widgetMap.insert("General/AskBeforeClosing", ui->checkBoxAskClose);
     widgetMap.insert("General/RequireChallenge", ui->checkBoxRequireChallenge);
     widgetMap.insert("Passwords/KillGPGAgent", ui->checkBoxKillGPGAgent);
@@ -143,10 +144,12 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
             this, &PreferencesDialog::saveSettings);
     connect(ui->buttonBox, &QDialogButtonBox::clicked,
             this, &PreferencesDialog::restoreButtonClicked);
-    connect(ui->checkBoxBackupDB, &QCheckBox::toggled,
+    connect(ui->groupBox, &QGroupBox::toggled,
             ui->pushButton, &QPushButton::setEnabled);
-    connect(ui->checkBoxBackupDB, &QCheckBox::checkStateChanged,
+
+    connect(ui->groupBox, &QGroupBox::toggled,
             this, &PreferencesDialog::onBackupCheckStateChanged);
+
     connect(ui->pushButton, &QPushButton::clicked,
             this, &PreferencesDialog::openBackupDir);
     connect(ui->buttonBox->button(QDialogButtonBox::Help),
@@ -294,20 +297,24 @@ void PreferencesDialog::loadSettings()
 
         if (auto edit = qobject_cast<QLineEdit*>(w)) {
             edit->setText(val.toString());
+
         } else if (auto check = qobject_cast<QCheckBox*>(w)) {
             check->setChecked(parseBool(val, check->isChecked()));
+
+        } else if (auto group = qobject_cast<QGroupBox*>(w)) {
+            // NEW: support checkable group boxes
+            group->setChecked(parseBool(val, group->isChecked()));
+
         } else if (auto spin = qobject_cast<QSpinBox*>(w)) {
             spin->setValue(val.isValid() ? val.toInt() : spin->value());
+
         } else if (auto combo = qobject_cast<QComboBox*>(w)) {
-            const QVariant val = s.value(key);
             if (key == "General/EchoMode") {
-                // stored as int
                 int savedVal = val.isValid() ? val.toInt() : QLineEdit::Password;
                 int idx = combo->findData(savedVal);
                 if (idx >= 0)
                     combo->setCurrentIndex(idx);
             } else {
-                // existing text‑based logic
                 const QString savedText = val.toString();
                 int idx = combo->findText(savedText);
                 if (idx >= 0)
@@ -316,8 +323,10 @@ void PreferencesDialog::loadSettings()
         }
     }
 
-    ui->pushButton->setEnabled(ui->checkBoxBackupDB->isChecked());
+    // Update button state based on group box
+    ui->pushButton->setEnabled(ui->groupBox->isChecked());
 }
+
 
 void PreferencesDialog::saveSettings()
 {
@@ -327,13 +336,20 @@ void PreferencesDialog::saveSettings()
     for (auto it = widgetMap.begin(); it != widgetMap.end(); ++it) {
         QWidget *w = it.value();
 
-        if (auto edit = qobject_cast<QLineEdit*>(w))
+        if (auto edit = qobject_cast<QLineEdit*>(w)) {
             s.setValue(it.key(), edit->text());
-        else if (auto check = qobject_cast<QCheckBox*>(w))
+
+        } else if (auto check = qobject_cast<QCheckBox*>(w)) {
             s.setValue(it.key(), check->isChecked());
-        else if (auto spin = qobject_cast<QSpinBox*>(w))
+
+        } else if (auto group = qobject_cast<QGroupBox*>(w)) {
+            // NEW: support checkable group boxes
+            s.setValue(it.key(), group->isChecked());
+
+        } else if (auto spin = qobject_cast<QSpinBox*>(w)) {
             s.setValue(it.key(), spin->value());
-        else if (auto combo = qobject_cast<QComboBox*>(w)) {
+
+        } else if (auto combo = qobject_cast<QComboBox*>(w)) {
             if (it.key() == "General/EchoMode")
                 s.setValue(it.key(), combo->currentData().toInt());
             else
@@ -341,8 +357,8 @@ void PreferencesDialog::saveSettings()
         }
     }
 
-    if (!ui->checkBoxBackupDB->isChecked())
-    {
+    // If backups disabled, remove backup folder
+    if (!ui->groupBox->isChecked()) {
         const QString dbPath = settings.getDefaultDbPath(this);
         if (!dbPath.isEmpty()) {
             const QString dbDir = QFileInfo(dbPath).absolutePath();
@@ -351,12 +367,12 @@ void PreferencesDialog::saveSettings()
             QDir dir(backupsPath);
             if (dir.exists()) {
                 if (!dir.removeRecursively()) {
-                    QMessageBox::warning(this, tr("Error"), tr("Could not remove backups folder."));
+                    QMessageBox::warning(this, tr("Error"),
+                                         tr("Could not remove backups folder."));
                 }
             }
         }
     }
-
 }
 
 void PreferencesDialog::resizeEvent(QResizeEvent *event)
@@ -394,7 +410,7 @@ void PreferencesDialog::onBackupCheckStateChanged(int state)
             }
         } else {
             // User cancelled → restore the checkbox state
-            ui->checkBoxBackupDB->setChecked(true);
+            ui->groupBox->setChecked(true);
         }
     }
 }

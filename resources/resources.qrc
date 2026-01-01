@@ -51,5 +51,9 @@
         <file>glyphs/south_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
         <file>glyphs/content_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
         <file>glyphs/preview_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/tune_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/verified_user_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/key_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/settings_applications_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
     </qresource>
 </RCC>
