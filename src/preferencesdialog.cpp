@@ -75,7 +75,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     /*
      * Setup tab labels
      */
-    QStringList labels = { tr("General"), tr("Passwords"), tr("Bookmarks"), tr("Help")  };
+    QStringList labels = { tr("General"), tr("Security"), tr("Passwords"), tr("Advanced")  };
     for (int i = 0; i < labels.size(); ++i) {
         ui->tabWidget->setTabText(i, labels.at(i));
     }
