@@ -2340,6 +2340,8 @@ void MainWindow::keyList()
     QMenu *showMenu = new QMenu(showBtn);
     QAction *showPublicAct = showMenu->addAction("Public Keys");
     QAction *showSecretAct = showMenu->addAction("Secret Keys");
+    showPublicAct->setIcon(QIcon(":/menus/glyphs/key_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+    showSecretAct->setIcon(QIcon(":/menus/glyphs/key_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
     showBtn->setMenu(showMenu);
 
     // EXISTING BUTTONS
@@ -2856,12 +2858,12 @@ void MainWindow::encryptMessage()
     passEdit2->setPlaceholderText("Re-enter password");
 
     QToolButton *generateBtn = new QToolButton(dlg);
-    generateBtn->setText("Generate Password");
+    generateBtn->setText("Generate");
     generateBtn->setPopupMode(QToolButton::MenuButtonPopup);
 
     QMenu *menu = new QMenu(generateBtn);
-    QAction *optA = menu->addAction("Generate Password");
-    QAction *optB = menu->addAction("Random Noise");
+    menu->addAction(ui->actionGenerate_Password);
+    menu->addAction(ui->actionRandom_Noise);
     generateBtn->setMenu(menu);
 
     passLayout->addWidget(passLabel1);
@@ -2905,19 +2907,6 @@ void MainWindow::encryptMessage()
                     ui->actionGenerate_Password->text(),
                     {}
                 );
-            });
-
-    connect(optA, &QAction::triggered, this,
-            [this]() {
-                QStringList wordList = passwordGenerator::loadWordList(settings.getWordListFile());
-                PasswordDialog::showPasswordGenerator(this,
-                                                      tr("Generate Password"),
-                                                      wordList);
-            });
-
-    connect(optB, &QAction::triggered, this,
-            [this]() {
-                RandomNoiseDialog::showRandomNoiseGenerator(this);
             });
 
     // --- SECURE ENCRYPTION ACTION ---

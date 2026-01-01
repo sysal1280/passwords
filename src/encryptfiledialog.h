@@ -105,8 +105,10 @@ public:
         toolBtn->setPopupMode(QToolButton::MenuButtonPopup);
 
         QMenu *menu = new QMenu(toolBtn);
-        QAction *optA = menu->addAction(tr("Generate Password"));
-        QAction *optB = menu->addAction(tr("Random Noise"));
+        QAction *optA = menu->addAction(QIcon(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"), tr("Generate Password"));
+        optA->setShortcut(QKeySequence(Qt::Key_F5));
+        QAction *optB = menu->addAction(QIcon(":/menus/glyphs/grain_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"), tr("Random Noise"));
+        optB->setShortcut(QKeySequence(Qt::Key_F6));
         toolBtn->setMenu(menu);
 
         passLayout->addWidget(toolBtn);
