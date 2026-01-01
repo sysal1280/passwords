@@ -48,10 +48,12 @@ NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     ui->setupUi(this);
 
     ui->toolButton->setPopupMode(QToolButton::MenuButtonPopup);
-    ui->toolButton->setText(tr("&Generate Password"));
+    ui->toolButton->setText(tr("Generate"));
     QMenu *menu = new QMenu(ui->toolButton);
-    QAction *optA = menu->addAction("Generate Password");
-    QAction *optB = menu->addAction("Random Noise");
+    QAction *optA = menu->addAction(QIcon(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"), tr("Generate Password"));
+    optA->setShortcut(QKeySequence(Qt::Key_F5));
+    QAction *optB = menu->addAction(QIcon(":/menus/glyphs/grain_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"), tr("Random Noise"));
+    optB->setShortcut(QKeySequence(Qt::Key_F6));
     ui->toolButton->setMenu(menu);
 
     // Connect using connect()
