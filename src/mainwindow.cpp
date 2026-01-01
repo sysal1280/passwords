@@ -4413,6 +4413,10 @@ void MainWindow::searchPopular()
             int appId      = appItem->data(Qt::UserRole).toInt();
             int categoryId = appItem->data(Qt::UserRole + 1).toInt();
             selectInTreeWidgets(categoryId, appId);
+            const auto items = ui->treeWidget_2->selectedItems();
+            if (items.isEmpty())
+                return;  // nothing selected, nothing to open
+            openPassword(items.first());
         });
 
     // --- EXPLICIT WIDTH CALCULATION (same fix as searchRecent) ---
@@ -4564,6 +4568,11 @@ void MainWindow::searchRecent()
             int appId      = appItem->data(Qt::UserRole).toInt();
             int categoryId = appItem->data(Qt::UserRole + 1).toInt();
             selectInTreeWidgets(categoryId, appId);
+
+            const auto items = ui->treeWidget_2->selectedItems();
+            if (items.isEmpty())
+                return;  // nothing selected, nothing to open
+            openPassword(items.first());
         });
 
     // --- EXPLICITLY RESIZE DIALOG WIDTH TO FIT TABLE ---
