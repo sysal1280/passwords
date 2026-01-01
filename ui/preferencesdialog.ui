@@ -17,7 +17,7 @@
    <item row="1" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -462,6 +462,13 @@
           <string>Help server</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_14">
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="checkBoxCloseHelpServer">
+            <property name="text">
+             <string>Close Help Server when this program closes</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_9">
             <property name="text">
@@ -474,13 +481,6 @@
           </item>
           <item row="1" column="0">
            <layout class="QGridLayout" name="gridLayout_13">
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>Port</string>
-              </property>
-             </widget>
-            </item>
             <item row="0" column="1">
              <widget class="QSpinBox" name="spinBoxHelpPort">
               <property name="minimum">
@@ -491,27 +491,27 @@
               </property>
              </widget>
             </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Port</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_10">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
-          </item>
-          <item row="1" column="1">
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>37</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBoxCloseHelpServer">
-            <property name="text">
-             <string>Close Help Server when this program closes</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </widget>

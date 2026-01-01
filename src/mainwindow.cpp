@@ -6436,6 +6436,23 @@ void MainWindow::ExportedWithoutEdits()
     int y = parentPos.y() + (parentSize.height() - h) / 2;
     dlg->setGeometry(x, y, w, h);
 
+    // --- EXPLICIT WIDTH CALCULATION (same fix as searchRecent) ---
+    layout->activate();
+
+    int totalWidth = table->verticalHeader()->width();
+    for (int c = 0; c < table->columnCount(); ++c)
+        totalWidth += table->columnWidth(c);
+
+    totalWidth += table->frameWidth() * 2;
+
+    QMargins m = layout->contentsMargins();
+    totalWidth += m.left() + m.right();
+
+    totalWidth += 16; // padding
+
+    dlg->resize(totalWidth, dlg->sizeHint().height());
+    // --- END WIDTH FIX ---
+
     dlg->show();   // MODELLESS
 }
 
@@ -6640,6 +6657,24 @@ void MainWindow::NotChangedSince(const QDateTime &cutoff)
     int x = parentPos.x() + (parentSize.width() - w) / 2;
     int y = parentPos.y() + (parentSize.height() - h) / 2;
     dlg->setGeometry(x, y, w, h);
+
+
+    // --- EXPLICIT WIDTH CALCULATION (same fix as searchRecent) ---
+    layout->activate();
+
+    int totalWidth = table->verticalHeader()->width();
+    for (int c = 0; c < table->columnCount(); ++c)
+        totalWidth += table->columnWidth(c);
+
+    totalWidth += table->frameWidth() * 2;
+
+    QMargins m = layout->contentsMargins();
+    totalWidth += m.left() + m.right();
+
+    totalWidth += 16; // padding
+
+    dlg->resize(totalWidth, dlg->sizeHint().height());
+    // --- END WIDTH FIX ---
 
     dlg->show();   // MODELLESS
 }
