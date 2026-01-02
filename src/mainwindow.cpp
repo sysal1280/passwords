@@ -1549,13 +1549,38 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
         },
 
         // --- onMissingKey ---
-        [this](const QString &err) {
-            ui->statusbar->clearMessage();
-            QApplication::restoreOverrideCursor();
-            QApplication::processEvents();
-            QMessageBox::critical(this, tr("GPG Error"), err);
-            clearScrollArea();
-        },
+    [this](const QString &err) {
+    ui->statusbar->clearMessage();
+    QApplication::restoreOverrideCursor();
+    QApplication::processEvents();
+
+    // Create a custom critical message box
+    QMessageBox msgBox(QMessageBox::Critical,
+                       tr("GPG Error"),
+                       err,
+                       QMessageBox::Ok | QMessageBox::Help,
+                       this);
+
+    // Optional: make Help the "secondary" button visually
+    msgBox.setDefaultButton(QMessageBox::Ok);
+
+    // Execute the dialog and capture which button was pressed
+    int result = msgBox.exec();
+
+    clearScrollArea();
+
+    // Handle Help button
+    if (result == QMessageBox::Help) {
+        checkHelpReachable([this](bool reachable) {
+            if (reachable) {
+                const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("no-secret-key"));
+                QDesktopServices::openUrl(url);
+            } else {
+                launchHelperProcess(QStringLiteral("no-secret-key"));
+            }
+        });
+    }
+    },
 
         // --- onFailure ---
         [this](const QString &err) {
@@ -5243,12 +5268,38 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
         },
 
         // --- onMissingKey ---
-        [this](const QString &err) {
-            ui->statusbar->clearMessage();
-            QApplication::restoreOverrideCursor();
-            QMessageBox::critical(this, tr("GPG Error"), err);
+    [this](const QString &err) {
+    ui->statusbar->clearMessage();
+    QApplication::restoreOverrideCursor();
+    QApplication::processEvents();
 
-        },
+    // Create a custom critical message box
+    QMessageBox msgBox(QMessageBox::Critical,
+                       tr("GPG Error"),
+                       err,
+                       QMessageBox::Ok | QMessageBox::Help,
+                       this);
+
+    // Optional: make Help the "secondary" button visually
+    msgBox.setDefaultButton(QMessageBox::Ok);
+
+    // Execute the dialog and capture which button was pressed
+    int result = msgBox.exec();
+
+    clearScrollArea();
+
+    // Handle Help button
+    if (result == QMessageBox::Help) {
+        checkHelpReachable([this](bool reachable) {
+            if (reachable) {
+                const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("no-secret-key"));
+                QDesktopServices::openUrl(url);
+            } else {
+                launchHelperProcess(QStringLiteral("no-secret-key"));
+            }
+        });
+    }
+    },
 
         // --- onFailure ---
         [this](const QString &err) {
@@ -5526,10 +5577,36 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
 
         // --- onMissingKey ---
         [this](const QString &err) {
-            ui->statusbar->clearMessage();
-            QApplication::restoreOverrideCursor();
-            QApplication::processEvents();
-            QMessageBox::critical(this, tr("GPG Error"), err);
+        ui->statusbar->clearMessage();
+        QApplication::restoreOverrideCursor();
+        QApplication::processEvents();
+
+        // Create a custom critical message box
+        QMessageBox msgBox(QMessageBox::Critical,
+                           tr("GPG Error"),
+                           err,
+                           QMessageBox::Ok | QMessageBox::Help,
+                           this);
+
+        // Optional: make Help the "secondary" button visually
+        msgBox.setDefaultButton(QMessageBox::Ok);
+
+        // Execute the dialog and capture which button was pressed
+        int result = msgBox.exec();
+
+        clearScrollArea();
+
+        // Handle Help button
+        if (result == QMessageBox::Help) {
+            checkHelpReachable([this](bool reachable) {
+                if (reachable) {
+                    const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("no-secret-key"));
+                    QDesktopServices::openUrl(url);
+                } else {
+                    launchHelperProcess(QStringLiteral("no-secret-key"));
+                }
+            });
+        }
         },
 
         // --- onFailure ---
@@ -7065,7 +7142,7 @@ void MainWindow::decryptWithGpg(
 
         // Case 1: True missing secret key
         if (sawNoSecKey && pkErrorCode == 33554449) {
-            onMissingKey("The secret key is not present.");
+            onMissingKey(tr("No valid secret keys can be found.\nThe operation cannot continue."));
         }
         // Case 2: User cancelled
         else if (sawNoSecKey && pkErrorCode == 83886179) {
