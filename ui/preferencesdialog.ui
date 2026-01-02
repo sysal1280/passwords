@@ -465,7 +465,7 @@
           <item row="2" column="0">
            <widget class="QCheckBox" name="checkBoxCloseHelpServer">
             <property name="text">
-             <string>End Help server session on exit</string>
+             <string>Close Help server session on exit</string>
             </property>
            </widget>
           </item>

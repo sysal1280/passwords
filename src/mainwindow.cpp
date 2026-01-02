@@ -4087,7 +4087,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 // Dialog buttons
                 //
                 QDialogButtonBox *buttons = new QDialogButtonBox(
-                    QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+                    QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help, &dlg);
                 mainLayout->addWidget(buttons);
 
                 QObject::connect(buttons, &QDialogButtonBox::accepted, &dlg, [&]() {
@@ -4095,6 +4095,16 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 });
                 QObject::connect(buttons, &QDialogButtonBox::rejected, &dlg, [&]() {
                     dlg.reject();
+                });
+                QObject::connect(buttons, &QDialogButtonBox::helpRequested, &dlg, [&]() {
+                    checkHelpReachable([this](bool reachable) {
+                        if (reachable) {
+                            const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("appkey-external"));
+                            QDesktopServices::openUrl(url);
+                        } else {
+                            launchHelperProcess(QStringLiteral("appkey-external"));
+                        }
+                    });
                 });
 
                 //
