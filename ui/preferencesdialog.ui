@@ -17,7 +17,7 @@
    <item row="1" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -465,7 +465,7 @@
           <item row="2" column="0">
            <widget class="QCheckBox" name="checkBoxCloseHelpServer">
             <property name="text">
-             <string>Close Help Server when this program closes</string>
+             <string>End Help server session on exit</string>
             </property>
            </widget>
           </item>
@@ -532,7 +532,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_10">
          <property name="title">
-          <string>Application Key</string>
+          <string>Application key</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="1" column="1">
