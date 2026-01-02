@@ -149,7 +149,14 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
         if (!db.open()) {
             showDbNotOpenError(this, db, Q_FUNC_INFO);
         } else {
-            ui->pushButtonExportKey->setEnabled(!isKeyExported(this, db));
+            QTimer::singleShot(0, this, [this](){
+                ui->groupBox_10->hide();
+                auto parentLayout = ui->groupBox_10->parentWidget()->layout();
+                if (parentLayout)
+                    parentLayout->removeWidget(ui->groupBox_10);
+                ui->groupBox_10->setParent(nullptr);
+                ui->groupBox_10->deleteLater();
+            });
         }
     }
 
