@@ -4032,7 +4032,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
                 // --- Build inline dialog ---
                 QDialog dlg(this);
-                dlg.setWindowTitle("Enter Application Key");
+                dlg.setWindowTitle(tr("Application Key Required"));
                 dlg.setModal(true);
                 dlg.resize(480, 240);
 
@@ -4046,9 +4046,9 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 QVBoxLayout *pasteLayout = new QVBoxLayout(pasteTab);
 
                 QLabel *pasteLabel = new QLabel(
-                    "Paste your application key below:", pasteTab);
+                    tr("Paste your application key below:"), pasteTab);
                 QTextEdit *pasteEdit = new QTextEdit(pasteTab);
-                pasteEdit->setPlaceholderText("Application Key here..");
+                pasteEdit->setPlaceholderText(tr("Application Key here.."));
 
                 pasteLayout->addWidget(pasteLabel);
                 pasteLayout->addWidget(pasteEdit);
@@ -4061,9 +4061,9 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 QVBoxLayout *fileLayout = new QVBoxLayout(fileTab);
 
                 QLabel *fileLabel = new QLabel(
-                    "Load your application key from a file:", fileTab);
+                tr("Load your application key from a file:"), fileTab);
 
-                QPushButton *fileButton = new QPushButton("Choose File", fileTab);
+                QPushButton *fileButton = new QPushButton(tr("Choose File.."), fileTab);
                 fileButton->setFixedWidth(120);   // Smaller button
 
                 QLabel *fileLoadedLabel = new QLabel("", fileTab);
@@ -4122,12 +4122,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 // Show dialog
                 //
                 if (dlg.exec() != QDialog::Accepted) {
-                    QMessageBox::critical(this, "Application Key Required",
-                                          "The application key is required to continue.\n"
-                                          "The application will now exit.");
                     this->close();   // closes MainWindow immediately
                     return {};       // signals failure to main.cpp
-
                 }
 
                 //
@@ -4148,9 +4144,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 // 1. Base64 decode (as before)
                 QByteArray decoded = QByteArray::fromBase64(keyText.toUtf8());
                 if (decoded.isEmpty()) {
-                    QMessageBox::critical(this, "Invalid Key",
-                                          "The key you provided is not valid.\n"
-                                          "The application cannot continue.");
+                    QMessageBox::critical(this, "Invalid Application Key",
+                                          "The Application Key you provided is invalid, incomplete or incorrect.");
                     qApp->quit();
                     return {};
                 }
@@ -4160,9 +4155,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
                 QRegularExpression re("^[A-Fa-f0-9]{192}$");
                 if (!re.match(decodedStr).hasMatch()) {
-                    QMessageBox::critical(this, "Invalid Key",
-                                          "The key you provided is not valid.\n"
-                                          "The application cannot continue.");
+                    QMessageBox::critical(this, tr("Invalid Application Key"),
+                                          tr("The Application Key you provided is invalid, incomplete or incorrect."));
                     qApp->quit();
                     return {};
                 }
