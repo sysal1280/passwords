@@ -73,12 +73,14 @@ public:
     int openedCredentialID = -1;
 
     bool showDebugMessages = false;
+    bool abortingStartup = false;
+
 
     QLabel *countdownLabel = nullptr;
     QProgressBar *countdownProgress = nullptr;
 
     // Public methods
-    void initDb();
+    bool initDb();
     bool openDatabase(const QString &fileName = QString());
     void launchHelperProcess(const QString &page);
     int countExportedWithoutEdits();

@@ -79,4 +79,23 @@ inline void showTransactionError(const QWidget *parent,
         );
 }
 
+inline bool isKeyExported(const QWidget *parent, const QSqlDatabase &db)
+{
+    QSqlQuery query(db);
+    query.setForwardOnly(true);
+    query.prepare("SELECT value FROM app_info WHERE key = 'app_key'");
+
+    if (!query.exec()) {
+        showQueryError(parent, query, Q_FUNC_INFO);
+        return false;
+    }
+
+    if (!query.first())
+        return false;
+
+    const QString value = query.value(0).toString().trimmed().toLower();
+    return (value == "exported");
+}
+
+
 #endif // DBUTILS_H

@@ -273,14 +273,21 @@ Ensure it is accessible in your PATH.
     /*
      * Open database in MainWindow if file is ready
      */
+    w->abortingStartup = true;
     bool dbOpened = false;
     if (dbFileReady) {
         const QString dbPath = qApp->property("dbFile").toString();
         if (!dbPath.isEmpty()) {
             // Call member methods on MainWindow
-            w->initDb();
+            if (!w->initDb()) {
+                delete w;
+                return 0;   // abort cleanly before event loop
+            }
             if (!w->openDatabase(dbPath))
+            {
+                delete w;
                 return 0;
+            }
             dbOpened = true;
         }
     }
@@ -300,6 +307,8 @@ Ensure it is accessible in your PATH.
                 return 0;   // User declined
         }
     }
+
+    w->abortingStartup = false;
 
     /*
      * GPG key checking — only if DB is opened

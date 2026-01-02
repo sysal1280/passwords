@@ -739,6 +739,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    if (abortingStartup) {
+        event->accept();
+        return;
+    }
+
     if (settings.getAskClose()) {
         auto reply = QMessageBox::question(this,
                                            tr("Confirm Exit"),
@@ -3966,47 +3971,24 @@ void MainWindow::search(int appId)
     QMessageBox::information(this, tr("Search"), tr("Password not found in category."));
 }
 
-void MainWindow::initDb()
+bool MainWindow::initDb()
 {
-    // 1. Load or create the appKey (file → DB → generate)
     this->appKey = loadOrCreateAppKey();
+
+    if (this->appKey.isEmpty()) {
+        return false;   // signal failure
+    }
+
     qApp->setProperty("appKey", this->appKey);
 
-    // 2. Initialize DB metadata (timestamps, etc.)
     initDbMetadata();
-
-    // 3. Check if GPG keys exist and prompt user if needed
     checkGpgKeys();
-}
 
+    return true;
+}
 
 QByteArray MainWindow::loadOrCreateAppKey()
 {
-    //
-    // 1. Try file-based key first
-    //
-    QString keyFilePath = appKeyFilePath();
-
-    if (QFile::exists(keyFilePath)) {
-        QFile keyFile(keyFilePath);
-        keyFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
-        if (keyFile.open(QIODevice::ReadOnly)) {
-            QByteArray encoded = keyFile.readAll();
-            keyFile.close();
-
-            QByteArray decoded = QByteArray::fromBase64(encoded);
-            if (!decoded.isEmpty()) {
-                qInfo().noquote() << "Using appKey from file:"
-                                  << (decoded.length() > 7
-                                          ? decoded.left(3) + "..." + decoded.right(4)
-                                          : decoded)
-                                  << "in" << keyFilePath;
-                return decoded;
-            }
-        }
-    } else {
-        qInfo().noquote() << "No appKey file exists at" << keyFilePath;
-    }
 
     //
     // 2. Fall back to DB-based key
@@ -4038,10 +4020,150 @@ QByteArray MainWindow::loadOrCreateAppKey()
         }
 
         if (query.next()) {
-            appKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
-        } else {
+
+            QString value = query.value(0).toString().trimmed();
+
             //
-            // 3. No key found — generate a new one
+            // CASE A — Key was exported → user must provide it manually
+            //
+            if (value.toLower() == "exported") {
+
+                QApplication::restoreOverrideCursor();
+
+                // --- Build inline dialog ---
+                QDialog dlg(this);
+                dlg.setWindowTitle("Enter Application Key");
+                dlg.setModal(true);
+                dlg.resize(480, 240);
+
+                QVBoxLayout *mainLayout = new QVBoxLayout(&dlg);
+                QTabWidget *tabs = new QTabWidget(&dlg);
+
+                //
+                // TAB 1 — Paste Key
+                //
+                QWidget *pasteTab = new QWidget(&dlg);
+                QVBoxLayout *pasteLayout = new QVBoxLayout(pasteTab);
+
+                QLabel *pasteLabel = new QLabel(
+                    "Paste your application key below:", pasteTab);
+                QTextEdit *pasteEdit = new QTextEdit(pasteTab);
+                pasteEdit->setPlaceholderText("Application Key here..");
+
+                pasteLayout->addWidget(pasteLabel);
+                pasteLayout->addWidget(pasteEdit);
+                pasteTab->setLayout(pasteLayout);
+
+                //
+                // TAB 2 — Load From File
+                //
+                QWidget *fileTab = new QWidget(&dlg);
+                QVBoxLayout *fileLayout = new QVBoxLayout(fileTab);
+
+                QLabel *fileLabel = new QLabel(
+                    "Load your application key from a file:", fileTab);
+
+                QPushButton *fileButton = new QPushButton("Choose File", fileTab);
+                fileButton->setFixedWidth(120);   // Smaller button
+
+                QLabel *fileLoadedLabel = new QLabel("", fileTab);
+                fileLoadedLabel->setStyleSheet("color: #006000; font-style: italic;");
+
+                fileLayout->addWidget(fileLabel);
+                fileLayout->addWidget(fileButton);
+                fileLayout->addWidget(fileLoadedLabel);
+                fileLayout->addStretch();
+                fileTab->setLayout(fileLayout);
+
+                tabs->addTab(pasteTab, "Paste Key");
+                tabs->addTab(fileTab, "Load From File");
+                tabs->setTabIcon(0,QIcon(":/menus/glyphs/content_paste_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+                tabs->setTabIcon(1,QIcon(":/menus/glyphs/attach_file_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+
+                mainLayout->addWidget(tabs);
+
+                //
+                // Dialog buttons
+                //
+                QDialogButtonBox *buttons = new QDialogButtonBox(
+                    QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+                mainLayout->addWidget(buttons);
+
+                QObject::connect(buttons, &QDialogButtonBox::accepted, &dlg, [&]() {
+                    dlg.accept();
+                });
+                QObject::connect(buttons, &QDialogButtonBox::rejected, &dlg, [&]() {
+                    dlg.reject();
+                });
+
+                //
+                // File picker
+                //
+                QString loadedKey;
+                QObject::connect(fileButton, &QPushButton::clicked, &dlg, [&]() {
+                    QString path = QFileDialog::getOpenFileName(
+                        &dlg, "Select Application Key File", QString(), "All Files (*)");
+
+                    if (!path.isEmpty()) {
+                        QFile f(path);
+                        if (f.open(QIODevice::ReadOnly)) {
+                            loadedKey = QString::fromUtf8(f.readAll()).trimmed();
+
+                            QFileInfo info(path);
+                            fileLoadedLabel->setText("Loaded: " + info.fileName());
+                        }
+                    }
+                });
+
+                dlg.setFixedSize(dlg.size());
+
+                //
+                // Show dialog
+                //
+                if (dlg.exec() != QDialog::Accepted) {
+                    QMessageBox::critical(this, "Application Key Required",
+                                          "The application key is required to continue.\n"
+                                          "The application will now exit.");
+                    this->close();   // closes MainWindow immediately
+                    return {};       // signals failure to main.cpp
+
+                }
+
+                //
+                // Extract key from whichever tab was used
+                //
+                QString keyText;
+
+                if (tabs->currentIndex() == 0) {
+                    keyText = pasteEdit->toPlainText().trimmed();
+                } else {
+                    keyText = loadedKey;
+                }
+
+                //
+                // Validate (must decode properly)
+                //
+                QByteArray decoded = QByteArray::fromBase64(keyText.toUtf8());
+                if (decoded.isEmpty()) {
+                    QMessageBox::critical(this, "Invalid Key",
+                                          "The key you provided is not valid.\n"
+                                          "The application cannot continue.");
+                    qApp->quit();
+                    return {};
+                }
+
+                appKey = decoded;
+            }
+            //
+            // CASE B — Key exists normally in DB
+            //
+            else {
+                appKey = QByteArray::fromBase64(value.toUtf8());
+            }
+        }
+        else {
+            //
+            // 3. No key found — generate a new one (UNCHANGED)
             //
             QString appKeyStr;
             for (int i = 0; i < 6; ++i) {
@@ -4070,13 +4192,112 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
     QSqlDatabase::removeDatabase(connName);
 
-    qInfo().noquote() << "Using appKey from DB:"
+    qInfo().noquote() << "Using appKey:"
                       << (appKey.length() > 7
                               ? appKey.left(3) + "..." + appKey.right(4)
                               : appKey);
 
     return appKey;
 }
+
+
+// QByteArray MainWindow::loadOrCreateAppKey()
+// {
+//     //
+//     // 1. Try file-based key first
+//     //
+//     QString keyFilePath = appKeyFilePath();
+
+//     if (QFile::exists(keyFilePath)) {
+//         QFile keyFile(keyFilePath);
+//         keyFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+//         if (keyFile.open(QIODevice::ReadOnly)) {
+//             QByteArray encoded = keyFile.readAll();
+//             keyFile.close();
+
+//             QByteArray decoded = QByteArray::fromBase64(encoded);
+//             if (!decoded.isEmpty()) {
+//                 qInfo().noquote() << "Using appKey from file:"
+//                                   << (decoded.length() > 7
+//                                           ? decoded.left(3) + "..." + decoded.right(4)
+//                                           : decoded)
+//                                   << "in" << keyFilePath;
+//                 return decoded;
+//             }
+//         }
+//     } else {
+//         qInfo().noquote() << "No appKey file exists at" << keyFilePath;
+//     }
+
+//     //
+//     // 2. Fall back to DB-based key
+//     //
+//     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+//     QByteArray appKey;
+
+//     {
+//         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+//         db.setDatabaseName(qApp->property("dbFile").toString());
+
+//         if (!db.open()) {
+//             showDbNotOpenError(this, db, Q_FUNC_INFO);
+//             QMessageBox::critical(nullptr, QApplication::applicationName(), db.lastError().text());
+//             return {};
+//         }
+
+//         QSqlQuery query(db);
+//         query.prepare(R"(
+//             SELECT value
+//             FROM app_info
+//             WHERE key = :app_key
+//         )");
+//         query.bindValue(":app_key", "app_key");
+
+//         if (!query.exec()) {
+//             showQueryError(nullptr, query, Q_FUNC_INFO);
+//             return {};
+//         }
+
+//         if (query.next()) {
+//             appKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
+//         } else {
+//             //
+//             // 3. No key found — generate a new one
+//             //
+//             QString appKeyStr;
+//             for (int i = 0; i < 6; ++i) {
+//                 QString uuidStr = QUuid::createUuid().toString(QUuid::WithoutBraces);
+//                 uuidStr.remove('-');
+//                 appKeyStr += uuidStr;
+//             }
+
+//             QByteArray encoded = appKeyStr.toUtf8().toBase64();
+
+//             query.prepare(R"(
+//                 INSERT INTO app_info (key, value)
+//                 VALUES (:app_key, :guid)
+//             )");
+//             query.bindValue(":app_key", "app_key");
+//             query.bindValue(":guid", encoded);
+
+//             if (!query.exec()) {
+//                 showQueryError(nullptr, query, Q_FUNC_INFO);
+//                 return {};
+//             }
+
+//             appKey = QByteArray::fromBase64(encoded);
+//         }
+//     }
+
+//     QSqlDatabase::removeDatabase(connName);
+
+//     qInfo().noquote() << "Using appKey from DB:"
+//                       << (appKey.length() > 7
+//                               ? appKey.left(3) + "..." + appKey.right(4)
+//                               : appKey);
+
+//     return appKey;
+// }
 
 void MainWindow::initDbMetadata()
 {

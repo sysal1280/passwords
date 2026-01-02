@@ -24,6 +24,7 @@
 #include "settings.h"
 #include "ui_preferencesdialog.h"
 #include "utils.h"
+#include "dbutils.h"
 
 #include <QAbstractButton>
 #include <QComboBox>
@@ -34,6 +35,8 @@
 #include <QResizeEvent>
 #include <QResource>
 #include <QSpinBox>
+#include <QSqlDatabase>
+#include <quuid.h>
 
 namespace {
 bool parseBool(const QVariant &v, bool fallback = false) {
@@ -134,6 +137,26 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 
 
     /*
+     * Appkey export setup
+     */
+
+    const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+        db.setDatabaseName(qApp->property("dbFile").toString());
+
+        if (!db.open()) {
+            showDbNotOpenError(this, db, Q_FUNC_INFO);
+        } else {
+            ui->pushButtonExportKey->setEnabled(!isKeyExported(this, db));
+        }
+    }
+
+    QSqlDatabase::removeDatabase(connectionName);
+
+
+    /*
      * Range settings for spinboxes
      */
     ui->spinBox->setRange(2,10);
@@ -178,6 +201,121 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
                     }
                 });
             });
+
+    connect(ui->pushButtonExportKey, &QPushButton::clicked,
+            this, [this]() {
+
+                QMessageBox msgBox;
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setWindowTitle("Export Application Key");
+
+                msgBox.setText(
+                    "<div style='line-height:135%; margin:4px 0 6px 0;'>"
+                    "<b><span style='color:#8c0000;'>This is a one‑time export.</span></b>"
+                    "<div style='margin-top:8px;'>"
+                    "Once you export the application key, it will be removed from the local database."
+                    "<br><br>"
+                    "<b>You will be required to provide this key manually every time the application starts.</b>"
+                    "<br>"
+                    "<ul style='margin:0; padding-left:20px;'>"
+                    "<li style='margin-bottom:6px;'>If you lose this key, your stored data cannot be recovered.</li>"
+                    "<li style='margin-bottom:6px;'>There is no way to regenerate the key.</li>"
+                    "<li style='margin-bottom:6px;'>Keep the exported key in a safe, secure location away from the database.</li>"
+                    "</ul>"
+                    "</div>"
+                    "<div style='margin-top:10px;'><b>Do you want to continue?</b></div>"
+                    "</div>"
+                    );
+
+                msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+                msgBox.setDefaultButton(QMessageBox::Cancel);
+
+                if (msgBox.exec() != QMessageBox::Ok)
+                    return;
+
+                // Perform export logic here...
+
+                // Retrieve the key
+                const QString appKey =
+                    qApp->property("appKey").toString().toUtf8().toBase64();
+
+                // Build the message box that displays the key
+                QMessageBox keyBox;
+                keyBox.setIcon(QMessageBox::Information);
+                keyBox.setWindowTitle("Your Application Key");
+
+                // Make the box narrower by wrapping content in a fixed-width div
+                QString html =
+                    "<div style='width:420px; line-height:135%; margin:4px 0 6px 0;'>"
+                    "<b><span style='color:#004a7f;'>This is the only time your application key will be shown.</span></b>"
+                    "<div style='margin-top:8px;'>"
+                    "Copy and store this key in a safe, secure location. "
+                    "You will need to provide it manually every time the application starts."
+                    "<br><br>"
+                    "<b>If you lose this key, your stored data cannot be recovered.</b>"
+                    "<br><br>"
+                    "<div style='margin-top:10px; padding:8px; border:1px solid #ccc; "
+                    "background:#f7f7f7; font-family:monospace; font-size:14px;'>"
+                    + appKey +
+                    "</div>"
+                    "<div style='margin-top:12px;'>"
+                    "Click <b>“Understood, I have a copy”</b> only after you have safely copied the key. "
+                    "Click <b>Cancel</b> to abort without making any changes."
+                    "</div>"
+                    "</div>"
+                    "</div>";
+
+                keyBox.setText(html);
+
+                // Custom OK button
+                QPushButton *understoodBtn = keyBox.addButton(
+                    "Understood, I have a copy", QMessageBox::AcceptRole);
+
+                // Standard Cancel button
+                keyBox.addButton(QMessageBox::Cancel);
+
+                // Default to Cancel for safety
+                keyBox.setDefaultButton(QMessageBox::Cancel);
+
+                // Execute dialog
+                keyBox.exec();
+
+                // If user did NOT click the custom OK button, abort
+                if (keyBox.clickedButton() != understoodBtn)
+                    return;   // User backed out — do NOT delete the key
+
+
+                // --- Now remove the key from the database ---
+
+                const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+                {
+                    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+                    db.setDatabaseName(qApp->property("dbFile").toString());
+
+                    if (!db.open()) {
+                        showDbNotOpenError(this, db, Q_FUNC_INFO);
+                    } else {
+                        QSqlQuery query(db);
+                        query.prepare("UPDATE app_info SET value = 'exported' WHERE key ='app_key'");
+                        if (query.exec())
+                        {
+                            ui->pushButtonExportKey->setEnabled(false);
+                            QMessageBox::information(
+                                this,
+                                QCoreApplication::applicationName(),
+                                "The Application Key has been removed.\nChanges will take effect next restart."
+                                );
+                        } else
+                        {
+                            showQueryError(this, query, Q_FUNC_INFO);
+                        }
+                    }
+                }
+
+                QSqlDatabase::removeDatabase(connectionName);
+            });
+
 }
 
 void PreferencesDialog::restoreButtonClicked(QAbstractButton *button)
