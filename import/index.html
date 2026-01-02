@@ -1451,7 +1451,7 @@
 
 
 
-<h1 id="importing-passwords">Importing Passwords</h1>
+<div><h1 id="importing-passwords">Importing Passwords</h1>
 <h2 id="overview">Overview</h2>
 <p>Importing is the counterpart to exporting, but it comes with its own set of considerations. The goal is to let you bring your existing passwords into Passwords safely, without opening the door to bulk‑leak risks or silent data loss. That’s why the import process is designed around small, deliberate steps rather than large automated migrations.</p>
 <p>You can import a single password directly, or combine multiple individually exported entries into a single JSON file if you want to bring in more than one password at once. This gives you flexibility without compromising security. </p>
@@ -1466,64 +1466,64 @@
 <p>Below is an example JSON file that shows how you can combine multiple exported passwords into a single importable file, making it easier to bring several entries into Passwords at once.</p>
 <pre><code class="language-json">[
   {
-    &quot;credentials&quot;: [
+    "credentials": [
       {
-        &quot;length&quot;: 6,
-        &quot;password&quot;: &quot;MySecurePass123&quot;,
-        &quot;secretOptCode&quot;: &quot;987654&quot;,
-        &quot;username&quot;: &quot;alice_account&quot;
+        "length": 6,
+        "password": "MySecurePass123",
+        "secretOptCode": "987654",
+        "username": "alice_account"
       }
     ],
-    &quot;description&quot;: &quot;Alice's online shopping account&quot;,
-    &quot;notes&quot;: [
-      { &quot;content&quot;: &quot;Use this account for grocery orders&quot; },
-      { &quot;content&quot;: &quot;Two-factor enabled&quot; }
+    "description": "Alice's online shopping account",
+    "notes": [
+      { "content": "Use this account for grocery orders" },
+      { "content": "Two-factor enabled" }
     ],
-    &quot;private_name&quot;: &quot;Shopping - Alice&quot;,
-    &quot;url&quot;: &quot;https://shop.example.com&quot;
+    "private_name": "Shopping - Alice",
+    "url": "https://shop.example.com"
   },
   {
-    &quot;credentials&quot;: [
+    "credentials": [
       {
-        &quot;length&quot;: 6,
-        &quot;password&quot;: &quot;BobSecret42&quot;,
-        &quot;secretOptCode&quot;: &quot;&quot;,
-        &quot;username&quot;: &quot;bob_account&quot;
+        "length": 6,
+        "password": "BobSecret42",
+        "secretOptCode": "",
+        "username": "bob_account"
       },
       {
-        &quot;length&quot;: 6,
-        &quot;password&quot;: &quot;BobAdmin!Secure99&quot;,
-        &quot;secretOptCode&quot;: &quot;445566&quot;,
-        &quot;username&quot;: &quot;bob_admin&quot;
+        "length": 6,
+        "password": "BobAdmin!Secure99",
+        "secretOptCode": "445566",
+        "username": "bob_admin"
       }
     ],
-    &quot;description&quot;: &quot;Bob's test account with both standard and admin credentials&quot;,
-    &quot;notes&quot;: [
-      { &quot;content&quot;: &quot;Standard + admin roles for testing&quot; }
+    "description": "Bob's test account with both standard and admin credentials",
+    "notes": [
+      { "content": "Standard + admin roles for testing" }
     ],
-    &quot;private_name&quot;: &quot;Test Account - Bob&quot;,
-    &quot;url&quot;: &quot;https://test.example.org&quot;
+    "private_name": "Test Account - Bob",
+    "url": "https://test.example.org"
   },
   {
-    &quot;credentials&quot;: [
+    "credentials": [
       {
-        &quot;length&quot;: 6,
-        &quot;password&quot;: &quot;SuperStrong!Pass2025&quot;,
-        &quot;secretOptCode&quot;: &quot;112233&quot;,
-        &quot;username&quot;: &quot;charlie_admin&quot;
+        "length": 6,
+        "password": "SuperStrong!Pass1234",
+        "secretOptCode": "112233",
+        "username": "charlie_admin"
       }
     ],
-    &quot;description&quot;: &quot;Charlie’s admin login&quot;,
-    &quot;notes&quot;: [
-      { &quot;content&quot;: &quot;Admin privileges&quot; },
-      { &quot;content&quot;: &quot;Rotate password every 90 days&quot; }
+    "description": "Charlie’s admin login",
+    "notes": [
+      { "content": "Admin privileges" },
+      { "content": "Rotate password every 90 days" }
     ],
-    &quot;private_name&quot;: &quot;Admin - Charlie&quot;,
-    &quot;url&quot;: &quot;https://admin.example.net&quot;
+    "private_name": "Admin - Charlie",
+    "url": "https://admin.example.net"
   }
 ]
 
-</code></pre>
+</code></pre></div>
 
 
 
@@ -1593,7 +1593,7 @@
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Adam Lanzafame
+      Copyright © 2026 Adam Lanzafame
     </div>
   
   

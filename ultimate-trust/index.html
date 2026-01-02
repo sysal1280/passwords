@@ -1417,7 +1417,7 @@
 
 
 
-<h1 id="ultimate-trust-gpg-keys">Ultimate Trust (GPG Keys)</h1>
+<div><h1 id="ultimate-trust-gpg-keys">Ultimate Trust (GPG Keys)</h1>
 <h2 id="why-ultimate-trust-is-required">Why ultimate trust is required</h2>
 <p>Normally, GPG enforces its “web of trust” model, asking the user to confirm whether a key should be trusted before allowing encryption, signing, or verification. In a non‑interactive environment, these prompts would block execution and cause automation to fail.</p>
 <p>Marking a key with <strong>ultimate trust</strong> tells GPG that you fully trust the key’s owner and that no additional confirmation is required when using it. This fits our needs perfectly. You should never encrypt passwords with someone else’s key, and that’s especially true if you don’t <strong>ultimately trust</strong> the key in the first place. This bypasses the trust checks and ensures that operations like encrypting backups, signing data, or verifying signatures can run unattended. Without ultimate trust, GPG may refuse to proceed or hang waiting for input, which is unacceptable in scripting and CI/CD pipelines.</p>
@@ -1431,7 +1431,7 @@ Do you really want to set this key to ultimate trust? (y/N) y
 gpg&gt; save
 </code></pre>
 <p>Once this step has been completed, you can re-try linking the key into Passwords.</p>
-<p><img alt="screenshot" src="../img/img_7.png" /></p>
+<p><img alt="screenshot" src="../img/img_7.png"></p></div>
 
 
 
@@ -1501,7 +1501,7 @@ gpg&gt; save
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Adam Lanzafame
+      Copyright © 2026 Adam Lanzafame
     </div>
   
   

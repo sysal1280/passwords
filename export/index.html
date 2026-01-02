@@ -1417,28 +1417,28 @@
 
 
 
-<h1 id="exporting-a-password">Exporting a password</h1>
+<div><h1 id="exporting-a-password">Exporting a password</h1>
 <h2 id="overview">Overview</h2>
 <p>Exporting passwords has always been a sensitive topic for this project. We want your data to be accessible when you need it, but we also want to avoid creating any path where a password could be taken without your knowledge or accidentally exposed. That’s why Passwords only allows exporting a single password at a time. It gives you control without opening the door to large‑scale leaks, and it helps prevent situations where a file gets saved, forgotten, and later discovered by the wrong person.</p>
 <p>You <em>can</em> combine multiple individually exported passwords into a single JSON file if you want to import several at once. But when it comes to removing them from the app, that still has to be done one password at a time. This is intentional, bulk deletion or bulk export creates too many opportunities for accidental loss or large‑scale leaks, and the project leans toward safety over convenience in those areas. I'm afraid, secure isn't always convenient.</p>
 <h2 id="export-format">Export format</h2>
 <p>Passwords are exported the same way they are encrypted and stored, in JSON format. Below is an example of a password export.</p>
 <pre><code class="language-json">{
-    &quot;private_name&quot;: &quot;Secure System&quot;,
-    &quot;description&quot;: &quot;Some description here&quot;,
-    &quot;credentials&quot;: [
+    "private_name": "Secure System",
+    "description": "Some description here",
+    "credentials": [
         {
-            &quot;length&quot;: 6,
-            &quot;password&quot;: &quot;MyP@sSw0rD!&quot;,
-            &quot;secretOptCode&quot;: &quot;KTDLU47DAEMEPCNZ&quot;,
-            &quot;username&quot;: &quot;someone@myemail.test&quot;
+            "length": 6,
+            "password": "MyP@sSw0rD!",
+            "secretOptCode": "KTDLU47DAEMEPCNZ",
+            "username": "someone@myemail.test"
         }
     ],
-    &quot;notes&quot;: [
+    "notes": [
     ],
-    &quot;url&quot;: &quot;https://somewhere.com/signin&quot;
+    "url": "https://somewhere.com/signin"
 }
-</code></pre>
+</code></pre></div>
 
 
 
@@ -1508,7 +1508,7 @@
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Adam Lanzafame
+      Copyright © 2026 Adam Lanzafame
     </div>
   
   

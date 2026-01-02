@@ -1485,7 +1485,7 @@
 
 
 
-<h1 id="destructive-passwords">Destructive Passwords</h1>
+<div><h1 id="destructive-passwords">Destructive Passwords</h1>
 <h2 id="overview">Overview</h2>
 <p>Because Passwords doesn’t use a traditional user‑login system where a user account would normally determine what actions are allowed, it becomes important to offer an optional safeguard against accidental or unauthorized data loss. This matters most when the application is being used to store multiple users’ passwords in the same database.</p>
 <p>That’s where <strong>destructive passwords</strong> come in. A destructive password is an optional, extra layer of protection you can add to your database. Whenever an action could lead to data being removed or permanently altered, a destructive password must be entered before the operation can continue. This ensures that sensitive or irreversible actions only happen when you explicitly intend them to, reducing the risk of accidental deletion or silent misuse.</p>
@@ -1495,22 +1495,22 @@
 <h5 id="linux">Linux</h5>
 <pre><code class="language-bash">#calculate the sha256sum of the new destructive password
 #replacing &lt;password&gt; with your new password
-echo -n &quot;&lt;password&gt;&quot; | sha256sum
+echo -n "&lt;password&gt;" | sha256sum
 dd81ca61fb57a4ff454c1cf89335a1f5e96afa849dfad4e0116b6ec35309fdea -
 
 #insert the destructive password
 #please note the name destructive_operation_password_1.
 #the number on the end should be incremented for each destructive password
 sqlite3 &lt;database&gt; \
-  &quot;INSERT INTO app_info (key, value) VALUES ('destructive_operation_password_1', 'e78b19251d4a3f3146982013542ac75544d5afe6e853dd3ac9b25b1a7ff53a53');&quot;
+  "INSERT INTO app_info (key, value) VALUES ('destructive_operation_password_1', 'e78b19251d4a3f3146982013542ac75544d5afe6e853dd3ac9b25b1a7ff53a53');"
 </code></pre>
 <h5 id="windows-powershell">Windows PowerShell</h5>
-<pre><code class="language-powershell">$password = &quot;&lt;password&gt;&quot;; `
-$hash = -join (([System.Security.Cryptography.SHA256]::Create()).ComputeHash([System.Text.Encoding]::UTF8.GetBytes($password)) | ForEach-Object { $_.ToString(&quot;x2&quot;) }); `
-sqlite3.exe &lt;database&gt; &quot;INSERT INTO app_info (key, value) VALUES ('destructive_operation_password_1', '$hash');&quot;
+<pre><code class="language-powershell">$password = "&lt;password&gt;"; `
+$hash = -join (([System.Security.Cryptography.SHA256]::Create()).ComputeHash([System.Text.Encoding]::UTF8.GetBytes($password)) | ForEach-Object { $_.ToString("x2") }); `
+sqlite3.exe &lt;database&gt; "INSERT INTO app_info (key, value) VALUES ('destructive_operation_password_1', '$hash');"
 
 </code></pre>
-<p>In both instances, the <database> can be obtained from Help.. System Information in the Standard Paths section.</p>
+<p>In both instances, the <database> can be obtained from Help.. System Information in the Standard Paths section.</database></p></div>
 
 
 
@@ -1580,7 +1580,7 @@ sqlite3.exe &lt;database&gt; &quot;INSERT INTO app_info (key, value) VALUES ('de
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Adam Lanzafame
+      Copyright © 2026 Adam Lanzafame
     </div>
   
   

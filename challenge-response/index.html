@@ -1473,7 +1473,7 @@
 
 
 
-<h1 id="challenge-response-login">Challenge Response Login</h1>
+<div><h1 id="challenge-response-login">Challenge Response Login</h1>
 <h2 id="logging-into-passwords">Logging into Passwords</h2>
 <p>In Passwords, the traditional login method of entering a username and password is unnecessary. All sensitive data is encrypted with one or more GPG keys, and <strong>possession of the correct private key—along with its passphrase—is all that is required to decrypt and use a password entry</strong>. If your key can decrypt an item, you are authorized to access it.</p>
 <p>This cryptographic model eliminates the need for server‑side authentication. The system does not verify who you <em>claim</em> to be; it simply verifies whether your key can unlock the encrypted data.</p>
@@ -1512,7 +1512,7 @@
 <li>When Passwords is accessible to more than one user, the setting is configured on a per‑user basis.</li>
 </ul>
 <h3 id="example-process">Example Process</h3>
-<p><img alt="Screenshot" src="../img/img_2.png" /></p>
+<p><img alt="Screenshot" src="../img/img_2.png"></p>
 <pre><code class="language-bash">$ gpg -d
 -----BEGIN PGP MESSAGE-----
 
@@ -1525,13 +1525,13 @@ WwQz3+yBJg==
 =DDX2
 -----END PGP MESSAGE-----
 gpg: encrypted with cv25519 key, ID 6D1C9AC309DD662D, created 2025-11-10
-      &quot;Test&quot;
+      "Test"
 
 Your Response to login is:
 Ship3-Puts-Walk
 
 </code></pre>
-<p>Run the <code>gpg -d</code> command, paste the challenge text, then press <strong>CTRL+D</strong> to end input. When prompted, enter the passphrase for your GPG key.</p>
+<p>Run the <code>gpg -d</code> command, paste the challenge text, then press <strong>CTRL+D</strong> to end input. When prompted, enter the passphrase for your GPG key.</p></div>
 
 
 
@@ -1601,7 +1601,7 @@ Ship3-Puts-Walk
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Adam Lanzafame
+      Copyright © 2026 Adam Lanzafame
     </div>
   
   

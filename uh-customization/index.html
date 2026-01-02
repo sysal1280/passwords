@@ -1259,6 +1259,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#application-stylesheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application Stylesheet
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1429,6 +1440,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#application-stylesheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application Stylesheet
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1451,7 +1473,7 @@
 
 
 
-<h1 id="under-the-hood-customization">Under the Hood: Customization</h1>
+<div><h1 id="under-the-hood-customization">Under the Hood: Customization</h1>
 <h2 id="overview">Overview</h2>
 <p>Passwords includes several customization features designed to support integration into corporate or professional environments.</p>
 <h3 id="splash-screen">Splash screen</h3>
@@ -1460,6 +1482,11 @@
 <p>Passwords can display a Terms of Use or security notice before the application loads. To enable this feature, create a text file named conditions.txt in the same directory as the Passwords executable.</p>
 <p>If this file is present, Passwords will show its contents in a dialog when the application starts. Users must acknowledge or accept the terms before they can proceed. If the file is not present, the application starts normally without displaying a dialog.</p>
 <p>This feature allows organisations to present legal notices, usage policies, or security warnings without modifying the application itself.</p>
+<h3 id="application-stylesheet">Application Stylesheet</h3>
+<p>Passwords supports full visual customization through an optional external stylesheet. This allows organisations to apply their own branding, colour schemes, or accessibility‑focused themes without modifying the application itself.</p>
+<p>To enable this feature, create a file named style.css and place it in the same directory as the Passwords executable. If this file is present, Passwords will automatically load and apply it at startup, overriding the built‑in default theme.</p>
+<p>The stylesheet uses standard Qt Style Sheet (QSS) syntax, which is similar to CSS. You can customise fonts, colours, spacing, widget appearance, and more. This makes it possible to align Passwords with corporate identity guidelines or create high‑contrast themes for improved readability.</p>
+<p>If style.css is not present, Passwords will fall back to its bundled default stylesheet.</p></div>
 
 
 
@@ -1529,7 +1556,7 @@
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Adam Lanzafame
+      Copyright © 2026 Adam Lanzafame
     </div>
   
   
