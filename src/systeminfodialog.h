@@ -165,7 +165,7 @@ private:
                            QDir::toNativeSeparators(QCoreApplication::applicationFilePath()));
 
         // AppKey source
-        report += "\nAppKey:\n";
+        report += tr("\nAppKey:\n");
 
         const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
@@ -174,13 +174,13 @@ private:
             db.setDatabaseName(qApp->property("dbFile").toString());
 
             if (!db.open()) {
-                report += "  Unknown\n";
+                report +=tr("  Unknown\n");
                 showDbNotOpenError(this, db, Q_FUNC_INFO);
             } else {
                 if (isKeyExported(this, db)) {
-                    report += "  Sourced from external (exported)\n";
+                    report += tr("  Sourced externally (exported).\n");
                 } else {
-                    report += "  Sourced from internal database\n";
+                    report += tr("  Present in the database.\n");
                 }
             }
         }

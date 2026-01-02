@@ -4103,7 +4103,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 QString loadedKey;
                 QObject::connect(fileButton, &QPushButton::clicked, &dlg, [&]() {
                     QString path = QFileDialog::getOpenFileName(
-                        &dlg, "Select Application Key File", QString(), "All Files (*)");
+                        &dlg, "Select Application Key File", QDir::homePath(), "All Files (*)");
 
                     if (!path.isEmpty()) {
                         QFile f(path);
