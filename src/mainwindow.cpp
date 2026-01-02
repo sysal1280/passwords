@@ -4116,6 +4116,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 });
 
                 dlg.setFixedSize(dlg.size());
+                pasteEdit->setFocus();
 
                 //
                 // Show dialog

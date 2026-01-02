@@ -24,6 +24,8 @@
 
 #include "settings.h"
 #include "utils.h"
+#include "dbutils.h"
+#include "quuid.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -163,13 +165,27 @@ private:
                            QDir::toNativeSeparators(QCoreApplication::applicationFilePath()));
 
         // AppKey source
-        QString appKeyPath = appKeyFilePath();
-        if (!appKeyPath.isEmpty() && QFile::exists(appKeyPath)) {
-            report += QString("\nAppKey:\n  Sourced from local file (%1)\n")
-            .arg(QDir::toNativeSeparators(appKeyPath));
-        } else {
-            report += "\nAppKey:\n  Sourced from database\n";
+        report += "\nAppKey:\n";
+
+        const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+        {
+            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+            db.setDatabaseName(qApp->property("dbFile").toString());
+
+            if (!db.open()) {
+                report += "  Unknown\n";
+                showDbNotOpenError(this, db, Q_FUNC_INFO);
+            } else {
+                if (isKeyExported(this, db)) {
+                    report += "  Sourced from external (exported)\n";
+                } else {
+                    report += "  Sourced from internal database\n";
+                }
+            }
         }
+
+        QSqlDatabase::removeDatabase(connectionName);
 
         // GPG info
         QString gpgPath = QStandardPaths::findExecutable("gpg");
