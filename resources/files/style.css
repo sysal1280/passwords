@@ -544,3 +544,37 @@ QFrame[tileType="symbol"] {
 QFrame[tileType="symbol"]:hover {
     background-color: #FB8C00;
 }
+
+/* ============================================================
+   PASSWORD INSPECTOR PASSWORD LABEL
+   ============================================================ */
+
+QLabel#labelPasswordInspector {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0   rgba(255,255,255,0.55),
+        stop:1   rgba(245,245,245,0.25)
+    );
+    color: #1a1a1a;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.12);
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+
+    /* subtle shadow to lift it */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+
+    /* smooth transitions */
+    transition: background 180ms ease, 
+                box-shadow 180ms ease,
+                border-color 180ms ease;
+}
+
+QLabel#labelPasswordInspector:hover {
+    background: rgba(255,255,255,0.75);
+    border-color: #2299d4;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+}
+
