@@ -4142,8 +4142,10 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 }
 
                 //
-                // Validate (must decode properly)
+                // Validate (must decode properly, and match expected format)
                 //
+
+                // 1. Base64 decode (as before)
                 QByteArray decoded = QByteArray::fromBase64(keyText.toUtf8());
                 if (decoded.isEmpty()) {
                     QMessageBox::critical(this, "Invalid Key",
@@ -4153,6 +4155,19 @@ QByteArray MainWindow::loadOrCreateAppKey()
                     return {};
                 }
 
+                // 2. Regex check on the decoded content (192 hex chars)
+                QString decodedStr = QString::fromUtf8(decoded);
+
+                QRegularExpression re("^[A-Fa-f0-9]{192}$");
+                if (!re.match(decodedStr).hasMatch()) {
+                    QMessageBox::critical(this, "Invalid Key",
+                                          "The key you provided is not valid.\n"
+                                          "The application cannot continue.");
+                    qApp->quit();
+                    return {};
+                }
+
+                // 3. Keep original behavior
                 appKey = decoded;
             }
             //
