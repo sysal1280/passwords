@@ -383,6 +383,28 @@ bool Settings::openCategoryDblClick()
     return truthy.contains(val);
 }
 
+bool Settings::hasExportedKey() const
+{
+    if (!settings)
+        return false;
+
+    settings->beginGroup("General");
+    bool exported = settings->value("AppKeyExported", false).toBool();
+    settings->endGroup();
+    return exported;
+}
+
+
+void Settings::setExportedKey()
+{
+    if (!settings)
+        return;
+
+    settings->beginGroup("General");
+    settings->setValue("AppKeyExported", true);
+    settings->endGroup();
+}
+
 void Settings::setGeneratedPasswordLength(int i)
 {
     if (!settings)

@@ -4048,7 +4048,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 QLabel *pasteLabel = new QLabel(
                     tr("Paste your application key below:"), pasteTab);
                 QTextEdit *pasteEdit = new QTextEdit(pasteTab);
-                pasteEdit->setPlaceholderText(tr("Application Key here.."));
+                pasteEdit->setPlaceholderText(tr("application key here.."));
+                pasteEdit->setTabChangesFocus(true);
 
                 pasteLayout->addWidget(pasteLabel);
                 pasteLayout->addWidget(pasteEdit);

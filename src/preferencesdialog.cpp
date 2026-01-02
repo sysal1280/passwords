@@ -140,27 +140,45 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
      * Appkey export setup
      */
 
-    const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    auto removeGroupBox = [this]() {
+        // Write the flag immediately
+        settings.setExportedKey();
 
+        // Remove the UI element after the window is fully constructed
+        QTimer::singleShot(0, this, [this]() {
+            ui->groupBox_10->hide();
+            if (auto parentLayout = ui->groupBox_10->parentWidget()->layout())
+                parentLayout->removeWidget(ui->groupBox_10);
+            ui->groupBox_10->setParent(nullptr);
+            ui->groupBox_10->deleteLater();
+        });
+    };
+
+    if (!settings.hasExportedKey())
     {
-        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
-        db.setDatabaseName(qApp->property("dbFile").toString());
+        qInfo() << Q_FUNC_INFO << "Checking for exported app key";
 
-        if (!db.open()) {
-            showDbNotOpenError(this, db, Q_FUNC_INFO);
-        } else {
-            QTimer::singleShot(0, this, [this](){
-                ui->groupBox_10->hide();
-                auto parentLayout = ui->groupBox_10->parentWidget()->layout();
-                if (parentLayout)
-                    parentLayout->removeWidget(ui->groupBox_10);
-                ui->groupBox_10->setParent(nullptr);
-                ui->groupBox_10->deleteLater();
-            });
+        const QString connectionName =
+            QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+        {
+            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+            db.setDatabaseName(qApp->property("dbFile").toString());
+
+            if (!db.open()) {
+                showDbNotOpenError(this, db, Q_FUNC_INFO);
+            } else {
+                if (isKeyExported(this, db))
+                    removeGroupBox();
+            }
         }
-    }
 
-    QSqlDatabase::removeDatabase(connectionName);
+        QSqlDatabase::removeDatabase(connectionName);
+    }
+    else
+    {
+        removeGroupBox();
+    }
 
 
     /*
@@ -210,7 +228,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
             });
 
     connect(ui->pushButtonExportKey, &QPushButton::clicked,
-            this, [this]() {
+            this, [this, removeGroupBox]() {
 
                 QMessageBox msgBox;
                 msgBox.setIcon(QMessageBox::Warning);
@@ -307,7 +325,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
                         query.prepare("UPDATE app_info SET value = 'exported' WHERE key ='app_key'");
                         if (query.exec())
                         {
-                            ui->pushButtonExportKey->setEnabled(false);
+                            removeGroupBox();
                             QMessageBox::information(
                                 this,
                                 QCoreApplication::applicationName(),

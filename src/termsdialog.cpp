@@ -20,7 +20,7 @@
 
 #include "termsdialog.h"
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QFile>
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -54,4 +54,5 @@ TermsDialog::TermsDialog(const QString &termsText, QWidget *parent)
     mainLayout->addLayout(buttonLayout);
 
     setLayout(mainLayout);
+    QApplication::restoreOverrideCursor();
 }
