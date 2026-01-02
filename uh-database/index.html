@@ -1429,7 +1429,7 @@
 
 
 
-<h1 id="under-the-hood-database">Under the Hood: Database</h1>
+<div><h1 id="under-the-hood-database">Under the Hood: Database</h1>
 <h2 id="sqlite-database">Sqlite database</h2>
 <p>Passwords uses a flat file SQLite database. SQLite is fully open‑source, and even more permissive than most open‑source projects. According to the official SQLite website, the entire source code is released into the <strong>public domain</strong>, meaning anyone can use it for any purpose without restriction. The project's website is <a href="https://sqlite.org/index.html">https://sqlite.org/index.html</a>.</p>
 <h3 id="database-schema">Database Schema</h3>
@@ -1689,8 +1689,8 @@ INSERT OR IGNORE INTO app_info (key, value)
 VALUES ('schema_version', '1');
 </code></pre>
 <p>After the database has been created it is recommended to enable Write-Ahead Logging (WAL) by running the following command:</p>
-<pre><code class="language-bash">sqlite3 &lt;database&gt; &quot;PRAGMA journal_mode=WAL;&quot;
-</code></pre>
+<pre><code class="language-bash">sqlite3 &lt;database&gt; "PRAGMA journal_mode=WAL;"
+</code></pre></div>
 
 
 
@@ -1760,7 +1760,7 @@ VALUES ('schema_version', '1');
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Adam Lanzafame
+      Copyright © 2026 Adam Lanzafame
     </div>
   
   

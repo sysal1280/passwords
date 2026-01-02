@@ -9,8 +9,6 @@
       
       
       
-        <link rel="prev" href="../license/">
-      
       
       
         
@@ -21,7 +19,7 @@
     
     
       
-        <title>Donate and Support - Passwords</title>
+        <title>Application Key Required - Passwords</title>
       
     
     
@@ -72,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#donate-and-support" class="md-skip">
+        <a href="#application-key-required" class="md-skip">
           Skip to content
         </a>
       
@@ -108,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Donate and Support
+              Application Key Required
             
           </span>
         </div>
@@ -1254,37 +1252,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Donate and Support
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../donate/" class="md-nav__link">
         
   
   
@@ -1300,48 +1271,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#how-can-you-help" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How can you help?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#donations-and-financial-support" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Donations and Financial Support
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1373,10 +1302,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-can-you-help" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How can you help?
+        Overview
       
     </span>
   </a>
@@ -1384,10 +1313,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#donations-and-financial-support" class="md-nav__link">
+  <a href="#supplying-the-application-key" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Donations and Financial Support
+        Supplying the application key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no-application-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No application key
       
     </span>
   </a>
@@ -1411,17 +1351,27 @@
 
 
 
-<div><h1 id="donate-and-support">Donate and Support</h1>
-<h2 id="how-can-you-help">How can you help?</h2>
-<p>One of the most valuable gifts you can give is your time. Whether it’s helping to improve documentation, spreading the word, helping someone learn or transition to Passwords, or answering questions from other users, your involvement makes a real difference.</p>
-<p>If you’re multilingual, you can help us reach a wider audience by translating content into other languages. Accessibility is at the heart of our mission, and translations ensure that more people can benefit from the project regardless of where they live or what language they speak.</p>
-<p>We also welcome feedback and feature suggestions. Sharing your experiences, reporting issues, or suggesting improvements helps us refine the project and keep it aligned with the needs of the community. </p>
-<p>Together, these contributions build a project that is not only secure and reliable, but also inclusive and community‑driven.</p>
-<h2 id="donations-and-financial-support">Donations and Financial Support</h2>
-<p>While time, feedback, and community involvement mean a lot, financial support also helps keep this project moving. Donations cover the real‑world costs behind the scenes, the hosting, infrastructure, testing tools, and everything else that makes it possible to keep the project free, open, and available to everyone.</p>
-<p>Every contribution, no matter the size, makes a difference. A small donation helps keep servers running smoothly, while larger contributions can fund new features, translations and new hardware. By supporting financially, you’re directly investing in the project’s future and helping it reach more people who need secure, privacy‑focused solutions.</p>
-<p>We believe in transparency and independence. That means donations go directly toward maintaining and improving the project, not toward subscriptions, advertising, or proprietary lock‑ins. Your support empowers the project to stay community‑driven and user‑focused.</p>
-<p><a href="https://buymeacoffee.com/sysal1280"><img alt="Screenshot" src="../img/bmc-button.svg"></a></p></div>
+<div><h1 id="application-key-required">Application Key Required</h1>
+<h2 id="overview">Overview</h2>
+<p>The application key has been exported from your database. This key is a critical component in the cryptographic system that protects your password metadata. Once it has been exported, the database no longer contains the information required to operate by itself.</p>
+<p>Exporting an application key is a common security practice. Many organizations choose to store sensitive cryptographic material outside the database to reduce the risk of unauthorized access. By separating encrypted data from the key that unlocks it, the system becomes significantly more resilient against breaches.</p>
+<p>Exporting the key is a <strong>one‑time, irreversible action</strong>. After the key has been removed from the database, it cannot be restored automatically, and the application will require you to provide the exported key whenever cryptographic operations are needed. This ensures that only individuals who possess the external key file can access or manage the protected password data.</p>
+<h2 id="supplying-the-application-key">Supplying the application key</h2>
+<p>The application cannot continue until the exported application key is provided. You have two options for supplying it:</p>
+<ul>
+<li><strong>Paste Key tab</strong> — If you have the key stored in a clipboard manager, password manager, or text file, you can paste it directly into the field provided.</li>
+<li><strong>Load From File tab</strong> — If your key was saved as a file during export, you can browse to that file and load it automatically.</li>
+</ul>
+<p>Once the key is supplied and validated, the application will regain access to the cryptographic material required to unlock and operate on your password data.</p>
+<h2 id="no-application-key">No application key</h2>
+<p>If you no longer have access to your application key, the encrypted data in your database cannot be recovered. The key is the only piece of information capable of decrypting metadata required to access GPG encrypted data, and for security reasons, it cannot be regenerated, bypassed, or reconstructed.</p>
+<p>Without the application key:</p>
+<ul>
+<li>The database remains permanently inaccessible</li>
+<li>Passwords and other encrypted records cannot be accessed</li>
+<li>All cryptographic operations are ineffective</li>
+</ul>
+<p>If the key has been lost, the only path forward is to create a new database and generate a new application key for future use. <strong>Your passwords are not recoverable.</strong></p></div>
 
 
 
@@ -1446,28 +1396,6 @@
       
         <footer class="md-footer">
   
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href="../license/" class="md-footer__link md-footer__link--prev" aria-label="Previous: License">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              <div class="md-ellipsis">
-                License
-              </div>
-            </div>
-          </a>
-        
-        
-      </nav>
     
   
   <div class="md-footer-meta md-typeset">
