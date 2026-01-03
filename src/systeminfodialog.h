@@ -177,9 +177,9 @@ private:
                 showDbNotOpenError(this, db, Q_FUNC_INFO);
             } else {
                 if (isKeyExported(this, db)) {
-                    report += tr("  Sourced externally (exported).\n");
+                    report += tr("  Sourced externally (exported)\n");
                 } else {
-                    report += tr("  Present in the database.\n");
+                    report += tr("  Present in the database\n");
                 }
             }
         }

@@ -261,7 +261,7 @@ void LoginDialog::generateChallenge()
 
     process->start("gpg", {"-ea", "-r", recipient});
 
-    QByteArray temp = "\nYour Response to login is:\n" + responseBytes + "\n\n";
+    QByteArray temp = "\nYour Response is:\n" + responseBytes + "\n\n";
     process->write(temp);
     process->closeWriteChannel();
 
