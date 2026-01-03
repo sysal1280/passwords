@@ -1211,12 +1211,16 @@ void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
 
         // Process each row of the query result and create tree items
         while (query.next()) {
-            QTreeWidgetItem* newItem = nullptr;
-            newItem = makeItemFromApplication(query);
-            if (newItem) {
+            if (QTreeWidgetItem* newItem = makeItemFromApplication(query)) {
+                const QString status = buildItemPath(item)
+                                     + settings.getPathSeparator()
+                                     + newItem->text(0);
+
+                newItem->setStatusTip(0,status);
                 ui->treeWidget_2->addTopLevelItem(newItem);
             }
         }
+
 
         // Clean up
         db.close();
