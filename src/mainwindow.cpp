@@ -4185,7 +4185,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
                             loadedKey = QString::fromUtf8(f.readAll()).trimmed();
 
                             QFileInfo info(path);
-                            fileLoadedLabel->setText("Loaded: " + info.fileName());
+                            fileLoadedLabel->setText("Selected: " + info.fileName());
                         }
                     }
                 });
