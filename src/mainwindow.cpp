@@ -185,6 +185,7 @@ MainWindow::MainWindow(QWidget *parent)
         { ui->actionRandom_Noise,          ":/menus/glyphs/grain_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionClear_GPG_Passphrase_Cache, ":/menus/glyphs/lock_reset_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionMaintenance,           ":/menus/glyphs/build_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
+        { ui->actionCopy_Password_Path,    ":/menus/glyphs/file_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"} ,
         { ui->actionOnline_Documentation,  ":/menus/glyphs/help_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" }
     };
 
@@ -247,6 +248,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionDelete_Password->setStatusTip(tr("Delete the selected password permanently"));
     ui->actionBookmark->setStatusTip(tr("Add or remove this password from your bookmarks"));
     ui->actionAudit_Log->setStatusTip(tr("View the full activity history for this password"));
+    ui->actionCopy_Password_Path->setStatusTip(tr("Copy the full path of the selected entry"));
 
 
     // OTP countdown widgets (progress bar + label)
@@ -327,6 +329,29 @@ MainWindow::MainWindow(QWidget *parent)
                 }
             });
 
+    //copy password path
+    connect(ui->actionCopy_Password_Path, &QAction::triggered, this,
+            [this]() {
+                // password item
+                QTreeWidgetItem *passwordItem = ui->treeWidget_2->currentItem();
+                if (!passwordItem)
+                    return;
+
+                // category item (from the other tree)
+                const auto selectedCategory = ui->treeWidget->selectedItems();
+                if (selectedCategory.isEmpty())
+                    return;
+
+                QTreeWidgetItem *categoryItem = selectedCategory.first();
+
+                const QString path =
+                    buildItemPath(categoryItem)
+                    + settings.getPathSeparator()
+                    + passwordItem->text(0);
+
+                QApplication::clipboard()->setText(path);
+                ui->statusbar->showMessage(tr("Copied to clipboard"),Passwords::SBTransientMessageTime);
+            });
 
     //open password
     connect(ui->actionOpen_Password,
@@ -2230,6 +2255,7 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
     menu.addSeparator();
     menu.addAction(ui->actionDelete_Password);
     menu.addAction(ui->actionExport_Password);
+    menu.addAction(ui->actionCopy_Password_Path);
     menu.addSeparator();
 
     // 4. Bookmark state
@@ -3027,9 +3053,9 @@ void MainWindow::encryptMessage()
                 const QString text = encryptedTextEdit->toPlainText();
                 if (!text.isEmpty()) {
                     QGuiApplication::clipboard()->setText(text);
-                    statusBar()->showMessage("Encrypted text copied to clipboard.", 3000);
+                    statusBar()->showMessage("Encrypted text copied to clipboard", Passwords::SBTransientMessageTime);
                 } else {
-                    statusBar()->showMessage("There is no encrypted text to copy.", 3000);
+                    statusBar()->showMessage("There is no encrypted text to copy", Passwords::SBTransientMessageTime);
                 }
             });
 
@@ -3210,11 +3236,12 @@ void MainWindow::decryptMessage()
             });
 
     connect(copyBtn, &QPushButton::clicked, this,
-            [decryptedTextEdit, dlg]() {
+            [this, decryptedTextEdit, dlg]() {
                 const QString text = decryptedTextEdit->toPlainText();
                 if (!text.isEmpty()) {
                     QGuiApplication::clipboard()->setText(text);
-                    QMessageBox::information(dlg, "Copied", "Decrypted text copied to clipboard.");
+                    ui->statusbar->showMessage("Decrypted text copied to clipboard",
+                                               Passwords::SBTransientMessageTime);
                 }
             });
 
@@ -3434,7 +3461,7 @@ void MainWindow::decryptFile()
 
         if (success) {
             if (!embeddedOutputPath.isEmpty()) {
-                ui->statusbar->showMessage("Decryption complete", 5000);
+                ui->statusbar->showMessage("Decryption complete", Passwords::SBTransientMessageTime);
                 QMessageBox::information(
                     this,
                     ui->actionDecrypt_File->text(),
@@ -3460,7 +3487,7 @@ void MainWindow::decryptFile()
                         out.write(*stdoutBuffer);
                         out.close();
 
-                        ui->statusbar->showMessage("Decryption complete", 5000);
+                        ui->statusbar->showMessage("Decryption complete", Passwords::SBTransientMessageTime);
                         QMessageBox::information(
                             this,
                             ui->actionDecrypt_File->text(),
@@ -3490,7 +3517,7 @@ void MainWindow::decryptFile()
             }
         }
         else {
-            ui->statusbar->showMessage(tr("Decryption failed"), 5000);
+            ui->statusbar->showMessage(tr("Decryption failed"), Passwords::SBTransientMessageTime);
             QMessageBox::critical(
                 this,
                 ui->actionDecrypt_File->text(),
@@ -3503,7 +3530,7 @@ void MainWindow::decryptFile()
 
     connect(process, &QProcess::errorOccurred, this,
             [this](QProcess::ProcessError) {
-                ui->statusbar->showMessage(tr("Failed to start gpg process"), 5000);
+                ui->statusbar->showMessage(tr("Failed to start gpg process"), Passwords::SBTransientMessageTime);
                 QMessageBox::critical(
                     this,
                     ui->actionDecrypt_File->text(),

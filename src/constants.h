@@ -6,6 +6,8 @@ inline constexpr const char* Organization   = "sysal1280";
 inline constexpr const char* Version        = "1.1.0";
 inline constexpr const char* Icon           = ":/password.png";
 
+inline constexpr int SBTransientMessageTime = 5000;
+
 inline constexpr const char* HelpBaseUrl    = "https://sysal1280.github.io/passwords/";
 inline constexpr const char* GitUrl         = "https://github.com/sysal1280/passwords.git";
 
