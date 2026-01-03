@@ -1278,45 +1278,26 @@ void MainWindow::clearScrollArea()
         alignedTimer = nullptr;
     }
 
-    // Hide countdown label and progress
     countdownLabel->setVisible(false);
     countdownProgress->setVisible(false);
 
-    QWidget *container = ui->scrollArea->widget();
-    if (!container) {
-        // If no container yet, create one and attach it
-        container = new QWidget;
-        ui->scrollArea->setWidget(container);
-        ui->scrollArea->setWidgetResizable(true);
-        ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-        ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    }
+    // ❗ Always create a fresh container
+    QWidget *container = new QWidget;
+    ui->scrollArea->setWidget(container);
+    ui->scrollArea->setWidgetResizable(true);
 
-    // Ensure the container has a layout
-    QGridLayout *gridLayout = qobject_cast<QGridLayout*>(container->layout());
-    if (!gridLayout) {
-        gridLayout = new QGridLayout(container);
-        gridLayout->setContentsMargins(12, 12, 12, 12);
-        gridLayout->setSpacing(8);
-    }
+    // Create a fresh layout
+    QGridLayout *gridLayout = new QGridLayout(container);
+    gridLayout->setContentsMargins(12, 12, 12, 12);
+    gridLayout->setSpacing(8);
 
-    // Clear existing widgets from the layout
-    QLayoutItem *child;
-    while ((child = gridLayout->takeAt(0)) != nullptr) {
-        if (child->widget()) {
-            delete child->widget(); // deletes any existing DropLabel
-        }
-        delete child;
-    }
-
-    // Add a fresh DropLabel
+    // Add DropLabel
     DropLabel *imageLabel = new DropLabel(container);
-    QPixmap pixmap(":/place.png");
-    imageLabel->setPixmap(pixmap);
+    imageLabel->setPixmap(QPixmap(":/place.png"));
     imageLabel->setScaledContents(true);
     imageLabel->setFixedSize(275, 105);
 
-    gridLayout->addWidget(imageLabel, 0, 0);
+    gridLayout->addWidget(imageLabel, 0, 0, Qt::AlignCenter);
 
     connect(imageLabel, &DropLabel::itemDropped,
             this, [this](QTreeWidgetItem *item) {
@@ -1329,6 +1310,7 @@ void MainWindow::clearScrollArea()
 
     openedCredentialID = -1;
 }
+
 
 // void MainWindow::openPassword(QTreeWidgetItem *item)
 // {
@@ -6432,12 +6414,15 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         // ----------------------------------------------------
         if (focus == ui->treeWidget_2) {
 
-            if (ui->treeWidget_2->topLevelItemCount() > 0) {
+            if (openedCredentialID == -1 &&
+                ui->treeWidget_2->topLevelItemCount() > 0) {
+
                 ui->treeWidget_2->clear();
                 event->accept();
                 return;
             }
         }
+
 
         // ----------------------------------------------------
         // 3. Fallback to your existing ESC logic
