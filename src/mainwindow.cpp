@@ -530,7 +530,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionOnline_Documentation, &QAction::triggered, this, [this]() {
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
-                const QUrl url(Passwords::HelpBaseUrl);
+                const QUrl url(getHelpBaseUrl());
                 QDesktopServices::openUrl(url);
             } else {
                 launchHelperProcess(QStringLiteral(""));
