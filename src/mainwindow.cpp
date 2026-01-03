@@ -40,6 +40,7 @@
 #include "preferencesdialog.h"
 #include "randomnoisedialog.h"
 #include "settings.h"
+#include "ui/ui_mainwindow.h"
 #include "utils.h"
 #include "watermarkedtreewidget.h"
 
@@ -6417,12 +6418,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
         // ----------------------------------------------------
         // 1. ESC pressed while treeWidget has focus
-        // ----------------------------------------------------
         if (focus == ui->treeWidget) {
-
-            QTreeWidgetItem *item = ui->treeWidget->currentItem();
-            if (item && item->isExpanded()) {
+            if (ui->treeWidget->topLevelItemCount() > 0) {
                 ui->treeWidget->collapseAll();
+                ui->treeWidget_2->clear();
                 event->accept();
                 return;
             }
