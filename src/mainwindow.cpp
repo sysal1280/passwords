@@ -542,7 +542,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionDonate, &QAction::triggered, this, [this]() {
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
-                const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("donate"));
+                const QUrl url(getHelpBaseUrl("donate"));
                 QDesktopServices::openUrl(url);
             } else {
                 launchHelperProcess(QStringLiteral("donate"));
@@ -1573,7 +1573,7 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
     if (result == QMessageBox::Help) {
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
-                const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("no-secret-key"));
+                const QUrl url(getHelpBaseUrl("help/no-secret-key"));
                 QDesktopServices::openUrl(url);
             } else {
                 launchHelperProcess(QStringLiteral("no-secret-key"));
@@ -2548,7 +2548,7 @@ void MainWindow::keyList()
                 connect(helpButton, &QPushButton::clicked, this, [this]() {
                     checkHelpReachable([this](bool reachable) {
                         if (reachable) {
-                            const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("keys"));
+                            const QUrl url(getHelpBaseUrl("keys"));
                             QDesktopServices::openUrl(url);
                         } else {
                             launchHelperProcess(QStringLiteral("keys"));
@@ -2646,7 +2646,7 @@ void MainWindow::keyList()
     connect(helpBtn, &QPushButton::clicked, this, [this]() {
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
-                const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("linking-keys"));
+                const QUrl url(getHelpBaseUrl("linking-keys"));
                 QDesktopServices::openUrl(url);
             } else {
                 launchHelperProcess(QStringLiteral("linking-keys"));
@@ -4124,10 +4124,10 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 QObject::connect(buttons, &QDialogButtonBox::helpRequested, &dlg, [&]() {
                     checkHelpReachable([this](bool reachable) {
                         if (reachable) {
-                            const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("appkey-external"));
+                            const QUrl url(getHelpBaseUrl("help/appkey-external"));
                             QDesktopServices::openUrl(url);
                         } else {
-                            launchHelperProcess(QStringLiteral("appkey-external"));
+                            launchHelperProcess(QStringLiteral("help/appkey-external"));
                         }
                     });
                 });
@@ -5292,7 +5292,7 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
     if (result == QMessageBox::Help) {
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
-                const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("no-secret-key"));
+                const QUrl url(getHelpBaseUrl("help/no-secret-key"));
                 QDesktopServices::openUrl(url);
             } else {
                 launchHelperProcess(QStringLiteral("no-secret-key"));
@@ -5600,7 +5600,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
         if (result == QMessageBox::Help) {
             checkHelpReachable([this](bool reachable) {
                 if (reachable) {
-                    const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("no-secret-key"));
+                    const QUrl url(getHelpBaseUrl("help/no-secret-key"));
                     QDesktopServices::openUrl(url);
                 } else {
                     launchHelperProcess(QStringLiteral("no-secret-key"));

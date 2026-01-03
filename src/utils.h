@@ -116,11 +116,37 @@ inline void setupDebugWarnings(QWidget *parent, QStatusBar *statusBar)
 #endif
 }
 
+inline QString getHelpBaseUrl(const QString& page = QString())
+{
+    QString lang = QLocale::system().name().left(2);
+
+    // Supported languages
+    static const QSet<QString> supported = { "en", "fr", "de" };
+    if (!supported.contains(lang))
+        lang = "en";
+
+    // Base: https://.../passwords/en/
+    QString base = QString("%1%2/").arg(Passwords::HelpBaseUrl, lang);
+
+    // If a page is provided, append it
+    if (!page.isEmpty()) {
+        // Ensure no accidental leading slash
+        QString cleanPage = page;
+        if (cleanPage.startsWith('/'))
+            cleanPage.remove(0, 1);
+
+        base += cleanPage;
+    }
+
+    return base;
+}
+
 inline void checkHelpReachable(std::function<void(bool)> callback,
                                QObject* parent = nullptr)
 {
     auto manager = new QNetworkAccessManager(parent);
-    QNetworkRequest request(QUrl("https://sysal1280.github.io/passwords/"));
+    auto request = QNetworkRequest(QUrl(getHelpBaseUrl()));
+
     QNetworkReply* reply = manager->head(request);
 
     QObject::connect(reply, &QNetworkReply::finished, [reply, callback]() {
@@ -129,6 +155,7 @@ inline void checkHelpReachable(std::function<void(bool)> callback,
         reply->deleteLater();
     });
 }
+
 
 inline void manageBackups(const QString &directory, int maxFiles, QWidget *parent = nullptr)
 {

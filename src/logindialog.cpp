@@ -98,7 +98,7 @@ LoginDialog::LoginDialog(QWidget *parent)
                 checkHelpReachable([this](bool reachable) {
                     if (reachable) {
                         // Open the online help page for challenge-response
-                        const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("challenge-response"));
+                        const QUrl url(getHelpBaseUrl("challenge-response"));
                         QDesktopServices::openUrl(url);
                     } else {
                         // Fallback to helper process

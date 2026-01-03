@@ -208,7 +208,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
                 checkHelpReachable([this](bool reachable) {
                     if (reachable) {
                         // Open the online help page for preferences
-                        const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("preferences"));
+                        const QUrl url(getHelpBaseUrl("preferences"));
                         QDesktopServices::openUrl(url);
                     } else {
                         // Fallback to helper process

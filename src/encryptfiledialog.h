@@ -178,7 +178,7 @@ public:
                     checkHelpReachable([this](bool reachable) {
                         if (reachable) {
                             // Open the online help page for encrypt-file
-                            const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("encrypt-file"));
+                            const QUrl url(getHelpBaseUrl("encrypt-file"));
                             QDesktopServices::openUrl(url);
                         } else {
                             // Fallback to helper process
