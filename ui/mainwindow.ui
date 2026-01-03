@@ -33,7 +33,7 @@
     <item row="0" column="0" colspan="2">
      <widget class="QLineEdit" name="lineEditSearch">
       <property name="placeholderText">
-       <string>Find a password...</string>
+       <string/>
       </property>
       <property name="clearButtonEnabled">
        <bool>true</bool>

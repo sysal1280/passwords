@@ -173,6 +173,7 @@ private:
     void insertAuditRow(int applicationId, const QString &user, const QString &host, const QString &action);
     void NotChangedSince(const QDateTime &cutoff);
     void showPasswordsContextMenu(const QPoint &pos);
+    bool tryOpenPasswordPath(const QString &path);
 
     void decryptWithGpg(
         const QByteArray &encrypted,

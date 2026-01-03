@@ -210,6 +210,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionAbout_Qt->setMenuRole(QAction::AboutQtRole);
     ui->actionPreferences->setMenuRole(QAction::PreferencesRole);
 
+    ui->lineEditSearch->setPlaceholderText("Find a password or paste a password path…");
+
     ui->actionOpen_Database->setStatusTip(tr("Open an existing database"));
     ui->actionPreferences->setStatusTip(tr("Change application settings"));
     ui->actionMaintenance->setStatusTip(tr("Verify database integrity and perform optimization tasks"));
@@ -3642,6 +3644,29 @@ void MainWindow::init()
 
 void MainWindow::search(const QString &text)
 {
+
+    QString sep = settings.getPathSeparator();
+    QString escapedSep = QRegularExpression::escape(sep);
+
+    // Regex:  segment <sep> segment [ <sep> segment ... ]
+    QRegularExpression pathRe(
+        QStringLiteral("^[^%1]+(%1[^%1]+)+$").arg(escapedSep)
+    );
+
+    // --- Detect password path ---
+    if (pathRe.match(text).hasMatch()) {
+        qDebug() << "Likely a password path:" << text;
+
+        if (tryOpenPasswordPath(text)) {
+            ui->lineEditSearch->clear();
+            return;   // SUCCESS → stop here
+        }
+
+        // If path lookup failed, fall through to keyword search
+        qDebug() << "Path looked valid but did not resolve in DB.";
+    }
+
+
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QList<SearchResult> results;
 
@@ -7197,4 +7222,96 @@ void MainWindow::decryptWithGpg(
     gpg->start("gpg", QStringList()
                << "--status-fd" << "2"
                << "--decrypt");
+}
+
+
+bool MainWindow::tryOpenPasswordPath(const QString &path)
+{
+    qDebug() << "=== tryOpenPasswordPath ===";
+    qDebug() << "Input path:" << path;
+
+    const QString sep = settings.getPathSeparator();
+    QStringList parts = path.split(sep, Qt::SkipEmptyParts);
+
+    if (parts.size() < 2) {
+        qDebug() << "FAIL: Not enough parts.";
+        return false;
+    }
+
+    QString appName = parts.takeLast();   // last part is password
+    QStringList categoryParts = parts;
+
+    qDebug() << "Category parts:" << categoryParts;
+    qDebug() << "Password name:" << appName;
+
+    // -------------------------------
+    // 1. Walk category treeWidget
+    // -------------------------------
+    QTreeWidgetItem *current = nullptr;
+
+    // Find root category
+    QList<QTreeWidgetItem*> roots =
+        ui->treeWidget->findItems(categoryParts.first(), Qt::MatchExactly);
+
+    if (roots.isEmpty()) {
+        qDebug() << "FAIL: Root category not found:" << categoryParts.first();
+        return false;
+    }
+
+    current = roots.first();
+    ui->treeWidget->setCurrentItem(current);
+    ui->treeWidget->expandItem(current);
+    emit ui->treeWidget->itemActivated(current, 0);
+
+    // Walk down the category chain
+    for (int i = 1; i < categoryParts.size(); ++i) {
+        const QString &name = categoryParts[i];
+        bool found = false;
+
+        for (int c = 0; c < current->childCount(); ++c) {
+            QTreeWidgetItem *child = current->child(c);
+            if (child->text(0) == name) {
+                current = child;
+                ui->treeWidget->setCurrentItem(current);
+                ui->treeWidget->expandItem(current);
+                emit ui->treeWidget->itemActivated(current, 0);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            qDebug() << "FAIL: Category not found:" << name;
+            return false;
+        }
+    }
+
+    qDebug() << "Category chain resolved successfully.";
+
+    // -------------------------------
+    // 2. Now treeWidget_2 contains passwords for this category
+    // -------------------------------
+    QTreeWidgetItem *pwdItem = nullptr;
+
+    for (int i = 0; i < ui->treeWidget_2->topLevelItemCount(); ++i) {
+        QTreeWidgetItem *item = ui->treeWidget_2->topLevelItem(i);
+        if (item->text(0) == appName) {
+            pwdItem = item;
+            break;
+        }
+    }
+
+    if (!pwdItem) {
+        qDebug() << "FAIL: Password not found:" << appName;
+        return false;
+    }
+
+    // -------------------------------
+    // 3. Select and open the password
+    // -------------------------------
+    ui->treeWidget_2->setCurrentItem(pwdItem);
+    openPassword(pwdItem);
+
+    qDebug() << "SUCCESS: Password opened.";
+    return true;
 }
