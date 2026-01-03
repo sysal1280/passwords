@@ -210,7 +210,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionAbout_Qt->setMenuRole(QAction::AboutQtRole);
     ui->actionPreferences->setMenuRole(QAction::PreferencesRole);
 
-    ui->lineEditSearch->setPlaceholderText("Find a password or paste a password path…");
+    ui->lineEditSearch->setPlaceholderText("Search or paste a password path..");
 
     ui->actionOpen_Database->setStatusTip(tr("Open an existing database"));
     ui->actionPreferences->setStatusTip(tr("Change application settings"));
@@ -6412,6 +6412,37 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     // ESC Key
     if (event->key() == Qt::Key_Escape) {
+
+        QWidget *focus = QApplication::focusWidget();
+
+        // ----------------------------------------------------
+        // 1. ESC pressed while treeWidget has focus
+        // ----------------------------------------------------
+        if (focus == ui->treeWidget) {
+
+            QTreeWidgetItem *item = ui->treeWidget->currentItem();
+            if (item && item->isExpanded()) {
+                ui->treeWidget->collapseAll();
+                event->accept();
+                return;
+            }
+        }
+
+        // ----------------------------------------------------
+        // 2. ESC pressed while treeWidget_2 has focus
+        // ----------------------------------------------------
+        if (focus == ui->treeWidget_2) {
+
+            if (ui->treeWidget_2->topLevelItemCount() > 0) {
+                ui->treeWidget_2->clear();
+                event->accept();
+                return;
+            }
+        }
+
+        // ----------------------------------------------------
+        // 3. Fallback to your existing ESC logic
+        // ----------------------------------------------------
         if (openedCredentialID == -1) {
             if (settings.getAskClose()) {
                 close();

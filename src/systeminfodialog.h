@@ -23,7 +23,6 @@
 #define SYSTEMINFODIALOG_H
 
 #include "settings.h"
-#include "utils.h"
 #include "dbutils.h"
 #include "quuid.h"
 
