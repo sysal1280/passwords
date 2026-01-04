@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../uh-resource-files/">
+        <link rel="prev" href="../overview/">
       
       
-        <link rel="next" href="../uh-secure-setup/">
+        <link rel="next" href="../new-pwd/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Single user vs multi-user deployments - Passwords</title>
+        <title>Building in Linux - Passwords</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#under-the-hood-single-user-vs-multi-user-deployments" class="md-skip">
+        <a href="#building-passwords-from-source-code" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Single user vs multi-user deployments
+              Building in Linux
             
           </span>
         </div>
@@ -334,18 +334,20 @@
                 
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" checked>
         
           
           <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
@@ -366,7 +368,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_1">
             <span class="md-nav__icon md-icon"></span>
             
@@ -381,10 +383,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../build-linux/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building in Linux
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -400,6 +429,120 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#linux-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linux Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Linux Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-download-the-source-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 - Download the source code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-download-qt-binaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 - Download Qt Binaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-lets-compile-and-build-some-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 - Let's compile and build some software
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-compile-passwords" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Compile Passwords
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-make-the-passwords-binary-portable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 - Make the Passwords Binary Portable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-remove-unnecessary-plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 - Remove unnecessary plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-8-remove-unnecessary-library-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8 - Remove unnecessary Library Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1057,20 +1200,18 @@
                 
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
         
           
           <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
@@ -1091,7 +1232,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1162,37 +1303,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Single user vs multi-user deployments
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../uh-setup/" class="md-nav__link">
         
   
   
@@ -1208,76 +1322,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Overview">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#configuration-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#database" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Database
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#further-reading" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Further Reading
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1490,22 +1534,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#linux-guide" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Overview
+        Linux Guide
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Overview">
+    <nav class="md-nav" aria-label="Linux Guide">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#configuration-files" class="md-nav__link">
+  <a href="#step-1-download-the-source-code" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration Files
+        Step 1 - Download the source code
       
     </span>
   </a>
@@ -1513,10 +1557,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#database" class="md-nav__link">
+  <a href="#step-2-download-qt-binaries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Database
+        Step 2 - Download Qt Binaries
       
     </span>
   </a>
@@ -1524,10 +1568,54 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#further-reading" class="md-nav__link">
+  <a href="#step-3-lets-compile-and-build-some-software" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Further Reading
+        Step 3 - Let's compile and build some software
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-compile-passwords" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Compile Passwords
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-make-the-passwords-binary-portable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 - Make the Passwords Binary Portable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-remove-unnecessary-plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 - Remove unnecessary plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-8-remove-unnecessary-library-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8 - Remove unnecessary Library Files
       
     </span>
   </a>
@@ -1556,80 +1644,215 @@
 
 
 
-<div><h1 id="under-the-hood-single-user-vs-multi-user-deployments">Under the Hood: Single user vs multi-user deployments</h1>
-<h2 id="overview">Overview</h2>
-<p>Passwords can be used by a single individual or shared across a family, team, or other group. The way you plan to use the application determines how much setup is required. In its default configuration, Passwords operates as a single‑user system, where all data is stored locally for one person. If you want to support multiple users you can configure Passwords for a multi‑user deployment. This section explains the differences between these modes and what to expect when setting them up.</p>
-<h3 id="configuration-files">Configuration Files</h3>
-<p>To support multiple users, the configuration files must be stored in a <strong>shared, readable location</strong>. The files do not need to be writable by every user, but all users must be able to read them. These configuration files contain the global settings that Passwords uses to run.</p>
-<p>To determine the current location of your configuration file, open <strong>Help → System Information</strong> and look under the <strong>Standard Paths</strong> section. The application lists all relevant directories, including the one used for configuration. For example, in the output below, the second‑to‑last line indicates the directory where files must be copied from is <code>/home/user/.config/sysal1280/Passwords</code>. All files must be copied.</p>
-<pre><code>Standard paths:
-  Desktop: /home/user/Desktop
-  Documents: /home/user/Documents
-  Download: /home/user/Downloads
-  Music: /home/user/Music
-  Pictures: /home/user/Pictures
-  Movies: /home/user/Videos
-  Home: /home/user
-  Temporary Directory: /tmp
-  Configuration file: /home/user/.config/sysal1280/Passwords/passwords.conf
-  Database file: /home/user/.local/share/sysal1280/Passwords/passwords
+<div><h1 id="building-passwords-from-source-code">Building Passwords from source code</h1>
+<h2 id="linux-guide">Linux Guide</h2>
+<p>Building Passwords from source code might seem daunting especially if you're new to the open-source world or not yet familiar with Qt. But don’t worry: this page isn’t a deep-dive tutorial, it’s a <strong>recipe</strong>. Step-by-step, it will guide you through everything you need to do to build the application successfully.</p>
+<p>Passwords has been built on a wide range of Linux distributions, including Fedora, openSUSE, Debian, Zorin OS, and many others. The overall build process is largely the same across these systems. However, some commands, package names, and minor details vary between distributions, so you may encounter small differences depending on what you’re using.</p>
+<h5 id="step-1-download-the-source-code">Step 1 - Download the source code</h5>
+<p>To begin, use the <code>git</code> tool to clone the repository.</p>
+<p>If you don’t already have Git installed, you can easily add it using your distribution’s package manager. For example:</p>
+<ul>
+<li><strong>Debian‑based systems:</strong> <code>sudo apt install git</code></li>
+<li><strong>RHEL‑based systems:</strong> <code>sudo dnf install git</code></li>
+<li><strong>openSUSE:</strong> <code>sudo zypper install git</code></li>
+<li><strong>Other distros:</strong> install Git using your preferred package manager</li>
+</ul>
+<p>Once Git is installed, clone the Passwords repository with:</p>
+<pre><code>cd /tmp
+git clone https://github.com/sysal1280/passwords.git
 </code></pre>
-<p>To enable multi‑user support, <strong>copy or move all files</strong> from the configuration directory to one of the following system‑wide locations. You may need to create the directory if it does not already exist:</p>
-<table>
-<thead>
-<tr>
-<th>Operating System</th>
-<th>New Directory</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Windows</td>
-<td>C:\ProgramData\Passwords</td>
-</tr>
-<tr>
-<td>Mac OS</td>
-<td>/Library/Preferences/Passwords</td>
-</tr>
-<tr>
-<td>Linux</td>
-<td>/etc/passwords</td>
-</tr>
-</tbody>
-</table>
-<h3 id="database">Database</h3>
-<p>To support multiple users, the database must also be stored in a <strong>shared, writable location</strong>. Every user must have permission to write to this file.</p>
-<p>As with the configuration file, the database file location is shown in the <strong>Standard Paths</strong> output. In the example above, the last line: <code>/home/user/.local/share/sysal1280/Passwords/passwords</code> indicates the file that must be moved.</p>
-<p>To enable multi‑user support, <strong>copy or move the database file</strong> to one of the following directories. Again, you may need to create the directory:</p>
-<table>
-<thead>
-<tr>
-<th>Operating System</th>
-<th>New Directory</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Windows</td>
-<td>C:\ProgramData\Passwords\Data</td>
-</tr>
-<tr>
-<td>Mac OS</td>
-<td>/Library/Application Support/Passwords/passwords</td>
-</tr>
-<tr>
-<td>Linux</td>
-<td>/var/lib/password/passwords</td>
-</tr>
-</tbody>
-</table>
-<p>You may also use a custom location. To do so, ensure that the configuration file contains the following entry under the <strong>General</strong> section:</p>
-<p><code>LastDatabase=&lt;path-to-database-file&gt;</code></p>
-<p>Once the configuration files and database have been moved—and the <code>LastDatabase</code> entry updated if necessary, Passwords can be launched normally and will operate in multi‑user mode.</p>
-<h3 id="further-reading">Further Reading</h3>
-<p>Specifically related to multi-user access, the following pages contain further important information.</p>
-<p><a href="../uh-secure-setup/">Secure Setup</a></p>
-<p><a href="../challenge-response/">Challenge Response</a></p></div>
+<h5 id="step-2-download-qt-binaries">Step 2 - Download Qt Binaries</h5>
+<p>Qt is available for free, and you can download it from: https://www.qt.io/development/download-qt-installer-oss</p>
+<p>Download the Linux installer (<code>.run</code> file) that matches your system.</p>
+<p>Before running it, make the file executable:</p>
+<p>Code</p>
+<pre><code>chmod +x qt-online-installer*.run
+</code></pre>
+<p>Then launch it. During installation, select the <strong>latest Qt 6 version (6.0 or newer)</strong> and choose <strong>Developer Tools</strong>, but <strong>deselect Qt Creator</strong>. You don’t need Qt Creator to build Passwords, and choosing <em>Custom Installation</em> allows you to uncheck it.</p>
+<p>Qt currently requires a (free) account to use the installer. While this may (and should, IMHO) change in the future, don’t let it discourage you, Qt is widely used, and creating an account is quick. Using a temporary email address is also an option if you prefer.</p>
+<h5 id="step-3-lets-compile-and-build-some-software">Step 3 - Let's compile and build some software</h5>
+<p>Navigate to the Passwords source directory</p>
+<p><code>cd /tmp/passwords</code></p>
+<p>Create a build directory</p>
+<p><code>mkdir build</code></p>
+<p>Move into build directory</p>
+<p><code>cd build</code></p>
+<p>The <code>cmake</code> tool will likely need to be installed and can be easily done so with your package manager.  </p>
+<ul>
+<li><strong>Debian‑based systems:</strong> <code>sudo apt install cmake</code></li>
+<li><strong>RHEL‑based systems:</strong> <code>sudo dnf install cmake</code></li>
+<li><strong>openSUSE:</strong> <code>sudo zypper install cmake</code></li>
+<li><strong>Other distros:</strong> install Git using your preferred package manager</li>
+</ul>
+<p>The next step is to run <strong>CMake</strong> so it can configure the build system. Before doing that, you’ll need to confirm the path to your <strong>Qt installation</strong>.</p>
+<p>If you used the Qt Online Installer, Qt is usually installed under:</p>
+<pre><code>/home/&lt;user&gt;/Qt
+</code></pre>
+<p>Inside that directory, each Qt version has its own folder, and inside that you’ll find the compiler‑specific directory (for example, <code>gcc_64</code>). This final directory is what CMake needs to locate the Qt libraries and tools.</p>
+<p>Once you’ve identified the correct path, run CMake like this, substituting the CMAKE_PREFIX_PATH with your specific path.</p>
+<pre><code>cmake ../ -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/&lt;user&gt;/Qt/6.9.3/gcc_64
+</code></pre>
+<p>After running the CMake command, you should expect to see output similar to the following if the configuration was successful:</p>
+<pre><code>cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/sysal/Qt/6.9.3/gcc_64 
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE  
+-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so   
+-- Found WrapOpenGL: TRUE  
+-- Found WrapVulkanHeaders: /usr/include  
+-- GCC/Clang/MinGW hardening enabled
+-- Configuring done (0.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/passwords
+
+</code></pre>
+<h5 id="step-4-compile-passwords">Step 4 — Compile Passwords</h5>
+<p>With the build files generated, the next step is to compile the application. This part is simple, just run <code>make</code></p>
+<p>You should expect to see something similar to below if successful.</p>
+<pre><code>make
+[  0%] Built target password_autogen_timestamp_deps
+[  3%] Automatic MOC and UIC for target password
+[  3%] Built target password_autogen
+[  7%] Automatic RCC for resources/resources.qrc
+[ 11%] Automatic RCC for resources/wordlists/wordlist.qrc
+[ 15%] Building CXX object CMakeFiles/password.dir/password_autogen/mocs_compilation.cpp.o
+[ 19%] Building CXX object CMakeFiles/password.dir/src/aboutdialog.cpp.o
+[ 23%] Building CXX object CMakeFiles/password.dir/src/categorydialog.cpp.o
+[ 26%] Building CXX object CMakeFiles/password.dir/src/categoryproperties.cpp.o
+[ 30%] Building CXX object CMakeFiles/password.dir/src/dataobfuscator.cpp.o
+[ 34%] Building CXX object CMakeFiles/password.dir/src/debugutils.cpp.o
+[ 38%] Building CXX object CMakeFiles/password.dir/src/droplabel.cpp.o
+[ 42%] Building CXX object CMakeFiles/password.dir/src/gpgcheck.cpp.o
+[ 46%] Building CXX object CMakeFiles/password.dir/src/logindialog.cpp.o
+[ 50%] Building CXX object CMakeFiles/password.dir/src/main.cpp.o
+[ 53%] Building CXX object CMakeFiles/password.dir/src/mainwindow.cpp.o
+[ 57%] Building CXX object CMakeFiles/password.dir/src/newpassworddialog.cpp.o
+[ 61%] Building CXX object CMakeFiles/password.dir/src/passworddialog.cpp.o
+[ 65%] Building CXX object CMakeFiles/password.dir/src/passwordgenerator.cpp.o
+[ 69%] Building CXX object CMakeFiles/password.dir/src/preferencesdialog.cpp.o
+[ 73%] Building CXX object CMakeFiles/password.dir/src/randomnoisedialog.cpp.o
+[ 76%] Building CXX object CMakeFiles/password.dir/src/settings.cpp.o
+[ 80%] Building CXX object CMakeFiles/password.dir/src/termsdialog.cpp.o
+[ 84%] Building CXX object CMakeFiles/password.dir/src/watermarkedtreewidget.cpp.o
+[ 88%] Building CXX object CMakeFiles/password.dir/password_autogen/3YJK5W5UP7/qrc_resources.cpp.o
+[ 92%] Building CXX object CMakeFiles/password.dir/password_autogen/YUFKSYIBPX/qrc_wordlist.cpp.o
+[ 96%] Linking CXX executable password
+[100%] Built target password
+
+</code></pre>
+<p>At this point, Passwords has been successfully compiled, and you now have a working binary ready to run. Many people choose to stop here and use Passwords directly from the build directory, and there’s absolutely nothing wrong with that. The only thing to keep in mind is that the Qt directory you specified in the CMake command must remain available on your system for Passwords to continue functioning. You can copy the password executable to where ever you like, but the Qt directory must exist.</p>
+<p>If you’re comfortable with that requirement, then congratulations on compiling Passwords. I hope it serves you well for many years to come, keeping your passwords and secrets secure and helping you protect your privacy.</p>
+<h5 id="step-5-make-the-passwords-binary-portable"><strong>Step 5 - Make the Passwords Binary Portable</strong></h5>
+<p>Now that Passwords has been compiled, you’ll find a file named <code>password</code> inside the build directory. This is the executable program. First thing we need to do it put it in a separate directory, so run</p>
+<pre><code>mkdir /tmp/passwords/final
+mv /tmp/passwords/build/password /tmp/passwords/final
+cd /tmp/passwords/final
+</code></pre>
+<p>By default, the binary expects to find the Qt libraries in the same location where you originally installed Qt (for example, <code>/home/&lt;user&gt;/Qt/6.x.x/gcc_64</code>). If you move the binary to another machine—or even just another folder—it won’t run unless that Qt directory is also present.</p>
+<p>To fix this, we make the binary <strong>portable</strong> by telling it to look for its required libraries in a folder <em>relative to itself</em>, rather than in a fixed system path. This is where <strong>patchelf</strong> comes in.</p>
+<p><code>patchelf</code> is a tool that can modify ELF binaries (the standard executable format on Linux). One of the things it can change is the <strong>RPATH</strong>—the <em>runtime library search path</em>. This is the list of directories the binary will search when looking for shared libraries like Qt.</p>
+<p>Run the following command using <code>$ORIGIN</code>. It ss a special placeholder that always means “the directory where this executable lives.”</p>
+<p><code>patchelf --set-rpath '$ORIGIN/lib' password</code></p>
+<p><strong>Step 6 - Copy the lib folder and plugins</strong></p>
+<p>After running patchelf, you can bundle the Qt libraries into a <code>lib/</code> folder next to the <code>password</code> binary, and the program will run anywhere, no system‑wide Qt installation required. And no fixed directories which must exist.</p>
+<p>We need to copy the entire lib folder from Qt to the current directory</p>
+<p><code>cp -r /&lt;Qt-path&gt;/gcc_64/lib .</code></p>
+<p>We also need to copy the plugins directory</p>
+<p><code>cp -r /&lt;Qt-path&gt;/gcc_64/plugins .</code></p>
+<p>Then we need to generate a conf file which tells Passwords where to look specifically.</p>
+<pre><code>cat &gt; qt.conf &lt;&lt; 'EOF'
+[Paths]
+Prefix=.
+Plugins=plugins
+Libraries=lib
+EOF
+</code></pre>
+<p>Everything in the <code>final</code> directory must stay together but can be put anywhere, copied to different systems and used free, forever.</p>
+<p>Serious congratulations are in order. You now have a fully functioning,  fully portable copy of Passwords built entirely from source pulled directly from GitHub and compiled on your own machine. From a security perspective, it’s hard to get better than that. You know exactly where your software came from, how it was built, and what it contains. I hope this build serves you well for many years, keeping your passwords and secrets safe and helping you protect your privacy.</p>
+<h5 id="step-7-remove-unnecessary-plugins">Step 7 - Remove unnecessary plugins</h5>
+<p>Qt is highly modular, and most applications only need a small subset of its plugins. By removing the components Passwords does not use, you can significantly reduce the size of your portable build.</p>
+<p>Start by cleaning up the plugin directory:</p>
+<pre><code>cd plugins
+
+find . -maxdepth 1 -type d ! -name '.' \
+  ! -name 'generic' \
+  ! -name 'iconengines' \
+  ! -name 'imageformats' \
+  ! -name 'platforminputcontexts' \
+  ! -name 'platforms' \
+  ! -name 'platformthemes' \
+  ! -name 'sqldrivers' \
+  ! -name 'tls' \
+  ! -name 'wayland-decoration-client' \
+  ! -name 'wayland-graphics-integration-client' \
+  ! -name 'wayland-shell-integration' \
+  ! -name 'xcbglintegrations' \
+  -exec rm -rf {} +
+
+  cd ..
+
+</code></pre>
+<h5 id="step-8-remove-unnecessary-library-files">Step 8 - Remove unnecessary  <strong>Library Files</strong></h5>
+<p>Qt ships with a large number of libraries, many of which Passwords does not use. Removing them helps shrink the final distribution and keeps your portable build clean and focused.</p>
+<p>Below is a curated list of libraries that are safe to remove for Passwords:</p>
+<pre><code>cd lib
+
+# Remove FFmpeg (Qt Multimedia)
+rm -f libavcodec* libavformat* libavutil* libswscale* libswresample* libQt6FFmpeg*
+
+# Remove ICU libs you don't need
+rm -f libicuio* libicutest* libicutu*
+
+# Remove QML / Quick / Quick3D / Labs / Controls
+rm -f libQt6Qml* libQt6Quick* libQt6Quick3D* libQt6Labs* libQt6QuickControls2* \
+      libQt6QuickDialogs2* libQt6QuickEffects* libQt6QuickLayouts* \
+      libQt6QuickParticles* libQt6QuickTimeline* libQt6QuickVectorImage* \
+      libQt6QuickWidgets*
+
+# Remove Designer, Help, UiTools
+rm -f libQt6Designer* libQt6DesignerComponents* libQt6Help* libQt6UiTools*
+
+# Remove PrintSupport (if no printing)
+rm -f libQt6PrintSupport*
+
+# Remove Wayland
+rm -f libQt6WaylandClient* libQt6WlShellIntegration*
+
+# Remove Embedded / EGLFS / KMS / FB
+rm -f libQt6EglFS* libQt6KmsSupport* libQt6FbSupport* libQt6DeviceDiscoverySupport* libQt6InputSupport*
+
+# Remove ShaderTools (QML only)
+rm -f libQt6ShaderTools*
+
+# Remove Multimedia
+rm -f libQt6Multimedia* libQt6MultimediaQuick* libQt6MultimediaWidgets* libQt6MultimediaTestLib*
+
+# Remove XML (if not used)
+rm -f libQt6Xml*
+
+# Remove Concurrent (if not used)
+rm -f libQt6Concurrent*
+
+# Remove example assets
+rm -f libQt6ExampleIcons* libQt6ExamplesAssetDownloader*
+
+# Remove static libs and build junk
+rm -f *.a *.prl
+rm -rf cmake pkgconfig objects-RelWithDebInfo
+
+cd ..
+</code></pre>
+<p>That’s it. All the files in <code>/tmp/passwords/final</code> are now your complete Passwords program. </p>
+<p>First, thank you for sticking with the process all the way to the end. And second, there really isn’t much more to say, you’re finished. Passwords is now fully built, fully portable, and 100% ready for production use.</p></div>
 
 
 
@@ -1659,7 +1882,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../uh-resource-files/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Resource Files">
+          <a href="../overview/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Overview">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1669,20 +1892,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Resource Files
+                Overview
               </div>
             </div>
           </a>
         
         
           
-          <a href="../uh-secure-setup/" class="md-footer__link md-footer__link--next" aria-label="Next: Secure Setup">
+          <a href="../new-pwd/" class="md-footer__link md-footer__link--next" aria-label="Next: New Password">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Secure Setup
+                New Password
               </div>
             </div>
             <div class="md-footer__button md-icon">
