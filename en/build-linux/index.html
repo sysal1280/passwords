@@ -1662,7 +1662,7 @@
 git clone https://github.com/sysal1280/passwords.git
 </code></pre>
 <h5 id="step-2-download-qt-binaries">Step 2 - Download Qt Binaries</h5>
-<p>Qt is available for free, and you can download it from: https://www.qt.io/development/download-qt-installer-oss</p>
+<p>Qt is open source and available for free. You can download it from: https://www.qt.io/development/download-qt-installer-oss</p>
 <p>Download the Linux installer (<code>.run</code> file) that matches your system.</p>
 <p>Before running it, make the file executable:</p>
 <p>Code</p>
@@ -1749,7 +1749,7 @@ git clone https://github.com/sysal1280/passwords.git
 [100%] Built target password
 
 </code></pre>
-<p>At this point, Passwords has been successfully compiled, and you now have a working binary ready to run. Many people choose to stop here and use Passwords directly from the build directory, and there’s absolutely nothing wrong with that. The only thing to keep in mind is that the Qt directory you specified in the CMake command must remain available on your system for Passwords to continue functioning. You can copy the password executable to where ever you like, but the Qt directory must exist.</p>
+<p>At this point, Passwords has been successfully compiled, and you now have a working binary ready to run. Many people choose to stop here and use Passwords directly from the build directory, and there’s absolutely nothing wrong with that. The only thing to keep in mind is that the Qt directory you specified in the CMake command must remain available on your system for Passwords to continue functioning. You can copy the password executable from the build directory to where ever you like, but the Qt directory must exist as well.</p>
 <p>If you’re comfortable with that requirement, then congratulations on compiling Passwords. I hope it serves you well for many years to come, keeping your passwords and secrets secure and helping you protect your privacy.</p>
 <h5 id="step-5-make-the-passwords-binary-portable"><strong>Step 5 - Make the Passwords Binary Portable</strong></h5>
 <p>Now that Passwords has been compiled, you’ll find a file named <code>password</code> inside the build directory. This is the executable program. First thing we need to do it put it in a separate directory, so run</p>
