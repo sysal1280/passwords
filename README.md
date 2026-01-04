@@ -33,33 +33,14 @@ By removing subscriptions, internet dependencies, and closed ecosystems, Passwor
 - No proprietary dependencies.
 - 100% open‑source, transparent, and auditable.
 
-#### Linux & macOS (Build from Source)
+#### Linux (Build from Source)
 
-Requirements:
-Qt 6+
-CMake
-GPG installed on your system
-Build steps:
-bash
-```
-git clone git@github.com:sysal1280/passwords.git
-cd passwords/
-mkdir build
-cd build
-cmake ../ -DCMAKE_PREFIX_PATH=/path/to/Qt/6.x.x/gcc_64 -DCMAKE_BUILD_TYPE=Release
-make
-```
-Replace /path/to/Qt/6.x.x/gcc_64 with your actual Qt installation path.
+Checkout the Linux guide at https://sysal1280.github.io/passwords/en/build-linux/
 
-You may also choose to Install Qt 6 and Qt Creator and build the software using the Qt Creator IDE.
+You can also download a zip file or AppImage from Releases.
 
 #### Windows
-You have two options:
-1. Download the installer from the Releases page
 
-2. Build from source using Qt Creator
+Checkout the Windows guide at https://sysal1280.github.io/passwords/en/build-windows/
 
-  - Install Qt 6 and Qt Creator.
-  - Open the CMakeLists.txt file in Qt Creator.
-  - Build and run the Release version.
-  - Optionally use windeploy.exe tool to gather all DLL's and other system requirements into one directory for easy bundling and distribution.
+You can also download a setup program from Releases.
