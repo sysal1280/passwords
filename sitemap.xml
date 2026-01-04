@@ -19,6 +19,12 @@
         <xhtml:link rel="alternate" hreflang="en" href="Noneen/backups/"/>
     </url>
     <url>
+        <loc>Noneen/build-linux/</loc>
+        <lastmod>2026-01-04</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/build-linux/"/>
+    </url>
+    <url>
         <loc>Noneen/challenge-response/</loc>
         <lastmod>2026-01-04</lastmod>
         <changefreq>daily</changefreq>
