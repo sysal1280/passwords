@@ -21,8 +21,11 @@
 #ifndef MULTILINEDELEGATE_H
 #define MULTILINEDELEGATE_H
 
+#include <QMessageBox>
 #include <QStyledItemDelegate>
+#include <QTextCursor>
 #include <QTextEdit>
+#include <QTimer>
 
 class MultiLineDelegate : public QStyledItemDelegate {
     Q_OBJECT
@@ -34,8 +37,33 @@ public:
                           const QStyleOptionViewItem &,
                           const QModelIndex &) const override {
         QTextEdit *editor = new QTextEdit(parent);
-        editor->setAcceptRichText(false);   // plain text only
+        editor->setAcceptRichText(false);
         editor->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+
+        const int maxBytes = 16 * 1024; // 64 KB
+
+        connect(editor, &QTextEdit::textChanged, editor, [editor, maxBytes]() {
+            QByteArray utf8 = editor->toPlainText().toUtf8();
+            if (utf8.size() > maxBytes) {
+                utf8.truncate(maxBytes);
+
+                editor->blockSignals(true);
+                editor->setPlainText(QString::fromUtf8(utf8));
+                editor->moveCursor(QTextCursor::End);
+                editor->blockSignals(false);
+
+                QTimer::singleShot(0, editor, [editor]() {
+                    QMessageBox::warning(
+                        editor->window(),
+                        "Text Limit Reached",
+                        "The maximum size for this field is 16 KB.\n"
+                        "Your text has been truncated."
+                        );
+                });
+
+            }
+        });
+
         return editor;
     }
 
@@ -46,8 +74,15 @@ public:
 
     void setModelData(QWidget *editor, QAbstractItemModel *model,
                       const QModelIndex &index) const override {
-        QString value = static_cast<QTextEdit*>(editor)->toPlainText();
-        model->setData(index, value, Qt::EditRole);
+        QTextEdit *edit = static_cast<QTextEdit*>(editor);
+        QByteArray utf8 = edit->toPlainText().toUtf8();
+
+        const int maxBytes = 16 * 1024;
+
+        if (utf8.size() > maxBytes)
+            utf8.truncate(maxBytes);
+
+        model->setData(index, QString::fromUtf8(utf8), Qt::EditRole);
     }
 
     void updateEditorGeometry(QWidget *editor,
