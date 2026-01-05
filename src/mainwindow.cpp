@@ -31,11 +31,9 @@
 #include "debugutils.h"
 #include "droplabel.h"
 #include "encryptfiledialog.h"
-#include "gitversion.h"
 #include "gpgcheck.h"
 #include "newpassworddialog.h"
 #include "passworddialog.h"
-#include "passwordgenerator.h"
 #include "plaintextedit.h"
 #include "preferencesdialog.h"
 #include "randomnoisedialog.h"
@@ -1616,6 +1614,8 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         ui->scrollArea->setWidgetResizable(true);
     }
 
+    ui->scrollArea->setWidgetResizable(true);
+
     // Get or create grid layout
     QGridLayout* gridLayout = qobject_cast<QGridLayout*>(ui->scrollArea->widget()->layout());
     if (!gridLayout) {
@@ -1848,25 +1848,53 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     gridLayout->setRowMinimumHeight(row, 32);
     row++;
 
+
     // --- Notes section ---
     if (root.contains("notes")) {
         QJsonArray notesArray = root.value("notes").toArray();
 
         if (!notesArray.isEmpty()) {
 
-            // Section header (only created when notes exist)
-            QLabel* notesHeader = new QLabel("Notes");
+            // Section header
+            QLabel *notesHeader = new QLabel("Notes");
             notesHeader->setObjectName("labelNotesHeading");
             gridLayout->addWidget(notesHeader, row, 0, 1, -1);
             row++;
 
-            // Each note as a full-width label
+            // Ensure scroll area resizes its content widget
+            ui->scrollArea->setWidgetResizable(true);
+
+            // Render each note
             for (const QJsonValue &noteVal : std::as_const(notesArray)) {
                 QJsonObject noteObj = noteVal.toObject();
                 QString content = noteObj.value("content").toString();
 
-                QLabel* noteLabel = new QLabel(content);
+                // Detect long unbroken tokens (base64, hashes, etc.)
+                const bool isSingleToken = !content.contains(' ') && content.length() > 40;
+
+                if (isSingleToken) {
+                    const int wrapWidth = 64;
+
+                    QString wrapped;
+                    wrapped.reserve(content.size() + content.size() / wrapWidth + 1);
+
+                    QStringView view(content);
+
+                    for (qsizetype i = 0; i < view.size(); i += wrapWidth) {
+                        wrapped.append(view.mid(i, wrapWidth));   // QStringView slice → no clazy warning
+                        if (i + wrapWidth < view.size()) {
+                            wrapped.append('\n');
+                        }
+                    }
+
+                    content = wrapped;
+                }
+
+
+                QLabel *noteLabel = new QLabel(content);
+                noteLabel->setTextFormat(Qt::PlainText);
                 noteLabel->setWordWrap(true);
+                noteLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
                 noteLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
                 gridLayout->addWidget(noteLabel, row, 0, 1, -1);
@@ -1877,7 +1905,6 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
             row++;
         }
     }
-
 
     // Add a full-width label in the next row for Password/Object Details
 
