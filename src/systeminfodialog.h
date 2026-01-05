@@ -22,6 +22,7 @@
 #ifndef SYSTEMINFODIALOG_H
 #define SYSTEMINFODIALOG_H
 
+#include "scopedcursor.h"
 #include "settings.h"
 #include "dbutils.h"
 #include "quuid.h"
@@ -49,6 +50,8 @@ public:
     explicit SystemInfoDialog(QWidget *parent = nullptr)
         : QDialog(parent)
     {
+        ScopedCursor wait(Qt::WaitCursor);
+
         setWindowTitle("System Information");
         resize(700, 500);
 

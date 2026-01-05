@@ -503,6 +503,8 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
 }
 
 void createGpgEncryptionKeyAsync(
+    //ScopedCursor wait(Qt::WaitCursor);
+
     const QString &name,
     QWidget *parent,
     std::function<void(bool)> done)

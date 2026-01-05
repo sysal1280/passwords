@@ -149,13 +149,28 @@ inline void checkHelpReachable(std::function<void(bool)> callback,
 
     QNetworkReply* reply = manager->head(request);
 
-    QObject::connect(reply, &QNetworkReply::finished, [reply, callback]() {
+    // --- Timeout timer ---
+    QTimer* timer = new QTimer(reply);   // parented to reply for auto cleanup
+    timer->setSingleShot(true);
+    timer->start(3000);                  // 3 seconds
+
+    QObject::connect(timer, &QTimer::timeout, reply, [reply, callback]() {
+        // Timeout reached → abort the request
+        reply->abort();
+        callback(false);
+        reply->deleteLater();
+    });
+
+    // --- Normal completion ---
+    QObject::connect(reply, &QNetworkReply::finished, reply, [reply, callback, timer]() {
+        if (timer->isActive())
+            timer->stop();   // prevent timeout firing after success
+
         bool ok = (reply->error() == QNetworkReply::NoError);
         callback(ok);
         reply->deleteLater();
     });
 }
-
 
 inline void manageBackups(const QString &directory, int maxFiles, QWidget *parent = nullptr)
 {

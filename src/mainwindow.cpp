@@ -541,7 +541,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Line edit search
     connect(ui->lineEditSearch, &QLineEdit::returnPressed,
-            this, [this]() {
+            this, [this] {
+                ScopedCursor wait(Qt::WaitCursor);
                 search(ui->lineEditSearch->text().trimmed());
             });
 
@@ -555,6 +556,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //user guide
     connect(ui->actionOnline_Documentation, &QAction::triggered, this, [this]() {
+        ScopedCursor wait(Qt::WaitCursor);
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
                 const QUrl url(getHelpBaseUrl());
@@ -567,6 +569,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //donate
     connect(ui->actionDonate, &QAction::triggered, this, [this]() {
+        ScopedCursor wait(Qt::WaitCursor);
         checkHelpReachable([this](bool reachable) {
             if (reachable) {
                 const QUrl url(getHelpBaseUrl("donate"));
@@ -658,12 +661,15 @@ MainWindow::MainWindow(QWidget *parent)
             this,
             &MainWindow::openPassword);
 
-    connect(ui->actionRecent, &QAction::triggered,
-            this, &MainWindow::searchRecent);
+    connect(ui->actionRecent, &QAction::triggered, this, [this] {
+        ScopedCursor wait(Qt::WaitCursor);
+        searchRecent();
+    });
 
-    connect(ui->actionPopular, &QAction::triggered,
-            this, &MainWindow::searchPopular);
-
+    connect(ui->actionPopular, &QAction::triggered, this, [this] {
+        ScopedCursor wait(Qt::WaitCursor);
+        searchPopular();
+    });
 
     connect(ui->actionEncrypt_message, &QAction::triggered,
             this, &MainWindow::encryptMessage);
@@ -672,7 +678,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::decryptMessage);
 
     connect(ui->actionExported_Passwords, &QAction::triggered,
-            this, &MainWindow::ExportedWithoutEdits);
+            this, &MainWindow::exportedWithoutEdits);
 
     //report: passwords older than N
     connect(ui->actionLast_Edited, &QAction::triggered, this, [this]() {
@@ -876,7 +882,7 @@ void MainWindow::showEvent(QShowEvent *event)
                         );
 
                 if (reply == QMessageBox::Yes) {
-                    ExportedWithoutEdits();
+                    exportedWithoutEdits();
                 }
 
             });
@@ -2480,7 +2486,7 @@ void MainWindow::keyList()
         // Instruction label
         QLabel *infoLabel = new QLabel(
             tr("Enter a name for the new key.\nThis name identifies the key in your GPG keyring.\n\n"
-               "Examples: \"%1\", \"Work passwords\", \"Personal vault\".\n")
+               "Examples: \"%1\", \"Work passwords\", \"Personal\".\n")
                 .arg(suggestedName),
             &inputDlg
         );
@@ -2511,7 +2517,6 @@ void MainWindow::keyList()
                 // If user leaves it blank, fall back to the suggested name
                 name = suggestedName;
             }
-
             // Asynchronous key creation — UI stays responsive
             createGpgEncryptionKeyAsync(name, dlg, [dlg](bool ok) {
                 if (ok) {
@@ -2521,9 +2526,6 @@ void MainWindow::keyList()
             });
         }
     });
-
-
-
 
     //
     // SHOW PUBLIC / SECRET KEYS
@@ -3779,6 +3781,7 @@ void MainWindow::search(const QString &text)
     QSqlDatabase::removeDatabase(connName);
 
     if (results.isEmpty()) {
+        QApplication::restoreOverrideCursor();
         QMessageBox::information(this, tr("Search"), tr("No matches found."));
         ui->lineEditSearch->setFocus();
         ui->lineEditSearch->selectAll();
@@ -6279,6 +6282,8 @@ QString MainWindow::formatOtp(const QString& otp)
 
 void MainWindow::wipeFile(const QString &path, int passes)
 {
+    ScopedCursor wait(Qt::WaitCursor);
+
     QFile f(path);
     if (!f.open(QIODevice::ReadWrite)) {
         qWarning() << "Failed to open file for wiping:" << path;
@@ -6369,7 +6374,7 @@ void MainWindow::insertAuditRow(int applicationId, const QString &user, const QS
     QSqlDatabase::removeDatabase(connName);
 }
 
-void MainWindow::ExportedWithoutEdits()
+void MainWindow::exportedWithoutEdits()
 {
     const QString dbFile = qApp->property("dbFile").toString();
     if (Q_UNLIKELY(dbFile.isEmpty())) {
@@ -6839,6 +6844,8 @@ void MainWindow::decryptWithGpg(
         std::function<void(const QString&)> onMissingKey,
         std::function<void(const QString&)> onFailure)
 {
+    ScopedCursor wait(Qt::WaitCursor);
+
     QProcess *gpg = new QProcess(this);
     gpg->setProcessChannelMode(QProcess::SeparateChannels);
 
