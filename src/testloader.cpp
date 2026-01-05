@@ -167,7 +167,7 @@ bool TestLoader::generateApplications(int count)
         }
 
         // 2. Generate app name
-        QString appName = QString("App_%1").arg(randomString(10));
+        QString appName = QString("PWD_%1").arg(randomString(QRandomGenerator::global()->bounded(4, 21)));
         QString obAppName = DataObfuscator::obfuscate(appName, appKey);
         qDebug() << "Generated app name:" << appName;
 

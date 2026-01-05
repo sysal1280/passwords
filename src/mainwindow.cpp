@@ -1951,6 +1951,7 @@ ScopedCursor wait(Qt::WaitCursor);
     /*
      * Now get the data for this application from the application_views table
      * This is where count and login information exists.
+     * If not there, just show created date.
      */
 
     {
@@ -1965,9 +1966,11 @@ ScopedCursor wait(Qt::WaitCursor);
             if (!selected.isEmpty()) {
                 QTreeWidgetItem *item = selected.first();
                 int id = item->data(0,Qt::UserRole).toInt();
+                QLocale locale = QLocale::system();
 
                 {
                     QSqlQuery query(db);
+                    query.setForwardOnly(true);
                     query.prepare(
                         "SELECT "
                         "  (SELECT COUNT(*) FROM application_views_audit WHERE application_id = :id) AS view_count, "
@@ -1983,8 +1986,6 @@ ScopedCursor wait(Qt::WaitCursor);
                     query.bindValue(":id", id);
 
                     if (query.exec() && query.first()) {
-
-                        QLocale locale = QLocale::system();
 
                         // Accessed count
                         QString accessedText = QString("Accessed: %1 times")
@@ -2014,9 +2015,26 @@ ScopedCursor wait(Qt::WaitCursor);
                         row++;
 
                     } else {
-                        showQueryError(this, query, Q_FUNC_INFO);
-                    }
+                        query.clear();
+                        query.setForwardOnly(true);
 
+                        query.prepare("SELECT created FROM application WHERE id = :id");
+                        query.bindValue(":id", id);
+
+                        if (query.exec() && query.first()) {
+                            qint64 epoch = query.value(0).toLongLong();
+                            QDateTime dt = QDateTime::fromSecsSinceEpoch(epoch);
+                            QString createdText = QString("Created: %1").arg(locale.toString(dt, QLocale::ShortFormat));
+                            QLabel* infoLabel = new QLabel(createdText);
+                            infoLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+                            infoLabel->setWordWrap(true); // important for multi-line
+                            gridLayout->addWidget(infoLabel, row, 0, 1, -1);
+                            row++;
+                        } else
+                        {
+                            showQueryError(this, query, Q_FUNC_INFO);
+                        }
+                    }
                 } // query destroyed here
             }
         }
