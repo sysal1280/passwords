@@ -363,7 +363,13 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
     QObject::connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::close);
 
     QObject::connect(copyBtn, &QPushButton::clicked, dlg, [textEdit]() {
-        QApplication::clipboard()->setText(textEdit->toPlainText());
+        QTextCursor cursor = textEdit->textCursor();
+
+        if (cursor.hasSelection()) {
+            QApplication::clipboard()->setText(cursor.selectedText());
+        } else {
+            QApplication::clipboard()->setText(textEdit->toPlainText());
+        }
     });
 
     QObject::connect(helpBtn,
