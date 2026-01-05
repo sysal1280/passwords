@@ -279,6 +279,9 @@ Ensure it is accessible in your PATH.
         const QString dbPath = qApp->property("dbFile").toString();
         if (!dbPath.isEmpty()) {
             // Call member methods on MainWindow
+            if (splash && splash->isVisible()) {
+                splash->hide();
+            }
             if (!w->initDb()) {
                 delete w;
                 return 0;   // abort cleanly before event loop
@@ -291,6 +294,10 @@ Ensure it is accessible in your PATH.
             dbOpened = true;
         }
     }
+    if (splash) {
+        splash->show();
+        splash->raise();
+    }
 
     /*
      * Terms - optional dialog
@@ -300,6 +307,9 @@ Ensure it is accessible in your PATH.
     if (Q_UNLIKELY(QFile::exists(termsPath))) {
         QFile f(termsPath);
         if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            if (splash && splash->isVisible()) {
+                splash->hide();
+            }
             QString termsText = f.readAll();
 
             TermsDialog dlg(termsText,splash);
@@ -307,8 +317,13 @@ Ensure it is accessible in your PATH.
                 return 0;   // User declined
         }
     }
+    if (splash) {
+        splash->show();
+        splash->raise();
+    }
 
     w->abortingStartup = false;
+
 
     /*
      * GPG key checking — only if DB is opened

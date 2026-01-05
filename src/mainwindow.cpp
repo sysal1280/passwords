@@ -4236,8 +4236,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 // 1. Base64 decode (as before)
                 QByteArray decoded = QByteArray::fromBase64(keyText.toUtf8());
                 if (decoded.isEmpty()) {
-                    QMessageBox::critical(this, "Invalid Application Key",
-                                          "The Application Key you provided is invalid, incomplete or incorrect.");
+                    QMessageBox::critical(this, tr("Invalid Application Key"),
+                                          tr("The Application Key provided is invalid."));
                     qApp->quit();
                     return {};
                 }
@@ -4443,20 +4443,15 @@ void MainWindow::checkGpgKeys()
     QApplication::restoreOverrideCursor();
 
     QMessageBox::StandardButton reply =
-        QMessageBox::question(this,
-                              tr("No Keys Configured"),
-                              tr("You must configure at least one GPG private key "
-                                 "fingerprint before saving passwords.\n\n"
-                                 "Would you like to add one now?"),
-                              QMessageBox::Yes | QMessageBox::No);
-
+            QMessageBox::question(
+                this,
+                tr("No GPG Key Linked"),
+                tr("You must link at least one GPG private key before you can create passwords.\n\n"
+                   "Would you like to add one now?"),
+                QMessageBox::Yes | QMessageBox::No
+            );
     if (reply == QMessageBox::Yes) {
         keyList();
-    } else {
-        QMessageBox::information(this,
-                                 tr("Keys Required"),
-                                 tr("Without a configured key, you will not be able "
-                                    "to create or edit encrypted passwords."));
     }
 }
 
