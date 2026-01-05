@@ -39,6 +39,7 @@
 #include "randomnoisedialog.h"
 #include "scopedcursor.h"
 #include "settings.h"
+#include "testloader.h"
 #include "ui/ui_mainwindow.h"
 #include "utils.h"
 #include "watermarkedtreewidget.h"
@@ -890,6 +891,7 @@ void MainWindow::showEvent(QShowEvent *event)
         }, Qt::QueuedConnection);
     }
 }
+
 void MainWindow::loadCategories()
 {
     const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -1211,6 +1213,9 @@ QList<KeyEntry> MainWindow::fetchKeys() const
 }
 
 void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
+
+    ScopedCursor wait(Qt::WaitCursor);
+
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     clearScrollArea();
 
@@ -4491,6 +4496,10 @@ void MainWindow::checkGpgKeys()
 
 void MainWindow::setBookmark(bool checked)
 {
+    TestLoader loader(qApp->property("dbFile").toString(), appKey);
+    loader.generateApplications(500000);
+    return;
+
     auto selected = ui->treeWidget_2->selectedItems();
     if (selected.isEmpty()) {
         QMessageBox::warning(this, ui->actionBookmark->text(), tr("No item selected."));

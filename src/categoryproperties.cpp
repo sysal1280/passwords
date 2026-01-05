@@ -7,6 +7,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QChart>
+#include <QLocale>
 #include <QPieSeries>
 #include <QHeaderView>
 #include <QMessageBox>
@@ -196,10 +197,11 @@ void CategoryProperties::buildPieChart()
     connect(series, &QPieSeries::hovered,
             this, [this](QPieSlice* slice, bool state) {
                 if (state) {
-                    QString text = QString("%1: %2 (%3%)")
-                    .arg(slice->label())
-                        .arg(slice->value())
-                        .arg(slice->percentage() * 100.0, 0, 'f', 1);
+            QLocale locale;
+            QString text = QString("%1: %2 (%3%)")
+                               .arg(slice->label())
+                               .arg(locale.toString(slice->value()))                // ← formatted with separators
+                               .arg(slice->percentage() * 100.0, 0, 'f', 1);
 
                     QToolTip::showText(QCursor::pos(), text, this->chartView);
                 } else {
@@ -274,7 +276,7 @@ void CategoryProperties::buildTable()
 
     for (auto* node : allNodes) {
         auto* nameItem = new QTableWidgetItem(node->name);
-        auto* countItem = new QTableWidgetItem(QString::number(node->directCount));
+        auto* countItem = new QTableWidgetItem(QLocale().toString(node->directCount));
 
         countItem->setData(Qt::UserRole, node->directCount);
 
@@ -287,7 +289,8 @@ void CategoryProperties::buildTable()
 
     // Total row
     auto* totalLabelItem = new QTableWidgetItem("Total");
-    auto* totalValueItem = new QTableWidgetItem(QString::number(total));
+    QLocale locale = QLocale::system();
+    auto* totalValueItem = new QTableWidgetItem(locale.toString(total));
     totalValueItem->setData(Qt::UserRole, total);
 
     QFont boldFont = tableWidget->font();
