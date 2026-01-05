@@ -21,6 +21,8 @@
 #ifndef DBMAINTENANCE_H
 #define DBMAINTENANCE_H
 
+#include "scopedcursor.h"
+
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -129,6 +131,8 @@ private slots:
 private:
     void runMaintenance()
     {
+        ScopedCursor wait(Qt::WaitCursor);
+
         auto post = [&](const QString& text, int progress) {
             QMetaObject::invokeMethod(this, "updateStatus",
                                       Qt::QueuedConnection,
