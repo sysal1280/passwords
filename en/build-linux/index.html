@@ -513,6 +513,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#step-6-copy-the-lib-folder-and-plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 - Copy the lib folder and plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#step-7-remove-unnecessary-plugins" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1629,6 +1640,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#step-6-copy-the-lib-folder-and-plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 - Copy the lib folder and plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#step-7-remove-unnecessary-plugins" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1796,7 +1818,7 @@ cd /tmp/passwords/final
 <p><code>patchelf</code> is a tool that can modify ELF binaries (the standard executable format on Linux). One of the things it can change is the <strong>RPATH</strong>—the <em>runtime library search path</em>. This is the list of directories the binary will search when looking for shared libraries like Qt.</p>
 <p>Run the following command using <code>$ORIGIN</code>. It ss a special placeholder that always means “the directory where this executable lives.”</p>
 <p><code>patchelf --set-rpath '$ORIGIN/lib' password</code></p>
-<p><strong>Step 6 - Copy the lib folder and plugins</strong></p>
+<h5 id="step-6-copy-the-lib-folder-and-plugins">Step 6 - Copy the lib folder and plugins</h5>
 <p>After running patchelf, you can bundle the Qt libraries into a <code>lib/</code> folder next to the <code>password</code> binary, and the program will run anywhere, no system‑wide Qt installation required. And no fixed directories which must exist.</p>
 <p>We need to copy the entire lib folder from Qt to the current directory</p>
 <p><code>cp -r /&lt;Qt-path&gt;/gcc_64/lib .</code></p>

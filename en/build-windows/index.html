@@ -529,6 +529,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#step-5-cleanup-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 - Cleanup (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1584,6 +1595,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#step-5-cleanup-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 - Cleanup (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1681,7 +1703,10 @@ copy %temp%\passwords\build\password.exe %temp%\passwords\deploy
 windeployqt6.exe %temp%\passwords\deploy\password.exe
 </code></pre>
 <p>After running these commands, you will have a folder at <code>%temp%\passwords\deploy</code> containing the compiled Passwords executable along with all of its required dependencies, ready for use.</p>
-<p>You can copy the contents of the <code>deploy</code> directory anywhere you like, but all files must remain together and in the same directory structure for the application to function properly.</p></div>
+<p>You can copy the contents of the <code>deploy</code> directory anywhere you like, but all files must remain together and in the same directory structure for the application to function properly.</p>
+<h5 id="step-5-cleanup-optional">Step 5 - Cleanup (optional)</h5>
+<p>None of the build tools you installed to build Passwords are needed anymore. You can safely uninstall Git and Qt. If the Qt installer does not fully remove the <code>C:\Qt</code> directory, you can delete it manually.</p>
+<p>Once you have copied the <code>deploy</code> directory to another location, the entire <code>%temp%\passwords</code> directory can also be deleted.</p></div>
 
 
 
