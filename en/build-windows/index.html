@@ -1612,7 +1612,7 @@
 <h5 id="step-1-download-the-source-code">Step 1 - Download the source code</h5>
 <p>Start by cloning the repository using the Git CMD application.</p>
 <p>If you don’t already have Git installed, download it from:
-https://gitforwindows.org</p>
+<a href="https://gitforwindows.org">https://gitforwindows.org</a></p>
 <p>Once Git is installed, open Git CMD from the Start menu. This launches a command prompt with all the Git tools ready to use.</p>
 <p>Run the following commands in the Git CMD window:</p>
 <pre><code>cd %temp%
@@ -1675,13 +1675,13 @@ https://www.qt.io/development/download-qt-installer-oss</p>
 </code></pre>
 <p>Once this step is done, Passwords has been compiled. Congratulations. </p>
 <h5 id="step-4-identifying-dependencies-and-bringing-it-all-together">Step 4 - Identifying dependencies and bringing it all together</h5>
-<p>After installing Qt, you’ll find a shortcut similar to:</p>
+<p>Passwords has several dependencies that need to be gathered alongside the executable. This step creates a directory called <code>deploy</code> and places the compiled <code>password.exe</code> and all required dependency files into it so the program can run correctly.</p>
 <pre><code>mkdir %temp%\passwords\deploy
 copy %temp%\passwords\build\password.exe %temp%\passwords\deploy
 windeployqt6.exe %temp%\passwords\deploy\password.exe
 </code></pre>
-<p>Now you have a folder called <code>%temp%\passwords\deploy</code> and it contains a compiled executable copy of Passwords and all of its dependency files, ready to be used. </p>
-<p>You can copy the files in the deploy directory anywhere you like, but they must all be copied together and remain in the directory structure present.</p></div>
+<p>After running these commands, you will have a folder at <code>%temp%\passwords\deploy</code> containing the compiled Passwords executable along with all of its required dependencies, ready for use.</p>
+<p>You can copy the contents of the <code>deploy</code> directory anywhere you like, but all files must remain together and in the same directory structure for the application to function properly.</p></div>
 
 
 
