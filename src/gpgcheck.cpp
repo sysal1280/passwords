@@ -431,7 +431,7 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
                          const QString primaryType =
                              (type == GpgKeyType::Public) ? "pub" : "sec";
 
-                         for (const QString& line : lines) {
+                         for (const QString &line : std::as_const(lines)) {
                              QStringList p = line.split(':');
                              if (p.size() < 10)
                                  continue;
