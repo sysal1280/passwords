@@ -52,7 +52,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Qt
-find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools Sql Network Charts)
+find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools Sql Network Charts Concurrent)
 
 # Collect sources
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
@@ -86,6 +86,7 @@ target_link_libraries(password PRIVATE
     Qt6::Sql
     Qt6::Network
     Qt6::Charts
+    Qt6::Concurrent
 )
 
 target_include_directories(password PRIVATE

@@ -58,5 +58,6 @@
         <file>glyphs/attach_file_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
         <file>glyphs/content_paste_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
         <file>glyphs/file_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/bug_report_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
     </qresource>
 </RCC>

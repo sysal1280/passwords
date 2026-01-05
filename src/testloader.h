@@ -2,9 +2,14 @@
 #define TESTLOADER_H
 
 #include <QObject>
-#include <QSqlDatabase>
+#include <QDialog>
 #include <QByteArray>
 #include <QString>
+#include <QSqlDatabase>
+
+class QSpinBox;
+class QProgressBar;
+class QPushButton;
 
 class TestLoader : public QObject
 {
@@ -16,6 +21,9 @@ public:
 
     bool generateCategories(int count, int maxDepth = 3);
     bool generateApplications(int count);
+    QString getRandomGpgKey(const QString &dbFile, const QByteArray &appKey);
+
+    void showDialog(QWidget *parent = nullptr);
 
 private:
     QString dbFile;
@@ -25,7 +33,40 @@ private:
     void closeDb(const QString &connName);
 
     int randomExistingCategoryId(QSqlDatabase &db);
+    QString randomTextWithSpaces(int minLen, int maxLen);
     QString randomString(int length);
+    QString fakeJson();
+    QByteArray encryptWithGpg(const QStringList &recipients, const QString &json);
+
+signals:
+    void progress(int value);
+
+};
+
+
+// ---------------------------------------------------------
+// Dialog class (must be OUTSIDE TestLoader for MOC to work)
+// ---------------------------------------------------------
+
+class TestLoaderDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    explicit TestLoaderDialog(TestLoader *loader, QWidget *parent = nullptr);
+
+private slots:
+    void onRunClicked();
+
+private:
+    TestLoader *loader;
+
+    QSpinBox *categoryCountSpin;
+    QSpinBox *categoryDepthSpin;
+    QSpinBox *appCountSpin;
+
+    QProgressBar *progressBar;
+    QPushButton *runButton;
+    QPushButton *closeButton;
 };
 
 #endif // TESTLOADER_H

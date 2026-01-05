@@ -768,7 +768,23 @@ MainWindow::MainWindow(QWidget *parent)
     //     "QTreeWidget::item { padding-top: 6px; padding-bottom: 6px; }"
     //     );
 
+
+    /*
+     * Are we debug, great, add a Generate Test Data. menu item
+     * and use the TestLoader class.
+     */
+#ifdef APP_DEBUG_BUILD
+    QAction *testAction = new QAction("Generate Test Data..", this);
+    testAction->setIcon(QIcon(":/menus/glyphs/bug_report_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+    connect(testAction, &QAction::triggered, this, [this]() {
+        TestLoader loader(qApp->property("dbFile").toString(), appKey, this);
+        loader.showDialog(this);
+    });
+    ui->menuDatabase->insertAction(ui->actionMaintenance,testAction);
+#endif
+
     setupDebugWarnings(this, ui->statusbar);
+
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -4496,10 +4512,6 @@ void MainWindow::checkGpgKeys()
 
 void MainWindow::setBookmark(bool checked)
 {
-    TestLoader loader(qApp->property("dbFile").toString(), appKey);
-    loader.generateApplications(500000);
-    return;
-
     auto selected = ui->treeWidget_2->selectedItems();
     if (selected.isEmpty()) {
         QMessageBox::warning(this, ui->actionBookmark->text(), tr("No item selected."));
