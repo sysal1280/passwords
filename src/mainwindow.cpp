@@ -1711,15 +1711,22 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         copyUsernameAction->setStatusTip(tr("Username only remains in clipboard for 15 seconds"));
         usernameEdit->addAction(copyUsernameAction, QLineEdit::TrailingPosition);
 
-        connect(copyUsernameAction, &QAction::triggered, this, [usernameEdit]() {
-            QClipboard *clipboard = QGuiApplication::clipboard();
-            clipboard->setText(usernameEdit->text());
-            QTimer::singleShot(15000, qApp, [clipboard]() {
-                clipboard->clear();
-                clipboard->setText("");
-                qDebug() << "clipboard cleared";
-            });
-        });
+        connect(copyUsernameAction, &QAction::triggered, this,
+                [usernameEdit, ui]() {
+                    QClipboard *clipboard = QGuiApplication::clipboard();
+                    clipboard->setText(usernameEdit->text());
+
+                    ui->statusbar->showMessage(
+                        "Username copied to clipboard",
+                        Passwords::SBTransientMessageTime
+                    );
+
+                    QTimer::singleShot(15000, qApp, [clipboard]() {
+                        clipboard->clear();
+                        clipboard->setText("");
+                        qDebug() << "clipboard cleared";
+                    });
+                });
 
         //
         // Password
@@ -1767,15 +1774,19 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         copyPasswordAction->setStatusTip("Password only remains in clipboard for 15 seconds");
         passwordEdit->addAction(copyPasswordAction, QLineEdit::TrailingPosition);
 
-        connect(copyPasswordAction, &QAction::triggered, this, [passwordEdit]() {
-            QClipboard *clipboard = QGuiApplication::clipboard();
-            clipboard->setText(passwordEdit->text());
-            QTimer::singleShot(15000, qApp, [clipboard]() {
-                clipboard->clear();
-                clipboard->setText("");
-                qDebug() << "clipboard cleared";
-            });
-        });
+        connect(copyPasswordAction, &QAction::triggered, this,
+                [passwordEdit, ui]() {
+                    QClipboard *clipboard = QGuiApplication::clipboard();
+                    clipboard->setText(passwordEdit->text());
+                    ui->statusbar->showMessage("Password copied to clipboard",
+                                               Passwords::SBTransientMessageTime);
+
+                    QTimer::singleShot(15000, qApp, [clipboard]() {
+                        clipboard->clear();
+                        clipboard->setText("");
+                        qDebug() << "clipboard cleared";
+                    });
+                });
 
         //
         // OTP
@@ -1795,10 +1806,16 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
         copyOTPAction->setStatusTip(tr("Copy the TOTP code to your clipboard"));
         otpEdit->addAction(copyOTPAction, QLineEdit::TrailingPosition);
 
-        connect(copyOTPAction, &QAction::triggered, this, [otpEdit]() {
-            QClipboard *clipboard = QGuiApplication::clipboard();
-            clipboard->setText(otpEdit->text().remove("-").trimmed());
-        });
+        connect(copyOTPAction, &QAction::triggered, this,
+                [otpEdit, ui]() {
+                    QClipboard *clipboard = QGuiApplication::clipboard();
+                    clipboard->setText(otpEdit->text().remove("-").trimmed());
+
+                    ui->statusbar->showMessage(
+                        "TOTP Code copied to clipboard",
+                        Passwords::SBTransientMessageTime
+                    );
+                });
 
         //
         // Compact two-row layout for this credential
