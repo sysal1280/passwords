@@ -37,6 +37,7 @@
 #include "plaintextedit.h"
 #include "preferencesdialog.h"
 #include "randomnoisedialog.h"
+#include "scopedcursor.h"
 #include "settings.h"
 #include "ui/ui_mainwindow.h"
 #include "utils.h"
@@ -1605,7 +1606,10 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
 }
 
 
-void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui) {
+void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui)
+{
+
+ScopedCursor wait(Qt::WaitCursor);
 
     // Ensure scrollArea has a widget
     if (!ui->scrollArea->widget()) {
