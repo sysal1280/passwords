@@ -559,12 +559,10 @@ QLabel#labelPasswordInspector {
     padding: 14px 18px;
     border-radius: 12px;
     border: 1px solid rgba(0,0,0,0.12);
+    font-size: 18pt;
     font-weight: bold;
     letter-spacing: 1px;
     text-align: center;
-
-    /* subtle shadow to lift it */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 
     /* smooth transitions */
     transition: background 180ms ease, 
@@ -575,6 +573,5 @@ QLabel#labelPasswordInspector {
 QLabel#labelPasswordInspector:hover {
     background: rgba(255,255,255,0.75);
     border-color: #2299d4;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.18);
 }
 

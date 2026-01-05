@@ -23,6 +23,7 @@
 #include "settings.h"
 #include "utils.h"
 
+
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
@@ -44,6 +45,7 @@
 #include <QSpinBox>
 #include <QStandardPaths>
 #include <QStatusBar>
+#include <QStyle>
 #include <QVBoxLayout>
 
 #include <QtMath>
@@ -62,7 +64,7 @@ PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
 
     // Big password label
     QLabel *pwLabel = new QLabel(password, this);
-    QFont big; big.setPointSize(20); big.setBold(true);
+    QFont big; big.setPointSize(18); big.setBold(true);
     pwLabel->setFont(big);
     pwLabel->setAlignment(Qt::AlignCenter);
     pwLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -72,17 +74,55 @@ PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
 
     // Scroll area for tiles
     QScrollArea *scroll = new QScrollArea(this);
-    scroll->setWidgetResizable(true);
+
+    // We will control the child + height ourselves
+    scroll->setWidgetResizable(false);
+
+    // No vertical scrollbars, horizontal as needed
+    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn); // important for stable height
 
     QWidget *tilesContainer = new QWidget(scroll);
     QHBoxLayout *tiles = new QHBoxLayout(tilesContainer);
     tiles->setSpacing(8);
+    tiles->setContentsMargins(0, 4, 0, 4);
 
-    for (QChar c : password)
-        tiles->addWidget(createCharacterTile(c));
+    // Make tiles taller so they visually occupy more vertical space
+    int maxTileHeight = 0;
+    for (QChar c : password) {
+        QWidget *tile = createCharacterTile(c);
+
+        int base = tile->sizeHint().height();
+        int h = static_cast<int>(base * 1.8) -16;   // take up more vertical space
+        tile->setFixedHeight(h);
+
+        tiles->addWidget(tile);
+        maxTileHeight = std::max(maxTileHeight, h);
+    }
 
     tiles->addStretch();
+
+    // --- Compute exact heights so there is ZERO vertical scroll range ---
+
+    const QMargins m = tiles->contentsMargins();
+    const int topMargin    = m.top();
+    const int bottomMargin = m.bottom();
+
+    // Height of the row of tiles inside the container
+    const int containerHeight = maxTileHeight + topMargin + bottomMargin;
+    tilesContainer->setFixedHeight(containerHeight);
+
     scroll->setWidget(tilesContainer);
+
+    // Frame + horizontal scrollbar height
+    const int frame = scroll->frameWidth();
+    const int hScrollExtent =
+        scroll->style()->pixelMetric(QStyle::PM_ScrollBarExtent, nullptr, scroll);
+
+    // Viewport height must equal containerHeight, so scroll height is:
+    const int scrollHeight = containerHeight + 2 * frame + hScrollExtent;
+    scroll->setFixedHeight(scrollHeight);
+
     main->addWidget(scroll);
 
     // Legend aligned right
@@ -117,9 +157,14 @@ PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
     double percent = (screenWidth >= 1920) ? 0.33 : 0.45;
     int dialogWidth = int(screenWidth * percent);
 
-    resize(dialogWidth, 300);
+    setFixedWidth(dialogWidth);
 
+    // Let Qt compute correct height now that scroll area has a fixed, correct height
+    adjustSize();
 }
+
+
+
 
 QWidget *PasswordInspectorDialog::makeLegendItem(const QString &color, const QString &label)
 {
