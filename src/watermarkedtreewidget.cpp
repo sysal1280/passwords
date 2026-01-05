@@ -22,6 +22,7 @@
 #include <QMimeData>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QDrag>
 
 WatermarkedTreeWidget::WatermarkedTreeWidget(QWidget *parent)
     : QTreeWidget(parent), m_watermarkText("Default Watermark") {
@@ -109,4 +110,66 @@ void WatermarkedTreeWidget::dragMoveEvent(QDragMoveEvent *event) {
     } else {
         event->ignore();
     }
+}
+
+void WatermarkedTreeWidget::startDrag(Qt::DropActions supportedActions)
+{
+    QList<QTreeWidgetItem*> items = selectedItems();
+    if (items.isEmpty())
+        return;
+
+    QTreeWidgetItem *item = items.first();
+
+    // Build your custom MIME data
+    QMimeData *mime = mimeData(items);
+
+    QDrag *drag = new QDrag(this);
+    drag->setMimeData(mime);
+
+    //
+    // --- Create a modern rounded "pill" drag indicator (semi-transparent) ---
+    //
+
+    QString text = item->text(0);
+
+    // Font setup
+    QFont font;
+    font.setBold(true);
+    font.setPointSize(11);
+
+    QFontMetrics fm(font);
+    int textWidth = fm.horizontalAdvance(text);
+
+    int padding = 20;
+    int height = 36;
+    int width = textWidth + padding * 2;
+
+    QPixmap pm(width, height);
+    pm.fill(Qt::transparent);
+
+    QPainter p(&pm);
+    p.setRenderHint(QPainter::Antialiasing, true);
+
+    // Semi-transparent background (your blue, but with alpha)
+    QColor bg(34, 153, 212, 180);
+    //                R   G    B   A(0–255)
+    // 180 gives ~70% opacity. Increase for more solid, decrease for more transparent.
+
+    p.setBrush(bg);
+    p.setPen(Qt::NoPen);
+
+    // Rounded rectangle
+    p.drawRoundedRect(pm.rect(), 10, 10);
+
+    // Text
+    p.setFont(font);
+    p.setPen(Qt::white);
+    p.drawText(pm.rect(), Qt::AlignCenter, text);
+
+    p.end();
+
+    drag->setPixmap(pm);
+    drag->setHotSpot(QPoint(width / 2, height / 2));
+
+    drag->exec(Qt::CopyAction);
 }

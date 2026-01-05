@@ -152,6 +152,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeWidget_2->header()->setStretchLastSection(true);
     ui->treeWidget_2->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->treeWidget_2->setDragEnabled(true);
+
     ui->treeWidget_2->setDragDropMode(QAbstractItemView::DragOnly);
     ui->treeWidget_2->setAnimated(true);
     ui->treeWidget_2->setWatermarkText("No Passwords");
