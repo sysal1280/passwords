@@ -39,10 +39,13 @@
 #include "randomnoisedialog.h"
 #include "scopedcursor.h"
 #include "settings.h"
-#include "testloader.h"
 #include "ui/ui_mainwindow.h"
 #include "utils.h"
 #include "watermarkedtreewidget.h"
+
+#ifdef APP_DEBUG_BUILD
+#include "testloader.h"
+#endif
 
 #include <QActionGroup>
 #include <QByteArray>
