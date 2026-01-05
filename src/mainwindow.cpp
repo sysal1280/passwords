@@ -6396,48 +6396,28 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     // ESC Key
     if (event->key() == Qt::Key_Escape) {
 
-        QWidget *focus = QApplication::focusWidget();
-
-        // ----------------------------------------------------
-        // 1. ESC pressed while treeWidget has focus
-        if (focus == ui->treeWidget) {
-            if (ui->treeWidget->topLevelItemCount() > 0) {
-                ui->treeWidget->collapseAll();
-                ui->treeWidget_2->clear();
-                event->accept();
-                return;
-            }
-        }
-
-        // ----------------------------------------------------
-        // 2. ESC pressed while treeWidget_2 has focus
-        // ----------------------------------------------------
-        if (focus == ui->treeWidget_2) {
-
-            if (openedCredentialID == -1 &&
-                ui->treeWidget_2->topLevelItemCount() > 0) {
-
-                ui->treeWidget_2->clear();
-                event->accept();
-                return;
-            }
-        }
-
-
-        // ----------------------------------------------------
-        // 3. Fallback to your existing ESC logic
-        // ----------------------------------------------------
-        if (openedCredentialID == -1) {
-            if (settings.getAskClose()) {
-                close();
-            }
-            event->accept();
-            return;
-        } else {
+        // 1. If a password is open, clear and stop
+        if (openedCredentialID != -1) {
             clearScrollArea();
             event->accept();
             return;
         }
+
+        // 2. No password open → collapse/clear if needed
+        if (ui->treeWidget->topLevelItemCount() > 0 ||
+            ui->treeWidget_2->topLevelItemCount() > 0) {
+
+            ui->treeWidget->collapseAll();
+            ui->treeWidget_2->clear();
+            ui->statusbar->clearMessage();
+
+            event->accept();
+            return;
+        }
+
+        // 3. Nothing open, nothing to collapse = nothing else to do
+        event->accept();
+        return;
     }
 
     // CTRL+F
