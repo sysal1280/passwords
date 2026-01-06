@@ -27,10 +27,12 @@
 #include "passwordgenerator.h"
 #include "randomnoisedialog.h"
 #include "settings.h"
+#include "gpgcheck.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QKeyEvent>
 #include <QList>
 #include <QMenu>
 #include <QMessageBox>
@@ -40,6 +42,133 @@
 #include <QTableWidgetItem>
 #include <QToolButton>
 #include <QTimer>
+
+
+class PasswordDelegate : public QStyledItemDelegate {
+public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    bool validate(const QString &text) const {
+        if (text.isEmpty()) return true; //won't validate without password anyway.
+        return isStrong(text);
+    }
+
+    QWidget *createEditor(QWidget *parent,
+                          const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const override
+    {
+        if (index.column() == 1) {
+            QLineEdit *line = new QLineEdit(parent);
+
+            // Store row/column so the event filter knows where it belongs
+            line->setProperty("row", index.row());
+            line->setProperty("column", index.column());
+            line->setProperty("handledCommitKey", false);
+
+            // Install event filter to intercept Tab, Enter, FocusOut
+            line->installEventFilter(const_cast<PasswordDelegate*>(this));
+
+            return line;
+        }
+
+        return QStyledItemDelegate::createEditor(parent, option, index);
+    }
+
+    bool eventFilter(QObject *editor, QEvent *event) override
+    {
+        QLineEdit *line = qobject_cast<QLineEdit*>(editor);
+        if (!line)
+            return QStyledItemDelegate::eventFilter(editor, event);
+
+        int row = line->property("row").toInt();
+        int column = line->property("column").toInt();
+
+        if (column != 1)
+            return QStyledItemDelegate::eventFilter(editor, event);
+
+        bool handledCommit = line->property("handledCommitKey").toBool();
+
+        auto reopenEditor = [&](QLineEdit *line) {
+            if (auto *view = qobject_cast<QAbstractItemView*>(parent())) {
+                QModelIndex idx = view->model()->index(row, column);
+
+                QMetaObject::invokeMethod(
+                    view,
+                    [view, idx]() {
+                        view->edit(idx);
+
+                        // Find the new editor and select text
+                        if (auto *line = view->findChild<QLineEdit*>()) {
+                            line->setFocus();
+                            line->selectAll();
+                        }
+                    },
+                    Qt::QueuedConnection
+                    );
+            }
+        };
+
+        // -------------------------
+        // 1. HANDLE COMMIT KEYS
+        // -------------------------
+        if (event->type() == QEvent::KeyPress) {
+            QKeyEvent *key = static_cast<QKeyEvent*>(event);
+
+            bool isCommitKey =
+                key->key() == Qt::Key_Return ||
+                key->key() == Qt::Key_Enter ||
+                key->key() == Qt::Key_Tab ||
+                key->key() == Qt::Key_Backtab;
+
+            if (isCommitKey) {
+
+                // Mark that we handled a commit key
+                line->setProperty("handledCommitKey", true);
+
+                if (!validate(line->text())) {
+                    bool keep = warnAndContinue();
+                    if (!keep) {
+                        line->clear();
+                        reopenEditor(line);
+                        return true; // block commit + navigation
+                    }
+                }
+            }
+        }
+
+        // -------------------------
+        // 2. HANDLE FOCUS OUT
+        // -------------------------
+        if (event->type() == QEvent::FocusOut) {
+
+            // If a commit key was already handled, skip FocusOut validation
+            if (handledCommit)
+                return false; // allow focus-out silently
+
+            if (!validate(line->text())) {
+                bool keep = warnAndContinue();
+                if (!keep) {
+                    line->clear();
+                    reopenEditor(line);
+                    return true; // block losing focus
+                }
+            }
+        }
+
+        return QStyledItemDelegate::eventFilter(editor, event);
+    }
+
+    void setModelData(QWidget *editor,
+                      QAbstractItemModel *model,
+                      const QModelIndex &index) const override
+    {
+        // Only called when validation succeeded
+        QStyledItemDelegate::setModelData(editor, model, index);
+    }
+};
+
+
+
 
 NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     : QDialog(parent)
@@ -55,6 +184,8 @@ NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     QAction *optB = menu->addAction(QIcon(":/menus/glyphs/grain_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"), tr("Random Noise"));
     optB->setShortcut(QKeySequence(Qt::Key_F6));
     ui->toolButton->setMenu(menu);
+
+    ui->tableWidgetCredentials->setItemDelegate(new PasswordDelegate(this));
 
     // Connect using connect()
     connect(optA, &QAction::triggered,

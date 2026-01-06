@@ -191,7 +191,7 @@ void checkGpgKeys(QWidget* parent)
 
 bool isStrong(const QString &str)
 {
-    if (str.size() < 10)
+    if (str.size() < 12)
         return false;
 
     bool hasLower = false;
@@ -228,7 +228,7 @@ bool warnAndContinue()
         "<b><span style='color:#8c0000;'>Your password is too weak.</span></b>"
         "<div style='margin-top:8px;'>"
         "<ul style='margin:0; padding-left:20px;'>"
-        "<li style='margin-bottom:6px;'>A strong password should be at least 10 characters long.</li>"
+        "<li style='margin-bottom:6px;'>A strong password should be at least 12 characters long.</li>"
         "<li style='margin-bottom:6px;'>Include lowercase and uppercase letters.</li>"
         "<li style='margin-bottom:6px;'>Include numbers.</li>"
         "<li style='margin-bottom:6px;'>Include special characters.</li>"
