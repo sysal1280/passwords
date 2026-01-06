@@ -668,8 +668,11 @@ MainWindow::MainWindow(QWidget *parent)
             });
 
     // Tree widget custom signals
-    connect(ui->treeWidget, &WatermarkedTreeWidget::itemDropped,
-            this, &MainWindow::moveCategory);
+    connect(ui->treeWidget,
+            &WatermarkedTreeWidget::itemDropped,
+            this,
+            &MainWindow::moveCategoryWrapper);
+
 
     connect(ui->treeWidget, &WatermarkedTreeWidget::itemsDropped,
             this, &MainWindow::moveCategories);
@@ -5736,7 +5739,7 @@ QString MainWindow::getItemPath(QTreeWidgetItem *item, int column)
     return parts.join(settings.getPathSeparator());
 }
 
-void MainWindow::moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targetItem) {
+void MainWindow::moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targetItem, bool skipPrompt = false) {
     if (!sourceItem || !targetItem) {
         qWarning() << "Invalid source or target item, ignoring drop action.";
         return;
@@ -5750,9 +5753,10 @@ void MainWindow::moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targ
         return;
     }
 
-    if (settings.getDragDropPrompt()) {
+    if (!skipPrompt && settings.getDragDropPrompt()) {
         const QString msg = tr("Move password \"%1\" to category \"%2\"?")
-        .arg(sourceItem->text(0), targetItem->text(0));
+                                .arg(sourceItem->text(0), targetItem->text(0));
+
         if (QMessageBox::question(this, tr("Confirm Move"), msg,
                                   QMessageBox::Yes | QMessageBox::No,
                                   QMessageBox::No) != QMessageBox::Yes) {
@@ -7408,6 +7412,12 @@ void MainWindow::moveCategories(const QList<QTreeWidgetItem*> &items,
     // (This means you may see prompts inside moveCategory if it also prompts;
     // we can refactor that later if you want exactly one prompt.)
     for (QTreeWidgetItem *item : items) {
-        moveCategory(item, targetItem);
+        moveCategory(item, targetItem, true);
     }
+}
+
+void MainWindow::moveCategoryWrapper(QTreeWidgetItem *sourceItem,
+                                     QTreeWidgetItem *targetItem)
+{
+    moveCategory(sourceItem, targetItem, false);   // skipPrompt = false
 }

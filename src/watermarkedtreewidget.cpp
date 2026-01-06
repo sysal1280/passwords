@@ -64,7 +64,6 @@ void WatermarkedTreeWidget::paintEvent(QPaintEvent *event) {
 
 void WatermarkedTreeWidget::dropEvent(QDropEvent *event)
 {
-
     if (!event->mimeData()->hasFormat("application/x-qtreewidgetitem")) {
         event->ignore();
         return;
@@ -78,7 +77,8 @@ void WatermarkedTreeWidget::dropEvent(QDropEvent *event)
     qDebug() << "Dropped blocks:" << itemBlocks;
 
 
-    for (const QString &block : itemBlocks) {
+    for (int i = 0; i < itemBlocks.size(); ++i) {
+        const QString &block = itemBlocks.at(i);
         QStringList cols = block.split(";");
 
         auto *item = new QTreeWidgetItem();

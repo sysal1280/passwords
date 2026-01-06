@@ -122,7 +122,7 @@ private:
     QString buildItemPath(QTreeWidgetItem *item) const;
     QString getItemPath(QTreeWidgetItem *item, int column = 0);
     QString buildCategoryPath(int categoryId, const QString &appKey, QSqlDatabase &db);
-    void moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targetItem);
+    void moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targetItem, bool skipPrompt);
     void moveCategories(const QList<QTreeWidgetItem*> &items, QTreeWidgetItem *targetItem);
     void selectInTreeWidgets(int categoryId, int appId);
 
@@ -154,6 +154,8 @@ private:
     void setBookmark(bool checked);
 
     QString formatOtp(const QString& otp);
+    void moveCategoryWrapper(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targetItem);
+
 
     void wipeFile(const QString &path, int passes = 2);
 
