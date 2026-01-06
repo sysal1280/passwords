@@ -17,7 +17,7 @@
    <item row="1" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -558,7 +558,7 @@
           <item row="0" column="0" colspan="2">
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Export the app key once and store it externally. You’ll enter it manually at startup instead of keeping it in the local database. Keep the exported key secure.</string>
+             <string>Export the Application Key for offline storage. This cryptographic material is required at startup to decrypt metadata. Store it securely.</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
