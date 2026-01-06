@@ -27,9 +27,12 @@
 WatermarkedTreeWidget::WatermarkedTreeWidget(QWidget *parent)
     : QTreeWidget(parent), m_watermarkText("Default Watermark") {
     setAcceptDrops(true);
-    setDragDropMode(QAbstractItemView::DropOnly);
+    setDragEnabled(true);
+    setDragDropMode(QAbstractItemView::DragDrop);
+    setDefaultDropAction(Qt::CopyAction);   // <-- REQUIRED
     setDropIndicatorShown(true);
 }
+
 
 void WatermarkedTreeWidget::setWatermarkText(const QString &text) {
     m_watermarkText = text;
@@ -59,44 +62,80 @@ void WatermarkedTreeWidget::paintEvent(QPaintEvent *event) {
     }
 }
 
-void WatermarkedTreeWidget::dropEvent(QDropEvent *event) {
-    if (event->mimeData()->hasFormat("application/x-qtreewidgetitem")) {
-        QByteArray ba = event->mimeData()->data("application/x-qtreewidgetitem");
-        QStringList cols = QString::fromUtf8(ba).split("\t");
+void WatermarkedTreeWidget::dropEvent(QDropEvent *event)
+{
 
-        QTreeWidgetItem *targetItem = itemAt(event->position().toPoint());
+    if (!event->mimeData()->hasFormat("application/x-qtreewidgetitem")) {
+        event->ignore();
+        return;
+    }
 
-        auto *sourceItem = new QTreeWidgetItem();
+    QByteArray ba = event->mimeData()->data("application/x-qtreewidgetitem");
+    QString data = QString::fromUtf8(ba);
+
+    QStringList itemBlocks = data.split(":::");
+    QList<QTreeWidgetItem*> droppedItems;
+    qDebug() << "Dropped blocks:" << itemBlocks;
+
+
+    for (const QString &block : itemBlocks) {
+        QStringList cols = block.split(";");
+
+        auto *item = new QTreeWidgetItem();
         for (int c = 0; c < cols.size(); ++c) {
             QStringList parts = cols[c].split("|");
-            sourceItem->setText(c, parts.value(0));
-            if (parts.size() > 1)
-                sourceItem->setData(c, Qt::UserRole, parts.value(1));
+            item->setText(c, parts.value(0));
+            item->setData(c, Qt::UserRole, parts.value(1));
         }
 
-        emit itemDropped(sourceItem, targetItem);
-        event->acceptProposedAction();
-    } else {
-        event->ignore();
+        droppedItems << item;
     }
+
+    QTreeWidgetItem *targetItem = itemAt(event->position().toPoint());
+
+    // 🔥 FIX: Emit the correct signal depending on count
+    if (droppedItems.count() == 1) {
+        emit itemDropped(droppedItems.first(), targetItem);
+    } else {
+        emit itemsDropped(droppedItems, targetItem);
+    }
+
+    event->acceptProposedAction();
 }
 
-QMimeData* WatermarkedTreeWidget::mimeData(const QList<QTreeWidgetItem*> &items) const {
+
+QMimeData* WatermarkedTreeWidget::mimeData(const QList<QTreeWidgetItem*> &items) const
+{
     QMimeData *mime = new QMimeData();
-    if (!items.isEmpty()) {
+
+    if (items.isEmpty())
+        return mime;
+
+    QStringList serializedItems;
+
+    for (QTreeWidgetItem *item : items) {
         QStringList cols;
-        for (int c = 0; c < items.first()->columnCount(); ++c) {
-            QString text = items.first()->text(c);
-            QVariant roleData = items.first()->data(c, Qt::UserRole);
-            // Store text and role data together, separated by '|'
-            cols << text + "|" + roleData.toString();
+
+        for (int c = 0; c < item->columnCount(); ++c) {
+            QString text = item->text(c);
+            QString role = item->data(c, Qt::UserRole).toString();
+            cols << text + "|" + role;
         }
-        mime->setData("application/x-qtreewidgetitem", cols.join("\t").toUtf8());
+
+        serializedItems << cols.join(";");
     }
+
+    // Items separated by ":::"
+    mime->setData("application/x-qtreewidgetitem",
+                  serializedItems.join(":::").toUtf8());
+
     return mime;
 }
 
+
 void WatermarkedTreeWidget::dragEnterEvent(QDragEnterEvent *event) {
+    qDebug() << "Formats:" << event->mimeData()->formats();
+
     if (event->mimeData()->hasFormat("application/x-qtreewidgetitem")) {
         event->acceptProposedAction();
     } else {
@@ -118,58 +157,41 @@ void WatermarkedTreeWidget::startDrag(Qt::DropActions supportedActions)
     if (items.isEmpty())
         return;
 
-    QTreeWidgetItem *item = items.first();
-
-    // Build your custom MIME data
-    QMimeData *mime = mimeData(items);
-
     QDrag *drag = new QDrag(this);
-    drag->setMimeData(mime);
+    drag->setMimeData(mimeData(items));
 
     //
-    // --- Create a modern rounded "pill" drag indicator (semi-transparent) ---
+    // --- Drag Pixmap ---
     //
 
-    QString text = item->text(0);
-
-    // Font setup
-    QFont font;
-    font.setBold(true);
-    font.setPointSize(11);
-
-    QFontMetrics fm(font);
-    int textWidth = fm.horizontalAdvance(text);
-
-    int padding = 20;
-    int height = 36;
-    int width = textWidth + padding * 2;
-
-    QPixmap pm(width, height);
+    QPixmap pm(140, 40);
     pm.fill(Qt::transparent);
 
     QPainter p(&pm);
     p.setRenderHint(QPainter::Antialiasing, true);
 
-    // Semi-transparent background (your blue, but with alpha)
     QColor bg(34, 153, 212, 180);
-    //                R   G    B   A(0–255)
-    // 180 gives ~70% opacity. Increase for more solid, decrease for more transparent.
-
     p.setBrush(bg);
     p.setPen(Qt::NoPen);
-
-    // Rounded rectangle
     p.drawRoundedRect(pm.rect(), 10, 10);
 
-    // Text
-    p.setFont(font);
     p.setPen(Qt::white);
-    p.drawText(pm.rect(), Qt::AlignCenter, text);
+    QFont font;
+    font.setBold(true);
+    font.setPointSize(11);
+    p.setFont(font);
 
+    QString label;
+    if (items.count() == 1)
+        label = items.first()->text(0);
+    else
+        label = QString("%1 items").arg(items.count());
+
+    p.drawText(pm.rect(), Qt::AlignCenter, label);
     p.end();
 
     drag->setPixmap(pm);
-    drag->setHotSpot(QPoint(width / 2, height / 2));
+    drag->setHotSpot(QPoint(pm.width() / 2, pm.height() / 2));
 
     drag->exec(Qt::CopyAction);
 }

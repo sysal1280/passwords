@@ -43,6 +43,7 @@ public:
 signals:
     // Emitted when a drop occurs; MainWindow can connect to this
     void itemDropped(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targetItem);
+    void itemsDropped(const QList<QTreeWidgetItem*>& items, QTreeWidgetItem *target);
 
 
 protected:

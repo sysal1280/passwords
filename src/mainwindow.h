@@ -123,6 +123,7 @@ private:
     QString getItemPath(QTreeWidgetItem *item, int column = 0);
     QString buildCategoryPath(int categoryId, const QString &appKey, QSqlDatabase &db);
     void moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targetItem);
+    void moveCategories(const QList<QTreeWidgetItem*> &items, QTreeWidgetItem *targetItem);
     void selectInTreeWidgets(int categoryId, int appId);
 
     // Tree persistence

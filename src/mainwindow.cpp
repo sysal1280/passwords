@@ -156,6 +156,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeWidget_2->setDragDropMode(QAbstractItemView::DragOnly);
     ui->treeWidget_2->setAnimated(true);
     ui->treeWidget_2->setWatermarkText("No Passwords");
+    ui->treeWidget_2->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
 
     //setup glyphs
     QHash<QAction*, QString> actionIcons = {
@@ -512,16 +514,130 @@ MainWindow::MainWindow(QWidget *parent)
             &QAction::triggered,
             this,
             [this]() {
-                if (auto *item = ui->treeWidget_2->currentItem()) {
-                    deletePassword(item);
-                } else {
+
+                const auto selected = ui->treeWidget_2->selectedItems();
+
+                if (selected.isEmpty()) {
                     QMessageBox::warning(
                         this,
                         ui->actionDelete_Password->text(),
                         tr("No password selected.")
                     );
+                    return;
                 }
+
+                //
+                // MULTI‑DELETE
+                //
+                if (selected.count() > 1) {
+
+                    int count = selected.count();
+
+                    // First confirmation
+                    QMessageBox::StandardButton reply =
+                        QMessageBox::question(
+                            this,
+                            tr("Delete Passwords"),
+                            tr("Are you sure you want to delete %1 passwords?").arg(count),
+                            QMessageBox::Yes | QMessageBox::No,
+                            QMessageBox::No
+                        );
+
+                    if (reply != QMessageBox::Yes)
+                        return;
+
+                    // Second confirmation: type DELETE
+                    const QString keyword = tr("DELETE");
+
+                    QDialog dialog(this);
+                    dialog.setWindowTitle(tr("Confirm Deletion"));
+
+                    QVBoxLayout layout(&dialog);
+
+                    QLabel label(
+                        tr("This action will permanently delete %1 passwords.\n"
+                           "To confirm, type \"%2\" below:")
+                            .arg(count)
+                            .arg(keyword)
+                    );
+                    layout.addWidget(&label);
+
+                    QLineEdit lineEdit;
+                    layout.addWidget(&lineEdit);
+
+                    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+                    layout.addWidget(&buttonBox);
+
+                    connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, [&]() {
+                        if (lineEdit.text() == keyword) {
+                            dialog.accept();
+                        } else {
+                            QMessageBox::warning(
+                                &dialog,
+                                ui->actionDelete_Password->text(),
+                                tr("You must type \"%1\" exactly to proceed.").arg(keyword)
+                            );
+                        }
+                    });
+
+                    connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+                    if (dialog.exec() != QDialog::Accepted)
+                        return;
+
+                    // Perform multi-delete
+                    QList<QTreeWidgetItem*> itemsToDelete = selected;
+                    for (QTreeWidgetItem *item : itemsToDelete)
+                        deletePassword(item);
+
+                    return;
+                }
+
+                //
+                // SINGLE DELETE
+                //
+                QTreeWidgetItem *item = selected.first();
+
+                const QString keyword = tr("DELETE");
+
+                QDialog dialog(this);
+                dialog.setWindowTitle(tr("Confirm Deletion"));
+
+                QVBoxLayout layout(&dialog);
+
+                QLabel label(
+                    tr("This action will permanently delete the password.\n"
+                       "To confirm, type \"%1\" below:")
+                        .arg(keyword)
+                );
+                layout.addWidget(&label);
+
+                QLineEdit lineEdit;
+                layout.addWidget(&lineEdit);
+
+                QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+                layout.addWidget(&buttonBox);
+
+                connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, [&]() {
+                    if (lineEdit.text() == keyword) {
+                        dialog.accept();
+                    } else {
+                        QMessageBox::warning(
+                            &dialog,
+                            ui->actionDelete_Password->text(),
+                            tr("You must type \"%1\" exactly to proceed.").arg(keyword)
+                        );
+                    }
+                });
+
+                connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+                if (dialog.exec() != QDialog::Accepted)
+                    return;
+
+                deletePassword(item);
             });
+
 
     //clear gpg agent cache
     connect(ui->actionClear_GPG_Passphrase_Cache,
@@ -554,6 +670,10 @@ MainWindow::MainWindow(QWidget *parent)
     // Tree widget custom signals
     connect(ui->treeWidget, &WatermarkedTreeWidget::itemDropped,
             this, &MainWindow::moveCategory);
+
+    connect(ui->treeWidget, &WatermarkedTreeWidget::itemsDropped,
+            this, &MainWindow::moveCategories);
+
 
     // just-in-time loading bookmarks
     connect(ui->menuBookmarks, &QMenu::aboutToShow,
@@ -2281,35 +2401,112 @@ QByteArray MainWindow::base32Decode(const QString &base32) {
     return result;
 }
 
+
 void MainWindow::showPasswordsContextMenu(const QPoint &pos)
 {
     QMenu menu;
     const QPoint globalPos = ui->treeWidget_2->viewport()->mapToGlobal(pos);
 
-    const auto selectedItems    = ui->treeWidget_2->selectedItems();
-    const auto selectedCategory = ui->treeWidget->selectedItems();
+    const auto selectedPasswords = ui->treeWidget_2->selectedItems();
+    const auto selectedCategories = ui->treeWidget->selectedItems();
 
-    // 1. Nothing selected at all → no menu
-    if (selectedItems.isEmpty() && selectedCategory.isEmpty()) {
+    const int count = selectedPasswords.count();
+
+    //
+    // 1. Nothing selected → no menu
+    //
+    if (count == 0 && selectedCategories.isEmpty()) {
         return;
     }
 
-    // 2. Category selected, but no password item selected
-    if (selectedItems.isEmpty()) {
-        qDebug() << "Hello"; // Placeholder for category-only actions
+    //
+    // 2. Category selected, but no password selected
+    //
+    if (count == 0) {
         menu.addAction(ui->actionNew_Password);
         menu.exec(globalPos);
         return;
     }
 
+    //
+    // 3. MULTI‑SELECT (2 or more password items)
+    //
+    //
+    // MULTI‑SELECT (2+ items)
+    //
+    if (count > 1) {
+
+        QAction *header = new QAction(QString("%1 items selected").arg(count), &menu);
+        header->setEnabled(false);
+        menu.addAction(header);
+        menu.addSeparator();
+
+        // --- Determine bookmark state of the group ---
+        QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        int bookmarkedCount = 0;
+
+        {
+            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+            db.setDatabaseName(qApp->property("dbFile").toString());
+
+            if (db.open()) {
+                QSqlQuery query(db);
+                query.setForwardOnly(true);
+
+                for (QTreeWidgetItem *item : selectedPasswords) {
+                    int id = item->data(0, Qt::UserRole).toInt();
+
+                    query.prepare("SELECT 1 FROM favourite "
+                                  "WHERE username = :user AND application_id = :id");
+                    query.bindValue(":user", userName);
+                    query.bindValue(":id", id);
+
+                    if (query.exec() && query.next())
+                        bookmarkedCount++;
+                }
+            }
+        }
+        QSqlDatabase::removeDatabase(connName);
+
+        bool allBookmarked = (bookmarkedCount == count);
+
+        QAction *bookmarkAction = new QAction(&menu);
+        if (allBookmarked) {
+            bookmarkAction->setText(tr("Remove Bookmark from %1 items").arg(count));
+            connect(bookmarkAction, &QAction::triggered, this, [this]() {
+                setBookmark(false);
+            });
+        } else {
+            bookmarkAction->setText(tr("Bookmark %1 items").arg(count));
+            connect(bookmarkAction, &QAction::triggered, this, [this]() {
+                setBookmark(true);
+            });
+        }
+
+        menu.addAction(bookmarkAction);
+        menu.addSeparator();
+
+        // Multi-delete (already implemented)
+        menu.addAction(ui->actionDelete_Password);
+
+        menu.exec(globalPos);
+        return;
+    }
+
+
+    //
+    // 4. SINGLE‑SELECT (exactly 1 password)
+    //
+    QTreeWidgetItem *item = selectedPasswords.first();
+    const int selectedId = item->data(0, Qt::UserRole).toInt();
+
+    // Category‑level action
     menu.addAction(ui->actionNew_Password);
     menu.addSeparator();
 
-    // 3. Password item selected
-    QTreeWidgetItem *item = selectedItems.first();
-    const int selectedId = item->data(0, Qt::UserRole).toInt();
-
-    // 3a. Open / Close Password action
+    //
+    // 4a. Open / Close Password
+    //
     if (openedCredentialID == selectedId) {
         auto *actionClose = new QAction(tr("Close Password"), &menu);
         actionClose->setIcon(QIcon(":/menus/glyphs/lock_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
@@ -2331,7 +2528,9 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
         menu.setDefaultAction(ui->actionOpen_Password);
     }
 
-    // 3b. Core actions
+    //
+    // 4b. Core single‑item actions
+    //
     menu.addAction(ui->actionEdit_Password);
     menu.addAction(ui->actionAdd_Search);
     menu.addSeparator();
@@ -2340,7 +2539,9 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
     menu.addAction(ui->actionCopy_Password_Path);
     menu.addSeparator();
 
-    // 4. Bookmark state
+    //
+    // 4c. Bookmark state (single‑item only)
+    //
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
@@ -2373,12 +2574,116 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
     menu.addAction(ui->actionBookmark);
     menu.addSeparator();
 
-    // 5. Audit log
+    //
+    // 4d. Audit log (single‑item only)
+    //
     menu.addAction(ui->actionAudit_Log);
 
-    // 6. Show menu
+    //
+    // 5. Show menu
+    //
     menu.exec(globalPos);
 }
+
+
+// void MainWindow::showPasswordsContextMenu(const QPoint &pos)
+// {
+//     QMenu menu;
+//     const QPoint globalPos = ui->treeWidget_2->viewport()->mapToGlobal(pos);
+
+//     const auto selectedItems    = ui->treeWidget_2->selectedItems();
+//     const auto selectedCategory = ui->treeWidget->selectedItems();
+
+//     // 1. Nothing selected at all → no menu
+//     if (selectedItems.isEmpty() && selectedCategory.isEmpty()) {
+//         return;
+//     }
+
+//     // 2. Category selected, but no password item selected
+//     if (selectedItems.isEmpty()) {
+//         qDebug() << "Hello"; // Placeholder for category-only actions
+//         menu.addAction(ui->actionNew_Password);
+//         menu.exec(globalPos);
+//         return;
+//     }
+
+//     menu.addAction(ui->actionNew_Password);
+//     menu.addSeparator();
+
+//     // 3. Password item selected
+//     QTreeWidgetItem *item = selectedItems.first();
+//     const int selectedId = item->data(0, Qt::UserRole).toInt();
+
+//     // 3a. Open / Close Password action
+//     if (openedCredentialID == selectedId) {
+//         auto *actionClose = new QAction(tr("Close Password"), &menu);
+//         actionClose->setIcon(QIcon(":/menus/glyphs/lock_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+//         actionClose->setShortcut(Qt::Key_Escape);
+//         actionClose->setStatusTip(tr("Hide the password and clear its decrypted details"));
+
+//         connect(actionClose, &QAction::hovered, [this, actionClose]() {
+//             statusBar()->showMessage(actionClose->statusTip());
+//         });
+//         connect(&menu, &QMenu::aboutToHide, [this]() {
+//             statusBar()->clearMessage();
+//         });
+//         connect(actionClose, &QAction::triggered, this, &MainWindow::clearScrollArea);
+
+//         menu.addAction(actionClose);
+//         menu.setDefaultAction(actionClose);
+//     } else {
+//         menu.addAction(ui->actionOpen_Password);
+//         menu.setDefaultAction(ui->actionOpen_Password);
+//     }
+
+//     // 3b. Core actions
+//     menu.addAction(ui->actionEdit_Password);
+//     menu.addAction(ui->actionAdd_Search);
+//     menu.addSeparator();
+//     menu.addAction(ui->actionDelete_Password);
+//     menu.addAction(ui->actionExport_Password);
+//     menu.addAction(ui->actionCopy_Password_Path);
+//     menu.addSeparator();
+
+//     // 4. Bookmark state
+//     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+//     {
+//         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+//         db.setDatabaseName(qApp->property("dbFile").toString());
+
+//         bool isBookmarked = false;
+
+//         if (db.open()) {
+//             QSqlQuery query(db);
+//             query.setForwardOnly(true);
+//             query.prepare(QStringLiteral(
+//                 "SELECT 1 FROM favourite "
+//                 "WHERE username = :username AND application_id = :id"));
+//             query.bindValue(":username", this->userName);
+//             query.bindValue(":id", selectedId);
+
+//             isBookmarked = (query.exec() && query.next());
+//         } else {
+//             showDbNotOpenError(this, db, Q_FUNC_INFO);
+//             return;
+//         }
+
+//         ui->actionBookmark->setCheckable(true);
+//         ui->actionBookmark->blockSignals(true);
+//         ui->actionBookmark->setChecked(isBookmarked);
+//         ui->actionBookmark->blockSignals(false);
+//     }
+//     QSqlDatabase::removeDatabase(connName);
+
+//     menu.addAction(ui->actionBookmark);
+//     menu.addSeparator();
+
+//     // 5. Audit log
+//     menu.addAction(ui->actionAudit_Log);
+
+//     // 6. Show menu
+//     menu.exec(globalPos);
+// }
 
 
 
@@ -4534,13 +4839,12 @@ void MainWindow::checkGpgKeys()
 
 void MainWindow::setBookmark(bool checked)
 {
-    auto selected = ui->treeWidget_2->selectedItems();
+    const auto selected = ui->treeWidget_2->selectedItems();
     if (selected.isEmpty()) {
         QMessageBox::warning(this, ui->actionBookmark->text(), tr("No item selected."));
         return;
     }
 
-    int id = selected.front()->data(0,Qt::UserRole).toInt();
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     {
@@ -4552,105 +4856,109 @@ void MainWindow::setBookmark(bool checked)
         }
 
         QSqlQuery query(db);
-        if (checked) {
-            query.prepare("INSERT INTO favourite (application_id, username) "
-                          "VALUES (:id, :user)");
-        } else {
-            query.prepare("DELETE FROM favourite "
-                          "WHERE application_id = :id AND username = :user");
-        }
 
-        query.bindValue(":id", id);
-        query.bindValue(":user", userName);
+        for (QTreeWidgetItem *item : selected) {
+            int id = item->data(0, Qt::UserRole).toInt();
 
-        if (!query.exec()) {
-            showQueryError(this,query,Q_FUNC_INFO);
+            if (checked) {
+                query.prepare("INSERT OR IGNORE INTO favourite (application_id, username) "
+                              "VALUES (:id, :user)");
+            } else {
+                query.prepare("DELETE FROM favourite "
+                              "WHERE application_id = :id AND username = :user");
+            }
+
+            query.bindValue(":id", id);
+            query.bindValue(":user", userName);
+
+            if (!query.exec()) {
+                showQueryError(this, query, Q_FUNC_INFO);
+            }
         }
     }
 
     QSqlDatabase::removeDatabase(connName);
 }
 
+// void MainWindow::setBookmark(bool checked)
+// {
+//     auto selected = ui->treeWidget_2->selectedItems();
+//     if (selected.isEmpty()) {
+//         QMessageBox::warning(this, ui->actionBookmark->text(), tr("No item selected."));
+//         return;
+//     }
+
+//     int id = selected.front()->data(0,Qt::UserRole).toInt();
+//     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+//     {
+//         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+//         db.setDatabaseName(qApp->property("dbFile").toString());
+//         if (!db.open()) {
+//             QMessageBox::critical(this, "", db.lastError().text());
+//             return;
+//         }
+
+//         QSqlQuery query(db);
+//         if (checked) {
+//             query.prepare("INSERT INTO favourite (application_id, username) "
+//                           "VALUES (:id, :user)");
+//         } else {
+//             query.prepare("DELETE FROM favourite "
+//                           "WHERE application_id = :id AND username = :user");
+//         }
+
+//         query.bindValue(":id", id);
+//         query.bindValue(":user", userName);
+
+//         if (!query.exec()) {
+//             showQueryError(this,query,Q_FUNC_INFO);
+//         }
+//     }
+
+//     QSqlDatabase::removeDatabase(connName);
+// }
+
 
 
 void MainWindow::deletePassword(QTreeWidgetItem *item)
 {
-    // The keyword the user must type to confirm
-    const QString confirmationKeyword = tr("DELETE");
-
-    // Build a dialog
-    QDialog dialog(this);
-    dialog.setWindowTitle("Confirm Deletion");
-
-    QVBoxLayout layout(&dialog);
-
-    QLabel label("This action will permanently delete the password.\n"
-                 "To confirm, type \"" + confirmationKeyword + "\" below:");
-    layout.addWidget(&label);
-
-    QLineEdit lineEdit;
-    layout.addWidget(&lineEdit);
-
-    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    layout.addWidget(&buttonBox);
-
-    QObject::connect(&buttonBox, &QDialogButtonBox::accepted,
-                     &dialog,   // context object
-                     [&]() {
-                         if (lineEdit.text() == confirmationKeyword) {
-                             dialog.accept();
-                         } else {
-                             QMessageBox::warning(&dialog,
-                                                  ui->actionDelete_Password->text(),
-                                                  tr("You must type \"") + confirmationKeyword + tr("\" exactly to proceed."));
-                         }
-                     });
-
-    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-
-    // Show dialog and check result
-    if (dialog.exec() == QDialog::Accepted) {
-        // Perform the deletion here
-        QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-        {
-            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
-            db.setDatabaseName(qApp->property("dbFile").toString());
-            if (!db.open()) {
-                QMessageBox::critical(this, "", db.lastError().text());
-                return;
-            }
-
-            if (!settings.verifyDeleteAllowed(db, this)) {
-                QMessageBox::warning(this, tr("Error"), tr("Delete not permitted."));
-                return; // bail out early
-            }
-
-            // proceed with delete
-            QSqlQuery pragma(db);
-            pragma.exec("PRAGMA foreign_keys = ON;");
-
-            QSqlQuery query(db);
-            query.prepare("DELETE FROM application WHERE id = :id");
-            query.bindValue(":id",item->data(0,Qt::UserRole).toInt());
-            if (!query.exec())
-            {
-                showQueryError(this,query,Q_FUNC_INFO);
-            } else
-            {
-                QTreeWidgetItem *parent = item->parent();
-                if (parent) {
-                    parent->removeChild(item);   // detach from parent
-                } else {
-                    int index = ui->treeWidget_2->indexOfTopLevelItem(item);
-                    if (index != -1) {
-                        ui->treeWidget_2->takeTopLevelItem(index);  // detach from top-level (the case with the current version)
-                    }
-                }
-                delete item;
-            }
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+        db.setDatabaseName(qApp->property("dbFile").toString());
+        if (!db.open()) {
+            QMessageBox::critical(this, "", db.lastError().text());
+            return;
         }
-        QSqlDatabase::removeDatabase(connName);
+
+        if (!settings.verifyDeleteAllowed(db, this)) {
+            QMessageBox::warning(this, tr("Error"), tr("Delete not permitted."));
+            return;
+        }
+
+        QSqlQuery pragma(db);
+        pragma.exec("PRAGMA foreign_keys = ON;");
+
+        QSqlQuery query(db);
+        query.prepare("DELETE FROM application WHERE id = :id");
+        query.bindValue(":id", item->data(0, Qt::UserRole).toInt());
+
+        if (!query.exec()) {
+            showQueryError(this, query, Q_FUNC_INFO);
+        } else {
+            // Remove from tree
+            if (QTreeWidgetItem *parent = item->parent()) {
+                parent->removeChild(item);
+            } else {
+                int index = ui->treeWidget_2->indexOfTopLevelItem(item);
+                if (index != -1)
+                    ui->treeWidget_2->takeTopLevelItem(index);
+            }
+            delete item;
+        }
     }
+    QSqlDatabase::removeDatabase(connName);
 }
 
 
@@ -5443,7 +5751,7 @@ void MainWindow::moveCategory(QTreeWidgetItem *sourceItem, QTreeWidgetItem *targ
     }
 
     if (settings.getDragDropPrompt()) {
-        const QString msg = tr("Move entry \"%1\" to category \"%2\"?")
+        const QString msg = tr("Move password \"%1\" to category \"%2\"?")
         .arg(sourceItem->text(0), targetItem->text(0));
         if (QMessageBox::question(this, tr("Confirm Move"), msg,
                                   QMessageBox::Yes | QMessageBox::No,
@@ -7073,4 +7381,33 @@ bool MainWindow::tryOpenPasswordPath(const QString &path)
 
     qDebug() << "SUCCESS: Password opened.";
     return true;
+}
+
+void MainWindow::moveCategories(const QList<QTreeWidgetItem*> &items,
+                                QTreeWidgetItem *targetItem)
+{
+    if (items.isEmpty() || !targetItem) {
+        qWarning() << "Invalid multi-drop: empty items or null target.";
+        return;
+    }
+
+    // Optional: one confirmation for the whole batch.
+    if (settings.getDragDropPrompt()) {
+        const QString msg = tr("Move %1 entries to category \"%2\"?")
+                                .arg(items.count())
+                                .arg(targetItem->text(0));
+
+        if (QMessageBox::question(this, tr("Confirm Move"), msg,
+                                  QMessageBox::Yes | QMessageBox::No,
+                                  QMessageBox::No) != QMessageBox::Yes) {
+            return;
+        }
+    }
+
+    // For now, reuse the existing single-item logic for each item.
+    // (This means you may see prompts inside moveCategory if it also prompts;
+    // we can refactor that later if you want exactly one prompt.)
+    for (QTreeWidgetItem *item : items) {
+        moveCategory(item, targetItem);
+    }
 }

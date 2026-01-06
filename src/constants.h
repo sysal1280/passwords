@@ -3,7 +3,7 @@
 namespace Passwords {
 inline constexpr const char* Name           = "Passwords";
 inline constexpr const char* Organization   = "sysal1280";
-inline constexpr const char* Version        = "1.1.1";
+inline constexpr const char* Version        = "1.2.1";
 inline constexpr const char* Icon           = ":/password.png";
 
 inline constexpr int SBTransientMessageTime = 5000;
