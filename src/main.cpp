@@ -50,7 +50,9 @@ static bool showDebugMessages = false;
 
 int main(int argc, char *argv[])
 {
-    qputenv("QT_QPA_PLATFORM", "xcb");
+    #ifdef Q_OS_LINUX
+        qputenv("QT_QPA_PLATFORM", "xcb");
+    #endif
 
     QApplication a(argc, argv);
     if (isDebuggerAttached()) {
