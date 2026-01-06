@@ -68,6 +68,7 @@
 #include <QLocale>
 #include <QMap>
 #include <QMessageBox>
+#include <QPointer>
 #include <QProcess>
 #include <QPropertyAnimation>
 #include <QPushButton>
@@ -903,6 +904,7 @@ MainWindow::MainWindow(QWidget *parent)
 #ifdef APP_DEBUG_BUILD
     QAction *testAction = new QAction("Generate Test Data..", this);
     testAction->setIcon(QIcon(":/menus/glyphs/bug_report_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+    testAction->setStatusTip(tr("Create and load test data for debugging and development work"));
     connect(testAction, &QAction::triggered, this, [this]() {
         TestLoader loader(qApp->property("dbFile").toString(), appKey, this);
         loader.showDialog(this);
@@ -2813,9 +2815,13 @@ void MainWindow::keyList()
 
     layout->addLayout(buttonLayout);
 
+    QPointer<QDialog> safeDlg = dlg;
+
     connect(showBtn, &QPushButton::clicked, this, [=]() {
-        showGpgKeyListDialog(GpgKeyType::Public, this->userName, dlg);
+        if (safeDlg)
+            showGpgKeyListDialog(GpgKeyType::Public, this->userName, safeDlg);
     });
+
 
     //
     // NEW KEY HANDLER

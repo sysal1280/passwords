@@ -359,6 +359,14 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
 
     layout->addWidget(buttonBox);
 
+    // --- Create process (moved here, unchanged) ---
+    QProcess* proc = new QProcess(dlg);
+
+    QObject::connect(dlg, &QObject::destroyed, proc, [proc]() {
+        if (proc->state() != QProcess::NotRunning)
+            proc->kill();
+    });
+
     // --- Button actions ---
     QObject::connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::close);
 
@@ -398,11 +406,6 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
                              }
                          });
                      });
-
-
-
-    // --- Create process ---
-    QProcess* proc = new QProcess(dlg);
 
     QObject::connect(proc, &QProcess::readyReadStandardOutput, dlg, [textEdit, proc]() {
         textEdit->append(QString::fromUtf8(proc->readAllStandardOutput()));
@@ -503,7 +506,6 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
 }
 
 void createGpgEncryptionKeyAsync(
-    //ScopedCursor wait(Qt::WaitCursor);
 
     const QString &name,
     QWidget *parent,
