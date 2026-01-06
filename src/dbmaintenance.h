@@ -1,30 +1,9 @@
-/*
- * passwords - A GnuPG based password manager
- *
- * Copyright (C) 2025  Adam.Lanzafame <sysal@tuta.io>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-
 #ifndef DBMAINTENANCE_H
 #define DBMAINTENANCE_H
 
 #include "scopedcursor.h"
 
 #include <QDialog>
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
 #include <QProgressBar>
@@ -36,20 +15,25 @@
 #include <QVBoxLayout>
 #include <QCloseEvent>
 #include <QDialogButtonBox>
-#include <QDesktopServices>
 
 class DbMaintenance : public QDialog
 {
     Q_OBJECT
+
 public:
-    explicit DbMaintenance(QSqlDatabase db, QWidget* parent = nullptr)
-        : QDialog(parent), m_db(db)
+    explicit DbMaintenance(QSqlDatabase db, QWidget *parent = nullptr)
+        : QDialog(parent)
+        , m_db(std::move(db))
+        , m_statusLabel(nullptr)
+        , m_progress(nullptr)
+        , m_startBtn(nullptr)
+        , m_closeBtn(nullptr)
     {
         setWindowTitle("Database Maintenance");
         setModal(true);
         setFixedSize(380, 180);
 
-        QVBoxLayout* layout = new QVBoxLayout(this);
+        auto *layout = new QVBoxLayout(this);
         layout->setContentsMargins(12, 12, 12, 12);
         layout->setSpacing(8);
 
@@ -63,21 +47,14 @@ public:
         m_progress->setValue(0);
         m_progress->setFixedHeight(18);
         layout->addWidget(m_progress);
-        layout->addSpacing(20);   // lifts the progress bar upward by 20px
+        layout->addSpacing(20);
 
-        // Buttons aligned to the right using QDialogButtonBox
-        QDialogButtonBox* buttonBox = new QDialogButtonBox(this);
-
-        // Add standard buttons
+        auto *buttonBox = new QDialogButtonBox(this);
         buttonBox->setStandardButtons(QDialogButtonBox::Close);
 
-        // Add custom Start button
         m_startBtn = buttonBox->addButton("Start", QDialogButtonBox::ActionRole);
-
-        // Retrieve pointers to the standard buttons
         m_closeBtn = buttonBox->button(QDialogButtonBox::Close);
 
-        // Add to layout
         layout->addWidget(buttonBox);
 
         connect(m_startBtn, &QPushButton::clicked,
@@ -85,19 +62,29 @@ public:
 
         connect(m_closeBtn, &QPushButton::clicked,
                 this, &QDialog::close);
-
     }
 
 protected:
-    void closeEvent(QCloseEvent* event) override
+    void closeEvent(QCloseEvent *event) override
     {
-        // If Start is disabled, maintenance is running
         if (!m_startBtn->isEnabled()) {
-            QMessageBox::warning(this,"Maintenance","Maintenance in progress. Please wait..");
+            QMessageBox::warning(this, "Maintenance",
+                                 "Maintenance in progress. Please wait...");
             event->ignore();
             return;
         }
         QDialog::closeEvent(event);
+    }
+
+    void reject() override
+    {
+        if (!m_startBtn->isEnabled()) {
+            QMessageBox::warning(this, "Maintenance",
+                                 "Maintenance in progress. Please wait...");
+            return;
+        }
+
+        QDialog::reject();
     }
 
 private slots:
@@ -106,17 +93,22 @@ private slots:
         m_startBtn->setEnabled(false);
         m_statusLabel->setText("Starting maintenance...");
 
-        QThread* thread = QThread::create([this]() {
+        // QThread::create returns a heap object; we tie its lifetime to this dialog.
+        QThread *thread = QThread::create([this]() {
             runMaintenance();
         });
 
-        connect(thread, &QThread::finished, this, &DbMaintenance::maintenanceFinished);
-        connect(thread, &QThread::finished, thread, &QObject::deleteLater);
+        thread->setObjectName("DbMaintenanceThread");
+
+        connect(thread, &QThread::finished,
+                this, &DbMaintenance::maintenanceFinished);
+        connect(thread, &QThread::finished,
+                thread, &QObject::deleteLater);
 
         thread->start();
     }
 
-    void updateStatus(const QString& text, int progress)
+    void updateStatus(const QString &text, int progress)
     {
         m_statusLabel->setText(text);
         m_progress->setValue(progress);
@@ -133,7 +125,7 @@ private:
     {
         ScopedCursor wait(Qt::WaitCursor);
 
-        auto post = [&](const QString& text, int progress) {
+        auto post = [this](const QString &text, int progress) {
             QMetaObject::invokeMethod(this, "updateStatus",
                                       Qt::QueuedConnection,
                                       Q_ARG(QString, text),
@@ -144,61 +136,73 @@ private:
             QThread::msleep(450);
         };
 
-        auto fail = [&](const QString& step, const QString& error) {
-            QMetaObject::invokeMethod(this, "updateStatus",
-                                      Qt::QueuedConnection,
-                                      Q_ARG(QString, step + " failed: " + error),
-                                      Q_ARG(int, m_progress->value()));
+        // Progress value is passed explicitly instead of reading widget state in worker thread
+        auto fail = [this, post](const QString &step, const QString &error, int progress) {
+            post(step + " failed: " + error, progress);
 
-            QMetaObject::invokeMethod(this, [this, step, error]() {
-                QMessageBox::critical(this, "Maintenance Error",
-                                      step + " failed:\n" + error);
-                m_startBtn->setEnabled(true);
-            }, Qt::QueuedConnection);
-
-            return;
+            QMetaObject::invokeMethod(this,
+                                      [this, step, error]() {
+                                          QMessageBox::critical(this, "Maintenance Error",
+                                                                step + " failed:\n" + error);
+                                          m_startBtn->setEnabled(true);
+                                      },
+                                      Qt::QueuedConnection);
         };
 
         QString err;
 
         post("Running integrity check...", 1);
-        if (!runQuery("PRAGMA integrity_check;", err))
-            return fail("Integrity check", err);
+        if (!runQuery("PRAGMA integrity_check;", err)) {
+            fail("Integrity check", err, 1);
+            return;
+        }
         pause();
 
         post("Running quick check...", 2);
-        if (!runQuery("PRAGMA quick_check;", err))
-            return fail("Quick check", err);
+        if (!runQuery("PRAGMA quick_check;", err)) {
+            fail("Quick check", err, 2);
+            return;
+        }
         pause();
 
         post("Analyzing database...", 3);
-        if (!runQuery("ANALYZE;", err))
-            return fail("Analyze", err);
+        if (!runQuery("ANALYZE;", err)) {
+            fail("Analyze", err, 3);
+            return;
+        }
         pause();
 
         post("Reindexing...", 4);
-        if (!runQuery("REINDEX;", err))
-            return fail("Reindex", err);
+        if (!runQuery("REINDEX;", err)) {
+            fail("Reindex", err, 4);
+            return;
+        }
         pause();
 
         post("Checking WAL mode...", 5);
-        QString mode = getSingleValue("PRAGMA journal_mode;", err);
-        if (mode.isEmpty() && !err.isEmpty())
-            return fail("Check WAL mode", err);
+        const QString mode = getSingleValue("PRAGMA journal_mode;", err);
+        if (mode.isEmpty() && !err.isEmpty()) {
+            fail("Check WAL mode", err, 5);
+            return;
+        }
 
         if (mode.toLower() == "wal") {
-            if (!runQuery("PRAGMA wal_checkpoint(FULL);", err))
-                return fail("WAL checkpoint", err);
+            if (!runQuery("PRAGMA wal_checkpoint(FULL);", err)) {
+                fail("WAL checkpoint", err, 5);
+                return;
+            }
         }
         pause();
 
         post("Vacuuming...", 6);
-        if (!runQuery("VACUUM;", err))
-            return fail("Vacuum", err);
+        if (!runQuery("VACUUM;", err)) {
+            fail("Vacuum", err, 6);
+            return;
+        }
         pause();
     }
 
-    bool runQuery(const QString& sql, QString& errorOut)
+    bool runQuery(const QString &sql, QString &errorOut)
     {
         QSqlQuery q(m_db);
         if (!q.exec(sql)) {
@@ -208,24 +212,24 @@ private:
         return true;
     }
 
-    QString getSingleValue(const QString& sql, QString& errorOut)
+    QString getSingleValue(const QString &sql, QString &errorOut)
     {
         QSqlQuery q(m_db);
         if (!q.exec(sql)) {
             errorOut = q.lastError().text();
-            return "";
+            return QString();
         }
         if (q.next())
             return q.value(0).toString();
-        return "";
+        return QString();
     }
 
 private:
-    QSqlDatabase m_db;
-    QLabel* m_statusLabel;
-    QProgressBar* m_progress;
-    QPushButton* m_startBtn;
-    QPushButton* m_closeBtn;
+    QSqlDatabase  m_db;
+    QLabel       *m_statusLabel;
+    QProgressBar *m_progress;
+    QPushButton  *m_startBtn;
+    QPushButton  *m_closeBtn;
 };
 
 #endif // DBMAINTENANCE_H

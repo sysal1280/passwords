@@ -5338,6 +5338,10 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
 {
     ScopedCursor wait(Qt::WaitCursor);
 
+    // Take *copies* of the data you need
+    const int id = item->data(0, Qt::UserRole).toInt();
+    const QString publicName = item->text(0);
+
     if (settings.getKillGpgAgent()) {
         killGpgAgent();
     }
@@ -5388,7 +5392,7 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
         encdata,
 
         // --- onSuccess ---
-        [this, item](const QByteArray &json) {
+        [this, id, publicName](const QByteArray &json) {
             ui->statusbar->clearMessage();
 
             // --- Step 3: Populate dialog with decrypted JSON ---
@@ -5402,7 +5406,7 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
             dlg.setKeys(keys);
 
             dlg.AppName       = obj.value("private_name").toString();
-            dlg.PublicAppName = item->text(0);
+            dlg.PublicAppName = publicName;
             dlg.Description   = obj.value("description").toString();
             dlg.URL           = obj.value("url").toString();
             dlg.openPassword();
@@ -5482,8 +5486,7 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
                             update.bindValue(":data",
                                 DataObfuscator::obfuscate(
                                     QString::fromUtf8(newEncrypted), appKey));
-                            update.bindValue(":id",
-                                item->data(0, Qt::UserRole).toInt());
+                            update.bindValue(":id",id);
 
                             if (!update.exec()) {
                                 qDebug() << "Update failed:" << update.lastError().text();
@@ -5503,8 +5506,7 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
                             }
 
                             if (ok)
-                                insertAuditRow(
-                                    item->data(0, Qt::UserRole).toInt(),
+                                insertAuditRow(id,
                                     userName,
                                     QSysInfo::machineHostName(),
                                     "EDITED"
