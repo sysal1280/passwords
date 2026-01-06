@@ -37,14 +37,27 @@ DropLabel::DropLabel(QWidget *parent)
 
 void DropLabel::dragEnterEvent(QDragEnterEvent *event)
 {
-    // Accept drags that carry a QTreeWidgetItem payload
-    if (event->mimeData()->hasFormat("application/x-qtreewidgetitem")) {
-        event->acceptProposedAction();
-        fadeToPixmap(QPixmap(":/place_alive.png"));
-    } else {
+    // Only accept our custom MIME type
+    if (!event->mimeData()->hasFormat("application/x-qtreewidgetitem")) {
         event->ignore();
+        return;
     }
+
+    // Extract payload
+    const QByteArray ba = event->mimeData()->data("application/x-qtreewidgetitem");
+    const QString payload = QString::fromUtf8(ba);
+
+    // Reject multi-item drags (they contain ":::")
+    if (payload.contains(":::")) {
+        event->ignore();
+        return;
+    }
+
+    // Single item → accept
+    event->acceptProposedAction();
+    fadeToPixmap(QPixmap(":/place_alive.png"));
 }
+
 
 void DropLabel::dropEvent(QDropEvent *event)
 {

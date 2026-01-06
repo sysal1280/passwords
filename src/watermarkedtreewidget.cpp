@@ -185,7 +185,7 @@ void WatermarkedTreeWidget::startDrag(Qt::DropActions supportedActions)
     if (items.count() == 1)
         label = items.first()->text(0);
     else
-        label = QString("%1 items").arg(items.count());
+        label = QString("%1 passwords").arg(items.count());
 
     p.drawText(pm.rect(), Qt::AlignCenter, label);
     p.end();
