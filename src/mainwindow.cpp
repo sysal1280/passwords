@@ -511,6 +511,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::keyList);
 
     //delete password
+    //delete password
     connect(ui->actionDelete_Password,
             &QAction::triggered,
             this,
@@ -587,9 +588,13 @@ MainWindow::MainWindow(QWidget *parent)
                         return;
 
                     // Perform multi-delete
-                    QList<QTreeWidgetItem*> itemsToDelete = selected;
-                    for (QTreeWidgetItem *item : itemsToDelete)
-                        deletePassword(item);
+                    {
+                        ScopedCursor wait(Qt::WaitCursor);
+
+                        QList<QTreeWidgetItem*> itemsToDelete = selected;
+                        for (QTreeWidgetItem *item : itemsToDelete)
+                            deletePassword(item);
+                    }
 
                     return;
                 }
@@ -636,8 +641,12 @@ MainWindow::MainWindow(QWidget *parent)
                 if (dialog.exec() != QDialog::Accepted)
                     return;
 
-                deletePassword(item);
+                {
+                    ScopedCursor wait(Qt::WaitCursor);
+                    deletePassword(item);
+                }
             });
+
 
 
     //clear gpg agent cache
@@ -7464,6 +7473,9 @@ void MainWindow::moveCategories(const QList<QTreeWidgetItem*> &items,
     // For now, reuse the existing single-item logic for each item.
     // (This means you may see prompts inside moveCategory if it also prompts;
     // we can refactor that later if you want exactly one prompt.)
+
+    ScopedCursor wait(Qt::WaitCursor);
+
     for (QTreeWidgetItem *item : items) {
         moveCategory(item, targetItem, true);
     }

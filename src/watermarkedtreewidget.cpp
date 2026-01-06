@@ -93,7 +93,6 @@ void WatermarkedTreeWidget::dropEvent(QDropEvent *event)
 
     QTreeWidgetItem *targetItem = itemAt(event->position().toPoint());
 
-    // 🔥 FIX: Emit the correct signal depending on count
     if (droppedItems.count() == 1) {
         emit itemDropped(droppedItems.first(), targetItem);
     } else {
