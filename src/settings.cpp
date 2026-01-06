@@ -100,7 +100,7 @@ void Settings::setLastUsedFile(const QString &filePath)
     if (!settings)
         return;
 
-    settings->beginGroup("General");
+    settings->beginGroup("Main");
     settings->setValue("LastDatabase", filePath);
     settings->endGroup();
     settings->sync();
@@ -111,7 +111,7 @@ QString Settings::getLastUsedFile()
     if (!settings)
         return QString();
 
-    settings->beginGroup("General");
+    settings->beginGroup("Main");
     QString val = settings->value("LastDatabase", "").toString().trimmed();
     settings->endGroup();
 
@@ -157,7 +157,7 @@ bool Settings::getDebugMode()
     if (!settings)
         return true;
 
-    settings->beginGroup("General");
+    settings->beginGroup("Main");
     QString val = settings->value("Debug", "no")
                       .toString()
                       .trimmed()
@@ -173,7 +173,7 @@ bool Settings::getBackupDatabase()
     if (!settings)
         return true;
 
-    settings->beginGroup("General");
+    settings->beginGroup("Main");
     QString val = settings->value("BackupDatabase", "yes")
                       .toString()
                       .trimmed()
@@ -253,7 +253,7 @@ int Settings::getMaxBackups()
     if (!settings)
         return 2;
 
-    settings->beginGroup("General");
+    settings->beginGroup("Main");
     int val = settings->value("MaxBackups", 0).toInt();
     settings->endGroup();
 
@@ -265,7 +265,7 @@ QLineEdit::EchoMode Settings::getEchoMode()
     if (!settings)
         return QLineEdit::Password;
 
-    settings->beginGroup("General");
+    settings->beginGroup("Main");
     int val = settings->value("EchoMode", QLineEdit::Password).toInt();
     settings->endGroup();
 
@@ -340,7 +340,7 @@ bool Settings::getLoginPreference()
     if (!settings)
         return false; // safe fallback
 
-    settings->beginGroup("General");
+    settings->beginGroup("Main");
     QString val = settings->value("RequireChallenge", "yes")
                       .toString()
                       .trimmed()
@@ -356,7 +356,7 @@ bool Settings::getAskClose()
     if (!settings)
         return true; // safe default
 
-    settings->beginGroup("General");
+    settings->beginGroup("Main");
     QString val = settings->value("AskBeforeClosing", "yes")
                       .toString()
                       .trimmed()
@@ -383,24 +383,12 @@ bool Settings::openCategoryDblClick()
     return truthy.contains(val);
 }
 
-bool Settings::hasExportedKey() const
-{
-    if (!settings)
-        return false;
-
-    settings->beginGroup("General");
-    bool exported = settings->value("AppKeyExported", false).toBool();
-    settings->endGroup();
-    return exported;
-}
-
-
 void Settings::setExportedKey()
 {
     if (!settings)
         return;
 
-    settings->beginGroup("General");
+    settings->beginGroup("Main");
     settings->setValue("AppKeyExported", true);
     settings->endGroup();
 }

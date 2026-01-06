@@ -51,7 +51,15 @@ private:
     void restoreDefaults();
     void onBackupCheckStateChanged(int state);
     void openBackupDir();
+    void restartApplication();
     Settings settings;
+
+    bool restartRequired = false;
+    QSet<QString> restartKeys = {
+        "Categories/DoubleClickOpen"   // setting which applied net restart
+    };
+
+
 };
 
 #endif // PREFERENCESDIALOG_H

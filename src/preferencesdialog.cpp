@@ -117,9 +117,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
      * Build the settings map
      */
 
-    widgetMap.insert("General/BackupDatabase", ui->groupBox);
-    widgetMap.insert("General/AskBeforeClosing", ui->checkBoxAskClose);
-    widgetMap.insert("General/RequireChallenge", ui->checkBoxRequireChallenge);
+    widgetMap.insert("Main/BackupDatabase", ui->groupBox);
+    widgetMap.insert("Main/AskBeforeClosing", ui->checkBoxAskClose);
+    widgetMap.insert("Main/RequireChallenge", ui->checkBoxRequireChallenge);
     widgetMap.insert("Passwords/KillGPGAgent", ui->checkBoxKillGPGAgent);
     widgetMap.insert("Passwords/GeneratedPasswordLength",ui->spinBox);
     widgetMap.insert("Passwords/AutoClose",ui->spinBoxAutoClose);
@@ -130,9 +130,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     widgetMap.insert("Search/MaxPopularResults", ui->spinBoxPopular);
     widgetMap.insert("Help/Port", ui->spinBoxHelpPort);
     widgetMap.insert("Help/CloseServer", ui->checkBoxCloseHelpServer);
-    widgetMap.insert("General/EchoMode", ui->comboBoxEchoMode);
+    widgetMap.insert("Main/EchoMode", ui->comboBoxEchoMode);
     widgetMap.insert("Passwords/KillGPGAgentOnExit", ui->checkBoxKillGPGAgentExit);
-    widgetMap.insert("General/MaxBackups", ui->spinBoxMaxBackups);
+    widgetMap.insert("Main/MaxBackups", ui->spinBoxMaxBackups);
     widgetMap.insert("Categories/DoubleClickOpen", ui->checkBoxDblClickCategories);
 
 
@@ -154,8 +154,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
         });
     };
 
-    if (!settings.hasExportedKey())
-    {
         qInfo() << Q_FUNC_INFO << "Checking for exported app key";
 
         const QString connectionName =
@@ -174,11 +172,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
         }
 
         QSqlDatabase::removeDatabase(connectionName);
-    }
-    else
-    {
-        removeGroupBox();
-    }
 
 
     /*
@@ -341,6 +334,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
                 QSqlDatabase::removeDatabase(connectionName);
             });
 
+    restartRequired = false;
+
 }
 
 void PreferencesDialog::restoreButtonClicked(QAbstractButton *button)
@@ -472,7 +467,7 @@ void PreferencesDialog::loadSettings()
             spin->setValue(val.isValid() ? val.toInt() : spin->value());
 
         } else if (auto combo = qobject_cast<QComboBox*>(w)) {
-            if (key == "General/EchoMode") {
+            if (key == "Main/EchoMode") {
                 int savedVal = val.isValid() ? val.toInt() : QLineEdit::Password;
                 int idx = combo->findData(savedVal);
                 if (idx >= 0)
@@ -496,31 +491,49 @@ void PreferencesDialog::saveSettings()
     qDebug() << "Saving to" << settings.configFilePath();
     QSettings s(settings.configFilePath(), QSettings::IniFormat);
 
+    // Clear flag for this save operation
+    restartRequired = false;
+
     for (auto it = widgetMap.begin(); it != widgetMap.end(); ++it) {
+        const QString &key = it.key();
         QWidget *w = it.value();
 
+        QVariant oldValue = s.value(key);
+        QVariant newValue;
+
         if (auto edit = qobject_cast<QLineEdit*>(w)) {
-            s.setValue(it.key(), edit->text());
+            newValue = edit->text();
+            s.setValue(key, newValue);
 
         } else if (auto check = qobject_cast<QCheckBox*>(w)) {
-            s.setValue(it.key(), check->isChecked());
+            newValue = check->isChecked();
+            s.setValue(key, newValue);
 
         } else if (auto group = qobject_cast<QGroupBox*>(w)) {
-            // NEW: support checkable group boxes
-            s.setValue(it.key(), group->isChecked());
+            // support checkable group boxes
+            newValue = group->isChecked();
+            s.setValue(key, newValue);
 
         } else if (auto spin = qobject_cast<QSpinBox*>(w)) {
-            s.setValue(it.key(), spin->value());
+            newValue = spin->value();
+            s.setValue(key, newValue);
 
         } else if (auto combo = qobject_cast<QComboBox*>(w)) {
-            if (it.key() == "General/EchoMode")
-                s.setValue(it.key(), combo->currentData().toInt());
-            else
-                s.setValue(it.key(), combo->currentText());
+            if (key == "Main/EchoMode") {
+                newValue = combo->currentData().toInt();
+            } else {
+                newValue = combo->currentText();
+            }
+            s.setValue(key, newValue);
+        }
+
+        // Check if this setting requires restart and has actually changed
+        if (restartKeys.contains(key) && oldValue != newValue) {
+            restartRequired = true;
         }
     }
 
-    // If backups disabled, remove backup folder
+    // If backups disabled, remove backup folder (your existing logic)
     if (!ui->groupBox->isChecked()) {
         const QString dbPath = settings.getDefaultDbPath(this);
         if (!dbPath.isEmpty()) {
@@ -536,6 +549,54 @@ void PreferencesDialog::saveSettings()
             }
         }
     }
+
+    // Show restart message if needed
+    if (restartRequired) {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setWindowTitle(tr("Restart Required"));
+        msgBox.setText(
+            tr("Some changes will take effect after restarting %1.")
+                .arg(QApplication::applicationName())
+            );
+
+        QPushButton *restartBtn = msgBox.addButton(
+            tr("Restart Now"), QMessageBox::AcceptRole);
+        msgBox.addButton(QMessageBox::Ok);
+
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == restartBtn) {
+            restartApplication();
+        }
+    }
+
+}
+
+void PreferencesDialog::restartApplication()
+{
+    QString program = QCoreApplication::applicationFilePath();
+    QStringList args = QCoreApplication::arguments();
+
+    if (!args.isEmpty())
+        args.removeFirst();
+
+    // Tell MainWindow to skip quit confirmation
+    if (auto mw = qobject_cast<MainWindow*>(parentWidget())) {
+        mw->abortingStartup = true; //ignore the name, this one just lets us skip quit confirmation if configured in passwords.conf
+    }
+
+    // Start the new instance *right now*
+    bool ok = QProcess::startDetached(program, args);
+
+    if (!ok) {
+        QMessageBox::critical(this, "Restart Failed",
+                              "Could not restart the application.");
+        return;
+    }
+
+    // Now quit the current instance
+    QCoreApplication::quit();
 }
 
 void PreferencesDialog::resizeEvent(QResizeEvent *event)

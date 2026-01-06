@@ -72,7 +72,6 @@ public:
      QLineEdit::EchoMode getEchoMode();
      int getMaxBackups();
      bool openCategoryDblClick();
-     bool hasExportedKey() const;
      void setExportedKey();
 
 private:
