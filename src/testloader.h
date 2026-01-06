@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QString>
 #include <QSqlDatabase>
+#include <QCloseEvent>
 
 class QSpinBox;
 class QProgressBar;
@@ -40,7 +41,6 @@ private:
 
 signals:
     void progress(int value);
-
 };
 
 
@@ -53,6 +53,10 @@ class TestLoaderDialog : public QDialog
     Q_OBJECT
 public:
     explicit TestLoaderDialog(TestLoader *loader, QWidget *parent = nullptr);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
+    void reject() override;
 
 private slots:
     void onRunClicked();

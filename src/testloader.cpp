@@ -551,3 +551,27 @@ QString TestLoader::randomTextWithSpaces(int minLen, int maxLen)
     // Clean up: avoid leading/trailing spaces
     return out.trimmed();
 }
+
+void TestLoaderDialog::closeEvent(QCloseEvent *event)
+{
+    if (!runButton->isEnabled()) {
+        QMessageBox::warning(this,
+                             "Test Data Generator",
+                             "Generation in progress. Please wait...");
+        event->ignore();
+        return;
+    }
+    QDialog::closeEvent(event);
+}
+
+void TestLoaderDialog::reject()
+{
+    if (!runButton->isEnabled()) {
+        QMessageBox::warning(this,
+                             "Test Data Generator",
+                             "Generation in progress. Please wait...");
+        return;
+    }
+
+    QDialog::reject();
+}
