@@ -49,7 +49,7 @@ public:
     using QStyledItemDelegate::QStyledItemDelegate;
 
     bool validate(const QString &text) const {
-        if (text.isEmpty()) return true; //won't validate without password anyway.
+        if (text.isEmpty()) return true;
         return isStrong(text);
     }
 
@@ -60,14 +60,15 @@ public:
         if (index.column() == 1) {
             QLineEdit *line = new QLineEdit(parent);
 
-            // Store row/column so the event filter knows where it belongs
             line->setProperty("row", index.row());
             line->setProperty("column", index.column());
             line->setProperty("handledCommitKey", false);
+            line->setProperty("contextMenuActive", false);
 
-            // Install event filter to intercept Tab, Enter, FocusOut
+            // Optional: disable context menu entirely
+            // line->setContextMenuPolicy(Qt::NoContextMenu);
+
             line->installEventFilter(const_cast<PasswordDelegate*>(this));
-
             return line;
         }
 
@@ -87,6 +88,26 @@ public:
             return QStyledItemDelegate::eventFilter(editor, event);
 
         bool handledCommit = line->property("handledCommitKey").toBool();
+        bool contextMenuActive = line->property("contextMenuActive").toBool();
+
+        // ----------------------------------------------------
+        // 0. CONTEXT MENU HANDLING (THE REAL FIX)
+        // ----------------------------------------------------
+        if (event->type() == QEvent::ContextMenu) {
+            line->setProperty("contextMenuActive", true);
+            return false; // allow menu
+        }
+
+        // When context menu closes, Qt sends FocusOut → ignore it
+        if (contextMenuActive && event->type() == QEvent::FocusOut) {
+            // Reset flag AFTER ignoring this FocusOut
+            line->setProperty("contextMenuActive", false);
+            return false; // do NOT validate
+        }
+
+        // ----------------------------------------------------
+        // 1. NORMAL VALIDATION LOGIC
+        // ----------------------------------------------------
 
         auto reopenEditor = [&](QLineEdit *line) {
             if (auto *view = qobject_cast<QAbstractItemView*>(parent())) {
@@ -96,8 +117,6 @@ public:
                     view,
                     [view, idx]() {
                         view->edit(idx);
-
-                        // Find the new editor and select text
                         if (auto *line = view->findChild<QLineEdit*>()) {
                             line->setFocus();
                             line->selectAll();
@@ -108,9 +127,7 @@ public:
             }
         };
 
-        // -------------------------
-        // 1. HANDLE COMMIT KEYS
-        // -------------------------
+        // Commit keys
         if (event->type() == QEvent::KeyPress) {
             QKeyEvent *key = static_cast<QKeyEvent*>(event);
 
@@ -121,8 +138,6 @@ public:
                 key->key() == Qt::Key_Backtab;
 
             if (isCommitKey) {
-
-                // Mark that we handled a commit key
                 line->setProperty("handledCommitKey", true);
 
                 if (!validate(line->text())) {
@@ -130,27 +145,24 @@ public:
                     if (!keep) {
                         line->clear();
                         reopenEditor(line);
-                        return true; // block commit + navigation
+                        return true;
                     }
                 }
             }
         }
 
-        // -------------------------
-        // 2. HANDLE FOCUS OUT
-        // -------------------------
+        // FocusOut
         if (event->type() == QEvent::FocusOut) {
 
-            // If a commit key was already handled, skip FocusOut validation
             if (handledCommit)
-                return false; // allow focus-out silently
+                return false;
 
             if (!validate(line->text())) {
                 bool keep = warnAndContinue();
                 if (!keep) {
                     line->clear();
                     reopenEditor(line);
-                    return true; // block losing focus
+                    return true;
                 }
             }
         }
@@ -162,11 +174,9 @@ public:
                       QAbstractItemModel *model,
                       const QModelIndex &index) const override
     {
-        // Only called when validation succeeded
         QStyledItemDelegate::setModelData(editor, model, index);
     }
 };
-
 
 
 
