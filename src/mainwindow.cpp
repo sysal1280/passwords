@@ -6142,14 +6142,32 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
             msgBox.setWindowTitle(tr("Import Complete"));
             msgBox.setTextFormat(Qt::RichText);
             msgBox.setText(
-                tr("Imported: %1<br>Skipped: %2<br><br>"
-                   "<b><span style='color:red;'>WARNING, WARNING, WARNING</span></b><br><br>"
-                   "The JSON file you just imported will remain in UNENCRYPTED form.<br><br>"
-                   "Leaving plaintext password files around is a serious security risk. "
-                   "Please securely delete or move the import file immediately to prevent leaks.")
+                tr("<div style='line-height:135%; margin:4px 0 6px 0;'>"
+                   "<b>Import completed.</b>"
+                   "<div style='margin-top:8px;'>"
+                   "<ul style='margin:0; padding-left:20px;'>"
+                   "<li style='margin-bottom:6px;'>Imported: <b>%1</b></li>"
+                   "<li style='margin-bottom:6px;'>Skipped: <b>%2</b></li>"
+                   "</ul>"
+                   "</div>"
+
+                   "<div style='margin-top:12px;'>"
+                   "<b><span style='color:red;'>WARNING</span></b><br><br>"
+                   "The JSON file you imported remains in <b>unencrypted</b> form."
+                   "</div>"
+
+                   "<div style='margin-top:8px;'>"
+                   "Leaving plaintext password files on disk is a serious security risk. "
+                   "Please securely delete or move the import file immediately to prevent leaks."
+                   "</div>"
+
+                   "<div style='margin-top:12px;'>"
+                   "You may also wish to consider changing the password for additional security."
+                   "</div>"
+                   "</div>")
                     .arg(importedCount)
                     .arg(skippedCount)
-                );
+            );
             msgBox.exec();
         }
 
