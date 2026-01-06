@@ -6486,14 +6486,12 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     // ESC Key
     if (event->key() == Qt::Key_Escape) {
 
-        // 1. If a password is open, clear and stop
         if (openedCredentialID != -1) {
             clearScrollArea();
             event->accept();
             return;
         }
 
-        // 2. No password open → collapse/clear if needed
         if (ui->treeWidget->topLevelItemCount() > 0 ||
             ui->treeWidget_2->topLevelItemCount() > 0) {
 
@@ -6505,49 +6503,78 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             return;
         }
 
-        // 3. Nothing open, nothing to collapse = nothing else to do
         event->accept();
         return;
     }
 
     // CTRL+F
-    if (event->key() == Qt::Key_F && event->modifiers() == Qt::ControlModifier) {
+    if (event->key() == Qt::Key_F &&
+        event->modifiers() == Qt::ControlModifier) {
+
         ui->lineEditSearch->setFocus();
         event->accept();
         return;
     }
 
-    // F2 — open new password dialog
+    // F2 — new password
     if (event->key() == Qt::Key_F2) {
         newPassword();
         event->accept();
         return;
     }
 
-    // Delete — delete category or password depending on focus
+    // DELETE KEY — safe version
     if (event->key() == Qt::Key_Delete) {
-        qDebug() << "Got Delete Key";
 
         QWidget *focus = QApplication::focusWidget();
 
-        if (focus == ui->treeWidget) {
-            deleteCategory(ui->treeWidget->currentItem());
+        // --- CATEGORY TREE ---
+        if (ui->treeWidget->isAncestorOf(focus)) {
+
+            QTreeWidgetItem *item = ui->treeWidget->currentItem();
+
+            if (!item) {
+                qDebug() << "Delete: no category selected";
+                event->accept();
+                return;
+            }
+
+            // Move focus away BEFORE deleting to avoid Qt reentrancy issues
+            this->setFocus();
+
+            deleteCategory(item);
             event->accept();
             return;
         }
 
-        if (focus == ui->treeWidget_2) {
-            deletePassword(ui->treeWidget_2->currentItem());
+        // --- PASSWORD TREE ---
+        if (ui->treeWidget_2->isAncestorOf(focus)) {
+
+            QTreeWidgetItem *item = ui->treeWidget_2->currentItem();
+
+            if (!item) {
+                qDebug() << "Delete: no password selected";
+                event->accept();
+                return;
+            }
+
+            // Move focus away BEFORE deleting
+            this->setFocus();
+
+            // Trigger QAction instead of calling deletePassword directly
+            // This ensures consistent behavior and avoids double-deletes
+            ui->actionDelete_Password->trigger();
+
             event->accept();
             return;
         }
 
-        // If Delete was pressed but no relevant widget had focus
+        // Delete pressed but no relevant widget had focus
         event->accept();
         return;
     }
 
-    // Pass unhandled keys to base class
+    // Default
     QMainWindow::keyPressEvent(event);
 }
 
