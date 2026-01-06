@@ -356,12 +356,12 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
     QPushButton* closeBtn = buttonBox->addButton(QDialogButtonBox::Close);
     QPushButton* copyBtn  = buttonBox->addButton(QObject::tr("Copy"), QDialogButtonBox::ActionRole);
     QPushButton* helpBtn  = buttonBox->addButton(QDialogButtonBox::Help);
-
     layout->addWidget(buttonBox);
 
-    // --- Create process (moved here, unchanged) ---
+    // --- Create process early so it's in scope ---
     QProcess* proc = new QProcess(dlg);
 
+    // Kill process if dialog is destroyed (prevents async crashes)
     QObject::connect(dlg, &QObject::destroyed, proc, [proc]() {
         if (proc->state() != QProcess::NotRunning)
             proc->kill();
@@ -372,41 +372,32 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
 
     QObject::connect(copyBtn, &QPushButton::clicked, dlg, [textEdit]() {
         QTextCursor cursor = textEdit->textCursor();
-
-        if (cursor.hasSelection()) {
-            QApplication::clipboard()->setText(cursor.selectedText());
-        } else {
-            QApplication::clipboard()->setText(textEdit->toPlainText());
-        }
+        QApplication::clipboard()->setText(
+            cursor.hasSelection() ? cursor.selectedText() : textEdit->toPlainText()
+            );
     });
 
-    QObject::connect(helpBtn,
-                     &QPushButton::clicked,
-                     dlg,
-                     [dlg]() {
+    QObject::connect(helpBtn, &QPushButton::clicked, dlg, [dlg]() {
+        checkHelpReachable([dlg](bool reachable) {
+            if (reachable) {
+                const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("keys-listing"));
+                QDesktopServices::openUrl(url);
+            } else {
+                MainWindow *mw = qobject_cast<MainWindow*>(dlg->parentWidget());
+                if (!mw) {
+                    QMessageBox::warning(
+                        dlg,
+                        QObject::tr("Help Error"),
+                        QObject::tr("Help system unavailable: parent window is not MainWindow.")
+                        );
+                    return;
+                }
+                mw->launchHelperProcess(QStringLiteral("keys-listing"));
+            }
+        });
+    });
 
-                         checkHelpReachable([dlg](bool reachable) {
-                             if (reachable) {
-                                 // Open the online help page for linking keys
-                                 const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("keys-listing"));
-                                 QDesktopServices::openUrl(url);
-                             } else {
-                                 // Fallback to helper process
-                                 MainWindow *mw = qobject_cast<MainWindow*>(dlg->parentWidget());
-                                 if (!mw) {
-                                     QMessageBox::warning(
-                                         dlg,
-                                         QObject::tr("Help Error"),
-                                         QObject::tr("Help system unavailable: parent window is not MainWindow.")
-                                         );
-                                     return;
-                                 }
-
-                                 mw->launchHelperProcess(QStringLiteral("keys-listing"));
-                             }
-                         });
-                     });
-
+    // --- Process output handlers ---
     QObject::connect(proc, &QProcess::readyReadStandardOutput, dlg, [textEdit, proc]() {
         textEdit->append(QString::fromUtf8(proc->readAllStandardOutput()));
     });
@@ -418,8 +409,10 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
     });
 
     // --- When finished, prettify output ---
-    QObject::connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-                     dlg, [textEdit, type](int, QProcess::ExitStatus) {
+    QObject::connect(proc,
+                     QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+                     dlg,
+                     [textEdit, type](int, QProcess::ExitStatus) {
 
                          QString raw = textEdit->toPlainText();
                          textEdit->clear();
@@ -431,8 +424,7 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
                          QString fingerprint;
                          QString created;
 
-                         const QString primaryType =
-                             (type == GpgKeyType::Public) ? "pub" : "sec";
+                         const QString primaryType = (type == GpgKeyType::Public) ? "pub" : "sec";
 
                          for (const QString &line : std::as_const(lines)) {
                              QStringList p = line.split(':');
@@ -449,9 +441,8 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
                                  keyId = p[4];
 
                                  if (!p[5].isEmpty()) {
-                                     created = QDateTime::fromSecsSinceEpoch(
-                                                   p[5].toLongLong())
-                                                   .toString("yyyy-MM-dd");
+                                     created = QDateTime::fromSecsSinceEpoch(p[5].toLongLong())
+                                     .toString("yyyy-MM-dd");
                                  }
                              }
                              else if (recordType == "fpr") {
