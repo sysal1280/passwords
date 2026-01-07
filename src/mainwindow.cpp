@@ -1845,7 +1845,7 @@ ScopedCursor wait(Qt::WaitCursor);
         QString url = root.value("url").toString().trimmed();
 
         if (!url.isEmpty()) {
-            QLabel* fullWidthLabel_url = new QLabel("<a href=\"" + url + "\">" + url + "</a>");
+            QLabel* fullWidthLabel_url = new QLabel("<a href=\"" + url + "\">" + shortenUrlForDisplay(url) + "</a>");
             fullWidthLabel_url->setObjectName("labelPasswordURL");
             fullWidthLabel_url->setTextFormat(Qt::RichText);
             fullWidthLabel_url->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -7503,3 +7503,17 @@ void MainWindow::moveCategoryWrapper(QTreeWidgetItem *sourceItem,
 {
     moveCategory(sourceItem, targetItem, false);   // skipPrompt = false
 }
+
+QString MainWindow::shortenUrlForDisplay(const QString& url, int maxLen)
+{
+    if (url.length() <= maxLen)
+        return url;
+
+    // Keep start and end, insert "..."
+    int keep = (maxLen - 3) / 2;
+    QString start = url.left(keep);
+    QString end = url.right(keep);
+
+    return start + "..." + end;
+}
+

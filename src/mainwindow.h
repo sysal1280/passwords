@@ -138,6 +138,7 @@ private:
 
     // JSON population
     void populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui);
+    QString shortenUrlForDisplay(const QString& url, int maxLen = 55);
 
     void createCategory(const QString& categoryName = QString());
     void importApplicationsFromFile(const QString &filePath);
