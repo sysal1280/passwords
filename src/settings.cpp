@@ -341,7 +341,7 @@ bool Settings::getLoginPreference()
         return false; // safe fallback
 
     settings->beginGroup("Main");
-    QString val = settings->value("RequireChallenge", "yes")
+    QString val = settings->value("RequireChallenge", false)
                       .toString()
                       .trimmed()
                       .toLower();

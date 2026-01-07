@@ -298,10 +298,6 @@ Ensure it is accessible in your PATH.
             dbOpened = true;
         }
     }
-    if (splash) {
-        splash->show();
-        splash->raise();
-    }
 
     /*
      * Terms - optional dialog
@@ -321,6 +317,7 @@ Ensure it is accessible in your PATH.
                 return 0;   // User declined
         }
     }
+
     if (splash) {
         splash->show();
         splash->raise();
