@@ -50,7 +50,6 @@ QLineEdit:focus {
     border: 1px solid #4a90e2;
 }
 
-
 QListWidget {
     background-color: white;
 }
@@ -70,7 +69,6 @@ QListWidget::item:selected:hover {
 QListWidget::item:hover {
     background: #e6f4fb;   /* same hover as tree widgets */
 }
-
 
 PlainTextEdit,
 QTextEdit,
@@ -196,8 +194,6 @@ QMenu::separator {
     margin: 6px 4px;
 }
 
-
-
  /* ============================================================
    CUSTOM
    Applies to all widgets.
@@ -218,8 +214,6 @@ QLineEdit#lineEditSearch:focus {
     background: #f3f7ff;
 }
 
-
-
 QLabel#labelNameHeading {
     background-color: #2299d4;
     padding: 6px;
@@ -228,8 +222,6 @@ QLabel#labelNameHeading {
     border: 1px solid #1a7bb0;
     border-radius: 1px;
 }
-
-
 
 QLabel#labelNotesHeading {
     background-color: #2299d4;
@@ -240,8 +232,6 @@ QLabel#labelNotesHeading {
     border-radius: 1px;
 }
 
-
-
 QLabel#labelAboutPasswordHeading {
     background-color: #ffffdc;      
     padding: 6px;
@@ -250,8 +240,6 @@ QLabel#labelAboutPasswordHeading {
     border: 1px solid #d4c878;      
     border-radius: 1px;
 }
-
-
 
 QLabel#labelPasswordURL {
     padding-bottom: 6px;
@@ -311,8 +299,6 @@ QTreeWidget#treeWidget_2::item:alternate {
     background: #f7f7f7;
 }
 
-
-
 /* ============================================================
    TREE_WIDGET ONLY (Categories Tree)
    ============================================================ */
@@ -346,7 +332,6 @@ QTreeWidget#treeWidget::item:selected:hover {
 QTreeWidget#treeWidget::item:alternate {
     background: #f7f7f7;
 }
-
 
 /* ============================================================
    SCROLL AREA (PASSWORDS drop)
@@ -386,8 +371,6 @@ QScrollArea#scrollArea QScrollBar::sub-page:vertical {
     background: none;
 }
 
-
-
 /* ============================================================
    STATUSBAR(MainWindow)
    ============================================================ */
@@ -402,7 +385,6 @@ QStatusBar#statusbar::item {
     border: none;
     padding: 0 6px;
 }
-
 
 /* ============================================================
    PASSWORD GENERATOR (editGenerateNewPassword)
@@ -422,8 +404,6 @@ QLineEdit#editGenerateNewPassword:focus {
     border-color: #4caf50;
     background: #ffffff;
 }
-
-
 
 /* ============================================================
    RANDOM NOISE GENRATOR (textEditRandomNoise)
@@ -445,8 +425,6 @@ QTextEdit#textEditRandomNoise:focus {
     border-color: #4caf50;
     background: #ffffff;
 }
-
-
 
 /* ============================================================
    TOTP PROGRESSBAR (progressTOTP)
@@ -497,7 +475,6 @@ QProgressBar#progressTOTP[toptState="critical"]::chunk {
     border-radius: 0;
     margin: 0px;
 }
-
 
 /* ============================================================
    PASSWORD INSPECOR
