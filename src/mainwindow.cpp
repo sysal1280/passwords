@@ -6232,11 +6232,17 @@ void MainWindow::createCategory(const QString& categoryName /* = QString() */)
     //
     // 2. Validate name
     //
-    static const QRegularExpression re("^.{1,64}$");
+    static const QRegularExpression re(
+        "^\\X{1,64}$",
+        QRegularExpression::UseUnicodePropertiesOption
+    );
+
     if (!re.match(text).hasMatch()) {
-        QMessageBox::warning(this,
-                             tr("Invalid Name"),
-                             tr("Category name contains invalid characters or is too long."));
+        QMessageBox::warning(
+            this,
+            tr("Invalid Name"),
+            tr("Category name contains invalid characters or is too long.")
+        );
         return;
     }
 
@@ -6344,12 +6350,20 @@ void MainWindow::renameCategory()
     }
 
     //validate
-    static const QRegularExpression re("^[\\w\\-\\s]{1,64}$");
+    static const QRegularExpression re(
+        "^(?:[\\p{L}\\p{N}\\p{Zs}-]|\\X){1,64}$",
+        QRegularExpression::UseUnicodePropertiesOption
+    );
+
     if (!re.match(text).hasMatch()) {
-        QMessageBox::warning(this, tr("Invalid Name"),
-                             tr("Category name contains invalid characters or is too long."));
+        QMessageBox::warning(
+            this,
+            tr("Invalid Name"),
+            tr("Category name contains invalid characters or is too long.")
+        );
         return;
     }
+
 
 
     // Duplicate check among siblings

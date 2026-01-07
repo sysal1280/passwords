@@ -353,12 +353,16 @@ void PreferencesDialog::restoreDefaults()
 {
 
     QMessageBox::StandardButton reply =
-        QMessageBox::question(this,
-                              tr("Restore Defaults"),
-                              tr("This will overwrite your current settings including graphcal interface settings with the default configuration.\n\n"
-                                 "Are you sure you want to continue?"),
-                              QMessageBox::Yes | QMessageBox::No,
-                              QMessageBox::No);
+        QMessageBox::question(
+            this,
+            tr("Restore Defaults"),
+            tr("This will reset all application preferences, including visual and interface settings, back to their default values.\n\n"
+               "This does not restore or regenerate your Application Key if it has been previously exported.\n\n"
+               "Do you want to continue?"),
+            QMessageBox::Yes | QMessageBox::No,
+            QMessageBox::No
+            );
+
 
     if (reply != QMessageBox::Yes) {
         return; // user cancelled
@@ -370,14 +374,14 @@ void PreferencesDialog::restoreDefaults()
 
     if (!stock.exists()) {
         qCritical().noquote() << Q_FUNC_INFO << "The boilerplate configuration file was not found inside the resource file.";
-        QMessageBox::critical(this, "",
+        QMessageBox::critical(this, tr("Restore Defaults"),
                               tr("The boilerplate configuration file was not found."));
         return;
     }
 
     if (!stock.open(QIODevice::ReadOnly)) {
         qCritical().noquote() << Q_FUNC_INFO << "The boilerplate configuration file could not be opened for reading.";
-        QMessageBox::critical(this, "",
+        QMessageBox::critical(this, tr("Restore Defaults"),
                               tr("Could not open the boilerplate configuration file."));
         return;
     }
@@ -388,14 +392,14 @@ void PreferencesDialog::restoreDefaults()
     QFile target(targetPath);
     if (!target.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         qCritical().noquote() << Q_FUNC_INFO << "Could not write to" << targetPath << target.errorString();
-        QMessageBox::critical(this, "",
+        QMessageBox::critical(this, tr("Restore Defaults"),
                               tr("Could not write to %1").arg(targetPath));
         return;
     }
 
     if (target.write(data) != data.size()) {
         qCritical().noquote() << Q_FUNC_INFO << "Failed to write all data to" << targetPath << target.errorString();
-        QMessageBox::critical(this, "",
+        QMessageBox::critical(this, tr("Restore Defaults"),
                               tr("Failed to write all data to %1").arg(targetPath));
         target.close();
         return;
@@ -407,7 +411,7 @@ void PreferencesDialog::restoreDefaults()
     if (success) {
         loadSettings();
         qApp->setProperty("skipSave", true);
-        QMessageBox::information(this, "",
+        QMessageBox::information(this, tr("Restore Defaults"),
                                  tr("Settings have been restored to defaults.\n\n"
                                     "Please restart the application for all default settings to take effect."));
         qInfo().noquote() << Q_FUNC_INFO << "Default configuration restored.";
