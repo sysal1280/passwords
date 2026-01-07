@@ -1,8 +1,10 @@
 ### Passwords
 
 A free, open‑source, offline password manager powered by GPG.
+
 Managing passwords securely is essential, yet many people still avoid password managers due to cost, cloud‑storage requirements, or distrust of proprietary systems. Passwords takes a different approach: it is a fully offline, cross‑platform, GPG‑based password manager designed for individuals, professionals, and high‑security environments.
-By removing subscriptions, internet dependencies, and closed ecosystems, Passwords makes strong credential management accessible to everyone — from home users to Tier‑0/Tier‑1 enterprise environments.
+
+By removing subscriptions, internet dependencies, and closed ecosystems, Passwords makes strong credential management accessible to everyone. Suitable for home users to Tier‑0/Tier‑1 enterprise environments.
 
 
 
@@ -55,3 +57,11 @@ You can also download a setup program from Releases.
 #### Screenshots
 
 ![](screenshots/mainwindow.png)
+
+![](screenshots/open_password.png)
+
+![](screenshots/generate_password.png)
+
+![](screenshots/properties.png)
+
+![](screenshots/preferences.png)
