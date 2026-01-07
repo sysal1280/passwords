@@ -61,12 +61,10 @@ QListWidget::item {
 
 QListWidget::item:selected {
     background: #2299d4;
-    color: white;
 }
 
 QListWidget::item:selected:hover {
     background: #2299d4;   /* keep it stable on hover */
-    color: white;
 }
 
 QListWidget::item:hover {

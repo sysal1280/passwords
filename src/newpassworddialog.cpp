@@ -42,6 +42,9 @@
 #include <QTableWidgetItem>
 #include <QToolButton>
 #include <QTimer>
+#include <QPen>
+#include <QPainter>
+#include <QColor>
 
 
 class PasswordDelegate : public QStyledItemDelegate {
