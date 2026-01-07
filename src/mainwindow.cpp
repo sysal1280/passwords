@@ -673,7 +673,6 @@ MainWindow::MainWindow(QWidget *parent)
     // Line edit search
     connect(ui->lineEditSearch, &QLineEdit::returnPressed,
             this, [this] {
-                ScopedCursor wait(Qt::WaitCursor);
                 search(ui->lineEditSearch->text().trimmed());
             });
 
@@ -4044,6 +4043,8 @@ void MainWindow::init()
 void MainWindow::search(const QString &text)
 {
 
+    ScopedCursor wait(Qt::WaitCursor);
+
     QString sep = settings.getPathSeparator();
     QString escapedSep = QRegularExpression::escape(sep);
 
@@ -4206,6 +4207,8 @@ void MainWindow::search(const QString &text)
         int x = parentPos.x() + (parentSize.width() - w) / 2;
         int y = parentPos.y() + (parentSize.height() - h) / 2;
         dlg.setGeometry(x, y, w, h);
+
+        QApplication::restoreOverrideCursor();
 
         if (dlg.exec() == QDialog::Accepted) {
             int row = table->currentRow();
