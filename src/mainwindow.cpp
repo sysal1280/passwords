@@ -194,6 +194,7 @@ MainWindow::MainWindow(QWidget *parent)
         { ui->actionClear_GPG_Passphrase_Cache, ":/menus/glyphs/lock_reset_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionMaintenance,           ":/menus/glyphs/build_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionCopy_Password_Path,    ":/menus/glyphs/file_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"} ,
+        { ui->actionReport_a_Bug,          ":/menus/glyphs/bug_report_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"},
         { ui->actionOnline_Documentation,  ":/menus/glyphs/help_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" }
     };
 
@@ -239,6 +240,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->actionOnline_Documentation->setStatusTip(tr("Open the user guide in your web browser"));
     ui->actionSystem_Information->setStatusTip(tr("View detailed system and application information"));
+    ui->actionReport_a_Bug->setStatusTip(tr("Report a bug or issue you’ve encountered"));
     ui->actionDonate->setStatusTip(tr("Learn how to support the project"));
     ui->actionAbout->setStatusTip(tr("View information about this application"));
     ui->actionAbout_Qt->setStatusTip(tr("View information about the Qt toolkit"));
@@ -702,6 +704,11 @@ MainWindow::MainWindow(QWidget *parent)
                 launchHelperProcess(QStringLiteral(""));
             }
         });
+    });
+
+    //report bug
+    connect(ui->actionReport_a_Bug, &QAction::triggered, this, [=]() {
+        QDesktopServices::openUrl(QUrl(Passwords::BugUrl));
     });
 
     //donate

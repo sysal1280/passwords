@@ -125,6 +125,7 @@
     </property>
     <addaction name="actionOnline_Documentation"/>
     <addaction name="actionSystem_Information"/>
+    <addaction name="actionReport_a_Bug"/>
     <addaction name="actionDonate"/>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
@@ -477,6 +478,14 @@
   <action name="actionCopy_Password_Path">
    <property name="text">
     <string>Copy Password Path</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionReport_a_Bug">
+   <property name="text">
+    <string>Report a Bug</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
