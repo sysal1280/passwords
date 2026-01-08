@@ -21,18 +21,18 @@
 #include "categoryproperties.h"
 #include "dataobfuscator.h"
 
-#include <QVBoxLayout>
 #include <QApplication>
+#include <QChart>
 #include <QDebug>
+#include <QHeaderView>
+#include <QLocale>
+#include <QMessageBox>
+#include <QPieSeries>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QChart>
-#include <QLocale>
-#include <QPieSeries>
-#include <QHeaderView>
-#include <QMessageBox>
 #include <QToolTip>
 #include <QUuid>
+#include <QVBoxLayout>
 
 CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     : QDialog(parent), selectedId(selectedCategoryId)
