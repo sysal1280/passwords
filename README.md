@@ -56,9 +56,9 @@ You can also download a setup program from Releases.
 
 #### Contact
 
-This key is provided so users, contributors and researches can reach me securely regarding vulnerabilities, responsible disclosure, or other sensitive matters.
+The following key is provided so users, contributors, and researchers can reach out securely regarding vulnerabilities, responsible disclosure, or other sensitive matters.
 
-If you need to verify the authenticity of this key, I’m happy to arrange a brief virtual meeting or alternative verification method. Establishing a proper trust path (“web of trust”) is important for high‑assurance communication.
+If verification of the key’s authenticity is required, a brief virtual meeting or alternative verification method can be arranged. Establishing a proper trust path (“web of trust”) is important for high‑assurance communication.
 
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----

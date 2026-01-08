@@ -1,26 +1,23 @@
-# Security Policy
-
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in **Passwords**, please report it responsibly.
+If a security vulnerability is discovered in **Passwords**, it should be reported responsibly.
 
 **Do not open a public GitHub issue.**
 
 Instead, use one of the following private channels:
 
-- https://github.com/sysal1280/passwords/security
-  
-- Email: sysal@tuta.io
+- Online submission: https://github.com/sysal1280/passwords/security
+- Email reporting: sysal@tuta.io
 
-We will review reports as quickly as possible and coordinate a fix and disclosure via Github.
+Reports are prioritised and reviewed as quickly as possible, including coordination of fixes and management of disclosure via GitHub.
 
-Thank you for helping keep the project secure.
+Thank you for helping keep the project secure ♥️
 
 #### Contact
 
-This key is provided so users, contributors and researches can reach me securely regarding vulnerabilities, responsible disclosure, or other sensitive matters.
+The following key is provided so users, contributors, and researchers can reach out securely regarding vulnerabilities, responsible disclosure, or other sensitive matters.
 
-If you need to verify the authenticity of this key, I’m happy to arrange a brief virtual meeting or alternative verification method. Establishing a proper trust path (“web of trust”) is important for high‑assurance communication.
+If verification of the key’s authenticity is required, a brief virtual meeting or alternative verification method can be arranged. Establishing a proper trust path (“web of trust”) is important for high‑assurance communication.
 
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -40,26 +37,25 @@ ISg+llckgu3wopbVOv2afKS2AYClG4oXP4CgUlkH
 
 ## Rewards & Recognition
 
-We value the time and effort security researchers invest in helping keep **Passwords** safe. To acknowledge meaningful contributions, we offer the following forms of recognition:
+The time and effort security researchers invest in helping keep **Passwords** safe is greatly appreciated. To acknowledge meaningful contributions, the following forms of recognition are offered:
 
 #### **CVE Credit**
 
-If your report results in a confirmed, fixable security vulnerability, we will:
+If a report results in a confirmed, fixable security vulnerability, the project will:
 
-- Request a **CVE ID** through GitHub’s security advisory process
-- List you as the **credited reporter** in the advisory (unless you prefer anonymity)
+- Request a CVE ID through GitHub’s security advisory process
+- Credit the reporter in the advisory (unless anonymity is preferred)
 
 #### **Public Recognition**
 
-With your permission, we will also:
+With permission, the project will also:
 
-- Acknowledge your contribution in the project’s **Security Hall of Fame** (README or a dedicated file)
-- Credit you in the **release notes** associated with the fix
-- Optionally link to your website, GitHub profile, or handle
+- Acknowledge the contribution in the commit history
+- Credit the reporter in the release notes associated with the fix
+- Optionally include a link to a website, GitHub profile, or handle
 
-If you prefer to remain anonymous, we will fully respect that.
+Anonymity is fully respected if preferred.
 
 #### **Swag**
 
-As a small token of appreciation, we can also send project‑themed swag such as stickers, stationery and mugs. If you’d like to receive something, just let us know when submitting your report.
-
+As a small token of appreciation, project‑themed swag such as stickers, stationery, or mugs can be provided. If this is of interest, it can be mentioned when submitting a report.
