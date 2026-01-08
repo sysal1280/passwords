@@ -1,0 +1,22 @@
+name: macOS Qt Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install Qt
+        run: brew install qt
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_PREFIX_PATH=$(brew --prefix qt)
+
+      - name: Build
+        run: cmake --build build --config Release
