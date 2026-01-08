@@ -9,8 +9,8 @@ If a security vulnerability is discovered in **Passwords**, it should be reporte
 
 Instead, use one of the following private channels:
 
-- - Online submission: https://github.com/sysal1280/passwords/security
-- - Email reporting: sysal@tuta.io
+- - - Online submission: https://github.com/sysal1280/passwords/security
+- - - Email reporting: sysal@tuta.io
 
 Reports are prioritised and reviewed as quickly as possible, including coordination of fixes and management of disclosure via GitHub.
 
@@ -23,7 +23,7 @@ The following key is provided so users, contributors, and researchers can reach 
 If verification of the key’s authenticity is required, a brief virtual meeting or alternative verification method can be arranged. Establishing a proper trust path (“web of trust”) is important for high‑assurance communication.
 
 ```
-- -----BEGIN PGP PUBLIC KEY BLOCK-----
+- - -----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mDMEaV9c5xYJKwYBBAHaRw8BAQdAdO8btpZZngb73SrbAU2fc70wNOszgj2Bs4WH
 f/ZOrmG0HkFkYW0gTGFuemFmYW1lIDxzeXNhbEB0dXRhLmlvPoiTBBMWCgA7FiEE
@@ -35,7 +35,7 @@ AwEIB4h4BBgWCgAgFiEEbnJhvdS9I2JlKax2lJxVOT5YwLYFAmlfXOcCGwwACgkQ
 lJxVOT5YwLZlqgD7B+PNwtzTbP0xuo+nmnCD9a5s3VQVK2lkG0+7E6vzYEEBALDl
 ISg+llckgu3wopbVOv2afKS2AYClG4oXP4CgUlkH
 =9i3E
-- -----END PGP PUBLIC KEY BLOCK-----
+- - -----END PGP PUBLIC KEY BLOCK-----
 ```
 
 ## Rewards & Recognition
@@ -46,26 +46,27 @@ The time and effort security researchers invest in helping keep **Passwords** sa
 
 If a report results in a confirmed, fixable security vulnerability, the project will:
 
-- - Request a CVE ID through GitHub’s security advisory process
-- - Credit the reporter in the advisory (unless anonymity is preferred)
+- - - Request a CVE ID through GitHub’s security advisory process
+- - - Credit the reporter in the advisory (unless anonymity is preferred)
 
 #### **Public Recognition**
 
 With permission, the project will also:
 
-- - Acknowledge the contribution in the commit history
-- - Credit the reporter in the release notes associated with the fix
-- - Optionally include a link to a website, GitHub profile, or handle
+- - - Acknowledge the contribution in the commit history
+- - - Credit the reporter in the release notes associated with the fix
+- - - Optionally include a link to a website, GitHub profile, or handle
 
 Anonymity is fully respected if preferred.
 
 #### **Swag**
 
 As a small token of appreciation, project‑themed swag such as stickers, stationery, or mugs can be provided. If this is of interest, it can be mentioned when submitting a report.
+
 -----BEGIN PGP SIGNATURE-----
 
-iHUEARYKAB0WIQRucmG91L0jYmUprHaUnFU5PljAtgUCaV+XYAAKCRCUnFU5PljA
-tgYVAP9CD5dke66EtuZyrIHV8b6/IP69rc585nUCqtMxSKUKOgEAuzdegiSOFo/u
-izjyhhr/gF1Z79yR0F0OxMNKdW1X5AA=
-=20xo
+iHUEARYKAB0WIQRucmG91L0jYmUprHaUnFU5PljAtgUCaV+YeAAKCRCUnFU5PljA
+tp2mAP9G7iYMSdq0+aXOz3DAlwLeYrFdDdrX+qo00PPDLPf4gQD+J0OuGHQKn9kV
+GgSgsy9lsr9ORfnQER8pWSeJm41snwk=
+=IaeB
 -----END PGP SIGNATURE-----
