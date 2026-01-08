@@ -21,13 +21,13 @@
 #ifndef CATEGORYPROPERTIES_H
 #define CATEGORYPROPERTIES_H
 
-#include <QDialog>
-#include <QMap>
-#include <QList>
-#include <QSqlDatabase>
 #include <QChartView>
-#include <QTableWidget>
+#include <QDialog>
 #include <QDialogButtonBox>
+#include <QList>
+#include <QMap>
+#include <QSqlDatabase>
+#include <QTableWidget>
 
 QT_BEGIN_NAMESPACE
 class QPieSeries;
