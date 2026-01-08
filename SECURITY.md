@@ -8,11 +8,9 @@ If you discover a security vulnerability in **Passwords**, please report it resp
 
 Instead, use one of the following private channels:
 
-- GitHub Security Advisories:  
-  https://github.com/sysal1280/passwords/security/advisories/new
-
-- Email:  
-  sysal@tuta.io
+- https://github.com/sysal1280/passwords/security
+  
+- Email: sysal@tuta.io
 
 We will review reports as quickly as possible and coordinate a fix and disclosure via Github.
 
