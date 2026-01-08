@@ -128,6 +128,15 @@ if(NOT MSVC)
         $<$<CONFIG:Release>:-D_FORTIFY_SOURCE=2>
     )
 
+# ---- PIE + ASLR ENABLED HERE ----
+target_compile_options(password PRIVATE
+    $<$<CONFIG:Release>:-fPIE>
+)
+target_link_options(password PRIVATE
+    $<$<CONFIG:Release>:-pie>
+)
+# ---------------------------------
+
     # Linux-only linker hardening
     if(UNIX AND NOT APPLE)
         target_link_options(password PRIVATE
@@ -153,6 +162,14 @@ if(MSVC)
     target_compile_options(password PRIVATE
         $<$<CONFIG:Release>:/GS>
         $<$<CONFIG:Release>:/guard:cf>
+        $<$<CONFIG:Release>:/sdl>
+        $<$<CONFIG:Release>:/Qspectre>
+    )
+
+    # ASLR + DEP (Windows equivalents of PIE + NX)
+    target_link_options(password PRIVATE
+        $<$<CONFIG:Release>:/DYNAMICBASE>
+        $<$<CONFIG:Release>:/NXCOMPAT>
     )
 
     # Remove debug info + optimize + fold identical functions
@@ -162,3 +179,4 @@ if(MSVC)
         $<$<CONFIG:Release>:/DEBUG:NONE>
     )
 endif()
+
