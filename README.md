@@ -2,7 +2,7 @@
 
 A free, open‑source, offline password manager powered by GPG.
 
-Managing passwords securely is essential, yet many people still avoid password managers due to cost, cloud‑storage requirements, or distrust of proprietary systems. Passwords takes a different approach: it is a fully offline, cross‑platform, GPG‑based password manager designed for individuals, professionals, and high‑security environments.
+Managing passwords securely is essential, yet many people still avoid password managers due to cost, cloud‑storage requirements, or distrust of proprietary systems. Passwords takes a different approach: it is a fully offline, cross‑platform, GPG based password manager designed for individuals, professionals, and high‑security environments.
 
 By removing subscriptions, internet dependencies, and closed ecosystems, Passwords makes strong credential management accessible to everyone. Suitable for home users to Tier‑0/Tier‑1 enterprise environments.
 
@@ -63,16 +63,17 @@ If verification of the key’s authenticity is required, a brief virtual meeting
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 
-mDMEaV9c5xYJKwYBBAHaRw8BAQdAdO8btpZZngb73SrbAU2fc70wNOszgj2Bs4WH
-f/ZOrmG0HkFkYW0gTGFuemFmYW1lIDxzeXNhbEB0dXRhLmlvPoiTBBMWCgA7FiEE
-bnJhvdS9I2JlKax2lJxVOT5YwLYFAmlfXOcCGwMFCwkIBwICIgIGFQoJCAsCBBYC
-AwECHgcCF4AACgkQlJxVOT5YwLZyxQD+N5V2M4FA0P0r7LZwGP305ZAoQjR/Fmjj
-2/46aXtrBcoBAPb0tBMLM1qD86VdJ2/PjksD7lxxHOhXRGvee9QQqDACuDgEaV9c
-5xIKKwYBBAGXVQEFAQEHQK35oYNwR/cKlQmQm62OhLVVNo+mSkob5tqtWf+LUz1n
-AwEIB4h4BBgWCgAgFiEEbnJhvdS9I2JlKax2lJxVOT5YwLYFAmlfXOcCGwwACgkQ
-lJxVOT5YwLZlqgD7B+PNwtzTbP0xuo+nmnCD9a5s3VQVK2lkG0+7E6vzYEEBALDl
-ISg+llckgu3wopbVOv2afKS2AYClG4oXP4CgUlkH
-=9i3E
+mDMEaV+hbhYJKwYBBAHaRw8BAQdAu+q2MRw1uFbHJjRo8fHfx3P6IddEZGhIpWf2
+4EOIAzG0QnN5c2FsMTI4MCAoaHR0cHM6Ly9naXRodWIuY29tL3N5c2FsMTI4MC9w
+YXNzd29yZHMpIDxzeXNhbEB0dXRhLmlvPoiTBBMWCgA7FiEEduAzNWhm5SbEvt3F
+mWejkyFPdxMFAmlfoW4CGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQ
+mWejkyFPdxOxsQEA813GexLfR7KiR3tTi/rTOy4Q3BnYgFFpOMSl7pVM0TcBALw9
+MvveuQ+EGiZvXp0k78R7eG/SyGYApDM7CuiKOGAAuDgEaV+hbhIKKwYBBAGXVQEF
+AQEHQEPtiVxJAOZJ/Y4qwZaJgJtPv51M3K5ljtFowLfMCeBvAwEIB4h4BBgWCgAg
+FiEEduAzNWhm5SbEvt3FmWejkyFPdxMFAmlfoW4CGwwACgkQmWejkyFPdxOENAEA
+5LDnktBg2JWencddQi5UcT1pw3n9DXhH8CQ4mhtfroIBANSjobsiMFJbkCLcbZHy
+MM0F3vfXCoM5bAW6SEjJr/YC
+=FKX/
 -----END PGP PUBLIC KEY BLOCK-----
 ```
 
