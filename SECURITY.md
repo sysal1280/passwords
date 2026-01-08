@@ -1,6 +1,3 @@
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
-
 ## Reporting a Vulnerability
 
 If a security vulnerability is discovered in **Passwords**, it should be reported responsibly.
@@ -63,10 +60,3 @@ Anonymity is fully respected if preferred.
 
 As a small token of appreciation, project‑themed swag such as stickers, stationery, or mugs can be provided. If this is of interest, it can be mentioned when submitting a report.
 
------BEGIN PGP SIGNATURE-----
-
-iHUEARYKAB0WIQRucmG91L0jYmUprHaUnFU5PljAtgUCaV+YeAAKCRCUnFU5PljA
-tp2mAP9G7iYMSdq0+aXOz3DAlwLeYrFdDdrX+qo00PPDLPf4gQD+J0OuGHQKn9kV
-GgSgsy9lsr9ORfnQER8pWSeJm41snwk=
-=IaeB
------END PGP SIGNATURE-----
