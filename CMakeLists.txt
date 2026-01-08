@@ -109,11 +109,6 @@ target_compile_definitions(password PRIVATE
     $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
 )
 
-# Hide internal symbols (GCC/Clang/MinGW)
-target_compile_options(password PRIVATE
-    $<$<CONFIG:Release>:-fvisibility=hidden>
-)
-
 #
 # ============================
 #   GCC / CLANG / MINGW
@@ -122,20 +117,37 @@ target_compile_options(password PRIVATE
 if(NOT MSVC)
     message(STATUS "GCC/Clang/MinGW hardening enabled")
 
+    # Hide internal symbols
+    target_compile_options(password PRIVATE
+        $<$<CONFIG:Release>:-fvisibility=hidden>
+    )
+
     # Stack protection + fortified libc
     target_compile_options(password PRIVATE
         $<$<CONFIG:Release>:-fstack-protector-strong>
         $<$<CONFIG:Release>:-D_FORTIFY_SOURCE=2>
     )
 
-# ---- PIE + ASLR ENABLED HERE ----
-target_compile_options(password PRIVATE
-    $<$<CONFIG:Release>:-fPIE>
-)
-target_link_options(password PRIVATE
-    $<$<CONFIG:Release>:-pie>
-)
-# ---------------------------------
+    # ---- PIE + ASLR ----
+    if(UNIX OR MINGW)
+        target_compile_options(password PRIVATE
+            $<$<CONFIG:Release>:-fPIE>
+        )
+        target_link_options(password PRIVATE
+            $<$<CONFIG:Release>:-pie>
+        )
+    endif()
+
+    # ---- Additional hardening ----
+    if(UNIX AND NOT APPLE)
+        target_compile_options(password PRIVATE
+            $<$<CONFIG:Release>:-fstack-clash-protection>
+            $<$<CONFIG:Release>:-fno-plt>
+        )
+        target_link_options(password PRIVATE
+            $<$<CONFIG:Release>:-Wl,-z,noexecstack,-z,separate-code>
+        )
+    endif()
 
     # Linux-only linker hardening
     if(UNIX AND NOT APPLE)
@@ -164,12 +176,15 @@ if(MSVC)
         $<$<CONFIG:Release>:/guard:cf>
         $<$<CONFIG:Release>:/sdl>
         $<$<CONFIG:Release>:/Qspectre>
+        $<$<CONFIG:Release>:/GL>
     )
 
     # ASLR + DEP (Windows equivalents of PIE + NX)
     target_link_options(password PRIVATE
         $<$<CONFIG:Release>:/DYNAMICBASE>
         $<$<CONFIG:Release>:/NXCOMPAT>
+        $<$<CONFIG:Release>:/GUARD:EHCONT>
+        $<$<CONFIG:Release>:/LTCG>
     )
 
     # Remove debug info + optimize + fold identical functions
@@ -179,4 +194,3 @@ if(MSVC)
         $<$<CONFIG:Release>:/DEBUG:NONE>
     )
 endif()
-
