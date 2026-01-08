@@ -1,3 +1,8 @@
+# passwords - A GnuPG based password manager
+# Copyright (C) 2025  Adam Lanzafame
+# Licensed under the GNU GPL v3 or later
+
+
 cmake_minimum_required(VERSION 3.16)
 
 project(password VERSION 0.1 LANGUAGES CXX)
