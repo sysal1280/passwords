@@ -27,12 +27,17 @@
 
 #if defined(Q_OS_WIN)
 #include <windows.h>
+#include <process.h>
+#define getpid _getpid
 #elif defined(Q_OS_LINUX)
 #include <fstream>
+#include <unistd.h>
 #elif defined(Q_OS_MAC)
 #include <sys/types.h>
 #include <sys/sysctl.h>
+#include <unistd.h>
 #endif
+
 
 bool isDebuggerAttached()
 {
