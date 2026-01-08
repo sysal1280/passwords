@@ -23,29 +23,29 @@
 
 #include <QApplication>
 
-#include <QSqlQuery>
-#include <QSqlError>
-#include <QRandomGenerator>
-#include <QUuid>
-#include <QDebug>
 #include <QDateTime>
-
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QSpinBox>
-#include <QLabel>
-#include <QProgressBar>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QSqlDatabase>
-#include <QJsonObject>
+#include <QDebug>
+#include <QDir>
+#include <QFileInfo>
+#include <QFutureWatcher>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <QFileInfo>
-#include <QDir>
+#include <QJsonObject>
 #include <QProcess>
+#include <QRandomGenerator>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QUuid>
 #include <QtConcurrent>
-#include <QFutureWatcher>
+
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMessageBox>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QVBoxLayout>
 
 // ---------------------------------------------------------
 // TestLoader core
