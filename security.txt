@@ -1,0 +1,5 @@
+Contact: mailto:sysal@tuta.io
+Contact: https://github.com/sysal1280/passwords/security/advisories/new
+Expires: 2026-06-01T00:00:00Z
+Policy: https://github.com/sysal1280/passwords/security
+
