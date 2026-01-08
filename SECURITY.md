@@ -38,3 +38,28 @@ ISg+llckgu3wopbVOv2afKS2AYClG4oXP4CgUlkH
 -----END PGP PUBLIC KEY BLOCK-----
 ```
 
+## Rewards & Recognition
+
+We value the time and effort security researchers invest in helping keep **Passwords** safe. To acknowledge meaningful contributions, we offer the following forms of recognition:
+
+#### **CVE Credit**
+
+If your report results in a confirmed, fixable security vulnerability, we will:
+
+- Request a **CVE ID** through GitHub’s security advisory process
+- List you as the **credited reporter** in the advisory (unless you prefer anonymity)
+
+#### **Public Recognition**
+
+With your permission, we will also:
+
+- Acknowledge your contribution in the project’s **Security Hall of Fame** (README or a dedicated file)
+- Credit you in the **release notes** associated with the fix
+- Optionally link to your website, GitHub profile, or handle
+
+If you prefer to remain anonymous, we will fully respect that.
+
+#### **Swag**
+
+As a small token of appreciation, we can also send project‑themed swag such as stickers, stationery and mugs. If you’d like to receive something, just let us know when submitting your report.
+
