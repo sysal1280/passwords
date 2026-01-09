@@ -188,7 +188,7 @@ if(MSVC)
     target_link_options(password PRIVATE
         $<$<CONFIG:Release>:/DYNAMICBASE>
         $<$<CONFIG:Release>:/NXCOMPAT>
-        $<$<CONFIG:Release>:/GUARD:EHCONT>
+        #$<$<CONFIG:Release>:/GUARD:EHCONT>
         $<$<CONFIG:Release>:/LTCG>
     )
 
