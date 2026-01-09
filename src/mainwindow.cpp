@@ -39,7 +39,6 @@
 #include "randomnoisedialog.h"
 #include "scopedcursor.h"
 #include "settings.h"
-#include "ui/ui_mainwindow.h"
 #include "utils.h"
 #include "watermarkedtreewidget.h"
 
@@ -701,7 +700,8 @@ MainWindow::MainWindow(QWidget *parent)
                 const QUrl url(getHelpBaseUrl());
                 QDesktopServices::openUrl(url);
             } else {
-                launchHelperProcess(QStringLiteral(""));
+                launchHelperProcess(QString());
+
             }
         });
     });
@@ -2533,12 +2533,18 @@ void MainWindow::showPasswordsContextMenu(const QPoint &pos)
         actionClose->setShortcut(Qt::Key_Escape);
         actionClose->setStatusTip(tr("Hide the password and clear its decrypted details"));
 
-        connect(actionClose, &QAction::hovered, [this, actionClose]() {
-            statusBar()->showMessage(actionClose->statusTip());
-        });
-        connect(&menu, &QMenu::aboutToHide, [this]() {
-            statusBar()->clearMessage();
-        });
+        connect(actionClose, &QAction::hovered,
+                this,
+                [this, actionClose]() {
+                    statusBar()->showMessage(actionClose->statusTip());
+                });
+
+        connect(&menu, &QMenu::aboutToHide,
+                this,
+                [this]() {
+                    statusBar()->clearMessage();
+                });
+
         connect(actionClose, &QAction::triggered, this, &MainWindow::clearScrollArea);
 
         menu.addAction(actionClose);
@@ -4655,7 +4661,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 // 2. Regex check on the decoded content (192 hex chars)
                 QString decodedStr = QString::fromUtf8(decoded);
 
-                QRegularExpression re("^[A-Fa-f0-9]{192}$");
+                static const QRegularExpression re(QStringLiteral("^[A-Fa-f0-9]{192}$"));
                 if (!re.match(decodedStr).hasMatch()) {
                     QMessageBox::critical(this, tr("Invalid Application Key"),
                                           tr("The Application Key you provided is invalid, incomplete or incorrect."));
@@ -7340,7 +7346,8 @@ void MainWindow::decryptWithGpg(
         int pkErrorCode = 0;
 
         // Parse collected status lines
-        for (const QString &line : *statusLines) {
+        const QStringList &lines = *statusLines;
+        for (const QString &line : lines) {
             if (line.contains("NO_SECKEY"))
                 sawNoSecKey = true;
 

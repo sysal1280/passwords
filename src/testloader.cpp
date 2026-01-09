@@ -37,7 +37,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QUuid>
-#include <QtConcurrent>
+#include <QtConcurrentRun>
 
 #include <QHBoxLayout>
 #include <QLabel>

@@ -155,15 +155,19 @@ void CategoryProperties::loadCategories()
     }
 
     // Build tree
-    for (auto* node : nodes) {
+    const auto &map = nodes;   // prevent detach during iteration
+
+    for (auto* node : map) {
         if (node->parentId != 0 && nodes.contains(node->parentId))
             nodes[node->parentId]->children.append(node);
     }
+
 }
 
 void CategoryProperties::loadApplicationCounts()
 {
-    for (auto* node : nodes)
+    const auto &map = nodes;   // prevent detach
+    for (auto* node : map)
         node->directCount = 0;
 
     QSqlQuery q(db);
@@ -187,7 +191,8 @@ int CategoryProperties::computeTotals(CategoryNode* node)
 {
     int sum = node->directCount;
 
-    for (auto* child : node->children)
+    const auto &children = node->children;   // prevent detach
+    for (auto* child : children)
         sum += computeTotals(child);
 
     node->totalCount = sum;
@@ -198,7 +203,9 @@ void CategoryProperties::collectAll(CategoryNode* node, QList<CategoryNode*>& ou
 {
     out.append(node);
 
-    for (auto* child : node->children)
+    const auto &children = node->children;   // prevent detach
+
+    for (auto* child : children)
         collectAll(child, out);
 }
 
@@ -209,7 +216,8 @@ void CategoryProperties::buildPieChart()
     QList<CategoryNode*> allNodes;
     collectAll(root, allNodes);
 
-    for (auto* node : allNodes) {
+    const auto &nodes = allNodes;
+    for (auto* node : nodes) {
         if (node->directCount > 0)   // skip empty categories
             series->append(node->name, node->directCount);
     }
@@ -218,10 +226,10 @@ void CategoryProperties::buildPieChart()
             this, [this](QPieSlice* slice, bool state) {
                 if (state) {
             QLocale locale;
-            QString text = QString("%1: %2 (%3%)")
-                               .arg(slice->label())
-                               .arg(locale.toString(slice->value()))                // ← formatted with separators
-                               .arg(slice->percentage() * 100.0, 0, 'f', 1);
+                    QString text = QString("%1: %2 (%3%)")
+                                       .arg(slice->label(),
+                                            locale.toString(slice->value()),
+                                            QString::number(slice->percentage() * 100.0, 'f', 1));
 
                     QToolTip::showText(QCursor::pos(), text, this->chartView);
                 } else {
@@ -294,7 +302,10 @@ void CategoryProperties::buildTable()
     int row = 0;
     int total = 0;
 
-    for (auto* node : allNodes) {
+    // Prevent detach — clazy fix
+    const auto &nodes = allNodes;
+
+    for (auto* node : nodes) {
         auto* nameItem = new QTableWidgetItem(node->name);
         auto* countItem = new QTableWidgetItem(QLocale().toString(node->directCount));
 
