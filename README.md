@@ -4,7 +4,7 @@ A free, open‑source, offline password manager powered by GPG.
 
 Managing passwords securely is essential, yet many people still avoid password managers due to cost, cloud‑storage requirements, or distrust of proprietary systems. Passwords takes a different approach: it is a fully offline, cross‑platform, GPG based password manager designed for individuals, professionals, and high‑security environments.
 
-By removing subscriptions, internet dependencies, and closed ecosystems, Passwords makes strong credential management accessible to everyone. Suitable for home users to Tier‑0/Tier‑1 enterprise environments.
+By removing subscriptions, internet dependencies, and closed ecosystems, Passwords makes strong credential management accessible to everyone. Suitable for everyone from home users to Tier‑0/Tier‑1 enterprise environments.
 
 
 
@@ -16,7 +16,9 @@ By removing subscriptions, internet dependencies, and closed ecosystems, Passwor
 
 - No cloud sync, no telemetry, no network access required.
 
-- Fully auditable and open‑source.  
+- Fully auditable and open‑source. 
+
+- Transparency is at the heart of this project.
 
 - No subscriptions, no vendor lock‑in, no proprietary services.
 
@@ -32,8 +34,7 @@ By removing subscriptions, internet dependencies, and closed ecosystems, Passwor
 - Supports time‑based codes (TOTP).
 - Possessing the database alone is not enough to compromise passwords — decryption requires private key(s), which can be stored on a hardware token.
 - Metadata is encrypted, including entry names and structure, preventing attackers from learning anything useful even if they obtain the database.
-- Cross‑platform desktop application.
-- Linux, macOS, Windows (64‑bit).
+- Cross‑platform desktop application. Supports **Linux**, **MacOS** and **Windows**.
 - No proprietary dependencies. Everything used throughout this project is completely opensource.
 - 100% open‑source, transparent, and auditable.
 - Secure by design.
