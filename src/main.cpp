@@ -450,7 +450,8 @@ void pwdMsgHandler(QtMsgType type, const QMessageLogContext &, const QString &ms
 
     QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
     QByteArray localMsg = msg.toLocal8Bit();
-    const char* prefix;
+
+    const char* prefix = "[UNKNOWN] ";
 
     switch (type) {
     case QtDebugMsg:   prefix = "[DEBUG] "; break;
@@ -466,3 +467,4 @@ void pwdMsgHandler(QtMsgType type, const QMessageLogContext &, const QString &ms
             localMsg.constData());
     fflush(stderr);
 }
+
