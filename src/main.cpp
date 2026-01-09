@@ -451,14 +451,15 @@ void pwdMsgHandler(QtMsgType type, const QMessageLogContext &, const QString &ms
     QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
     QByteArray localMsg = msg.toLocal8Bit();
 
-    const char* prefix = "[UNKNOWN] ";
+    const char* prefix;
 
     switch (type) {
-    case QtDebugMsg:   prefix = "[DEBUG] "; break;
-    case QtInfoMsg:    prefix = "[INFO]  "; break;
-    case QtWarningMsg: prefix = "[WARN]  "; break;
-    case QtCriticalMsg:prefix = "[ERROR] "; break;
-    case QtFatalMsg:   prefix = "[FATAL] "; break;
+    case QtDebugMsg:    prefix = "[DEBUG] "; break;
+    case QtInfoMsg:     prefix = "[INFO]  "; break;
+    case QtWarningMsg:  prefix = "[WARN]  "; break;
+    case QtCriticalMsg: prefix = "[ERROR] "; break;
+    case QtFatalMsg:    prefix = "[FATAL] "; break;
+    default:            prefix = "[UNKNOWN] "; break;
     }
 
     fprintf(stderr, "%s [%s] %s\n",
