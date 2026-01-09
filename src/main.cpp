@@ -194,7 +194,7 @@ sudo zypper install gnupg   (openSUSE)
 Ensure it is accessible in your PATH.
 )");
 #endif
-        qFatal() << msg;
+        qFatal("%s", qPrintable(msg));
         QMessageBox box(QMessageBox::Critical,
                         QApplication::applicationDisplayName(),
                         msg,
