@@ -1651,7 +1651,7 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
     // --- Step 0: Map mode to table/column names ---
     QString viewTable      = "application_views";
     QString idColumn       = "application_id";
-    QString credTable      = "application";
+    //QString credTable      = "application";
 
     // --- Step 1: Retrieve encrypted data ---
     ui->statusbar->showMessage("Reading database..");
@@ -2727,6 +2727,70 @@ QTreeWidgetItem* MainWindow::makeItemFromApplication(QSqlQuery& query) {
 
 void MainWindow::keyList()
 {
+
+    auto exportPrivateKeyAsync = [this](const QString &keyId, QWidget *parent) {
+        // Choose output file
+        QString file = QFileDialog::getSaveFileName(parent,
+            tr("Export Private Key"),
+            QString("%1.asc").arg(keyId),
+            tr("ASCII armored key (*.asc)")
+        );
+
+        if (file.isEmpty())
+            return;
+
+        QProcess *proc = new QProcess(parent);
+
+        connect(proc, &QProcess::finished, parent, [proc, parent](int exitCode, QProcess::ExitStatus) {
+            if (exitCode == 0) {
+                QMessageBox::information(parent, tr("Success"),
+                                         tr("Private key exported successfully."));
+            } else {
+                QMessageBox::critical(parent, tr("Error"),
+                                      tr("Failed to export private key:\n%1")
+                                          .arg(proc->readAllStandardError()));
+            }
+            proc->deleteLater();
+        });
+
+        QStringList args;
+        args << "--armor" << "--export-secret-keys" << keyId;
+
+        proc->setStandardOutputFile(file);
+        proc->start("gpg", args);
+    };
+
+    auto importPrivateKeyAsync = [this](QWidget *parent) {
+        QString file = QFileDialog::getOpenFileName(parent,
+            tr("Import Private Key"),
+            QString(),
+            tr("ASCII armored key (*.asc)")
+        );
+
+        if (file.isEmpty())
+            return;
+
+        QProcess *proc = new QProcess(parent);
+
+        connect(proc, &QProcess::finished, parent, [proc, parent](int exitCode, QProcess::ExitStatus) {
+            if (exitCode == 0) {
+                QMessageBox::information(parent, tr("Success"),
+                                         tr("Private key imported successfully."));
+            } else {
+                QMessageBox::critical(parent, tr("Error"),
+                                      tr("Failed to import private key:\n%1")
+                                          .arg(proc->readAllStandardError()));
+            }
+            proc->deleteLater();
+        });
+
+        QStringList args;
+        args << "--import" << file;
+
+        proc->start("gpg", args);
+    };
+
+
     const QString dbFile = qApp->property("dbFile").toString();
     if (Q_UNLIKELY(dbFile.isEmpty())) {
         QMessageBox::warning(this, ui->actionKey_List->text(), tr("No database open."));
@@ -2760,6 +2824,7 @@ void MainWindow::keyList()
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
     table->verticalHeader()->setDefaultSectionSize(22);
+    table->setContextMenuPolicy(Qt::CustomContextMenu);
 
     QFont headerFont = table->horizontalHeader()->font();
     headerFont.setBold(false);
@@ -2836,6 +2901,28 @@ void MainWindow::keyList()
 
     layout->addLayout(buttonLayout);
 
+    connect(table, &QTableWidget::customContextMenuRequested, this, [=](const QPoint &pos) {
+        int row = table->rowAt(pos.y());
+        if (row < 0)
+            return;
+
+        QMenu menu(dlg);
+
+        QAction *exportAct = menu.addAction(tr("Export Private Key"));
+        QAction *importAct = menu.addAction(tr("Import Private Key"));
+
+        QAction *chosen = menu.exec(table->viewport()->mapToGlobal(pos));
+        if (!chosen)
+            return;
+
+        if (chosen == exportAct) {
+            QString keyId = table->item(row, 1)->text();
+            exportPrivateKeyAsync(keyId, dlg);
+        } else if (chosen == importAct) {
+            importPrivateKeyAsync(dlg);
+        }
+    });
+
     QPointer<QDialog> safeDlg = dlg;
 
     connect(showBtn, &QPushButton::clicked, this, [=]() {
@@ -2895,8 +2982,12 @@ void MainWindow::keyList()
                 // If user leaves it blank, fall back to the suggested name
                 name = suggestedName;
             }
+
+            auto *wait = new ScopedCursor(Qt::WaitCursor);
+
             // Asynchronous key creation — UI stays responsive
-            createGpgEncryptionKeyAsync(name, dlg, [dlg](bool ok) {
+            createGpgEncryptionKeyAsync(name, dlg, [dlg, wait](bool ok) {
+                delete wait;
                 if (ok) {
                     QMessageBox::information(dlg, tr("Success"), tr("New GPG key created."));
                 }

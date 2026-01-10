@@ -305,7 +305,7 @@ bool warmupGpg(const QString &recipientKey, QWidget *parent)
     // Timeout protection
     QTimer timer;
     timer.setSingleShot(true);
-    QObject::connect(&timer, &QTimer::timeout, [&]() {
+    QObject::connect(&timer, &QTimer::timeout, &loop, [&]() {
         if (warmup.state() == QProcess::Running)
             warmup.kill();
         loop.quit();
@@ -457,7 +457,8 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
                                  QString user;
                                  QString email;
 
-                                 QRegularExpression re(R"(^(.*)\s+<(.*)>)");
+                                 static const QRegularExpression re(R"(^(.*)\s+<(.*)>)");
+
                                  auto m = re.match(uid);
                                  if (m.hasMatch()) {
                                      user = m.captured(1).trimmed();
@@ -565,7 +566,10 @@ void createGpgEncryptionKeyAsync(
             }
 
             QString output = s->proc->readAllStandardOutput();
-            for (const QString &line : output.split('\n')) {
+            QStringList lines = output.split('\n');
+
+            for (int i = 0; i < lines.size(); ++i) {
+                const QString &line = lines[i];
                 if (line.startsWith("fpr:")) {
                     QStringList parts = line.split(':');
                     if (parts.size() > 9) {

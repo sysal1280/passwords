@@ -110,8 +110,8 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
 
 CategoryProperties::~CategoryProperties()
 {
-    for (auto* node : nodes.values())
-        delete node;
+    for (auto it = nodes.cbegin(); it != nodes.cend(); ++it)
+        delete it.value();
 }
 
 bool CategoryProperties::loadDatabase()
@@ -272,11 +272,13 @@ void CategoryProperties::buildPieChart()
         QColor(176, 190, 197)   // Blue Grey Light
     };
 
+    auto slices = series->slices();
     int colorIndex = 0;
-    for (auto* slice : series->slices()) {
-        slice->setBrush(COLORS[colorIndex % COLORS.size()]);
+
+    for (int i = 0; i < slices.size(); ++i) {
+        auto *slice = slices[i];
+        slice->setBrush(COLORS[i % COLORS.size()]);
         slice->setLabelColor(Qt::black);
-        colorIndex++;
     }
 
     auto* chart = new QChart();
