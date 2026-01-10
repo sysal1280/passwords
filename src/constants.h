@@ -41,7 +41,7 @@ inline constexpr auto WarrantyDisclaimer =
 inline constexpr auto WordlistsCredit = "Wordlists by Sam Schlinkert (MIT License)";
 inline constexpr auto MaterialSymbolsCredit = "Material Symbols by Google (Apache 2.0 License)";
 inline constexpr auto IconCreditFormat = "%1 icon by Iconic Panda (Flaticon)";
-inline constexpr auto EmojiCredit = "Fluent Emoji by Microsoft, licensed under the MIT License.";
+inline constexpr auto EmojiCredit = "Beetle Fluent Emoji by Microsoft, licensed under the MIT License.";
 
 inline constexpr auto debugWarningSB = "Debug Version Only";
 

@@ -52,7 +52,7 @@ AboutDialog::AboutDialog(QWidget *parent)
     // Credits (static, no collapsible section)
     main->addLayout(createCredits(this));
 
-    resize(400, 410);
+    resize(400, 426);
     setFixedSize(size());
 }
 
@@ -189,10 +189,8 @@ QLayout* AboutDialog::createCredits(QWidget *parent)
     // Minimal required attributions (no hyperlinks)
     layout->addWidget(makePlain(Passwords::WordlistsCredit));
     layout->addWidget(makePlain(Passwords::MaterialSymbolsCredit));
-    layout->addWidget(makePlain(
-        QString(Passwords::IconCreditFormat).arg(QCoreApplication::applicationName())
-        ));
-
+    layout->addWidget(makePlain(QString(Passwords::IconCreditFormat).arg(QCoreApplication::applicationName())));
+    layout->addWidget(makePlain(Passwords::EmojiCredit));
 
     layout->addSpacing(4);
 
