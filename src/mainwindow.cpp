@@ -2738,7 +2738,9 @@ void MainWindow::keyList()
 
         if (file.isEmpty())
             return;
-
+        killGpgAgent(); // doesnt matter if we are asked or not.
+                        // if we are going to export a private key,
+                        // we are going to need the passphrase.
         QProcess *proc = new QProcess(parent);
 
         connect(proc, &QProcess::finished, parent, [proc, parent](int exitCode, QProcess::ExitStatus) {
@@ -2909,7 +2911,7 @@ void MainWindow::keyList()
         QMenu menu(dlg);
 
         // --- Section header ---
-        QAction *header = menu.addAction(tr("GPG Keyring"));
+        QAction *header = menu.addAction(tr("%1's GPG Keyring").arg(this->userName));
         header->setEnabled(false);
         menu.addSeparator();
 
