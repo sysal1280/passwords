@@ -2908,8 +2908,20 @@ void MainWindow::keyList()
 
         QMenu menu(dlg);
 
+        // --- Section header ---
+        QAction *header = menu.addAction(tr("GPG Keyring"));
+        header->setEnabled(false);
+        menu.addSeparator();
+
+        // --- Actual actions ---
         QAction *exportAct = menu.addAction(tr("Export Private Key"));
         QAction *importAct = menu.addAction(tr("Import Private Key"));
+        exportAct->setParent(this);
+        importAct->setParent(this);
+        exportAct->setIcon(QIcon(":/menus/glyphs/key_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+        importAct->setIcon(QIcon(":/menus/glyphs/key_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+        exportAct->setStatusTip(tr("Export the selected private key from your GPG keyring"));
+        importAct->setStatusTip(tr("Import a private key into your GPG keyring"));
 
         QAction *chosen = menu.exec(table->viewport()->mapToGlobal(pos));
         if (!chosen)
@@ -2922,6 +2934,7 @@ void MainWindow::keyList()
             importPrivateKeyAsync(dlg);
         }
     });
+
 
     QPointer<QDialog> safeDlg = dlg;
 
