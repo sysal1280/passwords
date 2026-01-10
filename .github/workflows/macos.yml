@@ -19,13 +19,22 @@ jobs:
         run: cmake -B build -DCMAKE_PREFIX_PATH=$(brew --prefix qt)
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config Release || cmake --build build
 
       - name: Bundle Qt frameworks into .app
         run: |
           APP_PATH=$(find build -maxdepth 1 -name "*.app" | head -n 1)
           echo "Found app: $APP_PATH"
-          /usr/local/opt/qt/bin/macdeployqt "$APP_PATH" -verbose=2
+
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app bundle found in build directory"
+            exit 1
+          fi
+
+          QT_BIN=$(brew --prefix qt)/bin/macdeployqt
+          echo "Using macdeployqt at: $QT_BIN"
+
+          "$QT_BIN" "$APP_PATH" -verbose=2
 
       - name: Upload .app bundle
         uses: actions/upload-artifact@v4
