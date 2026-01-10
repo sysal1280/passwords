@@ -44,7 +44,7 @@ inline constexpr const char* IconCreditFormat = "%1 icon by Iconic Panda (Flatic
 
 inline constexpr const char* debugWarningSB = "Debug Version Only";
 inline constexpr const char* debugWarningMB =
-    "This is a DEBUG build.\n\n"
+    "This is a Debug build.\n\n"
     "Debug builds include extra diagnostic information and reduced security "
     "protections. They are not safe for production use.\n\n"
     "Do not create or access real passwords or other sensitive data in this build.\n\n"
