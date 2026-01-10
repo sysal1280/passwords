@@ -26,6 +26,7 @@
 
 #include <QApplication>
 #include <QDialogButtonBox>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
@@ -96,20 +97,44 @@ inline void setupDebugWarnings(QWidget *parent, QStatusBar *statusBar)
 {
 #ifdef APP_DEBUG_BUILD
     // Permanent status bar warning
-    QLabel *debugWarning = new QLabel(Passwords::debugWarningSB);
-    debugWarning->setStyleSheet("color: red; font-weight: bold;");
-    statusBar->addPermanentWidget(debugWarning);
+    QWidget *container = new QWidget;
+    QHBoxLayout *layout = new QHBoxLayout(container);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(4); // small gap between icon and text
+
+    QLabel *iconLabel = new QLabel;
+    QIcon beetleIcon(":/menus/glyphs/beetle_color.svg");
+    iconLabel->setPixmap(beetleIcon.pixmap(16, 16));
+
+    QLabel *textLabel = new QLabel(Passwords::debugWarningSB);
+    textLabel->setStyleSheet("color: red; font-weight: bold;");
+
+    layout->addWidget(iconLabel);
+    layout->addWidget(textLabel);
+
+    statusBar->addPermanentWidget(container);
 
     // Repeating messagebox every 5 minutes
     QTimer *debugTimer = new QTimer(parent);
-    QObject::connect(debugTimer, &QTimer::timeout, parent, []() {
-        QMessageBox::critical(
-            nullptr,
-            QApplication::applicationName(),
-            Passwords::debugWarningMB
-            );
-    });
+
+    // Extract the lambda so we can call it manually
+    auto showDebugMessage = []() {
+        QIcon beetleIcon(":/menus/glyphs/beetle_color.svg");
+        QPixmap beetlePixmap = beetleIcon.pixmap(48, 48);
+
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(QApplication::applicationName());
+        msgBox.setText(Passwords::debugWarningMB);
+        msgBox.setIconPixmap(beetlePixmap);
+        msgBox.exec();
+    };
+
+    QObject::connect(debugTimer, &QTimer::timeout, parent, showDebugMessage);
+    QTimer::singleShot(10000, parent, showDebugMessage);
+
+    // Start the 5‑minute cycle
     debugTimer->start(5 * 60 * 1000); // 5 minutes
+
 #else
     Q_UNUSED(parent)
     Q_UNUSED(statusBar)

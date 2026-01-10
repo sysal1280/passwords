@@ -23,7 +23,7 @@
 namespace Passwords {
 inline constexpr const char* Name           = "Passwords";
 inline constexpr const char* Organization   = "sysal1280";
-inline constexpr const char* Version        = "1.2.1";
+inline constexpr const char* Version        = "1.3.1";
 inline constexpr const char* Icon           = ":/password.png";
 
 inline constexpr int SBTransientMessageTime = 5000;
@@ -45,8 +45,9 @@ inline constexpr const char* IconCreditFormat = "%1 icon by Iconic Panda (Flatic
 inline constexpr const char* debugWarningSB = "Debug Version Only";
 inline constexpr const char* debugWarningMB =
     "This is a DEBUG build.\n\n"
-    "It is not safe for production use. It is intended for testing purposes only. "
-    "Do not store real passwords or other proper data in this database.\n\n"
+    "Debug builds include extra diagnostic information and reduced security "
+    "protections. They are not safe for production use.\n\n"
+    "Do not create or access real passwords or other sensitive data in this build.\n\n"
     "If this program has been installed for you, uninstall it immediately.";
 
 }
