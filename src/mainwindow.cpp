@@ -773,8 +773,6 @@ MainWindow::MainWindow(QWidget *parent)
             &MainWindow::openCategoryFromCurrent);
     }
 
-
-
     connect(ui->actionBookmark, &QAction::toggled,
             this, [this](bool checked) {
                 setBookmark(checked);
@@ -1859,7 +1857,11 @@ ScopedCursor wait(Qt::WaitCursor);
         QString url = root.value("url").toString().trimmed();
 
         if (!url.isEmpty()) {
-            QLabel* fullWidthLabel_url = new QLabel("<a href=\"" + url + "\">" + shortenUrlForDisplay(url) + "</a>");
+            QLabel* fullWidthLabel_url = new QLabel(
+                "<a href=\"" + url + "\" style=\"color:#1a7bb0; text-decoration:none;\">"
+                + shortenUrlForDisplay(url) +
+                "</a>"
+            );
             fullWidthLabel_url->setObjectName("labelPasswordURL");
             fullWidthLabel_url->setTextFormat(Qt::RichText);
             fullWidthLabel_url->setTextInteractionFlags(Qt::TextBrowserInteraction);
