@@ -65,7 +65,8 @@ jobs:
 
       - name: Copy Qt libraries
         run: |
-          cp -r /usr/lib/x86_64-linux-gnu/qt6/lib passwords/lib
+          mkdir -p passwords/lib
+          cp /usr/lib/x86_64-linux-gnu/libQt6*.so* passwords/lib/
 
       - name: Copy built executable
         run: |
