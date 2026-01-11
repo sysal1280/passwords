@@ -46,34 +46,35 @@ jobs:
         id: find_app
         shell: bash
         run: |
-          APP=$(find build -maxdepth 3 -name "*.app" | head -n 1)
-          if [ -z "$APP" ]; then
-            echo "No .app found"
+          APP_PATH=$(find build -maxdepth 5 -name "*.app" | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app bundle found!"
+            find build -maxdepth 5 -type d -print
             exit 1
           fi
-          echo "app=$APP" >> $GITHUB_OUTPUT
-          echo "Found app: $APP"
+          echo "app_path=$APP_PATH" >> "$GITHUB_OUTPUT"
+          echo "Found app: $APP_PATH"
 
       - name: Prepare bundle directories
         shell: bash
         run: |
-          APP="${{ steps.find_app.outputs.app }}"
+          APP="${{ steps.find_app.outputs.app_path }}"
           mkdir -p "$APP/Contents/Frameworks"
           mkdir -p "$APP/Contents/PlugIns"
 
-      - name: Copy Qt frameworks (manual bundling)
+      - name: Copy Qt frameworks
         shell: bash
         run: |
-          APP="${{ steps.find_app.outputs.app }}"
+          APP="${{ steps.find_app.outputs.app_path }}"
           QT="$HOME/Qt/6.6.0/macos"
 
           cp -R "$QT/lib/Qt"*.framework "$APP/Contents/Frameworks/" || true
           cp -L "$QT/lib/libQt6"*.dylib "$APP/Contents/Frameworks/" || true
 
-      - name: Copy Qt plugins (manual bundling)
+      - name: Copy Qt plugins
         shell: bash
         run: |
-          APP="${{ steps.find_app.outputs.app }}"
+          APP="${{ steps.find_app.outputs.app_path }}"
           QT="$HOME/Qt/6.6.0/macos"
 
           cp -R "$QT/plugins/"* "$APP/Contents/PlugIns/" || true
@@ -81,15 +82,23 @@ jobs:
       - name: Copy ICU libraries
         shell: bash
         run: |
-          APP="${{ steps.find_app.outputs.app }}"
+          APP="${{ steps.find_app.outputs.app_path }}"
           QT="$HOME/Qt/6.6.0/macos"
 
           cp -L "$QT/lib/libicu"*.dylib "$APP/Contents/Frameworks/" || true
 
-      - name: Fix loader paths with install_name_tool
+      - name: Fix loader paths
         shell: bash
         run: |
-          APP="${{ steps.find_app.outputs.app }}"
+          APP="${{ steps.find_app.outputs.app_path }}"
+          INFO_PLIST="$APP/Contents/Info.plist"
+
+          if [ ! -f "$INFO_PLIST" ]; then
+            echo "ERROR: Info.plist missing!"
+            find "$APP" -maxdepth 5 -print
+            exit 1
+          fi
+
           EXE_NAME=$(defaults read "$APP/Contents/Info" CFBundleExecutable)
           EXE="$APP/Contents/MacOS/$EXE_NAME"
 
@@ -98,21 +107,23 @@ jobs:
           install_name_tool -add_rpath "@executable_path/../Frameworks" "$EXE"
 
           for FW in "$APP/Contents/Frameworks/"*.framework; do
+            [ -e "$FW" ] || continue
             NAME=$(basename "$FW" .framework)
             install_name_tool -id "@rpath/$NAME.framework/$NAME" "$FW/$NAME"
           done
 
           for DY in "$APP/Contents/Frameworks/"*.dylib; do
+            [ -e "$DY" ] || continue
             install_name_tool -id "@rpath/$(basename "$DY")" "$DY"
           done
 
       - name: Verify bundle
         shell: bash
         run: |
-          APP="${{ steps.find_app.outputs.app }}"
+          APP="${{ steps.find_app.outputs.app_path }}"
           echo "Frameworks:"
           ls -lh "$APP/Contents/Frameworks"
-          echo "Plugins:"
+          echo "PlugIns:"
           ls -lh "$APP/Contents/PlugIns"
 
           EXE_NAME=$(defaults read "$APP/Contents/Info" CFBundleExecutable)
@@ -124,7 +135,7 @@ jobs:
       - name: Create DMG
         shell: bash
         run: |
-          APP="${{ steps.find_app.outputs.app }}"
+          APP="${{ steps.find_app.outputs.app_path }}"
           DMG="password-macos.dmg"
           mkdir dmg
           cp -R "$APP" dmg/
