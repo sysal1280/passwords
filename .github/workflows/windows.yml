@@ -48,13 +48,14 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      # Deploy Qt DLLs
-      - name: Deploy Qt (windeployqt)
+      # Deploy Qt DLLs using windeployqt6
+      - name: Deploy Qt (windeployqt6)
+        shell: cmd
         run: |
           set PATH=%Qt6_DIR%\bin;%PATH%
           mkdir app
           copy build\Release\password.exe app\
-          windeployqt --release app\password.exe
+          windeployqt6 --release app\password.exe
 
       # Download GPG4Win
       - name: Download GPG4Win
