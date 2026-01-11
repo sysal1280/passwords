@@ -12,7 +12,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Install Qt
+      - name: Install Qt + tools
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -20,10 +20,69 @@ jobs:
             qt6-base-dev-tools \
             qt6-tools-dev \
             qt6-tools-dev-tools \
-            qt6-charts-dev
+            qt6-charts-dev \
+            patchelf
+
+      # Extract version from CMakeLists.txt
+      - name: Extract version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(grep -Eo 'project\(password VERSION [0-9]+\.[0-9]+' CMakeLists.txt | awk '{print $3}')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      # Extract git commit hash + dirty flag
+      - name: Extract git commit hash
+        id: git
+        shell: bash
+        run: |
+          HASH=$(git rev-parse --short HEAD)
+          DIRTY=""
+          if ! git diff --quiet --ignore-submodules HEAD; then
+            DIRTY="-dirty"
+          fi
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+          echo "dirty=$DIRTY" >> "$GITHUB_OUTPUT"
 
       - name: Configure CMake
-        run: cmake -B build
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config Release || cmake --build build
+
+      # Bundle Qt manually (following your documentation)
+      - name: Bundle Qt + fix RPATH
+        shell: bash
+        run: |
+          mkdir -p bundle/lib
+          mkdir -p bundle/plugins
+
+          # Copy executable
+          cp build/password bundle/
+
+          # Copy Qt libraries (adjust paths if needed)
+          QT_LIB_DIR=/usr/lib/x86_64-linux-gnu
+          cp $QT_LIB_DIR/libQt6*.so* bundle/lib/
+
+          # Copy Qt plugins
+          QT_PLUGIN_DIR=/usr/lib/x86_64-linux-gnu/qt6/plugins
+          cp -r $QT_PLUGIN_DIR/* bundle/plugins/
+
+          # Fix RPATH
+          patchelf --set-rpath '$ORIGIN/lib' bundle/password
+
+          # Make executable
+          chmod +x bundle/password
+
+          # Create final folder name
+          OUTDIR="password-linux-${{ steps.version.outputs.version }}-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}"
+          mv bundle "$OUTDIR"
+          echo "OUTDIR=$OUTDIR" >> "$GITHUB_ENV"
+
+      - name: Upload Linux bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.OUTDIR }}
+          path: ${{ env.OUTDIR }}
+          if-no-files-found: error
+

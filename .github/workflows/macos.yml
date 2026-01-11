@@ -58,7 +58,7 @@ jobs:
       - name: Create DMG
         run: |
           APP_PATH=$(find build -maxdepth 1 -name "*.app" | head -n 1)
-          DMG_NAME="password-macos-${{ steps.version.outputs.version }}-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}.dmg"
+          DMG_NAME="password-macos-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}.dmg"
           mkdir dmg
           cp -R "$APP_PATH" dmg/
           hdiutil create "$DMG_NAME" -volname "password" -srcfolder dmg -ov -format UDZO
