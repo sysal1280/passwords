@@ -23,6 +23,8 @@ jobs:
             qt6-charts-dev \
             patchelf
 
+          sudo apt-get install -y qt6-openglwidgets-dev
+
       - name: Configure CMake
         run: cmake -B build
 
