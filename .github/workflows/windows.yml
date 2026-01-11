@@ -120,7 +120,7 @@ jobs:
       - name: Build installer
         shell: cmd
         env:
-          APP_VERSION: ${{ steps.version.outputs.version }}-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}
+          APP_VERSION: ${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}
         run: |
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
 

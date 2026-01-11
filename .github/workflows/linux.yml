@@ -21,6 +21,10 @@ jobs:
             qt6-tools-dev \
             qt6-tools-dev-tools \
             qt6-charts-dev \
+            qt6-opengl-dev \
+            qt6-svg-dev \
+            qt6-wayland-dev \
+            qt6-declarative-dev \
             patchelf
 
       # Extract version from CMakeLists.txt
@@ -60,21 +64,27 @@ jobs:
           # Copy executable
           cp build/password bundle/
 
-          # Copy Qt libraries (adjust paths if needed)
           QT_LIB_DIR=/usr/lib/x86_64-linux-gnu
+          QT_PLUGIN_DIR=/usr/lib/x86_64-linux-gnu/qt6/plugins
+
+          # Copy ALL Qt libs (base, gui, widgets, opengl, charts, svg, etc.)
           cp $QT_LIB_DIR/libQt6*.so* bundle/lib/
 
-          # Copy Qt plugins
-          QT_PLUGIN_DIR=/usr/lib/x86_64-linux-gnu/qt6/plugins
-          cp -r $QT_PLUGIN_DIR/* bundle/plugins/
+          # Copy required plugin categories
+          cp -r $QT_PLUGIN_DIR/platforms bundle/plugins/
+          cp -r $QT_PLUGIN_DIR/imageformats bundle/plugins/
+          cp -r $QT_PLUGIN_DIR/xcbglintegrations bundle/plugins/ || true
+          cp -r $QT_PLUGIN_DIR/tls bundle/plugins/ || true
+          cp -r $QT_PLUGIN_DIR/wayland* bundle/plugins/ || true
+          cp -r $QT_PLUGIN_DIR/opengl* bundle/plugins/ || true
+          cp -r $QT_PLUGIN_DIR/renderers bundle/plugins/ || true
+          cp -r $QT_PLUGIN_DIR/egldeviceintegrations bundle/plugins/ || true
 
           # Fix RPATH
           patchelf --set-rpath '$ORIGIN/lib' bundle/password
 
-          # Make executable
           chmod +x bundle/password
 
-          # Create final folder name
           OUTDIR="password-linux-${{ steps.version.outputs.version }}-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}"
           mv bundle "$OUTDIR"
           echo "OUTDIR=$OUTDIR" >> "$GITHUB_ENV"
