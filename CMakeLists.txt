@@ -81,6 +81,27 @@ qt_add_executable(password WIN32 MACOSX_BUNDLE
     # Removed resources/appicon.rc from here; handled below for Windows only
 )
 
+if(APPLE)
+    set(GENERATED_ICON "${CMAKE_BINARY_DIR}/password.icns")
+
+    if(EXISTS "${GENERATED_ICON}")
+        message(STATUS "Using generated macOS icon: ${GENERATED_ICON}")
+
+        set_source_files_properties(
+            "${GENERATED_ICON}"
+            PROPERTIES MACOSX_PACKAGE_LOCATION "Resources"
+        )
+
+        target_sources(password PRIVATE "${GENERATED_ICON}")
+
+        set_target_properties(password PROPERTIES
+            MACOSX_BUNDLE_ICON_FILE "password.icns"
+        )
+    else()
+        message(STATUS "No generated macOS icon found; skipping icon embedding.")
+    endif()
+endif()
+
 # Windows-only resource file (keep icon on Windows, ignore on macOS/Linux)
 if(WIN32)
     target_sources(password PRIVATE resources/appicon.rc)
