@@ -78,8 +78,13 @@ qt_add_executable(password WIN32 MACOSX_BUNDLE
     ${SRC_FILES}
     ${UI_FILES}
     ${RESOURCE_FILES}
-    resources/appicon.rc
+    # Removed resources/appicon.rc from here; handled below for Windows only
 )
+
+# Windows-only resource file (keep icon on Windows, ignore on macOS/Linux)
+if(WIN32)
+    target_sources(password PRIVATE resources/appicon.rc)
+endif()
 
 target_compile_definitions(password PRIVATE
     $<$<CONFIG:Debug>:APP_DEBUG_BUILD>
@@ -102,6 +107,15 @@ target_include_directories(password PRIVATE
 target_include_directories(password PRIVATE ${CMAKE_BINARY_DIR})
 
 qt_finalize_executable(password)
+
+# Explicit macOS bundle properties – help ensure a proper .app with Info.plist
+if(APPLE)
+    set_target_properties(password PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_BUNDLE_NAME "passwords"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.adamlanzafame.passwords"
+    )
+endif()
 
 #
 # ============================
