@@ -73,7 +73,7 @@ file(GLOB_RECURSE RESOURCE_FILES CONFIGURE_DEPENDS
     "resources/*.qrc"
 )
 
-qt_add_executable(password WIN32
+qt_add_executable(password WIN32 MACOSX_BUNDLE
     MANUAL_FINALIZATION
     ${SRC_FILES}
     ${UI_FILES}
