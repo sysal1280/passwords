@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos-app
-          path: build/password.app
+          path: build/password.app/
           if-no-files-found: error
 
       # Download the artifact for release
