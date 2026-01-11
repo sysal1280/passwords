@@ -18,11 +18,9 @@ jobs:
           sudo apt-get install -y \
             qt6-base-dev \
             qt6-base-dev-tools \
-            qt6-base-plugins \
             qt6-tools-dev \
             qt6-tools-dev-tools \
             qt6-charts-dev \
-            qt6-opengl-dev \
             patchelf
 
       - name: Configure CMake
@@ -73,7 +71,20 @@ jobs:
       - name: Copy Qt libraries
         run: |
           mkdir -p passwords/lib
-          cp /usr/lib/x86_64-linux-gnu/libQt6*.so* passwords/lib/
+
+          # Copy all real Qt6 libs from the correct directory
+          cp -L /usr/lib/x86_64-linux-gnu/libQt6*.so* passwords/lib/
+
+          # Explicitly ensure OpenGLWidgets is copied
+          cp -L /usr/lib/x86_64-linux-gnu/libQt6OpenGLWidgets.so.6 passwords/lib/
+          
+      - name: Debug Qt libs on runner
+        run: |
+          echo "System Qt6 libs:"
+          ls -l /usr/lib/x86_64-linux-gnu/libQt6*
+
+          echo "Bundled Qt6 libs:"
+          ls -l passwords/lib/libQt6*
 
       - name: Copy built executable
         run: |
