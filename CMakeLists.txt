@@ -94,16 +94,6 @@ if(APPLE)
     )
 endif()
 
-if(APPLE)
-    message(STATUS "Checking for macOS icon at: ${CMAKE_SOURCE_DIR}/resources/password.icns")
-
-    if(EXISTS "${CMAKE_SOURCE_DIR}/resources/password.icns")
-        message(STATUS "macOS icon FOUND")
-    else()
-        message(STATUS "macOS icon NOT FOUND")
-    endif()
-endif()
-
 # Windows-only resource file (keep icon on Windows, ignore on macOS/Linux)
 if(WIN32)
     target_sources(password PRIVATE resources/appicon.rc)
