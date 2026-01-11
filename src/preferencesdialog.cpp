@@ -112,12 +112,13 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
         );
 
     // Inline CSS inside the HTML — the ONLY method Qt respects
+    const QString linkText = tr("Learn more");
+
     ui->labelOrchadStreetWords->setText(
-        QString("<a href=\"%1\" style=\"color:#1a7bb0; text-decoration:none;\">Learn more</a>")
-            .arg(Passwords::WordlistUrl)
+        QString(
+            "<a href=\"%1\" style=\"color:#1a7bb0; text-decoration:none;\">%2</a>"
+            ).arg(Passwords::WordlistUrl, linkText)
         );
-
-
 
     ui->comboBoxEchoMode->addItem(tr("Normal"), QLineEdit::Normal);
     ui->comboBoxEchoMode->addItem(tr("No Echo"), QLineEdit::NoEcho);
