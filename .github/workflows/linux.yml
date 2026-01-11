@@ -63,6 +63,11 @@ jobs:
             fi
           done
 
+      - name: Debug Qt libs
+        run: |
+          echo "Listing Qt6 libs:"
+          ls -l /usr/lib/x86_64-linux-gnu/libQt6*
+
       - name: Copy Qt libraries
         run: |
           mkdir -p passwords/lib
