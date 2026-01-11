@@ -21,7 +21,6 @@ jobs:
           arch: win64_msvc2019_64
           modules: qtcharts
 
-      # Extract version from CMakeLists.txt
       - name: Extract version
         id: version
         shell: bash
@@ -29,7 +28,6 @@ jobs:
           VERSION=$(grep -Eo 'project\(password VERSION [0-9]+\.[0-9]+' CMakeLists.txt | awk '{print $3}')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      # Extract git commit hash + dirty flag
       - name: Extract git commit hash
         id: git
         shell: bash
@@ -48,7 +46,6 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      # Deploy Qt DLLs using windeployqt6
       - name: Deploy Qt (windeployqt6)
         shell: cmd
         run: |
@@ -57,18 +54,21 @@ jobs:
           copy build\Release\password.exe app\
           "%Qt6_DIR%\bin\windeployqt6.exe" --release app\password.exe
 
-      # Download GPG4Win
       - name: Download GPG4Win
         shell: bash
         run: |
           mkdir -p deps
           curl -L -o deps/gpg4win-4.4.1.exe "https://files.gpg4win.org/gpg4win-4.4.1.exe"
 
-      # Install Inno Setup
+      - name: Download VC Redist
+        shell: bash
+        run: |
+          mkdir -p deps
+          curl -L -o deps/vc_redist.x64.exe "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+
       - name: Install Inno Setup
         run: choco install innosetup --no-progress
 
-      # Generate Inno Setup script without heredoc (YAML-safe)
       - name: Generate Inno Setup script
         shell: bash
         run: |
@@ -104,6 +104,7 @@ jobs:
           echo 'Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked' >> installer.iss
           echo >> installer.iss
           echo '[Files]' >> installer.iss
+          echo 'Source: "{#SourcePath}\deps\vc_redist.x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion' >> installer.iss
           echo 'Source: "{#SourcePath}\deps\gpg4win-4.4.1.exe"; DestDir: "{tmp}"; Flags: ignoreversion' >> installer.iss
           echo 'Source: "{#SourcePath}\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs' >> installer.iss
           echo >> installer.iss
@@ -112,11 +113,10 @@ jobs:
           echo 'Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon' >> installer.iss
           echo >> installer.iss
           echo '[Run]' >> installer.iss
-          echo 'Filename: "{app}\{#MyAppExeName}"; Flags: nowait postinstall skipifsilent' >> installer.iss
+          echo 'Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/install /quiet /norestart"; Flags: waituntilterminated' >> installer.iss
           echo 'Filename: "{tmp}\gpg4win-4.4.1.exe"; Parameters: "/S"; Flags: waituntilterminated' >> installer.iss
-          echo 'Filename: "{cmd}"; Parameters: "/C start https://sysal1280.github.io/passwords/"; Flags: postinstall runhidden' >> installer.iss
+          echo 'Filename: "{app}\password.exe"; Flags: nowait postinstall skipifsilent' >> installer.iss
 
-      # Build installer
       - name: Build installer
         shell: cmd
         env:
@@ -124,7 +124,6 @@ jobs:
         run: |
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
 
-      # Upload installer
       - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
