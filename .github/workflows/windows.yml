@@ -21,8 +21,63 @@ jobs:
           arch: win64_msvc2019_64
           modules: qtcharts
 
+      # Extract version from CMakeLists.txt
+      - name: Extract version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(grep -Eo 'project\(password VERSION [0-9]+\.[0-9]+' CMakeLists.txt | awk '{print $3}')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      # Extract git commit hash + dirty flag
+      - name: Extract git commit hash
+        id: git
+        shell: bash
+        run: |
+          HASH=$(git rev-parse --short HEAD)
+          DIRTY=""
+          if ! git diff --quiet --ignore-submodules HEAD; then
+            DIRTY="-dirty"
+          fi
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+          echo "dirty=$DIRTY" >> $GITHUB_OUTPUT
+
       - name: Configure CMake
         run: cmake -B build -G "Visual Studio 17 2022" -DCMAKE_PREFIX_PATH="%Qt6_DIR%"
 
       - name: Build
         run: cmake --build build --config Release
+
+      # Deploy Qt DLLs
+      - name: Deploy Qt (windeployqt)
+        run: |
+          set PATH=%Qt6_DIR%\bin;%PATH%
+          mkdir app
+          copy build\Release\password.exe app\
+          windeployqt --release app\password.exe
+
+      # Download GPG4Win
+      - name: Download GPG4Win
+        run: |
+          mkdir deps
+          curl -L -o deps\gpg4win-4.4.1.exe https://files.gpg4win.org/gpg4win-4.4.1.exe
+
+      # Install Inno Setup
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress
+
+      # Build installer
+      - name: Build installer
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}
+        run: |
+          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+
+      # Upload installer
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Passwords-Installer-${{ steps.version.outputs.version }}-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}
+          path: Output\Passwords-x86_64-${{ steps.version.outputs.version }}-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}.exe
+          if-no-files-found: error
+
