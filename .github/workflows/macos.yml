@@ -9,7 +9,8 @@ on:
 env:
   QT_VERSION: "6.6.0"
   QT_MODULES: "qtcharts"
-  QT_OUTPUT_DIR: ${{ runner.temp }}/Qt  # cached path; kept off $HOME to avoid permission issues
+  # Use runner.temp via expression so the workflow parser accepts it
+  QT_OUTPUT_DIR: ${{ runner.temp }}/Qt
   APP_BASENAME: "password"
   DMG_VOLUME_NAME: "password"
   CMAKE_BUILD_DIR: build
@@ -43,7 +44,6 @@ jobs:
         shell: bash
         run: |
           source .venv/bin/activate
-          # aqtinstall will reuse cached files under QT_OUTPUT_DIR when present
           aqt install-qt mac desktop ${{ env.QT_VERSION }} clang_64 \
             --outputdir "${QT_OUTPUT_DIR}" \
             --modules ${{ env.QT_MODULES }}
@@ -52,7 +52,7 @@ jobs:
         id: version
         shell: bash
         run: |
-          VERSION=$(grep -Eo 'project\\([A-Za-z0-9_-]+ VERSION [0-9]+\\.[0-9]+' CMakeLists.txt | awk '{print $3}' || true)
+          VERSION=$(grep -Eo 'project\([A-Za-z0-9_-]+ VERSION [0-9]+\.[0-9]+' CMakeLists.txt | awk '{print $3}' || true)
           if [ -z "$VERSION" ]; then
             VERSION="0.0"
           fi
@@ -91,7 +91,6 @@ jobs:
         run: |
           APP_PATH=$(find "${CMAKE_BUILD_DIR}" -maxdepth 3 -name "*.app" | head -n 1 || true)
           if [ -z "$APP_PATH" ]; then
-            # Try common CMake multi-config path
             APP_PATH=$(find "${CMAKE_BUILD_DIR}" -maxdepth 4 -path "*/Release/*.app" | head -n 1 || true)
           fi
           if [ -z "$APP_PATH" ]; then
@@ -112,7 +111,6 @@ jobs:
             exit 1
           fi
           echo "Using macdeployqt: $DEPLOYQT"
-          # macdeployqt will copy frameworks and plugins into the .app
           "$DEPLOYQT" "$APP_PATH" -verbose=2
 
       - name: Verify bundle contents
@@ -125,8 +123,7 @@ jobs:
           ls -la "$APP_PATH/Contents/Frameworks" || true
           echo "Listing PlugIns (should contain platforms and imageformats):"
           ls -la "$APP_PATH/Contents/PlugIns" || true
-          echo "Show linked libraries for the main executable:"
-          EXECUTABLE=$(defaults read "$APP_PATH/Contents/Info" CFBundleExecutable)
+          EXECUTABLE=$(defaults read "$APP_PATH/Contents/Info" CFBundleExecutable || true)
           if [ -n "$EXECUTABLE" ]; then
             EXE_PATH="$APP_PATH/Contents/MacOS/$EXECUTABLE"
             if [ -f "$EXE_PATH" ]; then
@@ -139,21 +136,25 @@ jobs:
             echo "Could not read CFBundleExecutable from Info.plist"
           fi
 
-      - name: Optional codesign if secrets provided
-        if: ${{ secrets.MAC_CODESIGN_IDENTITY != '' && secrets.APPLE_NOTARIZE_PASSWORD != '' }}
+      - name: Optional codesign and notarize
+        if: ${{ secrets.MAC_CODESIGN_IDENTITY && secrets.APPLE_ID && secrets.APPLE_NOTARIZE_PASSWORD && secrets.APPLE_TEAM_ID }}
         shell: bash
         env:
           CODESIGN_IDENTITY: ${{ secrets.MAC_CODESIGN_IDENTITY }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_NOTARIZE_PASSWORD: ${{ secrets.APPLE_NOTARIZE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           APP_PATH="${{ steps.find_app.outputs.app_path }}"
           echo "Codesigning app with identity $CODESIGN_IDENTITY"
-          # sign all frameworks and the app; adjust entitlements if needed
-          find "$APP_PATH/Contents/Frameworks" -type f -name "*.dylib" -or -name "*.framework" -print0 | xargs -0 -I{} codesign --timestamp --options runtime --sign "$CODESIGN_IDENTITY" "{}" || true
-          codesign --timestamp --options runtime --sign "$CODESIGN_IDENTITY" "$APP_PATH"
-          echo "Submitting for notarization (this step requires APPLE_ID and APPLE_NOTARIZE_PASSWORD)"
-          xcrun notarytool submit --wait --apple-id "$APPLE_ID" --password "$APPLE_NOTARIZE_PASSWORD" --team-id "${{ secrets.APPLE_TEAM_ID }}" "$APP_PATH"
+          # Sign frameworks and dylibs first
+          if [ -d "$APP_PATH/Contents/Frameworks" ]; then
+            find "$APP_PATH/Contents/Frameworks" -type f \( -name "*.dylib" -o -name "*.so" -o -name "*.framework" \) -print0 | xargs -0 -I{} codesign --timestamp --options runtime --sign "$CODESIGN_IDENTITY" "{}" || true
+          fi
+          # Sign the app bundle
+          codesign --timestamp --options runtime --sign "$CODESIGN_IDENTITY" "$APP_PATH" || true
+          # Notarize and staple
+          xcrun notarytool submit --wait --apple-id "$APPLE_ID" --password "$APPLE_NOTARIZE_PASSWORD" --team-id "$APPLE_TEAM_ID" "$APP_PATH"
           xcrun stapler staple "$APP_PATH" || true
 
       - name: Create DMG
@@ -163,7 +164,6 @@ jobs:
           DMG_NAME="${{ env.APP_BASENAME }}-macos-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}.dmg"
           mkdir -p dmg
           cp -R "$APP_PATH" dmg/
-          # create compressed read-only DMG
           hdiutil create "$DMG_NAME" -volname "${{ env.DMG_VOLUME_NAME }}" -srcfolder dmg -ov -format UDZO
           echo "DMG_NAME=$DMG_NAME" >> $GITHUB_ENV
 
