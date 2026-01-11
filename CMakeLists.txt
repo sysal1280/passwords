@@ -82,21 +82,17 @@ qt_add_executable(password WIN32 MACOSX_BUNDLE
 )
 
 if(APPLE)
-    # Place the icon inside the app bundle's Resources folder
     set_source_files_properties(
-        resources/passwords.icns
+        resources/password.icns
         PROPERTIES MACOSX_PACKAGE_LOCATION "Resources"
     )
 
-    # Add the icon file to the target
-    target_sources(password PRIVATE resources/passwords.icns)
+    target_sources(password PRIVATE resources/password.icns)
 
-    # Tell macOS which icon to use
     set_target_properties(password PROPERTIES
-        MACOSX_BUNDLE_ICON_FILE "passwords.icns"
+        MACOSX_BUNDLE_ICON_FILE "password.icns"
     )
 endif()
-
 
 # Windows-only resource file (keep icon on Windows, ignore on macOS/Linux)
 if(WIN32)
