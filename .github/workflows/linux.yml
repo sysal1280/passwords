@@ -1,47 +1,80 @@
-      - name: Bundle Qt + fix RPATH
-        shell: bash
+name: Linux Qt Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install Qt and tools
         run: |
-          mkdir -p bundle/lib
-          mkdir -p bundle/plugins
+          sudo apt-get update
+          sudo apt-get install -y \
+            qt6-base-dev \
+            qt6-base-dev-tools \
+            qt6-tools-dev \
+            qt6-tools-dev-tools \
+            qt6-charts-dev \
+            patchelf
 
-          # Copy executable
-          cp build/password bundle/
+      - name: Configure CMake
+        run: cmake -B build
 
-          QT_LIB_DIR=/usr/lib/x86_64-linux-gnu
-          QT_PLUGIN_DIR=/usr/lib/x86_64-linux-gnu/qt6/plugins
+      - name: Build
+        run: cmake --build build --config Release
 
-          # Copy ALL Qt libs
-          cp $QT_LIB_DIR/* bundle/lib/
+      - name: Prepare artifact directory
+        run: |
+          mkdir -p passwords/lib
+          mkdir -p passwords/plugins
 
-          # Copy ALL plugins first
-          cp -r $QT_PLUGIN_DIR/* bundle/plugins/
+      - name: Patch executable RPATH
+        run: |
+          patchelf --set-rpath '$ORIGIN/lib' build/password
 
-          # Now prune plugins according to your documentation
-          cd bundle/plugins
+      - name: Copy Qt plugins
+        run: |
+          QT_PLUGIN_DIR=$(qtpaths6 --plugin-dir)
 
-          find . -maxdepth 1 -type d ! -name '.' \
-            ! -name 'generic' \
-            ! -name 'iconengines' \
-            ! -name 'imageformats' \
-            ! -name 'platforminputcontexts' \
-            ! -name 'platforms' \
-            ! -name 'platformthemes' \
-            ! -name 'sqldrivers' \
-            ! -name 'tls' \
-            ! -name 'wayland-decoration-client' \
-            ! -name 'wayland-graphics-integration-client' \
-            ! -name 'wayland-shell-integration' \
-            ! -name 'xcbglintegrations' \
-            -exec rm -rf {} +
+          for plugin in \
+            generic \
+            iconengines \
+            imageformats \
+            platforminputcontexts \
+            platforms \
+            platformthemes \
+            sqldrivers \
+            tls \
+            wayland-decoration-client \
+            wayland-graphics-integration-client \
+            wayland-shell-integration \
+            xcbglintegrations
+          do
+            if [ -d "$QT_PLUGIN_DIR/$plugin" ]; then
+              cp -r "$QT_PLUGIN_DIR/$plugin" passwords/plugins/
+            else
+              echo "Plugin directory not found: $plugin"
+            fi
+          done
 
-          cd ../../
+      - name: Copy Qt libraries
+        run: |
+          QT_LIB_DIR=$(qtpaths6 --lib-dir)
+          cp -r "$QT_LIB_DIR"/* passwords/lib/
 
-          # Fix RPATH
-          patchelf --set-rpath '$ORIGIN/lib' bundle/password
+      - name: Copy built executable
+        run: |
+          cp build/password passwords/
 
-          chmod +x bundle/password
-
-          OUTDIR="password-linux-${{ steps.version.outputs.version }}-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}"
-          mv bundle "$OUTDIR"
-          echo "OUTDIR=$OUTDIR" >> "$GITHUB_ENV"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-passwords-bundle
+          path: passwords
 
