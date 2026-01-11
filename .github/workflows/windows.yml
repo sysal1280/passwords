@@ -69,6 +69,7 @@ jobs:
 
       # Build installer
       - name: Build installer
+        shell: cmd
         env:
           APP_VERSION: ${{ steps.version.outputs.version }}-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}
         run: |
