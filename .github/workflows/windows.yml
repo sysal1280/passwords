@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           VERSION=$(grep -Eo 'project\(password VERSION [0-9]+\.[0-9]+' CMakeLists.txt | awk '{print $3}')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       # Extract git commit hash + dirty flag
       - name: Extract git commit hash
@@ -39,8 +39,8 @@ jobs:
           if ! git diff --quiet --ignore-submodules HEAD; then
             DIRTY="-dirty"
           fi
-          echo "hash=$HASH" >> $GITHUB_OUTPUT
-          echo "dirty=$DIRTY" >> $GITHUB_OUTPUT
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+          echo "dirty=$DIRTY" >> "$GITHUB_OUTPUT"
 
       - name: Configure CMake
         run: cmake -B build -G "Visual Studio 17 2022" -DCMAKE_PREFIX_PATH="%Qt6_DIR%"
@@ -55,22 +55,24 @@ jobs:
           set PATH=%Qt6_DIR%\bin;%PATH%
           mkdir app
           copy build\Release\password.exe app\
-          windeployqt6 --release app\password.exe
+          "%Qt6_DIR%\bin\windeployqt6.exe" --release app\password.exe
 
       # Download GPG4Win
       - name: Download GPG4Win
+        shell: bash
         run: |
-          mkdir deps
-          curl -L -o deps\gpg4win-4.4.1.exe https://files.gpg4win.org/gpg4win-4.4.1.exe
+          mkdir -p deps
+          curl -L -o deps/gpg4win-4.4.1.exe "https://files.gpg4win.org/gpg4win-4.4.1.exe"
 
       # Install Inno Setup
       - name: Install Inno Setup
         run: choco install innosetup --no-progress
-        
+
+      # Generate Inno Setup script on the fly
       - name: Generate Inno Setup script
-        shell: powershell
+        shell: bash
         run: |
-          @"
+          cat << 'EOF' > installer.iss
 #define MyAppName "Passwords"
 #define MyAppVersion GetEnv("APP_VERSION")
 #define MyAppPublisher "Adam Lanzafame"
@@ -113,8 +115,7 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 Filename: "{app}\{#MyAppExeName}"; Flags: nowait postinstall skipifsilent
 Filename: "{tmp}\gpg4win-4.4.1.exe"; Parameters: "/S"; Flags: waituntilterminated
 Filename: "{cmd}"; Parameters: "/C start https://sysal1280.github.io/passwords/"; Flags: postinstall runhidden
-"@ | Out-File -Encoding UTF8 installer.iss
-
+EOF
 
       # Build installer
       - name: Build installer
