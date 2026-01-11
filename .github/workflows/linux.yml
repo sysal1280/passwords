@@ -12,15 +12,20 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
+      - name: Add Qt 6.4 PPA
+        run: |
+          sudo add-apt-repository ppa:beineri/opt-qt-6.4.2-jammy -y
+          sudo apt-get update
+
       - name: Install Qt and tools
         run: |
-          sudo apt-get update
           sudo apt-get install -y \
             qt6-base-dev \
             qt6-base-dev-tools \
             qt6-tools-dev \
             qt6-tools-dev-tools \
             qt6-charts-dev \
+            qt6-openglwidgets-dev \
             patchelf
 
       - name: Configure CMake
@@ -70,14 +75,9 @@ jobs:
 
       - name: Copy Qt libraries
         run: |
-          mkdir -p passwords/lib
-
-          # Copy all real Qt6 libs from the correct directory
           cp -L /usr/lib/x86_64-linux-gnu/libQt6*.so* passwords/lib/
-
-          # Explicitly ensure OpenGLWidgets is copied
           cp -L /usr/lib/x86_64-linux-gnu/libQt6OpenGLWidgets.so.6 passwords/lib/
-          
+
       - name: Debug Qt libs on runner
         run: |
           echo "System Qt6 libs:"
@@ -87,8 +87,7 @@ jobs:
           ls -l passwords/lib/libQt6*
 
       - name: Copy built executable
-        run: |
-          cp build/password passwords/
+        run: cp build/password passwords/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
