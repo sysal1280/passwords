@@ -14,8 +14,19 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Install Qt
-        run: brew install qt
+      # Install Python + aqtinstall
+      - name: Install aqtinstall
+        run: |
+          brew install python
+          pip3 install --upgrade pip
+          pip3 install aqtinstall
+
+      # Install Qt 6.6 with Charts (same as Linux)
+      - name: Install Qt 6.6 with Charts
+        run: |
+          aqt install-qt mac desktop 6.6.0 clang_64 \
+            --outputdir $HOME/Qt \
+            --modules qtcharts
 
       # Extract version from CMakeLists.txt
       - name: Extract version
@@ -36,34 +47,49 @@ jobs:
           echo "hash=$HASH" >> $GITHUB_OUTPUT
           echo "dirty=$DIRTY" >> $GITHUB_OUTPUT
 
+      # Configure CMake using the Qt installation
       - name: Configure CMake
-        run: cmake -B build -DCMAKE_PREFIX_PATH=$(brew --prefix qt)
+        run: |
+          cmake -B build \
+            -DCMAKE_PREFIX_PATH=$HOME/Qt/6.6.0/macos
 
+      # Build the application
       - name: Build
         run: cmake --build build --config Release || cmake --build build
 
-      - name: Bundle Qt frameworks into .app
+      # Deploy Qt frameworks into the .app bundle
+      - name: Bundle Qt frameworks
         run: |
-          APP_PATH=$(find build -maxdepth 1 -name "*.app" | head -n 1)
+          APP_PATH=$(find build -maxdepth 2 -name "*.app" | head -n 1)
           echo "Found app: $APP_PATH"
           if [ -z "$APP_PATH" ]; then
-            echo "No .app bundle found in build directory"
+            echo "No .app bundle found"
             exit 1
           fi
-          QT_BIN=$(brew --prefix qt)/bin/macdeployqt
-          echo "Using macdeployqt at: $QT_BIN"
-          "$QT_BIN" "$APP_PATH" -verbose=2
+
+          DEPLOYQT=$HOME/Qt/6.6.0/macos/bin/macdeployqt
+          echo "Using macdeployqt: $DEPLOYQT"
+
+          "$DEPLOYQT" "$APP_PATH" -verbose=2
+
+      # Debug: show bundled frameworks
+      - name: Debug bundled frameworks
+        run: |
+          APP_PATH=$(find build -maxdepth 2 -name "*.app" | head -n 1)
+          echo "Frameworks inside app:"
+          ls -lh "$APP_PATH/Contents/Frameworks"
 
       # Create DMG
       - name: Create DMG
         run: |
-          APP_PATH=$(find build -maxdepth 1 -name "*.app" | head -n 1)
+          APP_PATH=$(find build -maxdepth 2 -name "*.app" | head -n 1)
           DMG_NAME="password-macos-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}.dmg"
           mkdir dmg
           cp -R "$APP_PATH" dmg/
           hdiutil create "$DMG_NAME" -volname "password" -srcfolder dmg -ov -format UDZO
           echo "DMG_NAME=$DMG_NAME" >> $GITHUB_ENV
 
+      # Upload DMG artifact
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
