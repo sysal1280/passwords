@@ -65,8 +65,7 @@ jobs:
 
       - name: Copy Qt libraries
         run: |
-          QT_LIB_DIR=$(qtpaths6 --lib-dir)
-          cp -r "$QT_LIB_DIR"/* passwords/lib/
+          cp -r /usr/lib/x86_64-linux-gnu/qt6/lib passwords/lib
 
       - name: Copy built executable
         run: |
