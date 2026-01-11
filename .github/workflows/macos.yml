@@ -6,94 +6,178 @@ on:
       - "**"
   pull_request:
 
+env:
+  QT_VERSION: "6.6.0"
+  QT_MODULES: "qtcharts"
+  QT_OUTPUT_DIR: ${{ runner.temp }}/Qt  # cached path; kept off $HOME to avoid permission issues
+  APP_BASENAME: "password"
+  DMG_VOLUME_NAME: "password"
+  CMAKE_BUILD_DIR: build
+
 jobs:
   build:
     runs-on: macos-latest
+    timeout-minutes: 60
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      # Install Python + aqtinstall
-      - name: Install aqtinstall
-        run: |
-          brew install python
-          pip3 install --upgrade pip
-          pip3 install aqtinstall
+      - name: Cache Qt installation
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.QT_OUTPUT_DIR }}
+          key: qt-${{ env.QT_VERSION }}-mac-${{ runner.os }}-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: |
+            qt-${{ env.QT_VERSION }}-mac-
 
-      # Install Qt 6.6 with Charts (same as Linux)
-      - name: Install Qt 6.6 with Charts
+      - name: Create Python venv and install aqtinstall
+        shell: bash
         run: |
-          aqt install-qt mac desktop 6.6.0 clang_64 \
-            --outputdir $HOME/Qt \
-            --modules qtcharts
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade pip setuptools wheel
+          pip install aqtinstall
 
-      # Extract version from CMakeLists.txt
-      - name: Extract version
+      - name: Install Qt using aqtinstall
+        shell: bash
+        run: |
+          source .venv/bin/activate
+          # aqtinstall will reuse cached files under QT_OUTPUT_DIR when present
+          aqt install-qt mac desktop ${{ env.QT_VERSION }} clang_64 \
+            --outputdir "${QT_OUTPUT_DIR}" \
+            --modules ${{ env.QT_MODULES }}
+
+      - name: Extract version from CMakeLists.txt
         id: version
+        shell: bash
         run: |
-          VERSION=$(grep -Eo 'project\(password VERSION [0-9]+\.[0-9]+' CMakeLists.txt | awk '{print $3}')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          VERSION=$(grep -Eo 'project\\([A-Za-z0-9_-]+ VERSION [0-9]+\\.[0-9]+' CMakeLists.txt | awk '{print $3}' || true)
+          if [ -z "$VERSION" ]; then
+            VERSION="0.0"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      # Extract git commit hash + dirty flag
-      - name: Extract git commit hash
+      - name: Extract git commit hash and dirty flag
         id: git
+        shell: bash
         run: |
           HASH=$(git rev-parse --short HEAD)
           DIRTY=""
           if ! git diff --quiet --ignore-submodules HEAD; then
             DIRTY="-dirty"
           fi
-          echo "hash=$HASH" >> $GITHUB_OUTPUT
-          echo "dirty=$DIRTY" >> $GITHUB_OUTPUT
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+          echo "dirty=$DIRTY" >> "$GITHUB_OUTPUT"
 
-      # Configure CMake using the Qt installation
-      - name: Configure CMake
+      - name: Configure CMake for universal binary
+        shell: bash
         run: |
-          cmake -B build \
-            -DCMAKE_PREFIX_PATH=$HOME/Qt/6.6.0/macos
+          source .venv/bin/activate || true
+          mkdir -p "${CMAKE_BUILD_DIR}"
+          cmake -S . -B "${CMAKE_BUILD_DIR}" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
+            -DCMAKE_PREFIX_PATH="${QT_OUTPUT_DIR}/${QT_VERSION}/macos"
 
-      # Build the application
       - name: Build
-        run: cmake --build build --config Release || cmake --build build
-
-      # Deploy Qt frameworks into the .app bundle
-      - name: Bundle Qt frameworks
+        shell: bash
         run: |
-          APP_PATH=$(find build -maxdepth 2 -name "*.app" | head -n 1)
-          echo "Found app: $APP_PATH"
+          cmake --build "${CMAKE_BUILD_DIR}" --config Release -- -j$(sysctl -n hw.ncpu)
+
+      - name: Locate .app bundle
+        id: find_app
+        shell: bash
+        run: |
+          APP_PATH=$(find "${CMAKE_BUILD_DIR}" -maxdepth 3 -name "*.app" | head -n 1 || true)
           if [ -z "$APP_PATH" ]; then
-            echo "No .app bundle found"
+            # Try common CMake multi-config path
+            APP_PATH=$(find "${CMAKE_BUILD_DIR}" -maxdepth 4 -path "*/Release/*.app" | head -n 1 || true)
+          fi
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app bundle found in ${CMAKE_BUILD_DIR}"
             exit 1
           fi
+          echo "app_path=$APP_PATH" >> "$GITHUB_OUTPUT"
+          echo "Found app: $APP_PATH"
 
-          DEPLOYQT=$HOME/Qt/6.6.0/macos/bin/macdeployqt
+      - name: Run macdeployqt to bundle Qt frameworks and plugins
+        shell: bash
+        run: |
+          source .venv/bin/activate || true
+          APP_PATH="${{ steps.find_app.outputs.app_path }}"
+          DEPLOYQT="${QT_OUTPUT_DIR}/${QT_VERSION}/macos/bin/macdeployqt"
+          if [ ! -x "$DEPLOYQT" ]; then
+            echo "macdeployqt not found at $DEPLOYQT"
+            exit 1
+          fi
           echo "Using macdeployqt: $DEPLOYQT"
-
+          # macdeployqt will copy frameworks and plugins into the .app
           "$DEPLOYQT" "$APP_PATH" -verbose=2
 
-      # Debug: show bundled frameworks
-      - name: Debug bundled frameworks
+      - name: Verify bundle contents
+        shell: bash
         run: |
-          APP_PATH=$(find build -maxdepth 2 -name "*.app" | head -n 1)
-          echo "Frameworks inside app:"
-          ls -lh "$APP_PATH/Contents/Frameworks"
+          APP_PATH="${{ steps.find_app.outputs.app_path }}"
+          echo "Listing app Contents:"
+          ls -la "$APP_PATH/Contents"
+          echo "Listing Frameworks (should contain Qt frameworks):"
+          ls -la "$APP_PATH/Contents/Frameworks" || true
+          echo "Listing PlugIns (should contain platforms and imageformats):"
+          ls -la "$APP_PATH/Contents/PlugIns" || true
+          echo "Show linked libraries for the main executable:"
+          EXECUTABLE=$(defaults read "$APP_PATH/Contents/Info" CFBundleExecutable)
+          if [ -n "$EXECUTABLE" ]; then
+            EXE_PATH="$APP_PATH/Contents/MacOS/$EXECUTABLE"
+            if [ -f "$EXE_PATH" ]; then
+              echo "Executable: $EXE_PATH"
+              otool -L "$EXE_PATH" || true
+            else
+              echo "Executable not found at $EXE_PATH"
+            fi
+          else
+            echo "Could not read CFBundleExecutable from Info.plist"
+          fi
 
-      # Create DMG
-      - name: Create DMG
+      - name: Optional codesign if secrets provided
+        if: ${{ secrets.MAC_CODESIGN_IDENTITY != '' && secrets.APPLE_NOTARIZE_PASSWORD != '' }}
+        shell: bash
+        env:
+          CODESIGN_IDENTITY: ${{ secrets.MAC_CODESIGN_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_NOTARIZE_PASSWORD: ${{ secrets.APPLE_NOTARIZE_PASSWORD }}
         run: |
-          APP_PATH=$(find build -maxdepth 2 -name "*.app" | head -n 1)
-          DMG_NAME="password-macos-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}.dmg"
-          mkdir dmg
+          APP_PATH="${{ steps.find_app.outputs.app_path }}"
+          echo "Codesigning app with identity $CODESIGN_IDENTITY"
+          # sign all frameworks and the app; adjust entitlements if needed
+          find "$APP_PATH/Contents/Frameworks" -type f -name "*.dylib" -or -name "*.framework" -print0 | xargs -0 -I{} codesign --timestamp --options runtime --sign "$CODESIGN_IDENTITY" "{}" || true
+          codesign --timestamp --options runtime --sign "$CODESIGN_IDENTITY" "$APP_PATH"
+          echo "Submitting for notarization (this step requires APPLE_ID and APPLE_NOTARIZE_PASSWORD)"
+          xcrun notarytool submit --wait --apple-id "$APPLE_ID" --password "$APPLE_NOTARIZE_PASSWORD" --team-id "${{ secrets.APPLE_TEAM_ID }}" "$APP_PATH"
+          xcrun stapler staple "$APP_PATH" || true
+
+      - name: Create DMG
+        shell: bash
+        run: |
+          APP_PATH="${{ steps.find_app.outputs.app_path }}"
+          DMG_NAME="${{ env.APP_BASENAME }}-macos-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}.dmg"
+          mkdir -p dmg
           cp -R "$APP_PATH" dmg/
-          hdiutil create "$DMG_NAME" -volname "password" -srcfolder dmg -ov -format UDZO
+          # create compressed read-only DMG
+          hdiutil create "$DMG_NAME" -volname "${{ env.DMG_VOLUME_NAME }}" -srcfolder dmg -ov -format UDZO
           echo "DMG_NAME=$DMG_NAME" >> $GITHUB_ENV
 
-      # Upload DMG artifact
-      - name: Upload DMG
+      - name: Show DMG info
+        shell: bash
+        run: |
+          echo "Created DMG: ${{ env.DMG_NAME }}"
+          hdiutil imageinfo "${{ env.DMG_NAME }}" || true
+          ls -lh "${{ env.DMG_NAME }}"
+
+      - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.DMG_NAME }}
+          name: ${{ env.APP_BASENAME }}-macos-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}.dmg
           path: ${{ env.DMG_NAME }}
           if-no-files-found: error
 
