@@ -12,20 +12,18 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Add Qt 6.4 PPA
-        run: |
-          sudo add-apt-repository ppa:beineri/opt-qt-6.4.2-jammy -y
-          sudo apt-get update
-
+      # Install Qt6 from Ubuntu repos (no PPAs needed)
+      # qt6-base-dev-private contains the REAL OpenGLWidgets library
       - name: Install Qt and tools
         run: |
+          sudo apt-get update
           sudo apt-get install -y \
             qt6-base-dev \
             qt6-base-dev-tools \
+            qt6-base-dev-private \
             qt6-tools-dev \
             qt6-tools-dev-tools \
             qt6-charts-dev \
-            qt6-openglwidgets-dev \
             patchelf
 
       - name: Configure CMake
@@ -76,7 +74,6 @@ jobs:
       - name: Copy Qt libraries
         run: |
           cp -L /usr/lib/x86_64-linux-gnu/libQt6*.so* passwords/lib/
-          cp -L /usr/lib/x86_64-linux-gnu/libQt6OpenGLWidgets.so.6 passwords/lib/
 
       - name: Debug Qt libs on runner
         run: |
