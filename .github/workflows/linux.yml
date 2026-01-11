@@ -75,6 +75,11 @@ jobs:
       - name: Copy built executable
         run: |
           cp build/password passwords/
+          
+      - name: Copy ICU libraries
+        run: |
+          QT_LIB_DIR=$HOME/Qt/6.6.0/gcc_64/lib
+          cp -L "$QT_LIB_DIR"/libicu*.so* passwords/lib/
 
       - name: Debug bundled Qt libs
         run: |
