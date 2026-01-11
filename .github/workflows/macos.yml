@@ -3,33 +3,28 @@ name: macOS Qt Build
 on:
   push:
     tags:
-      - "v*"  # Trigger on version tags like v1.0, v2.1, etc.
+      - "v*"
     branches:
-      - "**"  # Trigger on any branch push (you can adjust this to only certain branches if needed)
-  pull_request:  # You can remove this if you don't want to trigger on PRs
+      - "**"
+  pull_request:
 
 jobs:
   build:
-    runs-on: macos-latest  # Use macOS for the build
+    runs-on: macos-latest
 
     steps:
-      # Checkout the code
       - name: Checkout source
         uses: actions/checkout@v3
 
-      # Install Qt
       - name: Install Qt
         run: brew install qt
 
-      # Configure CMake to find the Qt framework
       - name: Configure CMake
         run: cmake -B build -DCMAKE_PREFIX_PATH=$(brew --prefix qt)
 
-      # Build the project with CMake
       - name: Build
         run: cmake --build build --config Release || cmake --build build
 
-      # Bundle the Qt frameworks into the .app (macdeployqt step)
       - name: Bundle Qt frameworks into .app
         run: |
           APP_PATH=$(find build -maxdepth 1 -name "*.app" | head -n 1)
@@ -42,33 +37,35 @@ jobs:
           echo "Using macdeployqt at: $QT_BIN"
           "$QT_BIN" "$APP_PATH" -verbose=2
 
-      # Upload the .app bundle as an artifact
+      # Upload the .app bundle as a FLAT artifact
       - name: Upload .app bundle (artifact)
         uses: actions/upload-artifact@v4
         with:
-          name: macOS-app  # Name of the artifact
-          path: build/password.app/**  # Path to the .app bundle to upload
+          name: macos-app
+          path: build/password.app
+          if-no-files-found: error
 
-      # Download the .app artifact for release
+      # Download the artifact for release
       - name: Download built app for release
-        if: startsWith(github.ref, 'refs/tags/')  # Ensure this only runs for tag pushes
+        if: startsWith(github.ref, 'refs/tags/')
         uses: actions/download-artifact@v4
         with:
-          name: macOS-app  # Name of the artifact to download
-          path: release-files  # Path where the artifact will be downloaded
+          name: macos-app
+          path: release-files
 
-      # Debug - List files in the release directory to confirm the download path
+      # Debug: show EXACT extracted structure
       - name: Debug - List files in release directory
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
-          echo "Listing files in release-files/macOS-app"
-          ls -R release-files/macOS-app  # List files to ensure the .app is there
+          echo "Listing release-files:"
+          find release-files -maxdepth 6 -print
 
-      # Publish the release with the downloaded .app
+      # Publish the release
       - name: Publish Release
-        if: startsWith(github.ref, 'refs/tags/')  # Only run if this is a tag push
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: release-files/macOS-app/password.app/**  # Pattern to find the .app in the release directory
+          files: release-files/password.app/**
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Ensure token is passed with the correct permissions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
