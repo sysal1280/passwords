@@ -907,9 +907,15 @@ MainWindow::MainWindow(QWidget *parent)
 
                 menu.exec(globalPos);
             });
-    // ui->treeWidget_2->setStyleSheet(
-    //     "QTreeWidget::item { padding-top: 6px; padding-bottom: 6px; }"
-    //     );
+
+
+    // Set search icon
+    QIcon searchIcon(":/menus/glyphs/search_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg");
+    QAction *searchAction = ui->lineEditSearch->addAction(
+        searchIcon,
+        QLineEdit::LeadingPosition
+    );
+    Q_UNUSED(searchAction);
 
 
     /*
