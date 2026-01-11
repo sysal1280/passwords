@@ -82,25 +82,21 @@ qt_add_executable(password WIN32 MACOSX_BUNDLE
 )
 
 if(APPLE)
-    set(GENERATED_ICON "${CMAKE_BINARY_DIR}/password.icns")
+    # Place the icon inside the app bundle's Resources folder
+    set_source_files_properties(
+        resources/passwords.icns
+        PROPERTIES MACOSX_PACKAGE_LOCATION "Resources"
+    )
 
-    if(EXISTS "${GENERATED_ICON}")
-        message(STATUS "Using generated macOS icon: ${GENERATED_ICON}")
+    # Add the icon file to the target
+    target_sources(password PRIVATE resources/passwords.icns)
 
-        set_source_files_properties(
-            "${GENERATED_ICON}"
-            PROPERTIES MACOSX_PACKAGE_LOCATION "Resources"
-        )
-
-        target_sources(password PRIVATE "${GENERATED_ICON}")
-
-        set_target_properties(password PROPERTIES
-            MACOSX_BUNDLE_ICON_FILE "password.icns"
-        )
-    else()
-        message(STATUS "No generated macOS icon found; skipping icon embedding.")
-    endif()
+    # Tell macOS which icon to use
+    set_target_properties(password PROPERTIES
+        MACOSX_BUNDLE_ICON_FILE "passwords.icns"
+    )
 endif()
+
 
 # Windows-only resource file (keep icon on Windows, ignore on macOS/Linux)
 if(WIN32)
