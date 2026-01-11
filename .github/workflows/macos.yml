@@ -14,60 +14,127 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Install Qt
-        run: brew install qt
-
-      # Extract version from CMakeLists.txt
-      - name: Extract version
-        id: version
+      - name: Create Python venv + install aqtinstall
+        shell: bash
         run: |
-          VERSION=$(grep -Eo 'project\(password VERSION [0-9]+\.[0-9]+' CMakeLists.txt | awk '{print $3}')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install aqtinstall
 
-      # Extract git commit hash + dirty flag
-      - name: Extract git commit hash
-        id: git
+      - name: Install Qt 6.6 with Charts
+        shell: bash
         run: |
-          HASH=$(git rev-parse --short HEAD)
-          DIRTY=""
-          if ! git diff --quiet --ignore-submodules HEAD; then
-            DIRTY="-dirty"
-          fi
-          echo "hash=$HASH" >> $GITHUB_OUTPUT
-          echo "dirty=$DIRTY" >> $GITHUB_OUTPUT
+          source venv/bin/activate
+          aqt install-qt mac desktop 6.6.0 clang_64 \
+            --outputdir "$HOME/Qt" \
+            --modules qtcharts
 
       - name: Configure CMake
-        run: cmake -B build -DCMAKE_PREFIX_PATH=$(brew --prefix qt)
+        shell: bash
+        run: |
+          cmake -B build \
+            -DCMAKE_PREFIX_PATH="$HOME/Qt/6.6.0/macos" \
+            -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: cmake --build build --config Release || cmake --build build
-
-      - name: Bundle Qt frameworks into .app
+        shell: bash
         run: |
-          APP_PATH=$(find build -maxdepth 1 -name "*.app" | head -n 1)
-          echo "Found app: $APP_PATH"
-          if [ -z "$APP_PATH" ]; then
-            echo "No .app bundle found in build directory"
+          cmake --build build --config Release || cmake --build build
+
+      - name: Locate .app bundle
+        id: find_app
+        shell: bash
+        run: |
+          APP=$(find build -maxdepth 3 -name "*.app" | head -n 1)
+          if [ -z "$APP" ]; then
+            echo "No .app found"
             exit 1
           fi
-          QT_BIN=$(brew --prefix qt)/bin/macdeployqt
-          echo "Using macdeployqt at: $QT_BIN"
-          "$QT_BIN" "$APP_PATH" -verbose=2
+          echo "app=$APP" >> $GITHUB_OUTPUT
+          echo "Found app: $APP"
 
-      # Create DMG
-      - name: Create DMG
+      - name: Prepare bundle directories
+        shell: bash
         run: |
-          APP_PATH=$(find build -maxdepth 1 -name "*.app" | head -n 1)
-          DMG_NAME="password-macos-${{ steps.git.outputs.hash }}${{ steps.git.outputs.dirty }}.dmg"
+          APP="${{ steps.find_app.outputs.app }}"
+          mkdir -p "$APP/Contents/Frameworks"
+          mkdir -p "$APP/Contents/PlugIns"
+
+      - name: Copy Qt frameworks (manual bundling)
+        shell: bash
+        run: |
+          APP="${{ steps.find_app.outputs.app }}"
+          QT="$HOME/Qt/6.6.0/macos"
+
+          cp -R "$QT/lib/Qt"*.framework "$APP/Contents/Frameworks/" || true
+          cp -L "$QT/lib/libQt6"*.dylib "$APP/Contents/Frameworks/" || true
+
+      - name: Copy Qt plugins (manual bundling)
+        shell: bash
+        run: |
+          APP="${{ steps.find_app.outputs.app }}"
+          QT="$HOME/Qt/6.6.0/macos"
+
+          cp -R "$QT/plugins/"* "$APP/Contents/PlugIns/" || true
+
+      - name: Copy ICU libraries
+        shell: bash
+        run: |
+          APP="${{ steps.find_app.outputs.app }}"
+          QT="$HOME/Qt/6.6.0/macos"
+
+          cp -L "$QT/lib/libicu"*.dylib "$APP/Contents/Frameworks/" || true
+
+      - name: Fix loader paths with install_name_tool
+        shell: bash
+        run: |
+          APP="${{ steps.find_app.outputs.app }}"
+          EXE_NAME=$(defaults read "$APP/Contents/Info" CFBundleExecutable)
+          EXE="$APP/Contents/MacOS/$EXE_NAME"
+
+          echo "Fixing loader paths for: $EXE"
+
+          install_name_tool -add_rpath "@executable_path/../Frameworks" "$EXE"
+
+          for FW in "$APP/Contents/Frameworks/"*.framework; do
+            NAME=$(basename "$FW" .framework)
+            install_name_tool -id "@rpath/$NAME.framework/$NAME" "$FW/$NAME"
+          done
+
+          for DY in "$APP/Contents/Frameworks/"*.dylib; do
+            install_name_tool -id "@rpath/$(basename "$DY")" "$DY"
+          done
+
+      - name: Verify bundle
+        shell: bash
+        run: |
+          APP="${{ steps.find_app.outputs.app }}"
+          echo "Frameworks:"
+          ls -lh "$APP/Contents/Frameworks"
+          echo "Plugins:"
+          ls -lh "$APP/Contents/PlugIns"
+
+          EXE_NAME=$(defaults read "$APP/Contents/Info" CFBundleExecutable)
+          EXE="$APP/Contents/MacOS/$EXE_NAME"
+
+          echo "Linked libraries:"
+          otool -L "$EXE"
+
+      - name: Create DMG
+        shell: bash
+        run: |
+          APP="${{ steps.find_app.outputs.app }}"
+          DMG="password-macos.dmg"
           mkdir dmg
-          cp -R "$APP_PATH" dmg/
-          hdiutil create "$DMG_NAME" -volname "password" -srcfolder dmg -ov -format UDZO
-          echo "DMG_NAME=$DMG_NAME" >> $GITHUB_ENV
+          cp -R "$APP" dmg/
+          hdiutil create "$DMG" -volname "password" -srcfolder dmg -ov -format UDZO
+          echo "DMG=$DMG" >> $GITHUB_ENV
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.DMG_NAME }}
-          path: ${{ env.DMG_NAME }}
+          name: macos-passwords-bundle
+          path: ${{ env.DMG }}
           if-no-files-found: error
 
