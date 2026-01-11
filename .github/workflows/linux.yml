@@ -12,25 +12,35 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      # Install Qt6 from Ubuntu repos (no PPAs needed)
-      # qt6-base-dev-private contains the REAL OpenGLWidgets library
-      - name: Install Qt and tools
+      - name: Install system tools
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            qt6-base-dev \
-            qt6-base-dev-tools \
-            qt6-base-dev-private \
-            qt6-tools-dev \
-            qt6-tools-dev-tools \
-            qt6-charts-dev \
-            patchelf
+            cmake \
+            ninja-build \
+            patchelf \
+            python3-pip
+
+      - name: Install aqtinstall
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install aqtinstall
+
+      - name: Install Qt 6.6 (desktop, gcc_64)
+        run: |
+          aqt install-qt linux desktop 6.6.0 gcc_64 --outputdir $HOME/Qt
+
+      - name: Add Qt to PATH
+        run: |
+          echo "$HOME/Qt/6.6.0/gcc_64/bin" >> $GITHUB_PATH
 
       - name: Configure CMake
-        run: cmake -B build
+        run: |
+          cmake -B build -G Ninja -DCMAKE_PREFIX_PATH=$HOME/Qt/6.6.0/gcc_64
 
       - name: Build
-        run: cmake --build build --config Release
+        run: |
+          cmake --build build --config Release
 
       - name: Prepare artifact directory
         run: |
@@ -41,50 +51,24 @@ jobs:
         run: |
           patchelf --set-rpath '$ORIGIN/lib' build/password
 
-      - name: Copy Qt plugins
-        run: |
-          QT_PLUGIN_DIR=$(qtpaths6 --plugin-dir)
-
-          for plugin in \
-            generic \
-            iconengines \
-            imageformats \
-            platforminputcontexts \
-            platforms \
-            platformthemes \
-            sqldrivers \
-            tls \
-            wayland-decoration-client \
-            wayland-graphics-integration-client \
-            wayland-shell-integration \
-            xcbglintegrations
-          do
-            if [ -d "$QT_PLUGIN_DIR/$plugin" ]; then
-              cp -r "$QT_PLUGIN_DIR/$plugin" passwords/plugins/
-            else
-              echo "Plugin directory not found: $plugin"
-            fi
-          done
-
-      - name: Debug Qt libs
-        run: |
-          echo "Listing Qt6 libs:"
-          ls -l /usr/lib/x86_64-linux-gnu/libQt6*
-
       - name: Copy Qt libraries
         run: |
-          cp -L /usr/lib/x86_64-linux-gnu/libQt6*.so* passwords/lib/
+          QT_LIB_DIR=$HOME/Qt/6.6.0/gcc_64/lib
+          cp -L "$QT_LIB_DIR"/libQt6*.so* passwords/lib/
 
-      - name: Debug Qt libs on runner
+      - name: Copy Qt plugins
         run: |
-          echo "System Qt6 libs:"
-          ls -l /usr/lib/x86_64-linux-gnu/libQt6*
-
-          echo "Bundled Qt6 libs:"
-          ls -l passwords/lib/libQt6*
+          QT_PLUGIN_DIR=$HOME/Qt/6.6.0/gcc_64/plugins
+          cp -r "$QT_PLUGIN_DIR"/* passwords/plugins/
 
       - name: Copy built executable
-        run: cp build/password passwords/
+        run: |
+          cp build/password passwords/
+
+      - name: Debug bundled Qt libs
+        run: |
+          echo "Bundled Qt6 libs:"
+          ls -lh passwords/lib/libQt6*
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
