@@ -41,6 +41,14 @@ jobs:
         shell: bash
         run: |
           cmake --build build --config Release || cmake --build build
+          
+          
+      - name: Debug build tree
+        shell: bash
+        run: |
+          echo "Contents of build/ (maxdepth 4):"
+          find build -maxdepth 4 -print
+
 
       - name: Locate .app bundle
         id: find_app
