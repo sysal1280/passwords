@@ -37,8 +37,9 @@ jobs:
 
       - name: Install Qt 6.6 with Charts
         run: |
-          aqt install-qt linux desktop 6.6.0 gcc_64 --outputdir $HOME/Qt
-          aqt install-module linux desktop 6.6.0 gcc_64 qtcharts --outputdir $HOME/Qt
+          aqt install-qt linux desktop 6.6.0 gcc_64 \
+            --outputdir $HOME/Qt \
+            --modules qtcharts
 
       - name: Add Qt to PATH
         run: |
