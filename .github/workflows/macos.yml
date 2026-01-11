@@ -41,27 +41,47 @@ jobs:
         shell: bash
         run: |
           cmake --build build --config Release || cmake --build build
-          
-          
+
       - name: Debug build tree
         shell: bash
         run: |
           echo "Contents of build/ (maxdepth 4):"
           find build -maxdepth 4 -print
 
-
       - name: Locate .app bundle
         id: find_app
         shell: bash
         run: |
-          APP_PATH=$(find build -maxdepth 5 -name "*.app" | head -n 1)
+          APP_PATH=$(find build -maxdepth 5 -name "*.app" | head -n 1 || true)
           if [ -z "$APP_PATH" ]; then
-            echo "No .app bundle found!"
+            echo "No .app bundle found under build/"
             find build -maxdepth 5 -type d -print
             exit 1
           fi
           echo "app_path=$APP_PATH" >> "$GITHUB_OUTPUT"
           echo "Found app: $APP_PATH"
+
+      - name: Ensure Info.plist exists inside bundle
+        shell: bash
+        run: |
+          APP="${{ steps.find_app.outputs.app_path }}"
+          INFO_PLIST="$APP/Contents/Info.plist"
+
+          if [ -f "$INFO_PLIST" ]; then
+            echo "Info.plist already present in bundle: $INFO_PLIST"
+          else
+            echo "Info.plist missing in bundle. Trying to copy from .qt/info_plist"
+            # Look for generated Info.plist under build/.qt/info_plist/*
+            SRC_INFO=$(find build/.qt/info_plist -maxdepth 2 -name Info.plist | head -n 1 || true)
+            if [ -z "$SRC_INFO" ]; then
+              echo "ERROR: Could not find Info.plist under build/.qt/info_plist"
+              find build/.qt -maxdepth 5 -print || true
+              exit 1
+            fi
+            echo "Copying Info.plist from $SRC_INFO to $INFO_PLIST"
+            mkdir -p "$APP/Contents"
+            cp "$SRC_INFO" "$INFO_PLIST"
+          fi
 
       - name: Prepare bundle directories
         shell: bash
@@ -99,27 +119,32 @@ jobs:
         shell: bash
         run: |
           APP="${{ steps.find_app.outputs.app_path }}"
-          INFO_PLIST="$APP/Contents/Info.plist"
 
-          if [ ! -f "$INFO_PLIST" ]; then
-            echo "ERROR: Info.plist missing!"
+          # We know the target is called 'password', so the executable should be:
+          EXE="$APP/Contents/MacOS/password"
+
+          if [ ! -f "$EXE" ]; then
+            echo "ERROR: Expected executable not found at $EXE"
+            echo "Bundle contents:"
             find "$APP" -maxdepth 5 -print
             exit 1
           fi
 
-          EXE_NAME=$(defaults read "$APP/Contents/Info" CFBundleExecutable)
-          EXE="$APP/Contents/MacOS/$EXE_NAME"
-
           echo "Fixing loader paths for: $EXE"
 
+          # Ensure the app can find frameworks in Contents/Frameworks
           install_name_tool -add_rpath "@executable_path/../Frameworks" "$EXE"
 
+          # Fix IDs for frameworks
           for FW in "$APP/Contents/Frameworks/"*.framework; do
             [ -e "$FW" ] || continue
             NAME=$(basename "$FW" .framework)
-            install_name_tool -id "@rpath/$NAME.framework/$NAME" "$FW/$NAME"
+            if [ -f "$FW/$NAME" ]; then
+              install_name_tool -id "@rpath/$NAME.framework/$NAME" "$FW/$NAME"
+            fi
           done
 
+          # Fix IDs for plain dylibs
           for DY in "$APP/Contents/Frameworks/"*.dylib; do
             [ -e "$DY" ] || continue
             install_name_tool -id "@rpath/$(basename "$DY")" "$DY"
@@ -130,15 +155,17 @@ jobs:
         run: |
           APP="${{ steps.find_app.outputs.app_path }}"
           echo "Frameworks:"
-          ls -lh "$APP/Contents/Frameworks"
+          ls -lh "$APP/Contents/Frameworks" || true
           echo "PlugIns:"
-          ls -lh "$APP/Contents/PlugIns"
+          ls -lh "$APP/Contents/PlugIns" || true
 
-          EXE_NAME=$(defaults read "$APP/Contents/Info" CFBundleExecutable)
-          EXE="$APP/Contents/MacOS/$EXE_NAME"
-
-          echo "Linked libraries:"
-          otool -L "$EXE"
+          EXE="$APP/Contents/MacOS/password"
+          if [ -f "$EXE" ]; then
+            echo "Linked libraries for $EXE:"
+            otool -L "$EXE" || true
+          else
+            echo "Executable not found at $EXE"
+          fi
 
       - name: Create DMG
         shell: bash
