@@ -66,6 +66,55 @@ jobs:
       # Install Inno Setup
       - name: Install Inno Setup
         run: choco install innosetup --no-progress
+        
+      - name: Generate Inno Setup script
+        shell: powershell
+        run: |
+          @"
+#define MyAppName "Passwords"
+#define MyAppVersion GetEnv("APP_VERSION")
+#define MyAppPublisher "Adam Lanzafame"
+#define MyAppURL "https://github.com/sysal1280/passwords.git"
+#define MyAppExeName "password.exe"
+
+[Setup]
+AppId={{0FD632D1-DA16-45DA-BBBE-F8778FD03E21}
+AppName={#MyAppName}
+AppVersion={#MyAppVersion}
+AppPublisher={#MyAppPublisher}
+AppPublisherURL={#MyAppURL}
+AppSupportURL={#MyAppURL}
+AppUpdatesURL={#MyAppURL}
+DefaultDirName={autopf}\{#MyAppName}
+UninstallDisplayIcon={app}\{#MyAppExeName}
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
+DisableProgramGroupPage=yes
+PrivilegesRequiredOverridesAllowed=dialog
+OutputBaseFilename=Passwords-x86_64-{#MyAppVersion}
+SolidCompression=yes
+WizardStyle=modern dynamic
+
+[Languages]
+Name: "english"; MessagesFile: "compiler:Default.isl"
+
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+
+[Files]
+Source: "{#SourcePath}\deps\gpg4win-4.4.1.exe"; DestDir: "{tmp}"; Flags: ignoreversion
+Source: "{#SourcePath}\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[Icons]
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+
+[Run]
+Filename: "{app}\{#MyAppExeName}"; Flags: nowait postinstall skipifsilent
+Filename: "{tmp}\gpg4win-4.4.1.exe"; Parameters: "/S"; Flags: waituntilterminated
+Filename: "{cmd}"; Parameters: "/C start https://sysal1280.github.io/passwords/"; Flags: postinstall runhidden
+"@ | Out-File -Encoding UTF8 installer.iss
+
 
       # Build installer
       - name: Build installer
