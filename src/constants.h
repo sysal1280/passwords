@@ -31,6 +31,7 @@ inline constexpr int SBTransientMessageTime = 5000;
 inline constexpr auto HelpBaseUrl    = "https://sysal1280.github.io/passwords/";
 inline constexpr auto GitUrl         = "https://github.com/sysal1280/passwords.git";
 inline constexpr auto BugUrl         = "https://github.com/sysal1280/passwords/security";
+inline constexpr auto WordlistUrl    = "https://github.com/sts10/orchard-street-wordlists";
 
 inline constexpr auto License        = "Licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPLv3 License</a> or later.";
 inline constexpr auto WarrantyDisclaimer =

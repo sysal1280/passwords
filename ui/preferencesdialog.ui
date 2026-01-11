@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>442</width>
-    <height>475</height>
+    <height>513</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item row="1" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -364,16 +364,6 @@
             </item>
            </layout>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="labelOrchidStreetWords">
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/sts10/orchard-street-wordlists/blob/main/readme.markdown&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Learn more&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::TextFormat::RichText</enum>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1">
            <spacer name="horizontalSpacer_9">
             <property name="orientation">
@@ -386,6 +376,16 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QLabel" name="labelOrchadStreetWords">
+            <property name="text">
+             <string>&lt;a href=&quot;https://github.com/sts10/orchard-street-wordlists&quot;&gt;Learn more&lt;/a&gt;</string>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::TextFormat::RichText</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

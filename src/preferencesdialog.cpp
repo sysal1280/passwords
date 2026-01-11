@@ -17,12 +17,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "preferencesdialog.h"
+#include "ui_preferencesdialog.h"
 
 #include "constants.h"
 #include "mainwindow.h"
 #include "preferencesdialog.h"
 #include "settings.h"
-#include "ui_preferencesdialog.h"
 #include "utils.h"
 #include "dbutils.h"
 
@@ -100,7 +101,22 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
         qCritical().noquote() << Q_FUNC_INFO << "Failed to unregister " << wordListPath;
     }
 
-    ui->labelOrchidStreetWords->setOpenExternalLinks(true);
+
+    ui->labelOrchadStreetWords->clear();
+    ui->labelOrchadStreetWords->setObjectName("labelOrchadStreetWords");
+    ui->labelOrchadStreetWords->setTextFormat(Qt::RichText);
+    ui->labelOrchadStreetWords->setOpenExternalLinks(true);
+
+    ui->labelOrchadStreetWords->setTextInteractionFlags(
+        Qt::TextBrowserInteraction | Qt::LinksAccessibleByMouse
+        );
+
+    // Inline CSS inside the HTML — the ONLY method Qt respects
+    ui->labelOrchadStreetWords->setText(
+        QString("<a href=\"%1\" style=\"color:#1a7bb0; text-decoration:none;\">Learn more</a>")
+            .arg(Passwords::WordlistUrl)
+        );
+
 
 
     ui->comboBoxEchoMode->addItem(tr("Normal"), QLineEdit::Normal);
@@ -603,13 +619,7 @@ void PreferencesDialog::restartApplication()
     QCoreApplication::quit();
 }
 
-void PreferencesDialog::resizeEvent(QResizeEvent *event)
-{
-    Q_UNUSED(event);
-    setWindowState(Qt::WindowNoState);
-    adjustSize();
-    setFixedSize(size()); // snap back to fixed size on any resize
-}
+
 
 void PreferencesDialog::onBackupCheckStateChanged(int state)
 {

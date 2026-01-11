@@ -46,7 +46,7 @@ private slots:
 private:
     Ui::PreferencesDialog *ui;
     QMap<QString, QWidget*> widgetMap;
-    void resizeEvent(QResizeEvent *event);
+    //void resizeEvent(QResizeEvent *event);
     void restoreButtonClicked(QAbstractButton *button);
     void restoreDefaults();
     void onBackupCheckStateChanged(int state);

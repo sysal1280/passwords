@@ -794,9 +794,10 @@ MainWindow::MainWindow(QWidget *parent)
 
                 auto *pd = new PreferencesDialog(this);
                 pd->setWindowTitle(ui->actionPreferences->text());
-                pd->adjustSize();
-                pd->setFixedSize(pd->size());
                 pd->setWindowFlags(pd->windowFlags() & ~Qt::WindowMaximizeButtonHint);
+                pd->adjustSize();
+                pd->resize(pd->width()+48,pd->height()); //just a bit of width padding
+                pd->setFixedSize(pd->size());
                 pd->exec();
             });
 
