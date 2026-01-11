@@ -21,6 +21,7 @@ jobs:
           arch: win64_msvc2019_64
           modules: qtcharts
 
+      # Extract version from CMakeLists.txt
       - name: Extract version
         id: version
         shell: bash
@@ -28,6 +29,7 @@ jobs:
           VERSION=$(grep -Eo 'project\(password VERSION [0-9]+\.[0-9]+' CMakeLists.txt | awk '{print $3}')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+      # Extract git commit hash + dirty flag
       - name: Extract git commit hash
         id: git
         shell: bash
@@ -46,6 +48,7 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
+      # Deploy Qt DLLs using windeployqt6
       - name: Deploy Qt (windeployqt6)
         shell: cmd
         run: |
@@ -54,63 +57,66 @@ jobs:
           copy build\Release\password.exe app\
           "%Qt6_DIR%\bin\windeployqt6.exe" --release app\password.exe
 
+      # Download GPG4Win
       - name: Download GPG4Win
         shell: bash
         run: |
           mkdir -p deps
           curl -L -o deps/gpg4win-4.4.1.exe "https://files.gpg4win.org/gpg4win-4.4.1.exe"
 
+      # Install Inno Setup
       - name: Install Inno Setup
         run: choco install innosetup --no-progress
 
+      # Generate Inno Setup script without heredoc (YAML-safe)
       - name: Generate Inno Setup script
         shell: bash
         run: |
-          cat << 'EOF' > installer.iss
-#define MyAppName "Passwords"
-#define MyAppVersion GetEnv("APP_VERSION")
-#define MyAppPublisher "Adam Lanzafame"
-#define MyAppURL "https://github.com/sysal1280/passwords.git"
-#define MyAppExeName "password.exe"
+          : > installer.iss
+          echo '#define MyAppName "Passwords"' >> installer.iss
+          echo '#define MyAppVersion GetEnv("APP_VERSION")' >> installer.iss
+          echo '#define MyAppPublisher "Adam Lanzafame"' >> installer.iss
+          echo '#define MyAppURL "https://github.com/sysal1280/passwords.git"' >> installer.iss
+          echo '#define MyAppExeName "password.exe"' >> installer.iss
+          echo >> installer.iss
+          echo '[Setup]' >> installer.iss
+          echo 'AppId={{0FD632D1-DA16-45DA-BBBE-F8778FD03E21}' >> installer.iss
+          echo 'AppName={#MyAppName}' >> installer.iss
+          echo 'AppVersion={#MyAppVersion}' >> installer.iss
+          echo 'AppPublisher={#MyAppPublisher}' >> installer.iss
+          echo 'AppPublisherURL={#MyAppURL}' >> installer.iss
+          echo 'AppSupportURL={#MyAppURL}' >> installer.iss
+          echo 'AppUpdatesURL={#MyAppURL}' >> installer.iss
+          echo 'DefaultDirName={autopf}\{#MyAppName}' >> installer.iss
+          echo 'UninstallDisplayIcon={app}\{#MyAppExeName}' >> installer.iss
+          echo 'ArchitecturesAllowed=x64compatible' >> installer.iss
+          echo 'ArchitecturesInstallIn64BitMode=x64compatible' >> installer.iss
+          echo 'DisableProgramGroupPage=yes' >> installer.iss
+          echo 'PrivilegesRequiredOverridesAllowed=dialog' >> installer.iss
+          echo 'OutputBaseFilename=Passwords-x86_64-{#MyAppVersion}' >> installer.iss
+          echo 'SolidCompression=yes' >> installer.iss
+          echo 'WizardStyle=modern dynamic' >> installer.iss
+          echo >> installer.iss
+          echo '[Languages]' >> installer.iss
+          echo 'Name: "english"; MessagesFile: "compiler:Default.isl"' >> installer.iss
+          echo >> installer.iss
+          echo '[Tasks]' >> installer.iss
+          echo 'Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked' >> installer.iss
+          echo >> installer.iss
+          echo '[Files]' >> installer.iss
+          echo 'Source: "{#SourcePath}\deps\gpg4win-4.4.1.exe"; DestDir: "{tmp}"; Flags: ignoreversion' >> installer.iss
+          echo 'Source: "{#SourcePath}\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs' >> installer.iss
+          echo >> installer.iss
+          echo '[Icons]' >> installer.iss
+          echo 'Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"' >> installer.iss
+          echo 'Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon' >> installer.iss
+          echo >> installer.iss
+          echo '[Run]' >> installer.iss
+          echo 'Filename: "{app}\{#MyAppExeName}"; Flags: nowait postinstall skipifsilent' >> installer.iss
+          echo 'Filename: "{tmp}\gpg4win-4.4.1.exe"; Parameters: "/S"; Flags: waituntilterminated' >> installer.iss
+          echo 'Filename: "{cmd}"; Parameters: "/C start https://sysal1280.github.io/passwords/"; Flags: postinstall runhidden' >> installer.iss
 
-[Setup]
-AppId={{0FD632D1-DA16-45DA-BBBE-F8778FD03E21}
-AppName={#MyAppName}
-AppVersion={#MyAppVersion}
-AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}
-AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\{#MyAppName}
-UninstallDisplayIcon={app}\{#MyAppExeName}
-ArchitecturesAllowed=x64compatible
-ArchitecturesInstallIn64BitMode=x64compatible
-DisableProgramGroupPage=yes
-PrivilegesRequiredOverridesAllowed=dialog
-OutputBaseFilename=Passwords-x86_64-{#MyAppVersion}
-SolidCompression=yes
-WizardStyle=modern dynamic
-
-[Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"
-
-[Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-
-[Files]
-Source: "{#SourcePath}\deps\gpg4win-4.4.1.exe"; DestDir: "{tmp}"; Flags: ignoreversion
-Source: "{#SourcePath}\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-
-[Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
-
-[Run]
-Filename: "{app}\{#MyAppExeName}"; Flags: nowait postinstall skipifsilent
-Filename: "{tmp}\gpg4win-4.4.1.exe"; Parameters: "/S"; Flags: waituntilterminated
-Filename: "{cmd}"; Parameters: "/C start https://sysal1280.github.io/passwords/"; Flags: postinstall runhidden
-EOF
-
+      # Build installer
       - name: Build installer
         shell: cmd
         env:
@@ -118,6 +124,7 @@ EOF
         run: |
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
 
+      # Upload installer
       - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
