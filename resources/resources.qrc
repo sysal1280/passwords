@@ -26,7 +26,6 @@
         <file>glyphs/qt.svg</file>
         <file>glyphs/settings_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
         <file>glyphs/database_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
-        <file>glyphs/delete_forever_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
         <file>glyphs/edit_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
         <file>glyphs/lock_open_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
         <file>glyphs/footprint_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
@@ -61,5 +60,7 @@
         <file>glyphs/bug_report_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
         <file>glyphs/beetle_color.svg</file>
         <file>glyphs/search_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/pie_chart_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>glyphs/delete_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg</file>
     </qresource>
 </RCC>

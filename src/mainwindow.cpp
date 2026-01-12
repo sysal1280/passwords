@@ -171,13 +171,13 @@ MainWindow::MainWindow(QWidget *parent)
         { ui->actionAbout_Qt,              ":/menus/glyphs/qt.svg" },
         { ui->actionPreferences,           ":/menus/glyphs/settings_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionOpen_Database,         ":/menus/glyphs/database_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
-        { ui->actionDelete_Password,       ":/menus/glyphs/delete_forever_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
+        { ui->actionDelete_Password,       ":/menus/glyphs/delete_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionEdit_Password,         ":/menus/glyphs/edit_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionOpen_Password,         ":/menus/glyphs/lock_open_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionAudit_Log,             ":/menus/glyphs/footprint_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionNew_Category,          ":/menus/glyphs/create_new_folder_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionNew_Password,          ":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
-        { ui->actionDelete_Category,       ":/menus/glyphs/folder_delete_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
+        { ui->actionDelete_Category,       ":/menus/glyphs/delete_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionRefresh_Categories,    ":/menus/glyphs/refresh_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionDecrypt_File,          ":/menus/glyphs/encrypted_off_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionEncrypt_File,          ":/menus/glyphs/encrypted_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
@@ -194,6 +194,7 @@ MainWindow::MainWindow(QWidget *parent)
         { ui->actionMaintenance,           ":/menus/glyphs/build_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" },
         { ui->actionCopy_Password_Path,    ":/menus/glyphs/file_copy_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"} ,
         { ui->actionReport_a_Bug,          ":/menus/glyphs/bug_report_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"},
+        { ui->actionProperties,            ":/menus/glyphs/pie_chart_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"},
         { ui->actionOnline_Documentation,  ":/menus/glyphs/help_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" }
     };
 
