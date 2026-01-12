@@ -24,12 +24,10 @@
 #include <QRandomGenerator>
 #include <QtGlobal>
 
+
 static const int SALT_SIZE = 16;
-static const int MAC_SIZE  = 32; // SHA-256 output size
+static const int MAC_SIZE  = 32;
 
-// ----- Helpers (internal to this translation unit) -----
-
-// Derive a per-purpose key: K' = SHA256(K || info)
 static QByteArray deriveKey(const QByteArray &key, const QByteArray &info)
 {
     QCryptographicHash hash(QCryptographicHash::Sha256);
@@ -38,11 +36,10 @@ static QByteArray deriveKey(const QByteArray &key, const QByteArray &info)
     return hash.result();
 }
 
-// HMAC-SHA256 implementation using QCryptographicHash
 static QByteArray hmacSha256(const QByteArray &key, const QByteArray &data)
 {
     QByteArray k = key;
-    const int blockSize = 64; // Block size for SHA-256
+    const int blockSize = 64;
 
     if (k.size() > blockSize) {
         k = QCryptographicHash::hash(k, QCryptographicHash::Sha256);
@@ -72,7 +69,6 @@ static QByteArray hmacSha256(const QByteArray &key, const QByteArray &data)
     return outerHash.result();
 }
 
-// Generate keystream with SHA-256(encKey || salt || counter) and XOR with data
 static QByteArray streamXor(const QByteArray &data,
                             const QByteArray &encKey,
                             const QByteArray &salt)
@@ -114,7 +110,6 @@ static QByteArray streamXor(const QByteArray &data,
     return result;
 }
 
-// Constant-time comparison for MACs
 static bool constantTimeEqual(const QByteArray &a, const QByteArray &b)
 {
     if (a.size() != b.size())
@@ -127,35 +122,10 @@ static bool constantTimeEqual(const QByteArray &a, const QByteArray &b)
     return diff == 0;
 }
 
-// ----- Original xorProcess (kept for API compatibility) -----
-
-QByteArray DataObfuscator::xorProcess(const QByteArray &data, const QByteArray &key)
-{
-    if (key.isEmpty())
-        return data;
-
-    QByteArray result;
-    result.resize(data.size());
-
-    QByteArray keystream;
-    // Expand key into a long pseudo‑random stream
-    for (int block = 0; keystream.size() < data.size(); ++block) {
-        QByteArray material = key + QByteArray::number(block);
-        keystream.append(QCryptographicHash::hash(material, QCryptographicHash::Sha256));
-    }
-
-    for (int i = 0; i < data.size(); ++i)
-        result[i] = static_cast<char>(data[i] ^ keystream[i]);
-
-    return result;
-}
-
-// ----- New, stronger obfuscate/deobfuscate using stream cipher + HMAC -----
-
 QString DataObfuscator::obfuscate(const QString &data, const QByteArray &key)
 {
     if (key.isEmpty())
-        return data; // preserve old behaviour if you want
+        return data;
 
     QByteArray raw = data.toUtf8();
 
@@ -163,16 +133,12 @@ QString DataObfuscator::obfuscate(const QString &data, const QByteArray &key)
     QByteArray encKey = deriveKey(key, QByteArrayLiteral("enc"));
     QByteArray macKey = deriveKey(key, QByteArrayLiteral("mac"));
 
-    // Per-message random salt/nonce
     QByteArray salt(SALT_SIZE, Qt::Uninitialized);
     for (int i = 0; i < SALT_SIZE; ++i)
         salt[i] = static_cast<char>(QRandomGenerator::system()->generate() & 0xFF);
 
-
-    // Encrypt
     QByteArray ciphertext = streamXor(raw, encKey, salt);
 
-    // MAC over (salt || ciphertext)
     QByteArray macInput;
     macInput.reserve(salt.size() + ciphertext.size());
     macInput.append(salt);
@@ -180,7 +146,6 @@ QString DataObfuscator::obfuscate(const QString &data, const QByteArray &key)
 
     QByteArray mac = hmacSha256(macKey, macInput);
 
-    // Final message: salt || ciphertext || mac
     QByteArray out;
     out.reserve(salt.size() + ciphertext.size() + mac.size());
     out.append(salt);
@@ -193,11 +158,10 @@ QString DataObfuscator::obfuscate(const QString &data, const QByteArray &key)
 QString DataObfuscator::deobfuscate(const QString &encoded, const QByteArray &key)
 {
     if (key.isEmpty())
-        return encoded; // preserve old behaviour if you want
+        return encoded;
 
     QByteArray decoded = QByteArray::fromBase64(encoded.toLatin1());
     if (decoded.size() < SALT_SIZE + MAC_SIZE) {
-        // Not enough data to contain salt + MAC
         return QString();
     }
 
@@ -206,11 +170,9 @@ QString DataObfuscator::deobfuscate(const QString &encoded, const QByteArray &ke
     QByteArray ciphertext = decoded.mid(SALT_SIZE,
                                         decoded.size() - SALT_SIZE - MAC_SIZE);
 
-    // Derive keys
     QByteArray encKey = deriveKey(key, QByteArrayLiteral("enc"));
     QByteArray macKey = deriveKey(key, QByteArrayLiteral("mac"));
 
-    // Verify MAC
     QByteArray macInput;
     macInput.reserve(salt.size() + ciphertext.size());
     macInput.append(salt);
@@ -223,7 +185,6 @@ QString DataObfuscator::deobfuscate(const QString &encoded, const QByteArray &ke
         return QString();
     }
 
-    // Decrypt
     QByteArray plaintext = streamXor(ciphertext, encKey, salt);
     return QString::fromUtf8(plaintext);
 }
