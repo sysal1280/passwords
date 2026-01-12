@@ -20,10 +20,13 @@
 
 #include "categoryproperties.h"
 #include "dataobfuscator.h"
+#include "mainwindow.h"
+#include "utils.h"
 
 #include <QApplication>
 #include <QChart>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QHeaderView>
 #include <QLocale>
 #include <QMessageBox>
@@ -34,6 +37,7 @@
 #include <QUuid>
 #include <QVBoxLayout>
 
+
 CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     : QDialog(parent), selectedId(selectedCategoryId)
 {
@@ -42,13 +46,13 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
 
     auto* layout = new QVBoxLayout(this);
 
-    // --- Chart ---
+    // Chart
     chartView = new QChartView(this);
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(chartView);
 
-    // --- Table ---
+    // Table
     tableWidget = new QTableWidget(this);
     tableWidget->setColumnCount(2);
     tableWidget->setHorizontalHeaderLabels(QStringList() << "Category" << "Number of passwords");
@@ -62,7 +66,7 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     tableWidget->verticalHeader()->setDefaultSectionSize(22);
     layout->addWidget(tableWidget);
 
-    // --- Button box ---
+    // Buttonbox
     buttonBox = new QDialogButtonBox(
         QDialogButtonBox::Ok | QDialogButtonBox::Help,
         Qt::Horizontal,
@@ -79,7 +83,7 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     layout->setStretch(1, 0); // table (fixed height)
     layout->setStretch(2, 0); // buttons
 
-    // --- Load data ---
+    // Load data
     if (!loadDatabase()) {
         qWarning() << "Database failed to open";
         return;
@@ -88,12 +92,9 @@ CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     loadCategories();
     loadApplicationCounts();
 
-    /*
-     * Close db
-     */
     db.close();
     db = QSqlDatabase();
-    QSqlDatabase::removeDatabase("categoryprops_conn");
+    QSqlDatabase::removeDatabase("8f3c2a4e-9b1d-4c6e-8f72-3d9c4a12b587");
 
     if (!nodes.contains(selectedId)) {
         qWarning() << "Selected category ID not found:" << selectedId;
@@ -116,7 +117,7 @@ CategoryProperties::~CategoryProperties()
 
 bool CategoryProperties::loadDatabase()
 {
-    db = QSqlDatabase::addDatabase("QSQLITE", QUuid::createUuid().toString(QUuid::WithoutBraces));
+    db = QSqlDatabase::addDatabase("QSQLITE", "8f3c2a4e-9b1d-4c6e-8f72-3d9c4a12b587");
     db.setDatabaseName(qApp->property("dbFile").toString());
 
     if (!db.open()) {
@@ -359,9 +360,24 @@ void CategoryProperties::adjustTableHeightForVisibleRows(int visibleRows)
 
 void CategoryProperties::onHelpRequested()
 {
-    QMessageBox::information(
-        this,
-        tr("Category Properties Help"),
-        tr("This dialog shows a pie chart and table of passwords by category.")
-        );
+    checkHelpReachable([this](bool reachable) {
+        if (reachable) {
+            // Open the online help page for preferences
+            const QUrl url(getHelpBaseUrl("properties"));
+            QDesktopServices::openUrl(url);
+        } else {
+            // Fallback to helper process
+            MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
+            if (!mw) {
+                QMessageBox::warning(
+                    this,
+                    tr("Help Error"),
+                    tr("Help system unavailable: parent window is not MainWindow.")
+                    );
+                return;
+            }
+
+            mw->launchHelperProcess(QStringLiteral("properties"));
+        }
+    });
 }

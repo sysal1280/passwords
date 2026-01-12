@@ -20,19 +20,17 @@
 
 #include "aboutdialog.h"
 #include "constants.h"
+#include "gitversion.h"
 
 #include <QCoreApplication>
 #include <QFont>
-#include <QPixmap>
 #include <QFrame>
 #include <QGraphicsOpacityEffect>
 #include <QLabel>
+#include <QPixmap>
 #include <QPropertyAnimation>
 #include <QVBoxLayout>
 
-
-// Build metadata
-#include "gitversion.h"
 
 AboutDialog::AboutDialog(QWidget *parent)
     : QDialog(parent)
@@ -56,9 +54,7 @@ AboutDialog::AboutDialog(QWidget *parent)
     setFixedSize(size());
 }
 
-// ------------------------------------------------------------
 // Icon with fade‑in animation
-// ------------------------------------------------------------
 QWidget* AboutDialog::createIcon(QWidget *parent)
 {
     QLabel *icon = new QLabel(parent);
@@ -79,9 +75,7 @@ QWidget* AboutDialog::createIcon(QWidget *parent)
     return icon;
 }
 
-// ------------------------------------------------------------
 // App name
-// ------------------------------------------------------------
 QWidget* AboutDialog::createAppName(QWidget *parent)
 {
     QLabel *label = new QLabel(QCoreApplication::applicationName(), parent);
@@ -91,9 +85,7 @@ QWidget* AboutDialog::createAppName(QWidget *parent)
     return label;
 }
 
-// ------------------------------------------------------------
 // Version + git metadata
-// ------------------------------------------------------------
 QWidget* AboutDialog::createVersion(QWidget *parent)
 {
     QString version = QCoreApplication::applicationVersion();
@@ -121,9 +113,7 @@ QWidget* AboutDialog::createVersion(QWidget *parent)
     return label;
 }
 
-// ------------------------------------------------------------
 // Copyright
-// ------------------------------------------------------------
 QWidget* AboutDialog::createCopyright(QWidget *parent)
 {
     QLabel *label = new QLabel(
@@ -139,9 +129,7 @@ QWidget* AboutDialog::createCopyright(QWidget *parent)
     return label;
 }
 
-// ------------------------------------------------------------
 // Website link
-// ------------------------------------------------------------
 QWidget* AboutDialog::createWebsite(QWidget *parent)
 {
     QLabel *label = new QLabel(
@@ -156,9 +144,7 @@ QWidget* AboutDialog::createWebsite(QWidget *parent)
     return label;
 }
 
-// ------------------------------------------------------------
 // Credits section
-// ------------------------------------------------------------
 QLayout* AboutDialog::createCredits(QWidget *parent)
 {
     QVBoxLayout *layout = new QVBoxLayout;
@@ -186,7 +172,7 @@ QLayout* AboutDialog::createCredits(QWidget *parent)
         return l;
     };
 
-    // Minimal required attributions (no hyperlinks)
+    // Required attributions
     layout->addWidget(makePlain(Passwords::WordlistsCredit));
     layout->addWidget(makePlain(Passwords::MaterialSymbolsCredit));
     layout->addWidget(makePlain(QString(Passwords::IconCreditFormat).arg(QCoreApplication::applicationName())));
@@ -208,4 +194,3 @@ QLayout* AboutDialog::createCredits(QWidget *parent)
 
     return layout;
 }
-

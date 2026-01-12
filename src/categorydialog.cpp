@@ -26,6 +26,7 @@
 #include <QLineEdit>
 #include <QVBoxLayout>
 
+
 CategoryDialog::CategoryDialog(QWidget *parent, int existingCount)
     : QDialog(parent)
 {
