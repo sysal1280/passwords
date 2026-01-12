@@ -21,7 +21,6 @@
 #include "logindialog.h"
 #include "ui_logindialog.h"
 
-#include "constants.h"
 #include "dataobfuscator.h"
 #include "dbutils.h"
 #include "mainwindow.h"
@@ -38,6 +37,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QtGuiDepends>
+
 
 LoginDialog::LoginDialog(QWidget *parent)
     : QDialog(parent)
@@ -84,7 +84,6 @@ LoginDialog::LoginDialog(QWidget *parent)
                 showDbNotOpenError(this,db,Q_FUNC_INFO);
             }
         }
-        // remove connection after db object is destroyed
         QSqlDatabase::removeDatabase(connectionName);
 
     disconnect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);

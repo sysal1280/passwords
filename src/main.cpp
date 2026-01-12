@@ -41,9 +41,7 @@
 #include <QTimer>
 #include <QTranslator>
 
-// Forward declaration of helper
-// Returns true if a database file is ready (exists or was created/copied)
-// and qApp->property("dbFile") is set. It DOES NOT open the DB.
+
 static bool setupDatabaseFile(QWidget *parent);
 void pwdMsgHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 static bool showDebugMessages = false;
@@ -55,9 +53,9 @@ int main(int argc, char *argv[])
     #endif
 
     QApplication a(argc, argv);
-    if (isDebuggerAttached()) {
-        return 0;
-    }
+    //if (isDebuggerAttached()) {
+   //     return 0;
+    //}
 
     /*
      * Set QApplication settings
@@ -153,57 +151,35 @@ int main(int argc, char *argv[])
      * GPG tool checking
      */
 
-    if (Q_UNLIKELY(!isToolAvailable("gpg")))
+    if (Q_UNLIKELY(!isToolAvailable("gpg5")))
     {
         QApplication::restoreOverrideCursor();
         QApplication::processEvents();
-        QString msg;
 
 #ifdef Q_OS_WIN
-        msg = QCoreApplication::translate("main", R"(
-The GPG tool is either not installed or cannot be found.
-
-Please install Gpg4win (https://gpg4win.org) and ensure
-the installation directory is added to your PATH environment variable.
-)");
+        const QString msg = QCoreApplication::translate("main", MSG_GPG_NOT_FOUND_WIN);
 #elif defined(Q_OS_MAC)
-        msg = QCoreApplication::translate("main", R"(
-The GPG tool is either not installed or cannot be found.
-
-You can install GPG via Homebrew:
-
-<pre>
-    brew install gnupg
-</pre>
-
-Make sure your PATH includes Homebrew’s bin directory.
-)");
+        const QString msg = QCoreApplication::translate("main", MSG_GPG_NOT_FOUND_MAC);
 #else
-        msg = QCoreApplication::translate("main", R"(
-The GPG tool is either not installed or cannot be found.
-
-Please install GPG using your distribution’s package manager, e.g.
-
-<pre>
-sudo apt install gnupg      (Debian/Ubuntu)
-sudo dnf install gnupg      (Fedora)
-sudo pacman -S gnupg        (Arch)
-sudo zypper install gnupg   (openSUSE)
-</pre>
-
-Ensure it is accessible in your PATH.
-)");
+        const QString msg = QCoreApplication::translate("main", MSG_GPG_NOT_FOUND_LINUX);
 #endif
-        qFatal("%s", qPrintable(msg));
-        QMessageBox box(QMessageBox::Critical,
-                        QApplication::applicationDisplayName(),
-                        msg,
-                        QMessageBox::Ok);
-        box.setTextFormat(Qt::RichText);   // interpret HTML
+
+        QMessageBox box(
+            QMessageBox::Critical,
+            QApplication::applicationDisplayName(),
+            msg,
+            QMessageBox::Ok
+            );
+
+        box.setTextFormat(Qt::RichText);
         box.exec();
 
+        qFatal("%s", qPrintable(msg));
+
+        // Unreachable, but harmless
         return 0;
     }
+
 
     /*
      * Load stylesheet

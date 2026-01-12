@@ -54,3 +54,37 @@ inline constexpr auto debugWarningMB =
     "If this program has been installed for you, uninstall it immediately.";
 
 }
+
+inline constexpr auto MSG_GPG_NOT_FOUND_WIN = R"(
+The GPG tool is either not installed or cannot be found.
+
+Please install Gpg4win (https://gpg4win.org) and ensure
+the installation directory is added to your PATH environment variable.
+)";
+
+inline constexpr auto MSG_GPG_NOT_FOUND_MAC = R"(
+The GPG tool is either not installed or cannot be found.
+
+You can install GPG via Homebrew:
+
+<pre>
+    brew install gnupg
+</pre>
+
+Make sure your PATH includes Homebrew’s bin directory.
+)";
+
+inline constexpr auto MSG_GPG_NOT_FOUND_LINUX = R"(
+The GPG tool is either not installed or cannot be found.
+
+Please install GPG using your distribution’s package manager, e.g.
+
+<pre>
+sudo apt install gnupg      (Debian/Ubuntu)
+sudo dnf install gnupg      (Fedora)
+sudo pacman -S gnupg        (Arch)
+sudo zypper install gnupg   (openSUSE)
+</pre>
+
+Ensure it is accessible in your PATH.
+)";
