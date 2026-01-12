@@ -25,6 +25,7 @@
 #include "scopedcursor.h"
 #include "settings.h"
 #include "dbutils.h"
+#include "gitversion.h"
 #include "quuid.h"
 
 #include <QApplication>
@@ -119,6 +120,33 @@ private:
 #endif
 
         report += QString("Compiler: %1\n\n").arg(compiler);
+
+
+        // ------------------------------------------------------------
+        // Version + git metadata
+        // ------------------------------------------------------------
+        {
+            QString version = QCoreApplication::applicationVersion();
+
+#ifdef APP_DEBUG_BUILD
+            version += "-debug";
+#endif
+#ifdef APP_RELEASE_BUILD
+            version += "-release";
+#endif
+
+            QStringList git;
+            if (!QString(GIT_COMMIT_HASH).isEmpty()) git << GIT_COMMIT_HASH;
+            if (!QString(GIT_BRANCH).isEmpty())      git << GIT_BRANCH;
+            if (!QString(GIT_DIRTY).isEmpty())       git << GIT_DIRTY;
+
+            if (!git.isEmpty())
+                version += "+" + git.join(".");
+
+            version += QString(" (%1)").arg(BUILD_TIMESTAMP);
+
+            report += QString("Application Version: %1\n\n").arg(version);
+        }
 
         // Environment variables
         report += tr("Environment:\n");

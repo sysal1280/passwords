@@ -21,11 +21,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "dbmaintenance.h"
 #include "keyentry.h"
 #include "settings.h"
-#include "gpgcheck.h"
-
 #include <QDateTime>
 #include <QIcon>
 #include <QLabel>

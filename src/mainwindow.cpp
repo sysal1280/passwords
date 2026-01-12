@@ -28,6 +28,7 @@
 #include "categorydialog.h"
 #include "constants.h"
 #include "dbutils.h"
+#include "dbmaintenance.h"
 #include "debugutils.h"
 #include "droplabel.h"
 #include "encryptfiledialog.h"
