@@ -70,10 +70,23 @@ public:
         buttonLayout->addWidget(closeBtn);
 
         connect(closeBtn, &QPushButton::clicked, this, &QDialog::accept);
-        connect(copyBtn, &QPushButton::clicked, this, [this]() {
-            QClipboard *clipboard = QApplication::clipboard();
-            clipboard->setText(textEdit->toPlainText());
-        });
+
+        connect(copyBtn, &QPushButton::clicked, this,
+                [this]() {
+                    QString text;
+
+                    // Copy selected text if present
+                    const QString selected = textEdit->textCursor().selectedText();
+                    if (!selected.isEmpty()) {
+                        text = selected;
+                    } else {
+                        text = textEdit->toPlainText();
+                    }
+
+                    if (!text.isEmpty()) {
+                        QGuiApplication::clipboard()->setText(text);
+                    }
+                });
 
         mainLayout->addWidget(textEdit);
         mainLayout->addLayout(buttonLayout);
