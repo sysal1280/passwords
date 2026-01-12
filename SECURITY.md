@@ -1,6 +1,3 @@
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
-
 ## Reporting a Vulnerability
 
 If a security vulnerability is discovered in **Passwords**, it should be reported responsibly.
@@ -9,8 +6,8 @@ If a security vulnerability is discovered in **Passwords**, it should be reporte
 
 Instead, use one of the following private channels:
 
-- - - - Online submission: https://github.com/sysal1280/passwords/security
-- - - - Email reporting: sysal@tuta.io
+- Online submission: https://github.com/sysal1280/passwords/security
+- Email reporting: sysal@tuta.io
 
 Reports are prioritised and reviewed as quickly as possible, including coordination of fixes and management of disclosure via GitHub.
 
@@ -48,27 +45,19 @@ The time and effort security researchers invest in helping keep **Passwords** sa
 
 If a report results in a confirmed, fixable security vulnerability, the project will:
 
-- - - - Request a CVE ID through GitHub’s security advisory process
-- - - - Credit the reporter in the advisory (unless anonymity is preferred)
+- Request a CVE ID through GitHub’s security advisory process
+- Credit the reporter in the advisory (unless anonymity is preferred)
 
 #### **Public Recognition**
 
 With permission, the project will also:
 
-- - - - Acknowledge the contribution in the commit history
-- - - - Credit the reporter in the release notes associated with the fix
-- - - - Optionally include a link to a website, GitHub profile, or handle
+- Acknowledge the contribution in the commit history
+- Credit the reporter in the release notes associated with the fix
+- Optionally include a link to a website, GitHub profile, or handle
 
 Anonymity is fully respected if preferred.
 
 #### **Swag**
 
 As a small token of appreciation, project‑themed swag such as stickers, stationery, or mugs can be provided. If this is of interest, it can be mentioned when submitting a report.
-
------BEGIN PGP SIGNATURE-----
-
-iIQEARYKACwWIQR24DM1aGblJsS+3cWZZ6OTIU93EwUCaV+kgQ4cc3lzYWxAdHV0
-YS5pbwAKCRCZZ6OTIU93E4WeAQCK+T6MLIF0U6AEdUlMqUTYwW7G0u1U3nSf4wDf
-8UymAAEA0HniwUvqODWA02fjOvWH/FVG0eDgNTVYYjcNMcnw5Ak=
-=oSyT
------END PGP SIGNATURE-----

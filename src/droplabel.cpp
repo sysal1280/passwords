@@ -23,6 +23,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 
+
 DropLabel::DropLabel(QWidget *parent)
     : QLabel(parent)
 {
@@ -31,7 +32,7 @@ DropLabel::DropLabel(QWidget *parent)
 
     // attach opacity effect
     auto *effect = new QGraphicsOpacityEffect(this);
-    effect->setOpacity(1.0);  // ensure full opacity from the star
+    effect->setOpacity(1.0);
     setGraphicsEffect(effect);
 }
 
@@ -58,7 +59,6 @@ void DropLabel::dragEnterEvent(QDragEnterEvent *event)
     fadeToPixmap(QPixmap(":/place_alive.png"));
 }
 
-
 void DropLabel::dropEvent(QDropEvent *event)
 {
     if (!event->mimeData()->hasFormat("application/x-qtreewidgetitem")) {
@@ -80,12 +80,9 @@ void DropLabel::dropEvent(QDropEvent *event)
 
         item->setText(c, text);
 
-        // Store user role as-is (string) and also try to interpret as int if appropriate
         if (!userRoleStr.isEmpty()) {
             // Preserve original string role
             item->setData(c, Qt::UserRole, userRoleStr);
-
-            // If it looks like an integer, also store as int in UserRole + 1 (optional)
             bool ok = false;
             int asInt = userRoleStr.toInt(&ok);
             if (ok) {

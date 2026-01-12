@@ -90,4 +90,3 @@ void startDebuggerMonitor(QObject *parent, int intervalMs)
     });
     timer->start(intervalMs);
 }
-
