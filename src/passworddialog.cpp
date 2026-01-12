@@ -151,14 +151,6 @@ PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
 
     main->addWidget(analysisLabel);
 
-    // Dynamic width: 33% on large screens, 45% on small screens
-    QScreen *screen = QGuiApplication::primaryScreen();
-    int screenWidth = screen->geometry().width();
-    double percent = (screenWidth >= 1920) ? 0.33 : 0.45;
-    int dialogWidth = int(screenWidth * percent);
-
-    setFixedWidth(dialogWidth);
-
     // Let Qt compute correct height now that scroll area has a fixed, correct height
     adjustSize();
 }
