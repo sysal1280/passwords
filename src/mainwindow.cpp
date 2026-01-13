@@ -3432,25 +3432,25 @@ void MainWindow::encryptMessage()
 
     QTextEdit *plainTextEdit = new PlainTextEdit(dlg);
     plainTextEdit->setObjectName("plainTextInput");
-    plainTextEdit->setPlaceholderText("Enter text to encrypt...");
+    plainTextEdit->setPlaceholderText(tr("Enter text to encrypt..."));
     plainTextEdit->setAcceptRichText(false);
     layout->addWidget(plainTextEdit);
 
     // Password row
     QHBoxLayout *passLayout = new QHBoxLayout;
 
-    QLabel *passLabel1 = new QLabel("Password:", dlg);
+    QLabel *passLabel1 = new QLabel(tr("Password:"), dlg);
     QLineEdit *passEdit1 = new QLineEdit(dlg);
     passEdit1->setEchoMode(settings.getEchoMode());
-    passEdit1->setPlaceholderText("Enter password");
+    passEdit1->setPlaceholderText(tr("Enter password"));
 
-    QLabel *passLabel2 = new QLabel("Confirm:", dlg);
+    QLabel *passLabel2 = new QLabel(tr("Confirm:"), dlg);
     QLineEdit *passEdit2 = new QLineEdit(dlg);
     passEdit2->setEchoMode(settings.getEchoMode());
-    passEdit2->setPlaceholderText("Re-enter password");
+    passEdit2->setPlaceholderText(tr("Re-enter password"));
 
     QToolButton *generateBtn = new QToolButton(dlg);
-    generateBtn->setText("Generate");
+    generateBtn->setText(tr("Generate"));
     generateBtn->setPopupMode(QToolButton::MenuButtonPopup);
 
     QMenu *menu = new QMenu(generateBtn);
@@ -3471,16 +3471,16 @@ void MainWindow::encryptMessage()
     // Encrypted output
     QTextEdit *encryptedTextEdit = new QTextEdit(dlg);
     encryptedTextEdit->setReadOnly(true);
-    encryptedTextEdit->setPlaceholderText("Encrypted text will appear here...");
+    encryptedTextEdit->setPlaceholderText(tr("Encrypted text will appear here..."));
     layout->addWidget(encryptedTextEdit);
 
     // Buttons
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
-    QPushButton *encryptBtn = new QPushButton("&Encrypt", dlg);
-    QPushButton *copyBtn    = new QPushButton("Copy", dlg);
-    QPushButton *saveBtn    = new QPushButton("&Save", dlg);
-    QPushButton *closeBtn   = new QPushButton("&Close", dlg);
+    QPushButton *encryptBtn = new QPushButton(tr("&Encrypt"), dlg);
+    QPushButton *copyBtn    = new QPushButton(tr("Copy"), dlg);
+    QPushButton *saveBtn    = new QPushButton(tr("&Save"), dlg);
+    QPushButton *closeBtn   = new QPushButton(tr("&Close"), dlg);
     saveBtn->setEnabled(false);
     encryptBtn->setDefault(true);
     buttonLayout->addWidget(encryptBtn);
@@ -3510,15 +3510,15 @@ void MainWindow::encryptMessage()
         QString pass2 = passEdit2->text();
 
         if (inputText.isEmpty()) {
-            QMessageBox::warning(nullptr, "No Input", "Please enter some text to encrypt.");
+            QMessageBox::warning(nullptr,tr("No Input"), tr("Please enter some text to encrypt."));
             return;
         }
         if (pass1.isEmpty() || pass2.isEmpty()) {
-            QMessageBox::warning(nullptr, "No Password", "Please enter and confirm a password.");
+            QMessageBox::warning(nullptr, tr("No Password"), tr("Please enter and confirm a password."));
             return;
         }
         if (pass1 != pass2) {
-            QMessageBox::warning(nullptr, "Mismatch", "Passwords do not match. Please re-enter.");
+            QMessageBox::warning(nullptr, tr("Mismatch"), tr("Passwords do not match. Please re-enter."));
             return;
         }
 
@@ -3542,7 +3542,7 @@ void MainWindow::encryptMessage()
         process.start("gpg", args);
         if (!process.waitForStarted()) {
             QApplication::restoreOverrideCursor();
-            QMessageBox::critical(nullptr, "Error", "Failed to start gpg process.");
+            QMessageBox::critical(nullptr, tr("Error"), tr("Failed to start gpg process."));
             return;
         }
 
@@ -3562,7 +3562,7 @@ void MainWindow::encryptMessage()
 
         if (!process.waitForFinished()) {
             QApplication::restoreOverrideCursor();
-            QMessageBox::critical(nullptr, "Error", "gpg process did not finish.");
+            QMessageBox::critical(nullptr, tr("Error"), tr("gpg process did not finish."));
             return;
         }
 
@@ -3572,7 +3572,7 @@ void MainWindow::encryptMessage()
         if (!encryptedOutput.isEmpty()) {
             encryptedTextEdit->setPlainText(encryptedOutput);
         } else {
-            encryptedTextEdit->setPlainText("Encryption failed:\n" + errorOutput);
+            encryptedTextEdit->setPlainText(tr("Encryption failed:\n") + errorOutput);
         }
 
         QApplication::restoreOverrideCursor();
@@ -3584,9 +3584,9 @@ void MainWindow::encryptMessage()
                 const QString text = encryptedTextEdit->toPlainText();
                 if (!text.isEmpty()) {
                     QGuiApplication::clipboard()->setText(text);
-                    statusBar()->showMessage("Encrypted text copied to clipboard", Passwords::SBTransientMessageTime);
+                    statusBar()->showMessage(tr("Encrypted text copied to clipboard"), Passwords::SBTransientMessageTime);
                 } else {
-                    statusBar()->showMessage("There is no encrypted text to copy", Passwords::SBTransientMessageTime);
+                    statusBar()->showMessage(tr("There is no encrypted text to copy"), Passwords::SBTransientMessageTime);
                 }
             });
 
@@ -3624,15 +3624,15 @@ void MainWindow::encryptMessage()
                 }
 
                 QFile file(fileName);
-                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                if (Q_LIKELY(file.open(QIODevice::WriteOnly | QIODevice::Text))) {
                     QTextStream out(&file);
                     out << text;
                     file.close();
-                    QMessageBox::information(dlg, "Saved",
-                                             "Encrypted text saved successfully.");
+                    QMessageBox::information(dlg, tr("Saved"),
+                                             tr("Encrypted text saved successfully."));
                 } else {
-                    QMessageBox::critical(dlg, "Error",
-                                          "Could not save file.");
+                    QMessageBox::critical(dlg, tr("Error"),
+                                          tr("Could not save file."));
                 }
             });
 
