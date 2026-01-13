@@ -228,6 +228,7 @@ int main(int argc, char *argv[])
         if (styleFile.fileName().startsWith(":/")) {
             qWarning().noquote() << QString(QCoreApplication::translate("main", "No stylesheet file found, using defaults."));
             qInfo().noquote() << QString(QCoreApplication::translate("main", "To load stylesheet add style.css file to %1.")).arg(QCoreApplication::applicationDirPath());
+            qInfo().noquote() << QString(QCoreApplication::translate("main", "Create empty style.css file at %1 to auto populate it with the default style.")).arg(QCoreApplication::applicationDirPath());
         } else {
             qInfo().noquote() << QString(QCoreApplication::translate("main", "Loaded stylesheet file: %1.")).arg(styleFile.fileName());
         }
