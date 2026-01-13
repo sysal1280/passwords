@@ -19,6 +19,7 @@
 
 
 #pragma once
+#include <QCoreApplication>
 
 namespace Passwords {
 inline constexpr auto Name           = "Passwords";
@@ -33,36 +34,45 @@ inline constexpr auto GitUrl         = "https://github.com/sysal1280/passwords.g
 inline constexpr auto BugUrl         = "https://github.com/sysal1280/passwords/security";
 inline constexpr auto WordlistUrl    = "https://github.com/sts10/orchard-street-wordlists";
 
-inline constexpr auto License        = "Licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPLv3 License</a> or later.";
+inline constexpr auto License =
+    QT_TR_NOOP("Licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPLv3 License</a> or later.");
+
 inline constexpr auto WarrantyDisclaimer =
-    "This program is distributed in the hope that it will be useful, but it is provided without any warranty; "
-    "including without the implied warranties of merchantability or fitness for a particular purpose. "
-    "For full details, see the GNU General Public License.";
+    QT_TR_NOOP("This program is distributed in the hope that it will be useful, but it is provided without any warranty; "
+               "including without the implied warranties of merchantability or fitness for a particular purpose. "
+               "For full details, see the GNU General Public License.");
 
-inline constexpr auto WordlistsCredit = "Wordlists by Sam Schlinkert (MIT License)";
-inline constexpr auto MaterialSymbolsCredit = "Material Symbols by Google (Apache 2.0 License)";
-inline constexpr auto IconCreditFormat = "%1 icon by Iconic Panda (Flaticon)";
-inline constexpr auto EmojiCredit = "Beetle Fluent Emoji by Microsoft, licensed under the MIT License.";
+inline constexpr auto WordlistsCredit =
+    QT_TR_NOOP("Wordlists by Sam Schlinkert (MIT License)");
 
-inline constexpr auto debugWarningSB = "Debug Version Only";
+inline constexpr auto MaterialSymbolsCredit =
+    QT_TR_NOOP("Material Symbols by Google (Apache 2.0 License)");
+
+inline constexpr auto IconCreditFormat =
+    QT_TR_NOOP("%1 icon by Iconic Panda (Flaticon)");
+
+inline constexpr auto EmojiCredit =
+    QT_TR_NOOP("Beetle Fluent Emoji by Microsoft, licensed under the MIT License.");
+
+inline constexpr auto debugWarningSB =
+    QT_TR_NOOP("Debug Version Only");
 
 inline constexpr auto debugWarningMB =
-    "This is a Debug build.\n\n"
-    "Debug builds include extra diagnostic information and reduced security "
-    "protections. They are not safe for production use.\n\n"
-    "Do not create or access real passwords or other sensitive data in this build.\n\n"
-    "If this program has been installed for you, uninstall it immediately.";
-
+    QT_TR_NOOP("This is a Debug build.\n\n"
+               "Debug builds include extra diagnostic information and reduced security "
+               "protections. They are not safe for production use.\n\n"
+               "Do not create or access real passwords or other sensitive data in this build.\n\n"
+               "If this program has been installed for you, uninstall it immediately.");
 }
 
-inline constexpr auto MSG_GPG_NOT_FOUND_WIN = R"(
+inline constexpr auto MSG_GPG_NOT_FOUND_WIN = QT_TR_NOOP(R"(
 The GPG tool is either not installed or cannot be found.
 
 Please install Gpg4win (https://gpg4win.org) and ensure
 the installation directory is added to your PATH environment variable.
-)";
+)");
 
-inline constexpr auto MSG_GPG_NOT_FOUND_MAC = R"(
+inline constexpr auto MSG_GPG_NOT_FOUND_MAC = QT_TR_NOOP(R"(
 The GPG tool is either not installed or cannot be found.
 
 You can install GPG via Homebrew:
@@ -72,9 +82,9 @@ You can install GPG via Homebrew:
 </pre>
 
 Make sure your PATH includes Homebrew’s bin directory.
-)";
+)");
 
-inline constexpr auto MSG_GPG_NOT_FOUND_LINUX = R"(
+inline constexpr auto MSG_GPG_NOT_FOUND_LINUX = QT_TR_NOOP(R"(
 The GPG tool is either not installed or cannot be found.
 
 Please install GPG using your distribution’s package manager, e.g.
@@ -87,4 +97,4 @@ sudo zypper install gnupg   (openSUSE)
 </pre>
 
 Ensure it is accessible in your PATH.
-)";
+)");

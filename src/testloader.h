@@ -28,6 +28,7 @@
 #include <QSqlDatabase>
 #include <QCloseEvent>
 
+
 class QSpinBox;
 class QProgressBar;
 class QPushButton;
@@ -63,11 +64,6 @@ signals:
     void progress(int value);
 };
 
-
-// ---------------------------------------------------------
-// Dialog class (must be OUTSIDE TestLoader for MOC to work)
-// ---------------------------------------------------------
-
 class TestLoaderDialog : public QDialog
 {
     Q_OBJECT
@@ -93,4 +89,4 @@ private:
     QPushButton *closeButton;
 };
 
-#endif // TESTLOADER_H
+#endif
