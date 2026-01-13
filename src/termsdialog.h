@@ -22,6 +22,7 @@
 
 #include <QDialog>
 
+
 class QTextEdit;
 class QPushButton;
 
@@ -38,4 +39,4 @@ private:
     QPushButton *m_declineButton;
 };
 
-#endif // TERMSDIALOG_H
+#endif
