@@ -122,14 +122,18 @@ int main(int argc, char *argv[])
      * Set Translation
      */
     QTranslator translator;
-    QString locale = QLocale::system().name().toLower().trimmed();
 
-    if (translator.load(locale, QCoreApplication::applicationDirPath())) {
+    QString loc  = QLocale::system().name().toLower();
+    QString base = QFileInfo(QCoreApplication::applicationFilePath()).baseName();
+    QString file = base + "_" + loc + ".qm";
+    QString dir  = QCoreApplication::applicationDirPath();
+
+    if (translator.load(file, dir)) {
         QApplication::installTranslator(&translator);
-        qInfo().noquote() << QString(QCoreApplication::translate("main", "Loaded translation file: %1.")).arg(locale+".qm");
+        qInfo().noquote() << QCoreApplication::translate("main", "Loaded translation file: %1.").arg(file);
     } else {
-        qWarning().noquote() << QString(QCoreApplication::translate("main", "No translation file found for %1, using defaults.")).arg(locale);
-        qInfo().noquote() << QString(QCoreApplication::translate("main", "To load translation add %1.qm file to %2.")).arg(locale, QCoreApplication::applicationDirPath());
+        qWarning().noquote() << QCoreApplication::translate("main", "No translation file found for %1, using defaults.").arg(loc);
+        qInfo().noquote() << QCoreApplication::translate("main", "To load translation add %1 to %2.").arg(file, dir);
     }
 
 
