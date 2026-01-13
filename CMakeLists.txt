@@ -161,7 +161,7 @@ if(NOT MSVC)
     )
 
     # ---- PIE + ASLR ----
-    if(UNIX OR MINGW)
+    if((UNIX AND NOT APPLE) OR MINGW)
         target_compile_options(password PRIVATE
             $<$<CONFIG:Release>:-fPIE>
         )

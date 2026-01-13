@@ -31,6 +31,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
+
 Settings::Settings()
 {
     QString globalDir;
@@ -622,7 +623,7 @@ bool Settings::verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent)
                                                     QLineEdit::Password);
 
     if (enteredPassword.isEmpty()) {
-        return false; // user cancelled
+        return false;
     }
 
     QByteArray enteredBytes = enteredPassword.toUtf8();
