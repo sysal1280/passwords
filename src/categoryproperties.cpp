@@ -21,6 +21,7 @@
 #include "categoryproperties.h"
 #include "dataobfuscator.h"
 #include "mainwindow.h"
+#include "scopedcursor.h"
 #include "utils.h"
 
 #include <QApplication>
@@ -41,6 +42,7 @@
 CategoryProperties::CategoryProperties(int selectedCategoryId, QWidget* parent)
     : QDialog(parent), selectedId(selectedCategoryId)
 {
+    ScopedCursor wait(Qt::WaitCursor);
     setWindowTitle("Properties");
     resize(700, 600);
 

@@ -21,7 +21,7 @@
 #ifndef DBUTILS_H
 #define DBUTILS_H
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QMessageBox>
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -31,6 +31,7 @@ inline void showDbNotOpenError(const QWidget *parent,
                                const QSqlDatabase &db,
                                const char *caller)
 {
+        QApplication::restoreOverrideCursor();
     qCritical().noquote()
     << caller
     << "Database not opened."
@@ -47,6 +48,7 @@ inline void showQueryError(const QWidget *parent,
                            const QSqlQuery &query,
                            const char *caller)
 {
+    QApplication::restoreOverrideCursor();
     qCritical().noquote()
     << caller
     << "SQL query failed:"
@@ -66,6 +68,7 @@ inline void showTransactionError(const QWidget *parent,
                                  const QSqlDatabase &db,
                                  const char *caller)
 {
+        QApplication::restoreOverrideCursor();
     qCritical().noquote()
     << caller
     << "Failed to start or commit transaction:"

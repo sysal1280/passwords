@@ -1061,6 +1061,7 @@ void MainWindow::showEvent(QShowEvent *event)
 
 void MainWindow::loadCategories()
 {
+    ScopedCursor wait(Qt::WaitCursor);
     const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     {
