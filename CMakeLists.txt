@@ -6,13 +6,13 @@
 cmake_minimum_required(VERSION 3.16)
 project(password VERSION 0.1 LANGUAGES CXX)
 
+
 #
 #
 # ============================
 #   GIT METADATA
 # ============================
 #
-
 find_package(Git QUIET)
 
 if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -54,12 +54,12 @@ else()
     set(GIT_DIRTY "")
 endif()
 
+
 #
 # ============================
 #   BUILD TIMESTAMP (OPTIONAL)
 # ============================
 #
-
 option(ENABLE_BUILD_TIMESTAMP "Embed build timestamp in binary" ON)
 
 if(ENABLE_BUILD_TIMESTAMP)
@@ -102,6 +102,7 @@ qt_add_executable(password WIN32 MACOSX_BUNDLE
     ${RESOURCE_FILES}
 )
 
+
 #
 # ============================
 #   PLATFORM RESOURCES
@@ -130,6 +131,7 @@ if(WIN32)
     target_sources(password PRIVATE resources/appicon.rc)
 endif()
 
+
 #
 # ============================
 #   TARGET SETUP
@@ -148,6 +150,7 @@ target_link_libraries(password PRIVATE
 target_include_directories(password PRIVATE src ui ${CMAKE_BINARY_DIR})
 
 qt_finalize_executable(password)
+
 
 #
 # ============================
@@ -187,6 +190,7 @@ if(NOT MSVC)
         target_link_options(password PRIVATE $<$<CONFIG:Release>:-s>)
     endif()
 endif()
+
 
 #
 # ============================
