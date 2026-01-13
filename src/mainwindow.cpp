@@ -3727,6 +3727,8 @@ void MainWindow::decryptMessage()
             return;
         }
 
+        ScopedCursor wait(Qt::WaitCursor);
+
         // --- Write password securely ---
         QByteArray passBytes = pass.toUtf8();
         passBytes.append('\n');
