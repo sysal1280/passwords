@@ -3653,23 +3653,23 @@ void MainWindow::decryptMessage()
     dlg->setWindowTitle(ui->actionDecrypt_message->text());
     QVBoxLayout *layout = new QVBoxLayout(dlg);
 
-    QLabel *instruction = new QLabel(
+    QLabel *instruction = new QLabel(tr(
         "Paste the encrypted message below and enter the password used to encrypt it.\n"
-        "The decrypted plaintext will appear underneath.",
+        "The decrypted plaintext will appear underneath."),
         dlg
     );
     instruction->setWordWrap(true);
     layout->addWidget(instruction);
 
     QTextEdit *encryptedInputEdit = new QTextEdit(dlg);
-    encryptedInputEdit->setPlaceholderText("Paste encrypted text here...");
+    encryptedInputEdit->setPlaceholderText(tr("Paste encrypted text here..."));
     layout->addWidget(encryptedInputEdit);
 
     QHBoxLayout *passLayout = new QHBoxLayout;
     QLabel *passLabel = new QLabel("Password:", dlg);
     QLineEdit *passEdit = new QLineEdit(dlg);
     passEdit->setEchoMode(settings.getEchoMode());
-    passEdit->setPlaceholderText("Enter password");
+    passEdit->setPlaceholderText(tr("Enter password"));
 
     passLayout->addWidget(passLabel);
     passLayout->addWidget(passEdit);
@@ -3677,15 +3677,15 @@ void MainWindow::decryptMessage()
 
     QTextEdit *decryptedTextEdit = new QTextEdit(dlg);
     decryptedTextEdit->setReadOnly(true);
-    decryptedTextEdit->setPlaceholderText("Decrypted text will appear here...");
+    decryptedTextEdit->setPlaceholderText(tr("Decrypted text will appear here..."));
     layout->addWidget(decryptedTextEdit);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
 
-    QPushButton *copyBtn    = new QPushButton("Copy", dlg);
-    QPushButton *decryptBtn = new QPushButton("&Decrypt", dlg);
-    QPushButton *closeBtn   = new QPushButton("&Close", dlg);
+    QPushButton *copyBtn    = new QPushButton(tr("Copy"), dlg);
+    QPushButton *decryptBtn = new QPushButton(tr("&Decrypt"), dlg);
+    QPushButton *closeBtn   = new QPushButton(tr("&Close"), dlg);
 
     copyBtn->setEnabled(false);
     decryptBtn->setDefault(true);
@@ -3705,11 +3705,11 @@ void MainWindow::decryptMessage()
         QString pass = passEdit->text();
 
         if (encryptedText.isEmpty()) {
-            QMessageBox::warning(nullptr, "No Input", "Please paste some encrypted text.");
+            QMessageBox::warning(nullptr, tr("No Input"), tr("Please paste some encrypted text."));
             return;
         }
         if (pass.isEmpty()) {
-            QMessageBox::warning(nullptr, "No Password", "Please enter a password.");
+            QMessageBox::warning(nullptr, tr("No Password"), tr("Please enter a password."));
             return;
         }
 
@@ -3723,7 +3723,7 @@ void MainWindow::decryptMessage()
 
         process.start("gpg", args);
         if (!process.waitForStarted()) {
-            QMessageBox::critical(nullptr, "Error", "Failed to start gpg process.");
+            QMessageBox::critical(nullptr, tr("Error"), tr("Failed to start gpg process."));
             return;
         }
 
@@ -3743,7 +3743,7 @@ void MainWindow::decryptMessage()
         process.closeWriteChannel();
 
         if (!process.waitForFinished()) {
-            QMessageBox::critical(nullptr, "Error", "gpg process did not finish.");
+            QMessageBox::critical(nullptr, tr("Error"), tr("gpg process did not finish."));
             return;
         }
 
@@ -3753,7 +3753,7 @@ void MainWindow::decryptMessage()
         if (!decryptedOutput.isEmpty()) {
             decryptedTextEdit->setPlainText(decryptedOutput);
         } else {
-            decryptedTextEdit->setPlainText("Decryption failed:\n" + errorOutput);
+            decryptedTextEdit->setPlainText(tr("Decryption failed:\n") + errorOutput);
         }
     });
 
@@ -3773,7 +3773,7 @@ void MainWindow::decryptMessage()
                 const QString text = decryptedTextEdit->toPlainText();
                 if (!text.isEmpty()) {
                     QGuiApplication::clipboard()->setText(text);
-                    ui->statusbar->showMessage("Decrypted text copied to clipboard",
+                    ui->statusbar->showMessage(tr("Decrypted text copied to clipboard"),
                                                Passwords::SBTransientMessageTime);
                 }
             });
