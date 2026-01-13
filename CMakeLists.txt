@@ -128,6 +128,11 @@ if(APPLE)
         MACOSX_BUNDLE_BUNDLE_NAME "passwords"
         MACOSX_BUNDLE_GUI_IDENTIFIER "com.adamlanzafame.passwords"
     )
+
+    # Strip symbols from the final Mach-O binary
+    add_custom_command(TARGET password POST_BUILD
+        COMMAND strip -x "$<TARGET_FILE:password>"
+    )
 endif()
 
 #
@@ -188,10 +193,12 @@ if(NOT MSVC)
         )
     endif()
 
-    # Strip symbols (works on MinGW too)
-    target_link_options(password PRIVATE
-        $<$<CONFIG:Release>:-s>
-    )
+    # Strip symbols only on Linux and MinGW
+    if((UNIX AND NOT APPLE) OR MINGW)
+        target_link_options(password PRIVATE
+            $<$<CONFIG:Release>:-s>
+        )
+    endif()
 endif()
 
 #
