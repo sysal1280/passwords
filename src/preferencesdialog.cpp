@@ -39,6 +39,7 @@
 #include <QSqlDatabase>
 #include <quuid.h>
 
+
 namespace {
 bool parseBool(const QVariant &v, bool fallback = false) {
     if (!v.isValid()) return fallback;
@@ -74,9 +75,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    /*
-     * Setup tab labels
-     */
     QStringList labels = { tr("General"), tr("Security"), tr("Passwords"), tr("Advanced")  };
     for (int i = 0; i < labels.size(); ++i) {
         ui->tabWidget->setTabText(i, labels.at(i));
@@ -84,9 +82,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 
     ui->tabWidget->setCurrentIndex(0);
 
-    /*
-     * Load wordlist rc file.
-     */
     QString wordListPath = loadWordlistResource(this, Q_FUNC_INFO);
 
     QDir dir(":/wordlist");
@@ -95,7 +90,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
         ui->comboBoxWordList->addItem(name);
     }
 
-    // Unregister after loading
     if (!QResource::unregisterResource(wordListPath))
     {
         qCritical().noquote() << Q_FUNC_INFO << "Failed to unregister " << wordListPath;
@@ -130,10 +124,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     ui->tabWidget->setTabIcon(2,QIcon(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
     ui->tabWidget->setTabIcon(3,QIcon(":/menus/glyphs/settings_applications_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
 
-    /*
-     * Build the settings map
-     */
-
     widgetMap.insert("Main/BackupDatabase", ui->groupBox);
     widgetMap.insert("Main/AskBeforeClosing", ui->checkBoxAskClose);
     widgetMap.insert("Main/RequireChallenge", ui->checkBoxRequireChallenge);
@@ -151,11 +141,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     widgetMap.insert("Passwords/KillGPGAgentOnExit", ui->checkBoxKillGPGAgentExit);
     widgetMap.insert("Main/MaxBackups", ui->spinBoxMaxBackups);
     widgetMap.insert("Categories/DoubleClickOpen", ui->checkBoxDblClickCategories);
-
-
-    /*
-     * Appkey export setup
-     */
 
     auto removeGroupBox = [this]() {
         // Write the flag immediately
@@ -190,10 +175,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 
         QSqlDatabase::removeDatabase(connectionName);
 
-
-    /*
-     * Range settings for spinboxes
-     */
     ui->spinBox->setRange(2,10);
     ui->spinBoxAutoClose->setRange(0,600);
 
@@ -268,8 +249,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
                 if (msgBox.exec() != QMessageBox::Ok)
                     return;
 
-                // Perform export logic here...
-
                 // Retrieve the key
                 const QString appKey =
                     qApp->property("appKey").toString().toUtf8().toBase64();
@@ -302,25 +281,15 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 
                 keyBox.setText(html);
 
-                // Custom OK button
                 QPushButton *understoodBtn = keyBox.addButton(
                     "Understood, I have a copy", QMessageBox::AcceptRole);
 
-                // Standard Cancel button
                 keyBox.addButton(QMessageBox::Cancel);
-
-                // Default to Cancel for safety
                 keyBox.setDefaultButton(QMessageBox::Cancel);
-
-                // Execute dialog
                 keyBox.exec();
 
-                // If user did NOT click the custom OK button, abort
                 if (keyBox.clickedButton() != understoodBtn)
-                    return;   // User backed out — do NOT delete the key
-
-
-                // --- Now remove the key from the database ---
+                    return;
 
                 const QString connectionName = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
@@ -352,14 +321,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
             });
 
     restartRequired = false;
-
 }
 
 void PreferencesDialog::restoreButtonClicked(QAbstractButton *button)
 {
-    /*
-     * Restore button clicked
-     */
     QDialogButtonBox::ButtonRole role = ui->buttonBox->buttonRole(button);
     if (role == QDialogButtonBox::ResetRole) {
         restoreDefaults();
@@ -368,7 +333,6 @@ void PreferencesDialog::restoreButtonClicked(QAbstractButton *button)
 
 void PreferencesDialog::restoreDefaults()
 {
-
     QMessageBox::StandardButton reply =
         QMessageBox::question(
             this,
@@ -382,7 +346,7 @@ void PreferencesDialog::restoreDefaults()
 
 
     if (reply != QMessageBox::Yes) {
-        return; // user cancelled
+        return;
     }
 
     const QString targetPath = settings.configFilePath();
@@ -433,7 +397,6 @@ void PreferencesDialog::restoreDefaults()
                                     "Please restart the application for all default settings to take effect."));
         qInfo().noquote() << Q_FUNC_INFO << "Default configuration restored.";
     }
-
 }
 
 PreferencesDialog::~PreferencesDialog()
@@ -502,7 +465,6 @@ void PreferencesDialog::loadSettings()
         }
     }
 
-    // Update button state based on group box
     ui->pushButton->setEnabled(ui->groupBox->isChecked());
 }
 
@@ -616,11 +578,8 @@ void PreferencesDialog::restartApplication()
         return;
     }
 
-    // Now quit the current instance
     QCoreApplication::quit();
 }
-
-
 
 void PreferencesDialog::onBackupCheckStateChanged(int state)
 {
@@ -653,4 +612,3 @@ void PreferencesDialog::onBackupCheckStateChanged(int state)
         }
     }
 }
-

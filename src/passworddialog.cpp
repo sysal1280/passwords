@@ -50,6 +50,7 @@
 
 #include <QtMath>
 
+
 namespace PasswordDialog {
 
 PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
@@ -154,9 +155,6 @@ PasswordInspectorDialog::PasswordInspectorDialog(const QString &password,
     // Let Qt compute correct height now that scroll area has a fixed, correct height
     adjustSize();
 }
-
-
-
 
 QWidget *PasswordInspectorDialog::makeLegendItem(const QString &color, const QString &label)
 {
@@ -345,7 +343,6 @@ QString PasswordInspectorDialog::formatAnalysisSummary(const PasswordAnalysis &a
     return summary;
 }
 
-
 void showPasswordGenerator(QWidget *parent,
                            const QString &title,
                            const QStringList & /*wordList*/)
@@ -459,4 +456,4 @@ void showPasswordGenerator(QWidget *parent,
     dlg.exec();
 }
 
-} // namespace PasswordDialog
+}

@@ -53,9 +53,9 @@ int main(int argc, char *argv[])
     #endif
 
     QApplication a(argc, argv);
-    //if (isDebuggerAttached()) {
-   //     return 0;
-    //}
+    if (isDebuggerAttached()) {
+        return 0;
+    }
 
     /*
      * Set QApplication settings
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
      * GPG tool checking
      */
 
-    if (Q_UNLIKELY(!isToolAvailable("gpg5")))
+    if (Q_UNLIKELY(!isToolAvailable("gpg")))
     {
         QApplication::restoreOverrideCursor();
         QApplication::processEvents();

@@ -35,6 +35,7 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 
+
 namespace RandomNoiseDialog {
 
 static QByteArray generateRandomBytes(int byteCount)
@@ -68,7 +69,6 @@ static QString convertBytes(const QByteArray &bytes, int mode)
     for (unsigned char b : bytes)
     {
         while (b >= limit) {
-            // regenerate a byte until it's in range
             b = QRandomGenerator::system()->generate() & 0xFF;
         }
         out.append(charset[b % charsetSize]);
@@ -93,7 +93,6 @@ static double estimateEntropyBits(const QByteArray &data)
 
     const double pMax = double(maxCount) / double(data.size());
 
-    // Min-entropy per symbol (matches your Python script)
     return -std::log2(pMax);
 }
 
@@ -200,4 +199,4 @@ void showRandomNoiseGenerator(QWidget *parent, const QString &title)
     dlg.exec();
 }
 
-} // namespace RandomNoiseDialog
+}

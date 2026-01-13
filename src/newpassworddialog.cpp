@@ -68,9 +68,6 @@ public:
             line->setProperty("handledCommitKey", false);
             line->setProperty("contextMenuActive", false);
 
-            // Optional: disable context menu entirely
-            // line->setContextMenuPolicy(Qt::NoContextMenu);
-
             line->installEventFilter(const_cast<PasswordDelegate*>(this));
             return line;
         }
@@ -93,9 +90,6 @@ public:
         bool handledCommit = line->property("handledCommitKey").toBool();
         bool contextMenuActive = line->property("contextMenuActive").toBool();
 
-        // ----------------------------------------------------
-        // 0. CONTEXT MENU HANDLING (THE REAL FIX)
-        // ----------------------------------------------------
         if (event->type() == QEvent::ContextMenu) {
             line->setProperty("contextMenuActive", true);
             return false; // allow menu
@@ -107,10 +101,6 @@ public:
             line->setProperty("contextMenuActive", false);
             return false; // do NOT validate
         }
-
-        // ----------------------------------------------------
-        // 1. NORMAL VALIDATION LOGIC
-        // ----------------------------------------------------
 
         auto reopenEditor = [&](QLineEdit *line) {
             if (auto *view = qobject_cast<QAbstractItemView*>(parent())) {
@@ -181,8 +171,6 @@ public:
     }
 };
 
-
-
 NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::NewPasswordDialog)
@@ -200,7 +188,6 @@ NewPasswordDialog::NewPasswordDialog(QWidget *parent)
 
     ui->tableWidgetCredentials->setItemDelegate(new PasswordDelegate(this));
 
-    // Connect using connect()
     connect(optA, &QAction::triggered,
             this,
             [this]() {
@@ -351,12 +338,8 @@ void NewPasswordDialog::openNote(QString note)
 
     // Populate the single cell with the note text
     ui->tableWidgetNotes->setItem(row, 0, new QTableWidgetItem(note));
-
-    // Optional: adjust column width
     ui->tableWidgetNotes->resizeColumnsToContents();
 }
-
-
 
 void NewPasswordDialog::onCredentialsContextMenu(const QPoint &pos)
 {
@@ -388,7 +371,6 @@ void NewPasswordDialog::onCredentialsContextMenu(const QPoint &pos)
         ui->tableWidgetCredentials->editItem(ui->tableWidgetCredentials->item(row, 0));
     }
     else if (selectedAction == deleteRowAction) {
-        // 🔑 Ensure the row under the cursor is selected
         QModelIndex index = ui->tableWidgetCredentials->indexAt(pos);
         if (index.isValid()) {
             ui->tableWidgetCredentials->selectRow(index.row());
@@ -396,8 +378,6 @@ void NewPasswordDialog::onCredentialsContextMenu(const QPoint &pos)
         }
     }
 }
-
-
 
 NewPasswordDialog::~NewPasswordDialog()
 {
@@ -417,14 +397,12 @@ void NewPasswordDialog::onNotesContextMenu(const QPoint &pos)
         int row = ui->tableWidgetNotes->rowCount();
         ui->tableWidgetNotes->insertRow(row);
 
-        // 🔑 Create editable items for each column
         for (int col = 0; col < ui->tableWidgetNotes->columnCount(); ++col) {
             QTableWidgetItem *item = new QTableWidgetItem("");
             item->setFlags(item->flags() | Qt::ItemIsEditable);
             ui->tableWidgetNotes->setItem(row, col, item);
         }
 
-        // 🔑 Immediately start editing the first cell with your QTextEdit delegate
         ui->tableWidgetNotes->setCurrentCell(row, 0);
         ui->tableWidgetNotes->editItem(ui->tableWidgetNotes->item(row, 0));
     }
@@ -435,7 +413,6 @@ void NewPasswordDialog::onNotesContextMenu(const QPoint &pos)
         }
     }
 }
-
 
 void NewPasswordDialog::setKeys(const QList<KeyEntry> &keys)
 {
@@ -456,7 +433,6 @@ void NewPasswordDialog::setKeys(const QList<KeyEntry> &keys)
         ui->listWidget->addItem(item);
     }
 }
-
 
 QByteArray NewPasswordDialog::toJson() const
 {
@@ -561,8 +537,6 @@ void NewPasswordDialog::validateForm()
         return;
     }
 
-    // Add other conditions here, each with an early return if failed...
-
     // If all conditions passed, enable OK
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
 }
@@ -579,4 +553,3 @@ void NewPasswordDialog::suggestFields()
     if (ui->lineEditDescription->text().trimmed().isEmpty())
         ui->lineEditDescription->setText(publicName);
 }
-

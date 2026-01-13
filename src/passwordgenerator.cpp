@@ -26,6 +26,7 @@
 
 #include <algorithm>
 
+
 QStringList passwordGenerator::loadWordList(const QString &filePath) {
     QFile file(filePath);
     QStringList words;
@@ -52,7 +53,6 @@ QString capitalizeWord(const QString &word) {
 
 QString applySmartSymbolSubstitution(const QString &word, bool &substitutionUsed) {
 
-    // If we've already substituted once, skip entirely
     if (substitutionUsed)
         return word;
 
