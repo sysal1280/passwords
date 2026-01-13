@@ -100,10 +100,19 @@ QWidget* AboutDialog::createVersion(QWidget *parent)
     QStringList git;
     if (!QString(GIT_COMMIT_HASH).isEmpty()) git << GIT_COMMIT_HASH;
     if (!QString(GIT_BRANCH).isEmpty())      git << GIT_BRANCH;
-    if (!QString(GIT_DIRTY).isEmpty())       git << GIT_DIRTY;
 
+    // Build the base git string: commit.branch
+    QString gitString;
     if (!git.isEmpty())
-        version += "+" + git.join(".");
+        gitString = git.join(".");
+
+    // Append dirty suffix WITHOUT a dot
+    if (!QString(GIT_DIRTY).isEmpty())
+        gitString += GIT_DIRTY;   // "-dirty" or ""
+
+    // Add to version
+    if (!gitString.isEmpty())
+        version += "+" + gitString;
 
     version += QString(" (%1)").arg(BUILD_TIMESTAMP);
 
@@ -112,6 +121,7 @@ QWidget* AboutDialog::createVersion(QWidget *parent)
     label->setTextInteractionFlags(Qt::TextBrowserInteraction);
     return label;
 }
+
 
 // Copyright
 QWidget* AboutDialog::createCopyright(QWidget *parent)
