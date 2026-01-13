@@ -8,7 +8,6 @@ project(password VERSION 0.1 LANGUAGES CXX)
 
 
 #
-#
 # ============================
 #   GIT METADATA
 # ============================
