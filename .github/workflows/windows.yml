@@ -96,7 +96,7 @@ jobs:
           echo 'OutputBaseFilename=Passwords-x86_64-{#MyAppVersion}' >> installer.iss
           echo 'SolidCompression=yes' >> installer.iss
           echo 'WizardStyle=modern dynamic' >> installer.iss
-          echo 'License=resources\setup-license.txt' >> installer.iss
+          echo 'LicenseFile=resources\setup-license.txt' >> installer.iss
           echo >> installer.iss
           echo '[Languages]' >> installer.iss
           echo 'Name: "english"; MessagesFile: "compiler:Default.isl"' >> installer.iss
