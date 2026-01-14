@@ -5742,7 +5742,6 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
 
     // --- Step 2: Decrypt using shared helper ---
     ui->statusbar->showMessage(tr("Decrypting data.."));
-    QApplication::processEvents();
 
     decryptWithGpg(
         encdata,
@@ -5797,11 +5796,9 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
             }
 
             decrypted_data.fill(0);
-            openedCredentialID = credentialId;
 
             if (QApplication::overrideCursor())
                 QApplication::restoreOverrideCursor();
-            QApplication::processEvents();
         },
 
         // --- onMissingKey ---
@@ -5812,7 +5809,6 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
             ui->statusbar->clearMessage();
             if (QApplication::overrideCursor())
                 QApplication::restoreOverrideCursor();
-            QApplication::processEvents();
 
             QMessageBox msgBox(QMessageBox::Critical,
                                tr("GPG Error"),
@@ -5849,7 +5845,6 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
             ui->statusbar->showMessage(err);
             if (QApplication::overrideCursor())
                 QApplication::restoreOverrideCursor();
-            QApplication::processEvents();
         }
     );
 }
