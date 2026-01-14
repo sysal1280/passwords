@@ -251,7 +251,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 
                 // Retrieve the key
                 const QString appKey =
-                    qApp->property("appKey").toString().toUtf8().toBase64();
+                    qCompress(qApp->property("appKey").toString().toUtf8()).toBase64();
 
                 // Build the message box that displays the key
                 QMessageBox keyBox;

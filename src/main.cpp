@@ -53,9 +53,9 @@ int main(int argc, char *argv[])
     #endif
 
     QApplication a(argc, argv);
-    if (isDebuggerAttached()) {
-        return 0;
-    }
+   // if (isDebuggerAttached()) {
+   //     return 0;
+   // }
 
     /*
      * Set QApplication settings

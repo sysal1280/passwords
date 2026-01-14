@@ -58,8 +58,8 @@ public:
     ~MainWindow();
 
     // Application signature and schema version
-    static constexpr const char* APP_SIGNATURE   = "Asteraceae";
-    static constexpr const char* SCHEMA_VERSION = "1";
+    static constexpr const char* APP_SIGNATURE   = "Myrtaceae";
+    static constexpr const char* SCHEMA_VERSION = "2";
 
     // Utility functions
     static QByteArray base32Decode(const QString &base32);

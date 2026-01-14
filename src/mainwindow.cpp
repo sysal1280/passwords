@@ -106,7 +106,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    startDebuggerMonitor(this, 7000);
+    //startDebuggerMonitor(this, 7000);
+
+    qDebug() << "Size uncompressed" << QString("Adam Lanzafame").toUtf8().size();
+    qDebug() << "Size Compressed" << qCompress(QString("Adam Lanzafame").toUtf8(),9).size();
 
 #ifdef Q_OS_WIN
     userName = QString::fromLocal8Bit(qgetenv("USERNAME"));
@@ -4606,10 +4609,6 @@ bool MainWindow::initDb()
 
 QByteArray MainWindow::loadOrCreateAppKey()
 {
-
-    //
-    // 2. Fall back to DB-based key
-    //
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QByteArray appKey;
 
@@ -4647,7 +4646,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
                 QApplication::restoreOverrideCursor();
 
-                // --- Build inline dialog ---
+                // --- Build inline dialog (unchanged) ---
                 QDialog dlg(this);
                 dlg.setWindowTitle(tr("Application Key Required"));
                 dlg.setModal(true);
@@ -4656,37 +4655,23 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 QVBoxLayout *mainLayout = new QVBoxLayout(&dlg);
                 QTabWidget *tabs = new QTabWidget(&dlg);
 
-                //
-                // TAB 1 — Paste Key
-                //
                 QWidget *pasteTab = new QWidget(&dlg);
                 QVBoxLayout *pasteLayout = new QVBoxLayout(pasteTab);
-
-                QLabel *pasteLabel = new QLabel(
-                    tr("Paste your application key below:"), pasteTab);
+                QLabel *pasteLabel = new QLabel(tr("Paste your application key below:"), pasteTab);
                 QTextEdit *pasteEdit = new QTextEdit(pasteTab);
                 pasteEdit->setPlaceholderText(tr("application key here.."));
                 pasteEdit->setTabChangesFocus(true);
-
                 pasteLayout->addWidget(pasteLabel);
                 pasteLayout->addWidget(pasteEdit);
                 pasteTab->setLayout(pasteLayout);
 
-                //
-                // TAB 2 — Load From File
-                //
                 QWidget *fileTab = new QWidget(&dlg);
                 QVBoxLayout *fileLayout = new QVBoxLayout(fileTab);
-
-                QLabel *fileLabel = new QLabel(
-                tr("Load your application key from a file:"), fileTab);
-
+                QLabel *fileLabel = new QLabel(tr("Load your application key from a file:"), fileTab);
                 QPushButton *fileButton = new QPushButton(tr("Choose File.."), fileTab);
-                fileButton->setFixedWidth(120);   // Smaller button
-
+                fileButton->setFixedWidth(120);
                 QLabel *fileLoadedLabel = new QLabel("", fileTab);
                 fileLoadedLabel->setStyleSheet("color: #006000; font-style: italic;");
-
                 fileLayout->addWidget(fileLabel);
                 fileLayout->addWidget(fileButton);
                 fileLayout->addWidget(fileLoadedLabel);
@@ -4695,48 +4680,24 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
                 tabs->addTab(pasteTab, "Paste Key");
                 tabs->addTab(fileTab, "Load From File");
-                tabs->setTabIcon(0,QIcon(":/menus/glyphs/content_paste_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
-                tabs->setTabIcon(1,QIcon(":/menus/glyphs/attach_file_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
 
                 mainLayout->addWidget(tabs);
 
-                //
-                // Dialog buttons
-                //
                 QDialogButtonBox *buttons = new QDialogButtonBox(
                     QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help, &dlg);
                 mainLayout->addWidget(buttons);
 
-                QObject::connect(buttons, &QDialogButtonBox::accepted, &dlg, [&]() {
-                    dlg.accept();
-                });
-                QObject::connect(buttons, &QDialogButtonBox::rejected, &dlg, [&]() {
-                    dlg.reject();
-                });
-                QObject::connect(buttons, &QDialogButtonBox::helpRequested, &dlg, [&]() {
-                    checkHelpReachable([this](bool reachable) {
-                        if (reachable) {
-                            const QUrl url(getHelpBaseUrl("help/appkey-external"));
-                            QDesktopServices::openUrl(url);
-                        } else {
-                            launchHelperProcess(QStringLiteral("help/appkey-external"));
-                        }
-                    });
-                });
+                QObject::connect(buttons, &QDialogButtonBox::accepted, &dlg, [&]() { dlg.accept(); });
+                QObject::connect(buttons, &QDialogButtonBox::rejected, &dlg, [&]() { dlg.reject(); });
 
-                //
-                // File picker
-                //
                 QString loadedKey;
                 QObject::connect(fileButton, &QPushButton::clicked, &dlg, [&]() {
-                    QString path = QFileDialog::getOpenFileName(
-                        &dlg, "Select Application Key File", QDir::homePath(), "All Files (*)");
-
+                    QString path = QFileDialog::getOpenFileName(&dlg, "Select Application Key File",
+                                                                QDir::homePath(), "All Files (*)");
                     if (!path.isEmpty()) {
                         QFile f(path);
                         if (f.open(QIODevice::ReadOnly)) {
                             loadedKey = QString::fromUtf8(f.readAll()).trimmed();
-
                             QFileInfo info(path);
                             fileLoadedLabel->setText("Selected: " + info.fileName());
                         }
@@ -4746,31 +4707,21 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 dlg.setFixedSize(dlg.size());
                 pasteEdit->setFocus();
 
-                //
-                // Show dialog
-                //
                 if (dlg.exec() != QDialog::Accepted) {
-                    this->close();   // closes MainWindow immediately
-                    return {};       // signals failure to main.cpp
+                    this->close();
+                    return {};
                 }
 
-                //
-                // Extract key from whichever tab was used
-                //
-                QString keyText;
-
-                if (tabs->currentIndex() == 0) {
-                    keyText = pasteEdit->toPlainText().trimmed();
-                } else {
-                    keyText = loadedKey;
-                }
+                QString keyText = (tabs->currentIndex() == 0)
+                                      ? pasteEdit->toPlainText().trimmed()
+                                      : loadedKey;
 
                 //
-                // Validate (must decode properly, and match expected format)
+                // Decode → decompress → validate
                 //
+                QByteArray decodedCompressed = QByteArray::fromBase64(keyText.toUtf8());
+                QByteArray decoded = qUncompress(decodedCompressed);
 
-                // 1. Base64 decode (as before)
-                QByteArray decoded = QByteArray::fromBase64(keyText.toUtf8());
                 if (decoded.isEmpty()) {
                     QMessageBox::critical(this, tr("Invalid Application Key"),
                                           tr("The Application Key provided is invalid."));
@@ -4778,7 +4729,6 @@ QByteArray MainWindow::loadOrCreateAppKey()
                     return {};
                 }
 
-                // 2. Regex check on the decoded content (192 hex chars)
                 QString decodedStr = QString::fromUtf8(decoded);
 
                 static const QRegularExpression re(QStringLiteral("^[A-Fa-f0-9]{192}$"));
@@ -4789,19 +4739,20 @@ QByteArray MainWindow::loadOrCreateAppKey()
                     return {};
                 }
 
-                // 3. Keep original behavior
                 appKey = decoded;
             }
             //
             // CASE B — Key exists normally in DB
             //
             else {
-                appKey = QByteArray::fromBase64(value.toUtf8());
+                QByteArray compressed = QByteArray::fromBase64(value.toUtf8());
+                QByteArray raw = qUncompress(compressed);
+                appKey = raw;   // FIXED
             }
         }
         else {
             //
-            // 3. No key found — generate a new one (UNCHANGED)
+            // CASE C — No key found → generate new one
             //
             QString appKeyStr;
             for (int i = 0; i < 6; ++i) {
@@ -4810,7 +4761,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 appKeyStr += uuidStr;
             }
 
-            QByteArray encoded = appKeyStr.toUtf8().toBase64();
+            QByteArray encoded = qCompress(appKeyStr.toUtf8()).toBase64();
 
             query.prepare(R"(
                 INSERT INTO app_info (key, value)
@@ -4824,7 +4775,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 return {};
             }
 
-            appKey = QByteArray::fromBase64(encoded);
+            // FIX: decode + decompress
+            appKey = qUncompress(QByteArray::fromBase64(encoded));
         }
     }
 
@@ -4837,6 +4789,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
     return appKey;
 }
+
 
 
 // QByteArray MainWindow::loadOrCreateAppKey()
