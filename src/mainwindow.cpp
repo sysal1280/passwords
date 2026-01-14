@@ -935,9 +935,8 @@ MainWindow::MainWindow(QWidget *parent)
         loader.showDialog(this);
     });
     ui->menuDatabase->insertAction(ui->actionMaintenance,testAction);
-#endif
-
     setupDebugWarnings(this, ui->statusbar);
+#endif
 
 }
 
@@ -4924,24 +4923,15 @@ void MainWindow::initDbMetadata()
 
 void MainWindow::checkGpgKeys()
 {
-    QList<KeyEntry> keys = fetchKeys();
-    if (!keys.isEmpty())
+    if (!fetchKeys().isEmpty())
         return;
 
     qWarning().noquote() << "No GPG Keys have been linked.";
-    QApplication::restoreOverrideCursor();
 
-    QMessageBox::StandardButton reply =
-            QMessageBox::question(
-                this,
-                tr("No GPG Key Linked"),
-                tr("You must link at least one GPG private key before you can create passwords.\n\n"
-                   "Would you like to add one now?"),
-                QMessageBox::Yes | QMessageBox::No
-            );
-    if (reply == QMessageBox::Yes) {
-        keyList();
-    }
+    if (QApplication::overrideCursor())
+        QApplication::restoreOverrideCursor();
+
+    keyList();
 }
 
 void MainWindow::setBookmark(bool checked)

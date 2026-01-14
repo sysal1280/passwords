@@ -377,10 +377,9 @@ static bool setupDatabaseFile(QWidget *parent)
     QMessageBox::StandardButton reply =
         QMessageBox::question(
             parent,
-            QCoreApplication::translate("main", "Database Missing"),
+            QCoreApplication::translate("main", "No database found"),
             QCoreApplication::translate("main",
-                                        "No database was found.\n"
-                                        "Would you like to create a new one?"),
+                                        "Would you like to create a new database now?\nClicking No will close this program."),
             QMessageBox::Yes | QMessageBox::No
             );
 
@@ -412,7 +411,7 @@ static bool setupDatabaseFile(QWidget *parent)
         }
     } else {
         qFatal().noquote() << "A database must be setup to continue using Passwords.";
-        return false;
+        return 0;
     }
 }
 
