@@ -373,7 +373,7 @@ static bool setupDatabaseFile(QWidget *parent)
     }
 
     qWarning().noquote() << "No database has been found.";
-
+    QApplication::restoreOverrideCursor();
     QMessageBox::StandardButton reply =
         QMessageBox::question(
             parent,
@@ -411,15 +411,7 @@ static bool setupDatabaseFile(QWidget *parent)
             return false;
         }
     } else {
-        qInfo().noquote() << "Running in limited mode. A database should be setup for full functionality.";
-        QMessageBox::information(
-            parent,
-            QCoreApplication::translate("main", "Database Required"),
-            QCoreApplication::translate("main",
-                                        "%1 can continue without a database,\n"
-                                        "but functionality will be severely limited.\n"
-                                        "For example, you won't be able to create passwords.").arg(QApplication::applicationName())
-            );
+        qFatal().noquote() << "A database must be setup to continue using Passwords.";
         return false;
     }
 }
