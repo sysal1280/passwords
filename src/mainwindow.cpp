@@ -517,7 +517,6 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::keyList);
 
     //delete password
-    //delete password
     connect(ui->actionDelete_Password,
             &QAction::triggered,
             this,
@@ -875,6 +874,7 @@ MainWindow::MainWindow(QWidget *parent)
                     if (hasDb)
                     {
                         menu.addAction(ui->actionNew_Category);
+                        menu.addAction(ui->actionRefresh_Categories);
                     }
                     else
                     {
