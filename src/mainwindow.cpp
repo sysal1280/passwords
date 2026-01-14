@@ -106,7 +106,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    //startDebuggerMonitor(this, 7000);
+    startDebuggerMonitor(this, 7000);
 
     qDebug() << "Size uncompressed" << QString("Adam Lanzafame").toUtf8().size();
     qDebug() << "Size Compressed" << qCompress(QString("Adam Lanzafame").toUtf8(),9).size();
@@ -1792,6 +1792,7 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
 {
 
 ScopedCursor wait(Qt::WaitCursor);
+ui->scrollArea->blockSignals(true);
 
     // Ensure scrollArea has a widget
     if (!ui->scrollArea->widget()) {
@@ -2222,7 +2223,7 @@ updateFields();
         autoCloseTimer->stop();
         autoCloseTimer->start(autoClose * 1000);
     }
-
+ui->scrollArea->blockSignals(false);
 }
 
 bool MainWindow::killGpgAgent()
