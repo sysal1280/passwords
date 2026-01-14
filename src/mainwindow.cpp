@@ -4473,6 +4473,35 @@ QByteArray MainWindow::loadOrCreateAppKey()
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QByteArray appKey;
 
+    auto obfuscate = [&](const QByteArray &raw) -> QByteArray {
+        // Compress as before
+        QByteArray data = qCompress(raw);
+
+        quint32 rnd = QRandomGenerator::global()->generate();
+        char xorKey = static_cast<char>(rnd & 0xFF);
+
+        for (char &c : data)
+            c ^= xorKey;
+
+        data.prepend(xorKey);
+        return data.toBase64();
+    };
+
+    auto deobfuscate = [&](const QByteArray &encoded) -> QByteArray {
+        QByteArray data = QByteArray::fromBase64(encoded);
+        if (data.size() < 2) {
+            return {};
+        }
+
+        char xorKey = data[0];
+        data.remove(0, 1);
+
+        for (char &c : data)
+            c ^= xorKey;
+
+        return qUncompress(data);
+    };
+
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
@@ -4502,6 +4531,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
             //
             // CASE A — Key was exported → user must provide it manually
+            //          (UNCHANGED)
             //
             if (value.toLower() == "exported") {
 
@@ -4579,6 +4609,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
                 //
                 // Decode → decompress → validate
+                // (UNCHANGED FORMAT FOR EXPORTED KEYS)
                 //
                 QByteArray decodedCompressed = QByteArray::fromBase64(keyText.toUtf8());
                 QByteArray decoded = qUncompress(decodedCompressed);
@@ -4606,9 +4637,25 @@ QByteArray MainWindow::loadOrCreateAppKey()
             // CASE B — Key exists normally in DB
             //
             else {
-                QByteArray compressed = QByteArray::fromBase64(value.toUtf8());
-                QByteArray raw = qUncompress(compressed);
-                appKey = raw;   // FIXED
+                QByteArray stored = value.toUtf8();
+
+                // Try NEW obfuscated format first
+                QByteArray raw = deobfuscate(stored);
+
+                // Fallback: OLD format (qCompress → Base64)
+                if (raw.isEmpty()) {
+                    QByteArray compressed = QByteArray::fromBase64(stored);
+                    raw = qUncompress(compressed);
+                }
+
+                if (raw.isEmpty()) {
+                    QMessageBox::critical(this, tr("Invalid Application Key"),
+                                          tr("Stored application key is corrupted."));
+                    qApp->quit();
+                    return {};
+                }
+
+                appKey = raw;
             }
         }
         else {
@@ -4622,7 +4669,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 appKeyStr += uuidStr;
             }
 
-            QByteArray encoded = qCompress(appKeyStr.toUtf8()).toBase64();
+            // Store in NEW obfuscated format
+            QByteArray encoded = obfuscate(appKeyStr.toUtf8());
 
             query.prepare(R"(
                 INSERT INTO app_info (key, value)
@@ -4636,8 +4684,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 return {};
             }
 
-            // FIX: decode + decompress
-            appKey = qUncompress(QByteArray::fromBase64(encoded));
+            // appKey in memory is the RAW key (same as before)
+            appKey = appKeyStr.toUtf8();
         }
     }
 
@@ -4650,6 +4698,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
     return appKey;
 }
+
 
 
 

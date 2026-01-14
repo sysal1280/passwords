@@ -538,11 +538,6 @@ QLabel#labelPasswordInspector {
     font-weight: bold;
     letter-spacing: 1px;
     text-align: center;
-
-    /* smooth transitions */
-    transition: background 180ms ease, 
-                box-shadow 180ms ease,
-                border-color 180ms ease;
 }
 
 QLabel#labelPasswordInspector:hover {
