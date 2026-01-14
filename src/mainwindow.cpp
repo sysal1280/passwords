@@ -933,6 +933,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(testAction, &QAction::triggered, this, [this]() {
         TestLoader loader(qApp->property("dbFile").toString(), appKey, this);
         loader.showDialog(this);
+        loadCategories();
     });
     ui->menuDatabase->insertAction(ui->actionMaintenance,testAction);
     setupDebugWarnings(this, ui->statusbar);

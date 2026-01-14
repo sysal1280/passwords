@@ -260,7 +260,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 
                 // Make the box narrower by wrapping content in a fixed-width div
                 QString html =
-                    "<div style='width:420px; line-height:135%; margin:4px 0 6px 0;'>"
+                    "<div style='width:320px; line-height:135%; margin:4px 0 6px 0;'>"
                     "<b><span style='color:#004a7f;'>This is the only time your application key will be shown.</span></b>"
                     "<div style='margin-top:8px;'>"
                     "Copy and store this key in a safe, secure location. "

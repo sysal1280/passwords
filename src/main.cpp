@@ -380,7 +380,8 @@ static bool setupDatabaseFile(QWidget *parent)
             QCoreApplication::translate("main", "No database found"),
             QCoreApplication::translate("main",
                                         "Would you like to create a new database now?\nClicking No will close this program."),
-            QMessageBox::Yes | QMessageBox::No
+            QMessageBox::Yes | QMessageBox::No,
+        QMessageBox::Yes
             );
 
     if (reply == QMessageBox::Yes) {
