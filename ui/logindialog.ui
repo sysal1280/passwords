@@ -62,6 +62,9 @@
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QTextEdit" name="textEdit">
+        <property name="lineWrapMode">
+         <enum>QTextEdit::LineWrapMode::WidgetWidth</enum>
+        </property>
         <property name="placeholderText">
          <string/>
         </property>
