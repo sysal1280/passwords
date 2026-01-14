@@ -5660,7 +5660,13 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
 
 void MainWindow::exportPassword(QTreeWidgetItem *item)
 {
-    if (!item) return;
+    if (!item)
+        return;
+
+    // Capture needed values up front to avoid dangling QTreeWidgetItem*
+    const int appId = item->data(0, Qt::UserRole).toInt();
+    const QString baseName = item->text(0);
+    const int credentialId = item->text(1).toInt();
 
     // --- WARNING prompt ---
     QMessageBox msgBox(this);
@@ -5681,8 +5687,20 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
     );
 
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
-    msgBox.button(QMessageBox::Yes)->setText(tr("Export Anyway"));
-    msgBox.button(QMessageBox::Cancel)->setText(tr("Cancel"));
+
+    // Safely set button texts
+    if (QAbstractButton *btn = msgBox.button(QMessageBox::Yes)) {
+        if (auto pb = qobject_cast<QPushButton*>(btn))
+            pb->setText(tr("Export Anyway"));
+        else
+            btn->setText(tr("Export Anyway"));
+    }
+    if (QAbstractButton *btn = msgBox.button(QMessageBox::Cancel)) {
+        if (auto pb = qobject_cast<QPushButton*>(btn))
+            pb->setText(tr("Cancel"));
+        else
+            btn->setText(tr("Cancel"));
+    }
 
     if (msgBox.exec() != QMessageBox::Yes)
         return;
@@ -5692,7 +5710,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
     }
 
     // --- Step 1: Retrieve encrypted data from DB ---
-    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    const QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QByteArray encdata;
 
     ui->statusbar->showMessage(tr("Reading database.."));
@@ -5703,7 +5721,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
         if (db.open()) {
             QSqlQuery query(db);
             query.prepare("SELECT data FROM application WHERE id = :id");
-            query.bindValue(":id", item->data(0, Qt::UserRole).toInt());
+            query.bindValue(":id", appId);
 
             if (query.exec() && query.first()) {
                 encdata = DataObfuscator::deobfuscate(
@@ -5715,7 +5733,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
         } else {
             qCritical().noquote() << "Database not opened." << db.lastError().text();
             QMessageBox::critical(this, QApplication::applicationName(),
-                                  "No database open.");
+                                  tr("No database open."));
         }
     }
 
@@ -5730,7 +5748,10 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
         encdata,
 
         // --- onSuccess ---
-        [this, item](const QByteArray &json) {
+        [this, appId, baseName, credentialId](const QByteArray &json) {
+            if (!this->isVisible())
+                return;
+
             ui->statusbar->clearMessage();
 
             QByteArray decrypted_data = json;
@@ -5738,9 +5759,8 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
                 return;
 
             // Build suggested filename: <item text>_<date>.json
-            QString baseName = item->text(0);
-            QString dateStr  = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
-            QString suggestedName =
+            const QString dateStr  = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+            const QString suggestedName =
                 QDir::homePath() + "/" + baseName + "_" + dateStr + ".json";
 
             QString fileName = QFileDialog::getSaveFileName(
@@ -5756,7 +5776,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
                     outFile.write(decrypted_data);
                     outFile.close();
 
-                    insertAuditRow(item->data(0, Qt::UserRole).toInt(),
+                    insertAuditRow(appId,
                                    userName,
                                    QSysInfo::machineHostName(),
                                    "EXPORTED");
@@ -5764,7 +5784,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
                     QMessageBox::information(
                         this,
                         ui->actionExport_Password->text(),
-                        tr("Decrypted JSON saved to:\n") + fileName
+                        tr("Password exported to ") + fileName
                     );
 
                 } else {
@@ -5777,50 +5797,58 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
             }
 
             decrypted_data.fill(0);
-            openedCredentialID = item->text(1).toInt();
+            openedCredentialID = credentialId;
 
-            QApplication::restoreOverrideCursor();
+            if (QApplication::overrideCursor())
+                QApplication::restoreOverrideCursor();
             QApplication::processEvents();
         },
 
         // --- onMissingKey ---
         [this](const QString &err) {
-        ui->statusbar->clearMessage();
-        QApplication::restoreOverrideCursor();
-        QApplication::processEvents();
+            if (!this->isVisible())
+                return;
 
-        // Create a custom critical message box
-        QMessageBox msgBox(QMessageBox::Critical,
-                           tr("GPG Error"),
-                           err,
-                           QMessageBox::Ok | QMessageBox::Help,
-                           this);
+            ui->statusbar->clearMessage();
+            if (QApplication::overrideCursor())
+                QApplication::restoreOverrideCursor();
+            QApplication::processEvents();
 
-        // Optional: make Help the "secondary" button visually
-        msgBox.setDefaultButton(QMessageBox::Ok);
+            QMessageBox msgBox(QMessageBox::Critical,
+                               tr("GPG Error"),
+                               err,
+                               QMessageBox::Ok | QMessageBox::Help,
+                               this);
 
-        // Execute the dialog and capture which button was pressed
-        int result = msgBox.exec();
+            msgBox.setDefaultButton(QMessageBox::Ok);
 
-        clearScrollArea();
+            int result = msgBox.exec();
 
-        // Handle Help button
-        if (result == QMessageBox::Help) {
-            checkHelpReachable([this](bool reachable) {
-                if (reachable) {
-                    const QUrl url(getHelpBaseUrl("help/no-secret-key"));
-                    QDesktopServices::openUrl(url);
-                } else {
-                    launchHelperProcess(QStringLiteral("no-secret-key"));
-                }
-            });
-        }
+            clearScrollArea();
+
+            if (result == QMessageBox::Help) {
+                checkHelpReachable([this](bool reachable) {
+                    if (!this->isVisible())
+                        return;
+
+                    if (reachable) {
+                        const QUrl url(getHelpBaseUrl("help/no-secret-key"));
+                        QDesktopServices::openUrl(url);
+                    } else {
+                        launchHelperProcess(QStringLiteral("no-secret-key"));
+                    }
+                });
+            }
         },
 
         // --- onFailure ---
         [this](const QString &err) {
+            if (!this->isVisible())
+                return;
+
             ui->statusbar->showMessage(err);
-            QApplication::restoreOverrideCursor();
+            if (QApplication::overrideCursor())
+                QApplication::restoreOverrideCursor();
             QApplication::processEvents();
         }
     );
@@ -6125,7 +6153,9 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
             }
 
             // --- Encrypt with GPG ---
-            QString tempFile = QDir::tempPath() + "/import.asc";
+            QString tempFile = QDir::tempPath()
+                + "/import_" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".asc";
+
             QStringList args;
             for (const QString &key : std::as_const(selectedKeys)) {
                 args << "--recipient" << key;
