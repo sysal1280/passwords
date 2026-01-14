@@ -6257,6 +6257,10 @@ void MainWindow::createCategory(const QString& categoryName /* = QString() */)
             ui->treeWidget->addTopLevelItem(newItem);
         }
 
+        ui->treeWidget->clearSelection();
+        newItem->setSelected(true);
+        ui->treeWidget->setCurrentItem(newItem);
+
         db.close();
     }
 
