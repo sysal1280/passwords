@@ -73,6 +73,7 @@ public:
      int getMaxBackups();
      bool openCategoryDblClick();
      void setExportedKey();
+     void deleteSection(const QString &section);
 
 private:
     QString configDir;

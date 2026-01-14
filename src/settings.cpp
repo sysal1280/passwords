@@ -638,3 +638,21 @@ bool Settings::verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent)
 
     return false;
 }
+
+void Settings::deleteSection(const QString &section)
+{
+    if (!settings)
+        return;
+
+    settings->beginGroup(section);
+    bool exists = !settings->allKeys().isEmpty();
+    settings->endGroup();
+
+    if (exists) {
+        settings->beginGroup(section);
+        settings->remove("");
+        settings->endGroup();
+
+        settings->remove(section);
+    }
+}

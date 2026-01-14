@@ -1,4 +1,6 @@
 #include "dbupgrader.h"
+#include "settings.h"
+
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QVariant>
@@ -208,6 +210,14 @@ bool DatabaseUpgrader::upgrade_1_to_2(QString &error)
     if (!update.exec()) {
         error = update.lastError().text();
         return false;
+    }
+
+    // Also remove old General section from config file.
+    // It has been replaced with Main.
+    {
+        Settings settings;
+        settings.deleteSection("%General");
+        settings.deleteSection("General");
     }
 
     return true;
