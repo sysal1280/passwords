@@ -162,6 +162,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeWidget_2->setWatermarkText("No Passwords");
     ui->treeWidget_2->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
+    connect(qApp, &QApplication::aboutToQuit, this, [](){
+        qDebug() << "Application quitting";
+    });
+
 
     //setup glyphs
     QHash<QAction*, QString> actionIcons = {
@@ -1383,65 +1387,66 @@ QList<KeyEntry> MainWindow::fetchKeys() const
     return keys;
 }
 
-void MainWindow::openCategory(QTreeWidgetItem *item, int column) {
+void MainWindow::openCategory(QTreeWidgetItem *item, int column)
+{
+    if (!item || item->treeWidget() == nullptr)
+        return;
 
     ScopedCursor wait(Qt::WaitCursor);
 
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     clearScrollArea();
 
-    // Block signals and clear the second tree widget
     ui->treeWidget_2->blockSignals(true);
     ui->treeWidget_2->clear();
+    ui->treeWidget_2->setCurrentItem(nullptr);
+    ui->treeWidget_2->clearSelection();
 
-    // Create the database connection
     {
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(qApp->property("dbFile").toString());
 
         if (!db.open()) {
             showDbNotOpenError(this, db, Q_FUNC_INFO);
-            ui->treeWidget_2->blockSignals(false); // Unblock signals on error
+            ui->treeWidget_2->blockSignals(false);
             return;
         }
 
-        // Prepare and execute the query
         QSqlQuery query(db);
-        query.prepare(QString("SELECT * FROM application WHERE category_id = :id ORDER BY id"));
-        query.bindValue(":id", item->data(0,Qt::UserRole).toInt());
+        query.prepare("SELECT * FROM application WHERE category_id = :id ORDER BY id");
+        query.bindValue(":id", item->data(0, Qt::UserRole).toInt());
 
         if (!query.exec()) {
-            showQueryError(this,query,Q_FUNC_INFO);
+            showQueryError(this, query, Q_FUNC_INFO);
             db.close();
             QSqlDatabase::removeDatabase(connName);
             ui->treeWidget_2->blockSignals(false);
             return;
         }
 
-        // Process each row of the query result and create tree items
+        // Build items
         while (query.next()) {
-            if (QTreeWidgetItem* newItem = makeItemFromApplication(query)) {
-                const QString status = buildItemPath(item)
-                                     + settings.getPathSeparator()
-                                     + newItem->text(0);
+            if (QTreeWidgetItem *newItem = makeItemFromApplication(query)) {
 
-                newItem->setStatusTip(0,status);
+                const QString status =
+                    buildItemPath(item) +
+                    settings.getPathSeparator() +
+                    newItem->text(0);
+
+                newItem->setStatusTip(0, status);
                 ui->treeWidget_2->addTopLevelItem(newItem);
             }
         }
 
-
-        // Clean up
         db.close();
     }
+
     QSqlDatabase::removeDatabase(connName);
 
-    // Unblock signals after processing is complete
     ui->treeWidget_2->blockSignals(false);
+
     ui->treeWidget_2->clearSelection();
     ui->treeWidget_2->setCurrentItem(nullptr);
-
-    // Reset openedCredentialID
     openedCredentialID = -1;
 }
 
@@ -1643,30 +1648,33 @@ void MainWindow::clearScrollArea()
 
 void MainWindow::openPassword(QTreeWidgetItem *item)
 {
+    // Basic safety: null or stale item
+    if (!item || item->treeWidget() == nullptr)
+        return;
+
+    qDebug() << "openPassword called with item =" << item;
+
     if (settings.getKillGpgAgent()) {
         killGpgAgent();
     }
 
-    int parentId = item->data(0, Qt::UserRole).toInt();
+    const int parentId = item->data(0, Qt::UserRole).toInt();
 
+    // If already open, just clear the details
     if (openedCredentialID == parentId) {
         clearScrollArea();
         return;
     }
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    QApplication::processEvents();
+    // Use RAII cursor instead of manual set/restore + processEvents
+    ScopedCursor wait(Qt::WaitCursor);
 
-    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-
-    // --- Step 0: Map mode to table/column names ---
-    QString viewTable      = "application_views";
-    QString idColumn       = "application_id";
-    //QString credTable      = "application";
+    const QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    const QString viewTable = QStringLiteral("application_views");
+    const QString idColumn  = QStringLiteral("application_id");
 
     // --- Step 1: Retrieve encrypted data ---
-    ui->statusbar->showMessage("Reading database..");
-    QApplication::processEvents();
+    ui->statusbar->showMessage(tr("Reading database.."));
 
     QByteArray encdata;
     {
@@ -1687,8 +1695,7 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
             }
         } else {
             showDbNotOpenError(this, db, Q_FUNC_INFO);
-            QApplication::restoreOverrideCursor();
-            QApplication::processEvents();
+            ui->statusbar->clearMessage();
             return;
         }
     }
@@ -1696,16 +1703,29 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
     QSqlDatabase::removeDatabase(connName);
     ui->statusbar->clearMessage();
 
+    if (encdata.isEmpty()) {
+        // nothing to decrypt
+        clearScrollArea();
+        return;
+    }
+
     // --- Step 2: Decrypt using reusable helper ---
-    ui->statusbar->showMessage("Decrypting data..");
-    QApplication::processEvents();
+    ui->statusbar->showMessage(tr("Decrypting data.."));
 
     decryptWithGpg(
         encdata,
 
         // --- onSuccess ---
         [this, parentId, connName, viewTable, idColumn](const QByteArray &json) {
+            // We are on the GUI thread (with the fixed decryptWithGpg)
             ui->statusbar->clearMessage();
+
+            if (json.isEmpty()) {
+                clearScrollArea();
+                return;
+            }
+
+            // Populate the UI from JSON
             populateFromJsonApplication(json, ui);
 
             // Mark as opened
@@ -1739,54 +1759,44 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
             }
 
             QSqlDatabase::removeDatabase(connName);
-            QApplication::restoreOverrideCursor();
-            QApplication::processEvents();
+            // ScopedCursor in the outer function will restore the cursor
         },
 
         // --- onMissingKey ---
-    [this](const QString &err) {
-    ui->statusbar->clearMessage();
-    QApplication::restoreOverrideCursor();
-    QApplication::processEvents();
+        [this](const QString &err) {
+            ui->statusbar->clearMessage();
 
-    // Create a custom critical message box
-    QMessageBox msgBox(QMessageBox::Critical,
-                       tr("GPG Error"),
-                       err,
-                       QMessageBox::Ok | QMessageBox::Help,
-                       this);
+            QMessageBox msgBox(QMessageBox::Critical,
+                               tr("GPG Error"),
+                               err,
+                               QMessageBox::Ok | QMessageBox::Help,
+                               this);
 
-    // Optional: make Help the "secondary" button visually
-    msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            int result = msgBox.exec();
 
-    // Execute the dialog and capture which button was pressed
-    int result = msgBox.exec();
+            clearScrollArea();
 
-    clearScrollArea();
-
-    // Handle Help button
-    if (result == QMessageBox::Help) {
-        checkHelpReachable([this](bool reachable) {
-            if (reachable) {
-                const QUrl url(getHelpBaseUrl("help/no-secret-key"));
-                QDesktopServices::openUrl(url);
-            } else {
-                launchHelperProcess(QStringLiteral("no-secret-key"));
+            if (result == QMessageBox::Help) {
+                checkHelpReachable([this](bool reachable) {
+                    if (reachable) {
+                        const QUrl url(getHelpBaseUrl("help/no-secret-key"));
+                        QDesktopServices::openUrl(url);
+                    } else {
+                        launchHelperProcess(QStringLiteral("no-secret-key"));
+                    }
+                });
             }
-        });
-    }
-    },
+        },
 
         // --- onFailure ---
         [this](const QString &err) {
             ui->statusbar->showMessage(err);
             clearScrollArea();
-            QApplication::restoreOverrideCursor();
-            QApplication::processEvents();
+            // cursor restored by ScopedCursor
         }
     );
 }
-
 
 void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui)
 {
@@ -5663,16 +5673,15 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
     if (!item)
         return;
 
-    // Capture needed values up front to avoid dangling QTreeWidgetItem*
+    // Capture values immediately (avoid dangling pointers)
     const int appId = item->data(0, Qt::UserRole).toInt();
     const QString baseName = item->text(0);
     const int credentialId = item->text(1).toInt();
 
-    // --- WARNING prompt ---
+    // --- Security Warning ---
     QMessageBox msgBox(this);
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.setWindowTitle(tr("Security Warning"));
-
     msgBox.setText(
         tr("<div style='line-height:135%; margin:4px 0 6px 0;'>"
            "<b><span style='color:#8c0000;'>You are about to export your password data in unencrypted form.</span></b>"
@@ -5685,31 +5694,20 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
            "<b>Only continue if you fully understand and accept the security risks.</b>"
            "</div>")
     );
-
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
 
-    // Safely set button texts
-    if (QAbstractButton *btn = msgBox.button(QMessageBox::Yes)) {
-        if (auto pb = qobject_cast<QPushButton*>(btn))
-            pb->setText(tr("Export Anyway"));
-        else
-            btn->setText(tr("Export Anyway"));
-    }
-    if (QAbstractButton *btn = msgBox.button(QMessageBox::Cancel)) {
-        if (auto pb = qobject_cast<QPushButton*>(btn))
-            pb->setText(tr("Cancel"));
-        else
-            btn->setText(tr("Cancel"));
-    }
+    if (auto *btn = msgBox.button(QMessageBox::Yes))
+        btn->setText(tr("Export Anyway"));
+    if (auto *btn = msgBox.button(QMessageBox::Cancel))
+        btn->setText(tr("Cancel"));
 
     if (msgBox.exec() != QMessageBox::Yes)
         return;
 
-    if (settings.getKillGpgAgent()) {
+    if (settings.getKillGpgAgent())
         killGpgAgent();
-    }
 
-    // --- Step 1: Retrieve encrypted data from DB ---
+    // --- Step 1: Read encrypted data ---
     const QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QByteArray encdata;
 
@@ -5731,16 +5729,15 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
                 showQueryError(this, query, Q_FUNC_INFO);
             }
         } else {
-            qCritical().noquote() << "Database not opened." << db.lastError().text();
-            QMessageBox::critical(this, QApplication::applicationName(),
+            QMessageBox::critical(this,
+                                  QApplication::applicationName(),
                                   tr("No database open."));
         }
     }
-
     QSqlDatabase::removeDatabase(connName);
     ui->statusbar->clearMessage();
 
-    // --- Step 2: Decrypt using shared helper ---
+    // --- Step 2: Decrypt ---
     ui->statusbar->showMessage(tr("Decrypting data.."));
 
     decryptWithGpg(
@@ -5748,17 +5745,18 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
 
         // --- onSuccess ---
         [this, appId, baseName, credentialId](const QByteArray &json) {
-            if (!this->isVisible())
-                return;
 
+            // Always on GUI thread now (thanks to fixed decryptWithGpg)
             ui->statusbar->clearMessage();
 
-            QByteArray decrypted_data = json;
-            if (decrypted_data.isEmpty())
+            if (json.isEmpty())
                 return;
 
-            // Build suggested filename: <item text>_<date>.json
-            const QString dateStr  = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+            QByteArray decrypted_data = json;
+
+            const QString dateStr =
+                QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+
             const QString suggestedName =
                 QDir::homePath() + "/" + baseName + "_" + dateStr + ".json";
 
@@ -5772,6 +5770,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
             if (!fileName.isEmpty()) {
                 QFile outFile(fileName);
                 if (outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+
                     outFile.write(decrypted_data);
                     outFile.close();
 
@@ -5795,20 +5794,14 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
                 }
             }
 
-            decrypted_data.fill(0);
-
-            if (QApplication::overrideCursor())
-                QApplication::restoreOverrideCursor();
+            // Zero memory safely
+            if (!decrypted_data.isEmpty())
+                decrypted_data.fill(0);
         },
 
         // --- onMissingKey ---
         [this](const QString &err) {
-            if (!this->isVisible())
-                return;
-
             ui->statusbar->clearMessage();
-            if (QApplication::overrideCursor())
-                QApplication::restoreOverrideCursor();
 
             QMessageBox msgBox(QMessageBox::Critical,
                                tr("GPG Error"),
@@ -5817,19 +5810,16 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
                                this);
 
             msgBox.setDefaultButton(QMessageBox::Ok);
-
             int result = msgBox.exec();
 
             clearScrollArea();
 
             if (result == QMessageBox::Help) {
                 checkHelpReachable([this](bool reachable) {
-                    if (!this->isVisible())
-                        return;
-
                     if (reachable) {
-                        const QUrl url(getHelpBaseUrl("help/no-secret-key"));
-                        QDesktopServices::openUrl(url);
+                        QDesktopServices::openUrl(
+                            QUrl(getHelpBaseUrl("help/no-secret-key"))
+                        );
                     } else {
                         launchHelperProcess(QStringLiteral("no-secret-key"));
                     }
@@ -5839,12 +5829,7 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
 
         // --- onFailure ---
         [this](const QString &err) {
-            if (!this->isVisible())
-                return;
-
             ui->statusbar->showMessage(err);
-            if (QApplication::overrideCursor())
-                QApplication::restoreOverrideCursor();
         }
     );
 }
@@ -7314,67 +7299,6 @@ void MainWindow::openCategoryFromCurrent(QTreeWidgetItem* current, QTreeWidgetIt
     openCategory(current, 0);
 }
 
-
-// void MainWindow::decryptWithGpg(
-//         const QByteArray &encrypted,
-//         std::function<void(const QByteArray&)> onSuccess,
-//         std::function<void(const QString&)> onMissingKey,
-//         std::function<void(const QString&)> onFailure)
-// {
-//     QProcess *gpg = new QProcess(this);
-//     gpg->setProcessChannelMode(QProcess::SeparateChannels);
-
-//     // Track whether we've shown the missing-key dialog
-//     bool *noKeyShown = new bool(false);
-
-//     // Feed data when ready
-//     connect(gpg, &QProcess::started, this, [gpg, encrypted]() {
-//         gpg->write(encrypted);
-//         gpg->closeWriteChannel();
-//     });
-
-//     // Handle stdout (successful decrypt)
-//     connect(gpg, &QProcess::readyReadStandardOutput, this, [gpg, onSuccess]() {
-//         QByteArray out = gpg->readAllStandardOutput();
-//         if (!out.isEmpty()) {
-//             onSuccess(out);
-//         }
-//     });
-
-//     // Handle stderr
-//     connect(gpg, &QProcess::readyReadStandardError, this,
-//             [this, gpg, noKeyShown, onMissingKey, onFailure]() {
-
-//         QByteArray err = gpg->readAllStandardError();
-//         if (err.isEmpty()) return;
-
-//         QString errStr = QString::fromUtf8(err);
-
-//         // NEW: show stderr in the status bar (restores original behavior)
-//         ui->statusbar->showMessage(errStr);
-
-//         qDebug().noquote() << "GPG stderr:" << errStr;
-
-//         if (errStr.contains("no secret key", Qt::CaseInsensitive)) {
-//             if (!*noKeyShown) {
-//                 *noKeyShown = true;
-//                 onMissingKey(errStr);
-//             }
-//         } else {
-//             onFailure(errStr);
-//         }
-//     });
-
-//     // Cleanup
-//     connect(gpg, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-//             this, [gpg, noKeyShown](int, QProcess::ExitStatus) {
-//         delete noKeyShown;
-//         gpg->deleteLater();
-//     });
-
-//     gpg->start("gpg", QStringList() << "--decrypt");
-// }
-
 void MainWindow::decryptWithGpg(
         const QByteArray &encrypted,
         std::function<void(const QByteArray&)> onSuccess,
@@ -7395,13 +7319,22 @@ void MainWindow::decryptWithGpg(
         gpg->closeWriteChannel();
     });
 
+    // --- FIX: marshal onSuccess to GUI thread ---
     connect(gpg, &QProcess::readyReadStandardOutput, this,
-            [gpg, onSuccess]() {
+            [this, gpg, onSuccess]() {
         QByteArray out = gpg->readAllStandardOutput();
-        if (!out.isEmpty())
-            onSuccess(out);
+        if (!out.isEmpty()) {
+            QMetaObject::invokeMethod(
+                this,
+                [onSuccess, out]() {
+                    onSuccess(out);
+                },
+                Qt::QueuedConnection
+            );
+        }
     });
 
+    // --- FIX: marshal stderr UI updates to GUI thread ---
     connect(gpg, &QProcess::readyReadStandardError, this,
             [this, gpg, statusLines, humanErrors]() {
 
@@ -7411,72 +7344,87 @@ void MainWindow::decryptWithGpg(
 
         QString errStr = QString::fromUtf8(err);
 
-        ui->statusbar->showMessage(errStr);
-        qDebug().noquote() << "GPG stderr:" << errStr;
+        QMetaObject::invokeMethod(
+            this,
+            [this, errStr, statusLines, humanErrors]() {
+                ui->statusbar->showMessage(errStr);
+                qDebug().noquote() << "GPG stderr:" << errStr;
 
-        const QStringList lines = errStr.split('\n', Qt::SkipEmptyParts);
+                const QStringList lines = errStr.split('\n', Qt::SkipEmptyParts);
 
-        for (const QString &raw : lines) {
-            QString line = raw.trimmed();
-            if (line.startsWith("[GNUPG:]")) {
-                statusLines->append(line);
-            } else {
-                humanErrors->append(line);
-            }
-        }
+                for (const QString &raw : lines) {
+                    QString line = raw.trimmed();
+                    if (line.startsWith("[GNUPG:]")) {
+                        statusLines->append(line);
+                    } else {
+                        humanErrors->append(line);
+                    }
+                }
+            },
+            Qt::QueuedConnection
+        );
     });
 
+    // --- FIX: marshal finished() callback to GUI thread ---
     connect(gpg,
             QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this,
-            [gpg, statusLines, humanErrors,
+            [this, gpg, statusLines, humanErrors,
              onMissingKey, onFailure](int exitCode, QProcess::ExitStatus status) {
 
-        bool sawNoSecKey = false;
-        int pkErrorCode = 0;
+        QMetaObject::invokeMethod(
+            this,
+            [gpg, statusLines, humanErrors,
+             onMissingKey, onFailure, exitCode, status]() {
 
-        // Parse collected status lines
-        const QStringList &lines = *statusLines;
-        for (const QString &line : lines) {
-            if (line.contains("NO_SECKEY"))
-                sawNoSecKey = true;
+                bool sawNoSecKey = false;
+                int pkErrorCode = 0;
 
-            if (line.contains("ERROR pkdecrypt_failed")) {
-                QStringList parts = line.split(' ', Qt::SkipEmptyParts);
-                bool ok = false;
-                int code = parts.last().toInt(&ok);
-                if (ok)
-                    pkErrorCode = code;
-            }
-        }
+                const QStringList &lines = *statusLines;
+                for (const QString &line : lines) {
+                    if (line.contains("NO_SECKEY"))
+                        sawNoSecKey = true;
 
-        // Case 1: True missing secret key
-        if (sawNoSecKey && pkErrorCode == 33554449) {
-            onMissingKey(tr("No valid secret keys can be found.\nThe operation cannot continue."));
-        }
-        // Case 2: User cancelled
-        else if (sawNoSecKey && pkErrorCode == 83886179) {
-            // User cancelled — must call onFailure so cursor restores
-            onFailure("Operation cancelled");
-        }
+                    if (line.contains("ERROR pkdecrypt_failed")) {
+                        QStringList parts = line.split(' ', Qt::SkipEmptyParts);
+                        bool ok = false;
+                        int code = parts.last().toInt(&ok);
+                        if (ok)
+                            pkErrorCode = code;
+                    }
+                }
 
-        // Case 3: Other failure
-        else if (status != QProcess::NormalExit || exitCode != 0) {
-            if (!humanErrors->isEmpty())
-                onFailure(humanErrors->join("\n"));
-            else
-                onFailure("GPG failed");
-        }
+                // Case 1: True missing secret key
+                if (sawNoSecKey && pkErrorCode == 33554449) {
+                    onMissingKey(
+                        QObject::tr("No valid secret keys can be found.\nThe operation cannot continue.")
+                    );
+                }
+                // Case 2: User cancelled
+                else if (sawNoSecKey && pkErrorCode == 83886179) {
+                    onFailure("Operation cancelled");
+                }
+                // Case 3: Other failure
+                else if (status != QProcess::NormalExit || exitCode != 0) {
+                    if (!humanErrors->isEmpty())
+                        onFailure(humanErrors->join("\n"));
+                    else
+                        onFailure("GPG failed");
+                }
 
-        delete statusLines;
-        delete humanErrors;
-        gpg->deleteLater();
+                delete statusLines;
+                delete humanErrors;
+                gpg->deleteLater();
+            },
+            Qt::QueuedConnection
+        );
     });
 
     gpg->start("gpg", QStringList()
                << "--status-fd" << "2"
                << "--decrypt");
 }
+
 
 
 bool MainWindow::tryOpenPasswordPath(const QString &path)

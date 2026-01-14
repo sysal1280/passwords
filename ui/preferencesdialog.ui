@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -523,13 +523,13 @@ This cryptographic material is required at startup to decrypt metadata. Store it
          <item>
           <widget class="QGroupBox" name="groupBox_8">
            <property name="title">
-            <string>Help server</string>
+            <string>Local help server</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_6">
             <item row="0" column="0">
              <widget class="QLabel" name="label_9">
               <property name="text">
-               <string>To work in secure environments the user guide is served locally.</string>
+               <string>To work in secure environments the user guide can be served locally when firewalls prevent online access.</string>
               </property>
               <property name="wordWrap">
                <bool>true</bool>
@@ -573,7 +573,7 @@ This cryptographic material is required at startup to decrypt metadata. Store it
             <item row="2" column="0">
              <widget class="QCheckBox" name="checkBoxCloseHelpServer">
               <property name="text">
-               <string>Close Help server session on exit</string>
+               <string>Close help server session on exit</string>
               </property>
              </widget>
             </item>

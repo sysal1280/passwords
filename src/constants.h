@@ -98,3 +98,23 @@ sudo zypper install gnupg   (openSUSE)
 
 Ensure it is accessible in your PATH.
 )");
+
+
+inline constexpr auto MSG_APP_KEY_EXPORT = QT_TR_NOOP(
+    "<div style='width:320px; line-height:135%; margin:4px 0 6px 0;'>"
+    "<b><span style='color:#004a7f;'>This is the only time your application key will be shown.</span></b>"
+    "<div style='margin-top:8px;'>"
+    "Copy and store this key in a safe, secure location. "
+    "You will need to provide it manually every time the application starts."
+    "<br><br>"
+    "<b>If you lose this key, your stored data cannot be recovered.</b>"
+    "<div style='margin-top:10px; padding:8px; border:1px solid #ccc; "
+    "background:#f7f7f7; font-family:monospace; font-size:14px;'>%1"
+    "</div>"
+    "<div style='margin-top:12px;'>"
+    "Click <b>“Understood, I have a copy”</b> only after you have safely copied the key. "
+    "Click <b>Cancel</b> to abort without making any changes."
+    "</div>"
+    "</div>"
+    "</div>"
+    );
