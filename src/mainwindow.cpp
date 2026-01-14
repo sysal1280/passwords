@@ -4473,32 +4473,77 @@ QByteArray MainWindow::loadOrCreateAppKey()
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QByteArray appKey;
 
+    //
+    // CRC32 helper (self-contained)
+    //
+    auto crc32 = [&](const QByteArray &data) -> quint32 {
+        quint32 crc = 0xFFFFFFFF;
+        for (unsigned char b : data) {
+            crc ^= b;
+            for (int i = 0; i < 8; ++i)
+                crc = (crc >> 1) ^ (0xEDB88320 & (-(crc & 1)));
+        }
+        return ~crc;
+    };
+
+    //
+    // NEW obfuscation format
+    //
     auto obfuscate = [&](const QByteArray &raw) -> QByteArray {
-        // Compress as before
         QByteArray data = qCompress(raw);
 
-        quint32 rnd = QRandomGenerator::global()->generate();
-        char xorKey = static_cast<char>(rnd & 0xFF);
+        // Append CRC32
+        quint32 crc = crc32(data);
+        data.append(char((crc >> 24) & 0xFF));
+        data.append(char((crc >> 16) & 0xFF));
+        data.append(char((crc >> 8) & 0xFF));
+        data.append(char(crc & 0xFF));
 
+        // XOR with random byte
+        char xorKey = char(QRandomGenerator::global()->generate() & 0xFF);
         for (char &c : data)
             c ^= xorKey;
 
+        // Prepend XOR key
         data.prepend(xorKey);
+
         return data.toBase64();
     };
 
+    //
+    // NEW deobfuscation format
+    //
     auto deobfuscate = [&](const QByteArray &encoded) -> QByteArray {
         QByteArray data = QByteArray::fromBase64(encoded);
-        if (data.size() < 2) {
+        if (data.size() < 6)
             return {};
-        }
 
+        // Extract XOR key
         char xorKey = data[0];
         data.remove(0, 1);
 
+        // Undo XOR
         for (char &c : data)
             c ^= xorKey;
 
+        if (data.size() < 5)
+            return {};
+
+        // Extract CRC32
+        quint32 storedCrc =
+            (quint32(quint8(data[data.size()-4])) << 24) |
+            (quint32(quint8(data[data.size()-3])) << 16) |
+            (quint32(quint8(data[data.size()-2])) << 8)  |
+            (quint32(quint8(data[data.size()-1])));
+
+        data.chop(4);
+
+        // Verify CRC32
+        quint32 calcCrc = crc32(data);
+        if (calcCrc != storedCrc)
+            return {};
+
+        // Decompress
         return qUncompress(data);
     };
 
@@ -4525,13 +4570,15 @@ QByteArray MainWindow::loadOrCreateAppKey()
             return {};
         }
 
+        //
+        // CASE A — Key exists
+        //
         if (query.next()) {
 
             QString value = query.value(0).toString().trimmed();
 
             //
-            // CASE A — Key was exported → user must provide it manually
-            //          (UNCHANGED)
+            // CASE A1 — Exported key (unchanged)
             //
             if (value.toLower() == "exported") {
 
@@ -4633,16 +4680,17 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
                 appKey = decoded;
             }
+
             //
-            // CASE B — Key exists normally in DB
+            // CASE A2 — Normal stored key
             //
             else {
                 QByteArray stored = value.toUtf8();
 
-                // Try NEW obfuscated format first
+                // Try NEW format
                 QByteArray raw = deobfuscate(stored);
 
-                // Fallback: OLD format (qCompress → Base64)
+                // Fallback: OLD format
                 if (raw.isEmpty()) {
                     QByteArray compressed = QByteArray::fromBase64(stored);
                     raw = qUncompress(compressed);
@@ -4658,10 +4706,11 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 appKey = raw;
             }
         }
+
+        //
+        // CASE B — No key found → generate new one
+        //
         else {
-            //
-            // CASE C — No key found → generate new one
-            //
             QString appKeyStr;
             for (int i = 0; i < 6; ++i) {
                 QString uuidStr = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -4669,7 +4718,6 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 appKeyStr += uuidStr;
             }
 
-            // Store in NEW obfuscated format
             QByteArray encoded = obfuscate(appKeyStr.toUtf8());
 
             query.prepare(R"(
@@ -4684,7 +4732,6 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 return {};
             }
 
-            // appKey in memory is the RAW key (same as before)
             appKey = appKeyStr.toUtf8();
         }
     }
@@ -4698,107 +4745,6 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
     return appKey;
 }
-
-
-
-
-// QByteArray MainWindow::loadOrCreateAppKey()
-// {
-//     //
-//     // 1. Try file-based key first
-//     //
-//     QString keyFilePath = appKeyFilePath();
-
-//     if (QFile::exists(keyFilePath)) {
-//         QFile keyFile(keyFilePath);
-//         keyFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
-//         if (keyFile.open(QIODevice::ReadOnly)) {
-//             QByteArray encoded = keyFile.readAll();
-//             keyFile.close();
-
-//             QByteArray decoded = QByteArray::fromBase64(encoded);
-//             if (!decoded.isEmpty()) {
-//                 qInfo().noquote() << "Using appKey from file:"
-//                                   << (decoded.length() > 7
-//                                           ? decoded.left(3) + "..." + decoded.right(4)
-//                                           : decoded)
-//                                   << "in" << keyFilePath;
-//                 return decoded;
-//             }
-//         }
-//     } else {
-//         qInfo().noquote() << "No appKey file exists at" << keyFilePath;
-//     }
-
-//     //
-//     // 2. Fall back to DB-based key
-//     //
-//     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-//     QByteArray appKey;
-
-//     {
-//         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
-//         db.setDatabaseName(qApp->property("dbFile").toString());
-
-//         if (!db.open()) {
-//             showDbNotOpenError(this, db, Q_FUNC_INFO);
-//             QMessageBox::critical(nullptr, QApplication::applicationName(), db.lastError().text());
-//             return {};
-//         }
-
-//         QSqlQuery query(db);
-//         query.prepare(R"(
-//             SELECT value
-//             FROM app_info
-//             WHERE key = :app_key
-//         )");
-//         query.bindValue(":app_key", "app_key");
-
-//         if (!query.exec()) {
-//             showQueryError(nullptr, query, Q_FUNC_INFO);
-//             return {};
-//         }
-
-//         if (query.next()) {
-//             appKey = QByteArray::fromBase64(query.value(0).toString().toUtf8());
-//         } else {
-//             //
-//             // 3. No key found — generate a new one
-//             //
-//             QString appKeyStr;
-//             for (int i = 0; i < 6; ++i) {
-//                 QString uuidStr = QUuid::createUuid().toString(QUuid::WithoutBraces);
-//                 uuidStr.remove('-');
-//                 appKeyStr += uuidStr;
-//             }
-
-//             QByteArray encoded = appKeyStr.toUtf8().toBase64();
-
-//             query.prepare(R"(
-//                 INSERT INTO app_info (key, value)
-//                 VALUES (:app_key, :guid)
-//             )");
-//             query.bindValue(":app_key", "app_key");
-//             query.bindValue(":guid", encoded);
-
-//             if (!query.exec()) {
-//                 showQueryError(nullptr, query, Q_FUNC_INFO);
-//                 return {};
-//             }
-
-//             appKey = QByteArray::fromBase64(encoded);
-//         }
-//     }
-
-//     QSqlDatabase::removeDatabase(connName);
-
-//     qInfo().noquote() << "Using appKey from DB:"
-//                       << (appKey.length() > 7
-//                               ? appKey.left(3) + "..." + appKey.right(4)
-//                               : appKey);
-
-//     return appKey;
-// }
 
 void MainWindow::initDbMetadata()
 {
