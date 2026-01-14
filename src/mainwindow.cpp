@@ -4473,15 +4473,12 @@ QByteArray MainWindow::loadOrCreateAppKey()
     QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QByteArray appKey;
 
-    //
-    // CRC32 helper (self-contained)
-    //
     auto crc32 = [&](const QByteArray &data) -> quint32 {
         quint32 crc = 0xFFFFFFFF;
         for (unsigned char b : data) {
             crc ^= b;
             for (int i = 0; i < 8; ++i)
-                crc = (crc >> 1) ^ (0xEDB88320 & (-(crc & 1)));
+                crc = (crc >> 1) ^ (0xEDB88320 & (0u - (crc & 1u)));
         }
         return ~crc;
     };
@@ -4531,10 +4528,10 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
         // Extract CRC32
         quint32 storedCrc =
-            (quint32(quint8(data[data.size()-4])) << 24) |
-            (quint32(quint8(data[data.size()-3])) << 16) |
-            (quint32(quint8(data[data.size()-2])) << 8)  |
-            (quint32(quint8(data[data.size()-1])));
+                (quint32(quint8(data[data.size()-4])) << 24) |
+                (quint32(quint8(data[data.size()-3])) << 16) |
+                (quint32(quint8(data[data.size()-2])) << 8)  |
+                (quint32(quint8(data[data.size()-1])));
 
         data.chop(4);
 
@@ -4570,16 +4567,11 @@ QByteArray MainWindow::loadOrCreateAppKey()
             return {};
         }
 
-        //
-        // CASE A — Key exists
-        //
-        if (query.next()) {
+        if (query.next())
+        {
 
             QString value = query.value(0).toString().trimmed();
 
-            //
-            // CASE A1 — Exported key (unchanged)
-            //
             if (value.toLower() == "exported") {
 
                 QApplication::restoreOverrideCursor();
@@ -4622,7 +4614,7 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 mainLayout->addWidget(tabs);
 
                 QDialogButtonBox *buttons = new QDialogButtonBox(
-                    QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help, &dlg);
+                            QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help, &dlg);
                 mainLayout->addWidget(buttons);
 
                 QObject::connect(buttons, &QDialogButtonBox::accepted, &dlg, [&]() { dlg.accept(); });
@@ -4645,14 +4637,15 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 dlg.setFixedSize(dlg.size());
                 pasteEdit->setFocus();
 
-                if (dlg.exec() != QDialog::Accepted) {
+                if (dlg.exec() != QDialog::Accepted)
+                {
                     this->close();
                     return {};
                 }
 
                 QString keyText = (tabs->currentIndex() == 0)
-                                      ? pasteEdit->toPlainText().trimmed()
-                                      : loadedKey;
+                        ? pasteEdit->toPlainText().trimmed()
+                        : loadedKey;
 
                 //
                 // Decode → decompress → validate
@@ -4661,7 +4654,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 QByteArray decodedCompressed = QByteArray::fromBase64(keyText.toUtf8());
                 QByteArray decoded = qUncompress(decodedCompressed);
 
-                if (decoded.isEmpty()) {
+                if (decoded.isEmpty())
+                {
                     QMessageBox::critical(this, tr("Invalid Application Key"),
                                           tr("The Application Key provided is invalid."));
                     qApp->quit();
@@ -4671,7 +4665,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 QString decodedStr = QString::fromUtf8(decoded);
 
                 static const QRegularExpression re(QStringLiteral("^[A-Fa-f0-9]{192}$"));
-                if (!re.match(decodedStr).hasMatch()) {
+                if (!re.match(decodedStr).hasMatch())
+                {
                     QMessageBox::critical(this, tr("Invalid Application Key"),
                                           tr("The Application Key you provided is invalid, incomplete or incorrect."));
                     qApp->quit();
@@ -4680,11 +4675,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
                 appKey = decoded;
             }
-
-            //
-            // CASE A2 — Normal stored key
-            //
-            else {
+            else
+            {
                 QByteArray stored = value.toUtf8();
 
                 // Try NEW format
@@ -4706,13 +4698,11 @@ QByteArray MainWindow::loadOrCreateAppKey()
                 appKey = raw;
             }
         }
-
-        //
-        // CASE B — No key found → generate new one
-        //
-        else {
+        else
+        {
             QString appKeyStr;
-            for (int i = 0; i < 6; ++i) {
+            for (int i = 0; i < 6; ++i)
+            {
                 QString uuidStr = QUuid::createUuid().toString(QUuid::WithoutBraces);
                 uuidStr.remove('-');
                 appKeyStr += uuidStr;
@@ -4740,8 +4730,8 @@ QByteArray MainWindow::loadOrCreateAppKey()
 
     qInfo().noquote() << "Using appKey:"
                       << (appKey.length() > 7
-                              ? appKey.left(3) + "..." + appKey.right(4)
-                              : appKey);
+                          ? appKey.left(3) + "..." + appKey.right(4)
+                          : appKey);
 
     return appKey;
 }
