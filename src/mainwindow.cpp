@@ -22,6 +22,7 @@
 #include "./ui_mainwindow.h"
 
 #include "dataobfuscator.h"
+#include "dbupgrader.h"
 #include "systeminfodialog.h"
 #include "aboutdialog.h"
 #include "categoryproperties.h"
@@ -4466,6 +4467,41 @@ void MainWindow::search(int appId)
 
 bool MainWindow::initDb()
 {
+    //Database upgrade
+    //This is the first time the database is touched after startup.
+    {
+        QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+        {
+            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+            db.setDatabaseName(qApp->property("dbFile").toString());
+
+            if (!db.open()) {
+                QMessageBox::critical(this, tr("Error"),
+                                      tr("Failed to open database: %1").arg(db.lastError().text()));
+                QSqlDatabase::removeDatabase(connName);
+                return false;
+            }
+
+            QSqlQuery(db).exec("PRAGMA foreign_keys = ON");
+
+            //Do upgrade
+            DatabaseUpgrader upgrader(db);
+            QString error;
+
+            if (!upgrader.upgradeToLatest(MainWindow::APP_SIGNATURE,
+                                          MainWindow::SCHEMA_VERSION,
+                                          error)) {
+                QMessageBox::critical(this, tr("Error"),
+                                      tr("Database upgrade failed:\n%1").arg(error));
+                db.close();
+                QSqlDatabase::removeDatabase(connName);
+                return false;
+            }
+        }
+        QSqlDatabase::removeDatabase(connName);
+    }
+
     this->appKey = loadOrCreateAppKey();
 
     if (this->appKey.isEmpty()) {
