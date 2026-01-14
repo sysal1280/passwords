@@ -191,32 +191,30 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 
     connect(ui->pushButton, &QPushButton::clicked,
             this, &PreferencesDialog::openBackupDir);
+
     connect(ui->buttonBox->button(QDialogButtonBox::Help),
             &QPushButton::clicked,
             this,
             [this]() {
 
-                checkHelpReachable([this](bool reachable) {
-                    if (reachable) {
-                        // Open the online help page for preferences
-                        const QUrl url(getHelpBaseUrl("preferences"));
-                        QDesktopServices::openUrl(url);
-                    } else {
-                        // Fallback to helper process
-                        MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
-                        if (!mw) {
-                            QMessageBox::warning(
-                                this,
-                                tr("Help Error"),
-                                tr("Help system unavailable: parent window is not MainWindow.")
-                                );
-                            return;
-                        }
+                checkOnlineHelp([this](bool reachable) {
 
-                        mw->launchHelperProcess(QStringLiteral("preferences"));
+                    if (reachable) {
+                        QDesktopServices::openUrl(
+                            QUrl(getHelpBaseUrl("preferences"))
+                            );
+                    } else if (localHelpAvailable()) {
+                        launchHelperProcess("preferences");
+                    } else {
+                        QMessageBox::warning(
+                            this,
+                            tr("Help Error"),
+                            tr(MSG_NO_HELP)
+                            );
                     }
                 });
             });
+
 
     connect(ui->pushButtonExportKey, &QPushButton::clicked,
             this, [this, removeGroupBox]() {

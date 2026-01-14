@@ -378,21 +378,21 @@ void showGpgKeyListDialog(GpgKeyType type, const QString &userName, QWidget *par
     });
 
     QObject::connect(helpBtn, &QPushButton::clicked, dlg, [dlg]() {
-        checkHelpReachable([dlg](bool reachable) {
+
+        checkOnlineHelp([dlg](bool reachable) {
+
             if (reachable) {
-                const QUrl url(Passwords::HelpBaseUrl + QStringLiteral("keys-listing"));
-                QDesktopServices::openUrl(url);
+                QDesktopServices::openUrl(
+                    QUrl(getHelpBaseUrl("keys-listing"))
+                    );
+            } else if (localHelpAvailable()) {
+                launchHelperProcess("keys-listing");
             } else {
-                MainWindow *mw = qobject_cast<MainWindow*>(dlg->parentWidget());
-                if (!mw) {
-                    QMessageBox::warning(
-                        dlg,
-                        QObject::tr("Help Error"),
-                        QObject::tr("Help system unavailable: parent window is not MainWindow.")
-                        );
-                    return;
-                }
-                mw->launchHelperProcess(QStringLiteral("keys-listing"));
+                QMessageBox::warning(
+                    dlg,
+                    QObject::tr("Help Error"),
+                    QObject::tr("Local help is not installed and online help is unreachable.")
+                    );
             }
         });
     });

@@ -362,24 +362,20 @@ void CategoryProperties::adjustTableHeightForVisibleRows(int visibleRows)
 
 void CategoryProperties::onHelpRequested()
 {
-    checkHelpReachable([this](bool reachable) {
-        if (reachable) {
-            // Open the online help page for preferences
-            const QUrl url(getHelpBaseUrl("properties"));
-            QDesktopServices::openUrl(url);
-        } else {
-            // Fallback to helper process
-            MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
-            if (!mw) {
-                QMessageBox::warning(
-                    this,
-                    tr("Help Error"),
-                    tr("Help system unavailable: parent window is not MainWindow.")
-                    );
-                return;
-            }
+    checkOnlineHelp([this](bool reachable) {
 
-            mw->launchHelperProcess(QStringLiteral("properties"));
+        if (reachable) {
+            QDesktopServices::openUrl(
+                QUrl(getHelpBaseUrl("properties"))
+                );
+        } else if (localHelpAvailable()) {
+            launchHelperProcess("properties");
+        } else {
+            QMessageBox::warning(
+                this,
+                tr("Help Error"),
+                tr("Local help is not installed and online help is unreachable.")
+                );
         }
     });
 }

@@ -23,7 +23,6 @@
 
 #include "dataobfuscator.h"
 #include "dbutils.h"
-#include "mainwindow.h"
 #include "settings.h"
 #include "utils.h"
 
@@ -44,6 +43,7 @@ LoginDialog::LoginDialog(QWidget *parent)
     , ui(new Ui::LoginDialog)
 {
     ui->setupUi(this);
+
     this->setWindowTitle(tr("Challenge"));
     ui->textEdit->setReadOnly(true);
 
@@ -94,23 +94,20 @@ LoginDialog::LoginDialog(QWidget *parent)
             this,
             [this]() {
 
-                checkHelpReachable([this](bool reachable) {
+                checkOnlineHelp([this](bool reachable) {
+
                     if (reachable) {
-                        // Open the online help page for challenge-response
-                        const QUrl url(getHelpBaseUrl("challenge-response"));
-                        QDesktopServices::openUrl(url);
+                        QDesktopServices::openUrl(
+                            QUrl(getHelpBaseUrl("challenge-response"))
+                            );
+                    } else if (localHelpAvailable()) {
+                        launchHelperProcess("challenge-response");
                     } else {
-                        // Fallback to helper process
-                        MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
-                        if (!mw) {
-                            QMessageBox::warning(
-                                this,
-                                tr("Help Error"),
-                                tr("Help system unavailable: parent window is not MainWindow.")
-                                );
-                            return;
-                        }
-                        mw->launchHelperProcess(QStringLiteral("challenge-response"));
+                        QMessageBox::warning(
+                            this,
+                            tr("Help Error"),
+                            tr(MSG_NO_HELP)
+                            );
                     }
                 });
             });
@@ -132,7 +129,7 @@ LoginDialog::LoginDialog(QWidget *parent)
                 reject();
             });
 
-    connect(ui->lineEdit, &QLineEdit::textChanged,
+    connect(ui->lineEditChallengeResponse, &QLineEdit::textChanged,
             this, [okButton](const QString &text) {
                 okButton->setEnabled(!text.trimmed().isEmpty());
             });
@@ -141,11 +138,8 @@ LoginDialog::LoginDialog(QWidget *parent)
     connect(ui->textEdit, &QTextEdit::textChanged,
             this, [this]() {
                 ui->textEdit->selectAll();
-                ui->lineEdit->setFocus();
+                ui->lineEditChallengeResponse->setFocus();
             });
-
-
-    hasHelp(ui->buttonBox->button(QDialogButtonBox::Help));
 
 }
 
@@ -260,7 +254,12 @@ void LoginDialog::generateChallenge()
 
     process->start("gpg", {"-ea", "-r", recipient});
 
-    QByteArray temp = "\nYour Response is:\n" + responseBytes + "\n\n";
+    QByteArray temp;
+    temp.reserve(responseBytes.size() + 64);
+    temp.append(tr("\nYour Response is:\n").toUtf8());
+    temp.append(responseBytes);
+    temp.append("\n\n");
+
     process->write(temp);
     process->closeWriteChannel();
 
@@ -281,23 +280,25 @@ void LoginDialog::generateChallenge()
 
 void LoginDialog::tryResponse()
 {
-        QByteArray enteredBytes = ui->lineEdit->text().toUtf8();
-        QByteArray enteredHash = QCryptographicHash::hash(enteredBytes, QCryptographicHash::Sha512);
-        std::fill(enteredBytes.begin(), enteredBytes.end(), '\0');
-        enteredBytes.clear();
+    QByteArray enteredBytes = ui->lineEditChallengeResponse->text().toUtf8();
+    QByteArray enteredHash = QCryptographicHash::hash(enteredBytes, QCryptographicHash::Sha512);
 
-        if (enteredHash == responseHash) {
-            accept();
-        } else {
-            if (errorCount >= 2) {
-                reject();
-            } else {
-                ui->lineEdit->clear();
-                ui->lineEdit->setFocus();
-                errorCount++;
-            }
-        }
+    enteredBytes.fill('\0');
+    if (enteredHash == responseHash) {
+        accept();
+        return;
+    }
+
+    errorCount++;
+    if (errorCount >= 3) {
+        reject();
+        return;
+    }
+
+    ui->lineEditChallengeResponse->clear();
+    ui->lineEditChallengeResponse->setFocus();
 }
+
 
 bool LoginDialog::hasKeys() const {
     return ui->comboBoxLogin->count() > 0;

@@ -32,6 +32,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QProcess>
 #include <QPushButton>
 #include <QResource>
 #include <QStandardPaths>
@@ -78,19 +79,29 @@ inline QString appKeyFilePath()
     return QFile::exists(path) ? path : QString();
 }
 
-inline bool hasHelp(QPushButton *helpButton = nullptr)
+inline QString getHelpBaseUrl(const QString& page = QString())
 {
-    const QString appDir = QCoreApplication::applicationDirPath();
+    QString lang = QLocale::system().name().left(2);
 
-    const bool ok =
-        (QFile::exists(appDir + "/pwdhlp.exe") ||
-         QFile::exists(appDir + "/pwdhlp"))
-        && QFile::exists(appDir + "/pwdhlp.rcc");
+    // Supported languages
+    static const QSet<QString> supported = { "en", "fr", "de" };
+    if (!supported.contains(lang))
+        lang = "en";
 
-    if (!ok && helpButton)
-        helpButton->setEnabled(false);
+    // Base: https://.../passwords/en/
+    QString base = QString("%1%2/").arg(Passwords::HelpBaseUrl, lang);
 
-    return ok;
+    // If a page is provided, append it
+    if (!page.isEmpty()) {
+        // Ensure no accidental leading slash
+        QString cleanPage = page;
+        if (cleanPage.startsWith('/'))
+            cleanPage.remove(0, 1);
+
+        base += cleanPage;
+    }
+
+    return base;
 }
 
 inline void setupDebugWarnings(QWidget *parent, QStatusBar *statusBar)
@@ -139,62 +150,6 @@ inline void setupDebugWarnings(QWidget *parent, QStatusBar *statusBar)
     Q_UNUSED(parent)
     Q_UNUSED(statusBar)
 #endif
-}
-
-inline QString getHelpBaseUrl(const QString& page = QString())
-{
-    QString lang = QLocale::system().name().left(2);
-
-    // Supported languages
-    static const QSet<QString> supported = { "en", "fr", "de" };
-    if (!supported.contains(lang))
-        lang = "en";
-
-    // Base: https://.../passwords/en/
-    QString base = QString("%1%2/").arg(Passwords::HelpBaseUrl, lang);
-
-    // If a page is provided, append it
-    if (!page.isEmpty()) {
-        // Ensure no accidental leading slash
-        QString cleanPage = page;
-        if (cleanPage.startsWith('/'))
-            cleanPage.remove(0, 1);
-
-        base += cleanPage;
-    }
-
-    return base;
-}
-
-inline void checkHelpReachable(std::function<void(bool)> callback,
-                               QObject* parent = nullptr)
-{
-    auto manager = new QNetworkAccessManager(parent);
-    auto request = QNetworkRequest(QUrl(getHelpBaseUrl()));
-
-    QNetworkReply* reply = manager->head(request);
-
-    // --- Timeout timer ---
-    QTimer* timer = new QTimer(reply);   // parented to reply for auto cleanup
-    timer->setSingleShot(true);
-    timer->start(3000);                  // 3 seconds
-
-    QObject::connect(timer, &QTimer::timeout, reply, [reply, callback]() {
-        // Timeout reached → abort the request
-        reply->abort();
-        callback(false);
-        reply->deleteLater();
-    });
-
-    // --- Normal completion ---
-    QObject::connect(reply, &QNetworkReply::finished, reply, [reply, callback, timer]() {
-        if (timer->isActive())
-            timer->stop();   // prevent timeout firing after success
-
-        bool ok = (reply->error() == QNetworkReply::NoError);
-        callback(ok);
-        reply->deleteLater();
-    });
 }
 
 inline void manageBackups(const QString &directory, int maxFiles, QWidget *parent = nullptr)
@@ -251,6 +206,105 @@ inline void manageBackups(const QString &directory, int maxFiles, QWidget *paren
         progress->setValue(toDelete);
         progress->deleteLater();
     }
+}
+
+
+inline void checkOnlineHelp(std::function<void(bool)> callback)
+{
+    auto manager = new QNetworkAccessManager;
+    auto reply = manager->get(QNetworkRequest(QUrl(getHelpBaseUrl())));
+
+    QObject::connect(reply, &QNetworkReply::finished, reply, [reply, callback]() {
+
+        int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        bool ok = (reply->error() == QNetworkReply::NoError &&
+                   status >= 200 && status < 300);
+
+        callback(ok);
+        reply->deleteLater();
+    });
+}
+
+inline bool localHelpAvailable()
+{
+    const QString appDir = QCoreApplication::applicationDirPath();
+
+    qDebug().noquote() << "=== localHelpAvailable() DEBUG ===";
+    qDebug().noquote() << "appDir =" << appDir;
+
+    const QString exe1 = appDir + "/pwdhlp";
+    const QString exe2 = appDir + "/pwdhlp.exe";
+    const QString rcc  = appDir + "/pwdhlp.rcc";
+
+    qDebug().noquote() << "Checking:" << exe1 << "exists =" << QFile::exists(exe1);
+    qDebug().noquote() << "Checking:" << exe2 << "exists =" << QFile::exists(exe2);
+    qDebug().noquote() << "Checking:" << rcc  << "exists =" << QFile::exists(rcc);
+
+    // List all files in the directory so we can SEE what's actually there
+    QDir d(appDir);
+    qDebug().noquote() << "Files in appDir:";
+    for (const QString &f : d.entryList(QDir::Files))
+        qDebug().noquote() << " -" << f;
+
+    qDebug().noquote() << "===================================";
+
+    return ((QFile::exists(exe1) || QFile::exists(exe2))
+            && QFile::exists(rcc));
+}
+
+inline void launchHelperProcess(const QString &page)
+{
+    Settings settings;
+
+    QApplication::setOverrideCursor(Qt::BusyCursor);
+
+    QString tempDir =
+        QStandardPaths::writableLocation(QStandardPaths::TempLocation)
+        + QDir::separator()
+        + QCoreApplication::applicationName()
+        + QCoreApplication::applicationVersion();
+
+    QDir().mkpath(tempDir);
+
+    QString exePath =
+        QCoreApplication::applicationDirPath()
+        + QDir::separator()
+        + QStringLiteral("pwdhlp")
+#if defined(Q_OS_WIN)
+        + QStringLiteral(".exe")
+#endif
+        ;
+
+    QStringList args;
+    args << "--webdir" << tempDir
+         << "--port"   << QString::number(settings.getHelpPort());
+
+    if (!page.isEmpty())
+        args << "--page" << page;
+
+    static QProcess *helperProcess = nullptr;
+
+    if (!helperProcess || helperProcess->state() == QProcess::NotRunning) {
+
+        helperProcess = new QProcess(qApp);
+        helperProcess->setProgram(exePath);
+        helperProcess->setArguments(args);
+
+        QObject::connect(helperProcess, &QProcess::errorOccurred,
+                         [exePath](QProcess::ProcessError error){
+                             if (error == QProcess::FailedToStart) {
+                                 QMessageBox::warning(nullptr, QObject::tr("Help"),
+                                                      QObject::tr("Failed to start: %1").arg(exePath));
+                             }
+                         });
+
+        helperProcess->start();
+
+    } else {
+        QProcess::startDetached(exePath, args);
+    }
+
+    QApplication::restoreOverrideCursor();
 }
 
 #endif // UTILS_H

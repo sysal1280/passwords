@@ -175,24 +175,20 @@ public:
                 this,
                 [this]() {
 
-                    checkHelpReachable([this](bool reachable) {
-                        if (reachable) {
-                            // Open the online help page for encrypt-file
-                            const QUrl url(getHelpBaseUrl("encrypt-file"));
-                            QDesktopServices::openUrl(url);
-                        } else {
-                            // Fallback to helper process
-                            MainWindow *mw = qobject_cast<MainWindow*>(parentWidget());
-                            if (!mw) {
-                                QMessageBox::warning(
-                                    this,
-                                    tr("Help Error"),
-                                    tr("Help system unavailable: parent window is not MainWindow.")
-                                    );
-                                return;
-                            }
+                    checkOnlineHelp([this](bool reachable) {
 
-                            mw->launchHelperProcess(QStringLiteral("encrypt-file"));
+                        if (reachable) {
+                            QDesktopServices::openUrl(
+                                QUrl(getHelpBaseUrl("encrypt-file"))
+                                );
+                        } else if (localHelpAvailable()) {
+                            launchHelperProcess("encrypt-file");
+                        } else {
+                            QMessageBox::warning(
+                                this,
+                                tr("Help Error"),
+                                tr("Local help is not installed and online help is unreachable.")
+                                );
                         }
                     });
                 });

@@ -322,34 +322,29 @@ int main(int argc, char *argv[])
     /*
      * Show main window with slight delay and handle login preference
      */
-    QTimer::singleShot(500, w, [w, splash, &settings]() {
+    QTimer::singleShot(222, nullptr, [w, splash, &settings]() {
+        if (settings.getLoginPreference()) {
+            qInfo().noquote() << "Issuing access challenge.";
+
+            QApplication::restoreOverrideCursor();
+            LoginDialog login(nullptr);
+            login.setModal(true);
+
+            if (login.hasKeys() && login.exec() != QDialog::Accepted) {
+                QCoreApplication::exit(0);
+                return;
+            }
+        }
         w->show();
         w->activateWindow();
         w->raise();
         QApplication::processEvents(QEventLoop::AllEvents, 100);
-
-        w->setEnabled(false);
 
         QApplication::restoreOverrideCursor();
         QApplication::processEvents();
 
         splash->finish(w);
         delete splash;
-
-        if (settings.getLoginPreference()) {
-            qInfo().noquote() << "Issuing access challenge.";
-            LoginDialog login(w);
-            login.move(w->geometry().center() - login.rect().center());
-            login.setModal(true);
-
-            if (!login.hasKeys() || login.exec() == QDialog::Accepted) {
-                w->setEnabled(true);
-            } else {
-                QCoreApplication::exit(0);
-            }
-        } else {
-            w->setEnabled(true);
-        }
     });
 
     return a.exec();

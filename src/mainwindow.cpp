@@ -703,13 +703,21 @@ MainWindow::MainWindow(QWidget *parent)
     //user guide
     connect(ui->actionOnline_Documentation, &QAction::triggered, this, [this]() {
         ScopedCursor wait(Qt::WaitCursor);
-        checkHelpReachable([this](bool reachable) {
-            if (reachable) {
-                const QUrl url(getHelpBaseUrl());
-                QDesktopServices::openUrl(url);
-            } else {
-                launchHelperProcess(QString());
 
+        checkOnlineHelp([this](bool reachable) {
+
+            if (reachable) {
+                QDesktopServices::openUrl(
+                    QUrl(getHelpBaseUrl())
+                );
+            } else if (localHelpAvailable()) {
+                launchHelperProcess("");
+            } else {
+                QMessageBox::warning(
+                    this,
+                    tr("Help Error"),
+                    tr(MSG_NO_HELP)
+                );
             }
         });
     });
@@ -722,12 +730,21 @@ MainWindow::MainWindow(QWidget *parent)
     //donate
     connect(ui->actionDonate, &QAction::triggered, this, [this]() {
         ScopedCursor wait(Qt::WaitCursor);
-        checkHelpReachable([this](bool reachable) {
+
+        checkOnlineHelp([this](bool reachable) {
+
             if (reachable) {
-                const QUrl url(getHelpBaseUrl("donate"));
-                QDesktopServices::openUrl(url);
+                QDesktopServices::openUrl(
+                    QUrl(getHelpBaseUrl("donate"))
+                );
+            } else if (localHelpAvailable()) {
+                launchHelperProcess("donate");
             } else {
-                launchHelperProcess(QStringLiteral("donate"));
+                QMessageBox::warning(
+                    this,
+                    tr("Help Error"),
+                    tr(MSG_NO_HELP)
+                );
             }
         });
     });
@@ -1628,12 +1645,21 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
             clearScrollArea();
 
             if (result == QMessageBox::Help) {
-                checkHelpReachable([this](bool reachable) {
+
+                checkOnlineHelp([this](bool reachable) {
+
                     if (reachable) {
-                        const QUrl url(getHelpBaseUrl("help/no-secret-key"));
-                        QDesktopServices::openUrl(url);
+                        QDesktopServices::openUrl(
+                            QUrl(getHelpBaseUrl("help/no-secret-key"))
+                        );
+                    } else if (localHelpAvailable()) {
+                        launchHelperProcess("no-secret-key");
                     } else {
-                        launchHelperProcess(QStringLiteral("no-secret-key"));
+                        QMessageBox::warning(
+                            this,
+                            tr("Help Error"),
+                            tr(MSG_NO_HELP)
+                        );
                     }
                 });
             }
@@ -2971,15 +2997,25 @@ void MainWindow::keyList()
                 QPushButton *helpButton = msgBox.addButton(QMessageBox::Help);
 
                 connect(helpButton, &QPushButton::clicked, this, [this]() {
-                    checkHelpReachable([this](bool reachable) {
+
+                    checkOnlineHelp([this](bool reachable) {
+
                         if (reachable) {
-                            const QUrl url(getHelpBaseUrl("keys"));
-                            QDesktopServices::openUrl(url);
+                            QDesktopServices::openUrl(
+                                QUrl(getHelpBaseUrl("keys"))
+                            );
+                        } else if (localHelpAvailable()) {
+                            launchHelperProcess("keys");
                         } else {
-                            launchHelperProcess(QStringLiteral("keys"));
+                            QMessageBox::warning(
+                                this,
+                                tr("Help Error"),
+                                tr(MSG_NO_HELP)
+                            );
                         }
                     });
                 });
+
 
                 msgBox.exec();
                 return;
@@ -3069,12 +3105,21 @@ void MainWindow::keyList()
 
     // HELP BUTTON
     connect(helpBtn, &QPushButton::clicked, this, [this]() {
-        checkHelpReachable([this](bool reachable) {
+
+        checkOnlineHelp([this](bool reachable) {
+
             if (reachable) {
-                const QUrl url(getHelpBaseUrl("linking-keys"));
-                QDesktopServices::openUrl(url);
+                QDesktopServices::openUrl(
+                    QUrl(getHelpBaseUrl("linking-keys"))
+                );
+            } else if (localHelpAvailable()) {
+                launchHelperProcess("linking-keys");
             } else {
-                launchHelperProcess(QStringLiteral("linking-keys"));
+                QMessageBox::warning(
+                    this,
+                    tr("Help Error"),
+                    tr(MSG_NO_HELP)
+                );
             }
         });
     });
@@ -5484,12 +5529,21 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
 
     // Handle Help button
     if (result == QMessageBox::Help) {
-        checkHelpReachable([this](bool reachable) {
+
+        checkOnlineHelp([this](bool reachable) {
+
             if (reachable) {
-                const QUrl url(getHelpBaseUrl("help/no-secret-key"));
-                QDesktopServices::openUrl(url);
+                QDesktopServices::openUrl(
+                    QUrl(getHelpBaseUrl("help/no-secret-key"))
+                );
+            } else if (localHelpAvailable()) {
+                launchHelperProcess("no-secret-key");
             } else {
-                launchHelperProcess(QStringLiteral("no-secret-key"));
+                QMessageBox::warning(
+                    this,
+                    tr("Help Error"),
+                    tr(MSG_NO_HELP)
+                );
             }
         });
     }
@@ -5650,16 +5704,25 @@ void MainWindow::exportPassword(QTreeWidgetItem *item)
             clearScrollArea();
 
             if (result == QMessageBox::Help) {
-                checkHelpReachable([this](bool reachable) {
+
+                checkOnlineHelp([this](bool reachable) {
+
                     if (reachable) {
                         QDesktopServices::openUrl(
                             QUrl(getHelpBaseUrl("help/no-secret-key"))
                         );
+                    } else if (localHelpAvailable()) {
+                        launchHelperProcess("no-secret-key");
                     } else {
-                        launchHelperProcess(QStringLiteral("no-secret-key"));
+                        QMessageBox::warning(
+                            this,
+                            tr("Help Error"),
+                            tr(MSG_NO_HELP)
+                        );
                     }
                 });
             }
+
         },
 
         // --- onFailure ---
@@ -6541,19 +6604,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::launchHelperProcess(const QString &page)
 {
-    if (!hasHelp())
-    {
-        QMessageBox::warning(
-            this,
-            QApplication::applicationName(),
-            tr("No help available.\n\n"
-               "You can either allow access to %1 or download offline help from %2.")
-                .arg(Passwords::HelpBaseUrl,
-                     Passwords::GitUrl)
-        );
-        return;
-    }
-
     QApplication::setOverrideCursor(Qt::BusyCursor);
 
     QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation)

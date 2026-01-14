@@ -28,7 +28,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QLineEdit" name="lineEdit">
+       <widget class="QLineEdit" name="lineEditChallengeResponse">
         <property name="placeholderText">
          <string>Decrypted response</string>
         </property>
@@ -73,7 +73,7 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>lineEdit</tabstop>
+  <tabstop>lineEditChallengeResponse</tabstop>
   <tabstop>comboBoxLogin</tabstop>
   <tabstop>textEdit</tabstop>
  </tabstops>

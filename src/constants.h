@@ -118,3 +118,5 @@ inline constexpr auto MSG_APP_KEY_EXPORT = QT_TR_NOOP(
     "</div>"
     "</div>"
     );
+
+inline constexpr auto MSG_NO_HELP = QT_TR_NOOP("Local help is not installed and online help is unreachable.");
