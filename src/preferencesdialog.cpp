@@ -254,7 +254,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
                     qCompress(qApp->property("appKey").toString().toUtf8()).toBase64();
 
                 // Build the message box that displays the key
-                QMessageBox keyBox;
+                QMessageBox keyBox(this);
                 keyBox.setIcon(QMessageBox::Information);
                 keyBox.setWindowTitle("Your Application Key");
 
