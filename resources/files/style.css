@@ -557,7 +557,6 @@ QLineEdit#lineEditChallengeResponse {
     border-radius: 6px;
     padding: 6px 8px;
     font-size: 16px;
-    qproperty-alignment: 'AlignCenter';
     letter-spacing: 2px;
     color: #263238;
     selection-background-color: #2299d4;

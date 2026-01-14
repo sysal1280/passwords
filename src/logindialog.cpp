@@ -141,6 +141,13 @@ LoginDialog::LoginDialog(QWidget *parent)
                 ui->lineEditChallengeResponse->setFocus();
             });
 
+
+    QIcon responseIcon(":/menus/glyphs/admin_panel_settings_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg");
+    QAction *responseAction = ui->lineEditChallengeResponse->addAction(
+        responseIcon,
+        QLineEdit::LeadingPosition
+        );
+    Q_UNUSED(responseAction);
 }
 
 LoginDialog::~LoginDialog()
