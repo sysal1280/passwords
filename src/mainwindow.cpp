@@ -2701,8 +2701,9 @@ void MainWindow::keyList()
     table->horizontalHeader()->setFont(headerFont);
 
     // Populate from DB
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
     {
-        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "fetchkeys");
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
         db.setDatabaseName(dbFile);
         if (!db.open()) {
             showDbNotOpenError(this, db, Q_FUNC_INFO);
@@ -2727,7 +2728,7 @@ void MainWindow::keyList()
             showQueryError(this, query, Q_FUNC_INFO);
         }
     }
-    QSqlDatabase::removeDatabase("fetchkeys");
+    QSqlDatabase::removeDatabase(connName);
 
     layout->addWidget(table);
     table->setCurrentItem(nullptr);
