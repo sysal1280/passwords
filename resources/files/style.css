@@ -561,7 +561,6 @@ QLineEdit#lineEditChallengeResponse {
     color: #263238;
     selection-background-color: #2299d4;
     selection-color: white;
-    transition: border 120ms ease, background 120ms ease;
 }
 
 QLineEdit#lineEditChallengeResponse:focus {
