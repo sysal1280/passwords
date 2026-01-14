@@ -23,6 +23,7 @@
 
 #include "dataobfuscator.h"
 #include "dbutils.h"
+#include "dbutils.h"
 #include "settings.h"
 #include "utils.h"
 
@@ -51,40 +52,29 @@ LoginDialog::LoginDialog(QWidget *parent)
     okButton->setEnabled(false);
     okButton->setDefault(true);
 
-    QString connectionName = QUuid::createUuid().toString();
-        {
-            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
-            db.setDatabaseName(qApp->property("dbFile").toString());
-            if (db.open()) {
-                QSqlQuery query(db);
-                query.setForwardOnly(true);
-                query.prepare("SELECT label,key FROM keys ORDER BY label");
-                if (query.exec()) {
-                    ui->comboBoxLogin->clear();
-                    keys.clear();
+    {
+        auto list = DbUtils::fetchKeys(this);
 
-                    while (query.next()) {
-                        const QString label = DataObfuscator::deobfuscate(query.value(0).toString(), qApp->property("appKey").toByteArray());
-                        const QString key   = DataObfuscator::deobfuscate(query.value(1).toString(), qApp->property("appKey").toByteArray());
-                        ui->comboBoxLogin->addItem(label);
-                        keys.insert(label, key);
-                    }
+        ui->comboBoxLogin->clear();
+        keys.clear();   // You can delete this map entirely later
 
-                    // --- activate first entry and update clipboard ---
-                    if (ui->comboBoxLogin->count() > 0) {
-                        ui->comboBoxLogin->setCurrentIndex(0);
-                        generateChallenge();
-                    }
-                } else
-                {
-                    showQueryError(this,query,Q_FUNC_INFO);
-                }
-                db.close();
-            } else {
-                showDbNotOpenError(this,db,Q_FUNC_INFO);
-            }
+        for (const auto &entry : list) {
+
+            // Display text for the user
+            QString displayText = entry.label + " (" + entry.key + ")";
+
+            // Add to combo box, storing the REAL key in item data
+            ui->comboBoxLogin->addItem(displayText, entry.key);
         }
-        QSqlDatabase::removeDatabase(connectionName);
+
+        if (ui->comboBoxLogin->count() > 0) {
+            ui->comboBoxLogin->setCurrentIndex(0);
+            generateChallenge();
+        }
+    }
+
+
+
 
     disconnect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     disconnect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -236,7 +226,7 @@ void LoginDialog::generateChallenge()
 
     responseHash = QCryptographicHash::hash(responseBytes, QCryptographicHash::Sha512);
 
-    const QString recipient = keys.value(ui->comboBoxLogin->currentText());
+    const QString recipient = ui->comboBoxLogin->currentData().toString();
     QProcess *process = new QProcess(this);
 
     connect(process, &QProcess::readyReadStandardOutput, this, [=]() {

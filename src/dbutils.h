@@ -21,11 +21,17 @@
 #ifndef DBUTILS_H
 #define DBUTILS_H
 
+#include "dataobfuscator.h"
+#include "keyentry.h"
+
 #include <QApplication>
+#include <QList>
 #include <QMessageBox>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <quuid.h>
+
 
 inline void showDbNotOpenError(const QWidget *parent,
                                const QSqlDatabase &db,
@@ -100,5 +106,52 @@ inline bool isKeyExported(const QWidget *parent, const QSqlDatabase &db)
     return (value == "exported");
 }
 
+
+namespace DbUtils {
+
+inline QList<KeyEntry> fetchKeys(QWidget *errorParent)
+{
+    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QList<KeyEntry> keys;
+
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connName);
+        db.setDatabaseName(qApp->property("dbFile").toString());
+
+        if (db.open()) {
+
+            QSqlQuery query(db);
+            query.setForwardOnly(true);
+
+            if (query.exec("SELECT id, label, key FROM keys")) {
+
+                while (query.next()) {
+                    KeyEntry entry;
+                    entry.id    = query.value(0).toInt();
+                    entry.label = DataObfuscator::deobfuscate(
+                        query.value(1).toString(),
+                        qApp->property("appKey").toByteArray()
+                        );
+                    entry.key   = DataObfuscator::deobfuscate(
+                        query.value(2).toString(),
+                        qApp->property("appKey").toByteArray()
+                        );
+                    keys.append(entry);
+                }
+
+            } else {
+                showQueryError(errorParent, query, Q_FUNC_INFO);
+            }
+
+        } else {
+            showDbNotOpenError(errorParent, db, Q_FUNC_INFO);
+        }
+    }
+
+    QSqlDatabase::removeDatabase(connName);
+    return keys;
+}
+
+} // namespace DbUtils
 
 #endif // DBUTILS_H

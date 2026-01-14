@@ -1217,7 +1217,7 @@ void MainWindow::newPassword()
     NewPasswordDialog dlg(this);
     dlg.setWindowTitle(ui->actionNew_Password->text());
 
-    QList<KeyEntry> keys = fetchKeys();
+    QList<KeyEntry> keys = DbUtils::fetchKeys(this);
     dlg.setKeys(keys);
 
     if (dlg.exec() == QDialog::Accepted) {
@@ -1368,40 +1368,6 @@ void MainWindow::newPassword()
         }
         QSqlDatabase::removeDatabase("sqlNewPassword");
     }
-}
-
-
-QList<KeyEntry> MainWindow::fetchKeys() const
-{
-    QString connName = QUuid::createUuid().toString(QUuid::WithoutBraces);
-    QList<KeyEntry> keys;
-    {
-        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE",connName);
-        db.setDatabaseName(qApp->property("dbFile").toString());
-        if (db.open())
-        {
-            QSqlQuery query(db);
-            query.setForwardOnly(true);
-            if (query.exec("SELECT id, label, key FROM keys"))
-            {
-            while (query.next()) {
-                KeyEntry entry;
-                entry.id    = query.value(0).toInt();
-                entry.label = DataObfuscator::deobfuscate(query.value(1).toString(),qApp->property("appKey").toByteArray());
-                entry.key   = DataObfuscator::deobfuscate(query.value(2).toString(),qApp->property("appKey").toByteArray());
-                keys.append(entry);
-            }
-            } else
-            {
-                showQueryError(this,query,Q_FUNC_INFO);
-            }
-        } else
-        {
-            showDbNotOpenError(this, db, Q_FUNC_INFO);
-        }
-    }
-    QSqlDatabase::removeDatabase(connName);
-    return keys;
 }
 
 void MainWindow::openCategory(QTreeWidgetItem *item, int column)
@@ -4815,7 +4781,7 @@ void MainWindow::initDbMetadata()
 
 void MainWindow::checkGpgKeys()
 {
-    if (!fetchKeys().isEmpty())
+    if (!DbUtils::fetchKeys(this).isEmpty())
         return;
 
     qWarning().noquote() << "No GPG Keys have been linked.";
@@ -5388,7 +5354,7 @@ void MainWindow::editPassword(QTreeWidgetItem *item)
             NewPasswordDialog dlg(this);
             dlg.setWindowTitle("Edit Password");
 
-            QList<KeyEntry> keys = fetchKeys();
+            QList<KeyEntry> keys = DbUtils::fetchKeys(this);
             dlg.setKeys(keys);
 
             dlg.AppName       = obj.value("private_name").toString();
@@ -5854,7 +5820,7 @@ void MainWindow::importApplicationsFromFile(const QString &filePath)
     QJsonArray items = doc.isArray() ? doc.array() : QJsonArray{ doc.object() };
 
     // 3) Prompt for keys dynamically
-    QList<KeyEntry> keys = fetchKeys();
+    QList<KeyEntry> keys = DbUtils::fetchKeys(this);
     if (keys.isEmpty()) {
         QMessageBox::critical(this, tr("Import Error"),
                               tr("No encryption keys available."));

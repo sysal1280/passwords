@@ -63,7 +63,6 @@ public:
 
     // Utility functions
     static QByteArray base32Decode(const QString &base32);
-    QList<KeyEntry> fetchKeys() const;
 
     QString userName;
     QByteArray appKey = "";
