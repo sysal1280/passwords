@@ -74,6 +74,8 @@ public:
      bool openCategoryDblClick();
      void setExportedKey();
      void deleteSection(const QString &section);
+     QString getShellCommand() const;
+     QString getShellArguments() const;
 
 private:
     QString configDir;

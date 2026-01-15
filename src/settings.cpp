@@ -28,6 +28,8 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QProcess>
+#include <QStringList>
 #include <QSqlError>
 #include <QSqlQuery>
 
@@ -655,4 +657,28 @@ void Settings::deleteSection(const QString &section)
 
         settings->remove(section);
     }
+}
+
+QString Settings::getShellCommand() const
+{
+    if (!settings)
+        return QString();
+
+    settings->beginGroup("Main");
+    QString cmd = settings->value("ShellCommand").toString();
+    settings->endGroup();   // ← important
+    qDebug() << cmd;
+    return cmd;
+}
+
+QString Settings::getShellArguments() const
+{
+    if (!settings)
+        return QString();
+
+    settings->beginGroup("Main");
+    QString args = settings->value("ShellArguments").toString(); // or "ShellCommand" for your test
+    settings->endGroup();   // ← important
+    qDebug() << args;
+    return args;
 }

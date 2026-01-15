@@ -54,6 +54,15 @@ LoginDialog::LoginDialog(QWidget *parent)
     okButton->setEnabled(false);
     okButton->setDefault(true);
 
+    QPushButton *shellButton = new QPushButton(tr("Shell"), this);
+    shellButton->setIcon(QIcon(":/menus/glyphs/terminal_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+    ui->buttonBox->addButton(shellButton, QDialogButtonBox::ActionRole);
+
+    {
+        Settings settings;
+        shellButton->setEnabled(!settings.getShellCommand().isEmpty());
+    }
+
     {
         auto list = DbUtils::fetchKeys(this);
 
@@ -103,6 +112,23 @@ LoginDialog::LoginDialog(QWidget *parent)
                     }
                 });
             });
+
+
+    connect(shellButton, &QPushButton::clicked, this, [this]() {
+        Settings settings;
+
+        QString program = settings.getShellCommand();
+        QString argString = settings.getShellArguments();
+        QStringList args = QProcess::splitCommand(argString);
+
+        if (program.isEmpty()) {
+            QMessageBox::warning(this, tr("Shell Error"),
+                                 tr("No shell command configured in settings."));
+            return;
+        }
+
+        QProcess::startDetached(program, args);
+    });
 
     connect(ui->comboBoxLogin, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this](int index) {
