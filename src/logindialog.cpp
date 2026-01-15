@@ -21,7 +21,6 @@
 #include "logindialog.h"
 #include "ui_logindialog.h"
 
-#include "dataobfuscator.h"
 #include "dbutils.h"
 #include "dbutils.h"
 #include "settings.h"
@@ -56,9 +55,10 @@ LoginDialog::LoginDialog(QWidget *parent)
         auto list = DbUtils::fetchKeys(this);
 
         ui->comboBoxLogin->clear();
-        keys.clear();   // You can delete this map entirely later
+        keys.clear();
 
-        for (const auto &entry : list) {
+        for (int i = 0; i < list.size(); ++i) {
+            const KeyEntry &entry = list.at(i);
 
             // Display text for the user
             QString displayText = entry.label + " (" + entry.key + ")";
@@ -72,8 +72,6 @@ LoginDialog::LoginDialog(QWidget *parent)
             generateChallenge();
         }
     }
-
-
 
 
     disconnect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
@@ -207,13 +205,22 @@ void LoginDialog::generateChallenge()
 
         if (chosen.isEmpty()) {
             QString fallback;
-            static const QString chars = QStringLiteral("ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789");
-            for (int i = 0; i < 16; ++i) {
+
+            static const QString chars =
+                QStringLiteral("ABCDEFGHJKMNPQRSTUVWXYZ"
+                               "abcdefghjkmnpqrstuvwxyz"
+                               "23456789"
+                               "@!$&");
+
+            for (int i = 0; i < 28; ++i) {
                 const int r = QRandomGenerator::global()->bounded(chars.size());
                 fallback.append(chars.at(r));
-                if ((i + 1) % 4 == 0 && i != 15)
+
+                // Insert hyphens every 4 characters (except at the end)
+                if ((i % 4) == 3 && i != 27)
                     fallback.append('-');
             }
+
             chosen << fallback;
         }
 

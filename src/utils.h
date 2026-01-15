@@ -229,24 +229,9 @@ inline bool localHelpAvailable()
 {
     const QString appDir = QCoreApplication::applicationDirPath();
 
-    qDebug().noquote() << "=== localHelpAvailable() DEBUG ===";
-    qDebug().noquote() << "appDir =" << appDir;
-
     const QString exe1 = appDir + "/pwdhlp";
     const QString exe2 = appDir + "/pwdhlp.exe";
     const QString rcc  = appDir + "/pwdhlp.rcc";
-
-    qDebug().noquote() << "Checking:" << exe1 << "exists =" << QFile::exists(exe1);
-    qDebug().noquote() << "Checking:" << exe2 << "exists =" << QFile::exists(exe2);
-    qDebug().noquote() << "Checking:" << rcc  << "exists =" << QFile::exists(rcc);
-
-    // List all files in the directory so we can SEE what's actually there
-    QDir d(appDir);
-    qDebug().noquote() << "Files in appDir:";
-    for (const QString &f : d.entryList(QDir::Files))
-        qDebug().noquote() << " -" << f;
-
-    qDebug().noquote() << "===================================";
 
     return ((QFile::exists(exe1) || QFile::exists(exe2))
             && QFile::exists(rcc));
