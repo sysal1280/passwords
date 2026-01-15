@@ -192,8 +192,8 @@ void LoginDialog::generateChallenge()
     {
         QStringList chosen;
 
-        if (words.size() >= 3) {
-            for (int i = 0; i < 3; ++i) {
+        if (words.size() >= settings.getGeneratedPasswordLength()) {
+            for (int i = 0; i < settings.getGeneratedPasswordLength(); ++i) {
                 const int r = QRandomGenerator::global()->bounded(words.size());
                 QString word = words.at(r);
                 if (!word.isEmpty())
