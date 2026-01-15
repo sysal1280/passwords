@@ -35,6 +35,7 @@ TermsDialog::TermsDialog(const QString &termsText, QWidget *parent)
     resize(600, 400);
 
     m_textEdit = new QTextEdit(this);
+    m_textEdit->setObjectName("textEditTerms");
     m_textEdit->setReadOnly(true);
     m_textEdit->setPlainText(termsText);
 

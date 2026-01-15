@@ -548,6 +548,23 @@ QLabel#labelPasswordInspector:hover {
 
 
 /* ============================================================
+   CHALLENGE COMBOBOX, CHOOSE KEY (CHALLENGE RESPONSE DIALOG)
+   ============================================================ */
+   
+QComboBox#comboBoxLogin {
+
+}
+
+
+/* ============================================================
+   CHALLENGE TEXTEDIT (CHALLENGE RESPONSE DIALOG)
+   ============================================================ */
+      
+QTextEdit#textEditChallenge {
+
+}
+
+/* ============================================================
    RESPONSE LINEEDIT (CHALLENGE RESPONSE DIALOG)
    ============================================================ */
    
@@ -573,4 +590,14 @@ QLineEdit#lineEditChallengeResponse:disabled {
     color: #9e9e9e;
     border: 2px solid #d0d0d0;
 }
+
+
+/* ============================================================
+   TERMS TEXTEDIT (TERMS DIALOG)
+   ============================================================ */
+   
+QTextEdit#textEditTerms {
+
+}
+
 

@@ -61,7 +61,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QTextEdit" name="textEdit">
+       <widget class="QTextEdit" name="textEditChallenge">
         <property name="lineWrapMode">
          <enum>QTextEdit::LineWrapMode::WidgetWidth</enum>
         </property>
@@ -78,7 +78,7 @@
  <tabstops>
   <tabstop>lineEditChallengeResponse</tabstop>
   <tabstop>comboBoxLogin</tabstop>
-  <tabstop>textEdit</tabstop>
+  <tabstop>textEditChallenge</tabstop>
  </tabstops>
  <resources/>
  <connections>

@@ -45,7 +45,7 @@ LoginDialog::LoginDialog(QWidget *parent)
     ui->setupUi(this);
 
     this->setWindowTitle(tr("Challenge"));
-    ui->textEdit->setReadOnly(true);
+    ui->textEditChallenge->setReadOnly(true);
 
     QPushButton *okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     okButton->setEnabled(false);
@@ -124,9 +124,9 @@ LoginDialog::LoginDialog(QWidget *parent)
             });
 
     // Hook up textEdit's textChanged signal
-    connect(ui->textEdit, &QTextEdit::textChanged,
+    connect(ui->textEditChallenge, &QTextEdit::textChanged,
             this, [this]() {
-                ui->textEdit->selectAll();
+                ui->textEditChallenge->selectAll();
                 ui->lineEditChallengeResponse->setFocus();
             });
 
@@ -147,8 +147,8 @@ LoginDialog::~LoginDialog()
 void LoginDialog::generateChallenge()
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    ui->textEdit->clear();
-    ui->textEdit->setPlaceholderText(tr("Loading challenge.."));
+    ui->textEditChallenge->clear();
+    ui->textEditChallenge->setPlaceholderText(tr("Loading challenge.."));
 
     Settings settings;
     QString configFile = settings.configFilePath();
@@ -239,7 +239,7 @@ void LoginDialog::generateChallenge()
 
     connect(process, &QProcess::readyReadStandardOutput, this, [=]() {
         QString text = QString::fromUtf8(process->readAllStandardOutput());
-        ui->textEdit->setText(text);
+        ui->textEditChallenge->setText(text);
 
         // Copy to clipboard right after setting the text
         QApplication::clipboard()->setText(text, QClipboard::Clipboard);
@@ -311,7 +311,7 @@ bool LoginDialog::hasKeys() const {
 
 void LoginDialog::showEvent(QShowEvent *event) {
     QDialog::showEvent(event);
-    if (!ui->textEdit->toPlainText().isEmpty()) {
-        QApplication::clipboard()->setText(ui->textEdit->toPlainText(), QClipboard::Clipboard);
+    if (!ui->textEditChallenge->toPlainText().isEmpty()) {
+        QApplication::clipboard()->setText(ui->textEditChallenge->toPlainText(), QClipboard::Clipboard);
     }
 }
