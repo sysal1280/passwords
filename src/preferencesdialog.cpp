@@ -31,6 +31,7 @@
 #include <QComboBox>
 #include <QDebug>
 #include <QDesktopServices>
+#include <QFileDialog>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QResizeEvent>
@@ -95,6 +96,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
         qCritical().noquote() << Q_FUNC_INFO << "Failed to unregister " << wordListPath;
     }
 
+    ui->lineEditShellProgram->setReadOnly(true);
 
     ui->labelOrchadStreetWords->clear();
     ui->labelOrchadStreetWords->setObjectName("labelOrchadStreetWords");
@@ -141,6 +143,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     widgetMap.insert("Passwords/KillGPGAgentOnExit", ui->checkBoxKillGPGAgentExit);
     widgetMap.insert("Main/MaxBackups", ui->spinBoxMaxBackups);
     widgetMap.insert("Categories/DoubleClickOpen", ui->checkBoxDblClickCategories);
+    widgetMap.insert("Main/ShellCommand", ui->lineEditShellProgram);
+    widgetMap.insert("Main/ShellArguments", ui->lineEditShellArguments);
 
     auto removeGroupBox = [this]() {
         // Write the flag immediately
@@ -191,6 +195,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 
     connect(ui->pushButton, &QPushButton::clicked,
             this, &PreferencesDialog::openBackupDir);
+
+    connect(ui->pushButtonBrowseShell, &QPushButton::clicked, this, [this]() {
+        browseForExecutable();
+    });
 
     connect(ui->buttonBox->button(QDialogButtonBox::Help),
             &QPushButton::clicked,
@@ -588,4 +596,32 @@ void PreferencesDialog::onBackupCheckStateChanged(int state)
             ui->groupBox->setChecked(true);
         }
     }
+}
+
+void PreferencesDialog::browseForExecutable()
+{
+    QString filter;
+
+#if defined(Q_OS_WIN)
+    filter = tr("Executables (*.exe *.bat *.cmd);;All Files (*)");
+#elif defined(Q_OS_MAC)
+    // macOS apps are bundles, but executables still live inside
+    filter = tr("Applications (*.app);;All Files (*)");
+#else
+    // Linux/Unix: no standard extension, so show everything
+    filter = tr("All Files (*)");
+#endif
+
+    QString file = QFileDialog::getOpenFileName(
+        this,
+        tr("Select Shell Program"),
+        QString(),
+        filter
+        );
+
+    if (file.isEmpty())
+        return;
+
+    // Update UI
+    ui->lineEditShellProgram->setText(file);
 }

@@ -52,6 +52,7 @@ private:
     void onBackupCheckStateChanged(int state);
     void openBackupDir();
     void restartApplication();
+    void browseForExecutable();
     Settings settings;
 
     bool restartRequired = false;

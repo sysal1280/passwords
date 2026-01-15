@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>444</width>
-    <height>517</height>
+    <height>526</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -32,10 +32,10 @@
             <string>Access and confirmation</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_4">
-            <item row="0" column="0">
-             <widget class="QCheckBox" name="checkBoxRequireChallenge">
+            <item row="3" column="0">
+             <widget class="QCheckBox" name="checkBoxDblClickCategories">
               <property name="text">
-               <string>Require Challenge before login</string>
+               <string>Require Double Click to open Categories</string>
               </property>
              </widget>
             </item>
@@ -46,10 +46,17 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QCheckBox" name="checkBoxDblClickCategories">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="checkBoxRequireChallenge">
               <property name="text">
-               <string>Require Double Click to open Categories</string>
+               <string>Require Challenge before login</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QCheckBox" name="checkboxDragDropPrompt">
+              <property name="text">
+               <string>Prompt on Drag and Drop</string>
               </property>
              </widget>
             </item>
@@ -128,10 +135,43 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkboxDragDropPrompt">
-           <property name="text">
-            <string>Prompt on Drag and Drop</string>
+          <widget class="QGroupBox" name="groupBox_11">
+           <property name="title">
+            <string>Shell</string>
            </property>
+           <layout class="QGridLayout" name="gridLayout_20">
+            <item row="0" column="0">
+             <layout class="QGridLayout" name="gridLayout_19">
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_14">
+                <property name="text">
+                 <string>Arguments</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineEditShellProgram"/>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string>Program</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QPushButton" name="pushButtonBrowseShell">
+                <property name="text">
+                 <string>Browse..</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" colspan="2">
+               <widget class="QLineEdit" name="lineEditShellArguments"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
