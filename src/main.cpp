@@ -328,6 +328,8 @@ int main(int argc, char *argv[])
 
             QApplication::restoreOverrideCursor();
             LoginDialog login(nullptr);
+            login.adjustSize();
+            login.resize(600,login.height());
             login.setModal(true);
 
             if (login.hasKeys() && login.exec() != QDialog::Accepted) {

@@ -32,6 +32,7 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <QPushButton>
+#include <QScrollBar>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -46,6 +47,8 @@ LoginDialog::LoginDialog(QWidget *parent)
 
     this->setWindowTitle(tr("Challenge"));
     ui->textEditChallenge->setReadOnly(true);
+    ui->textEditChallenge->setLineWrapMode(QTextEdit::NoWrap);
+    ui->textEditChallenge->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     QPushButton *okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     okButton->setEnabled(false);
@@ -240,6 +243,8 @@ void LoginDialog::generateChallenge()
     connect(process, &QProcess::readyReadStandardOutput, this, [=]() {
         QString text = QString::fromUtf8(process->readAllStandardOutput());
         ui->textEditChallenge->setText(text);
+        ui->textEditChallenge->moveCursor(QTextCursor::Start);
+        ui->textEditChallenge->verticalScrollBar()->setValue(0);
 
         // Copy to clipboard right after setting the text
         QApplication::clipboard()->setText(text, QClipboard::Clipboard);
