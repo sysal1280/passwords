@@ -420,14 +420,16 @@ void NewPasswordDialog::setKeys(const QList<KeyEntry> &keys)
     ui->listWidget->clear();
 
     for (const auto &entry : keys) {
-        // Show both label and key in the text
-        QString displayText = entry.label + " (" + entry.key + ")";
-        QListWidgetItem *item = new QListWidgetItem(displayText);
 
-        // Add a checkbox
+        // Compact version: avoid repeating the same text twice
+        const QString displayText =
+            (entry.label == entry.key)
+                ? entry.label
+                : entry.label + " (" + entry.key + ")";
+
+        auto *item = new QListWidgetItem(displayText);
+
         item->setCheckState(Qt::Unchecked);
-
-        // Store the actual key in item data for easy retrieval later
         item->setData(Qt::UserRole, entry.key);
 
         ui->listWidget->addItem(item);

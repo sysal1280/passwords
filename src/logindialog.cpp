@@ -60,10 +60,12 @@ LoginDialog::LoginDialog(QWidget *parent)
         for (int i = 0; i < list.size(); ++i) {
             const KeyEntry &entry = list.at(i);
 
-            // Display text for the user
-            QString displayText = entry.label + " (" + entry.key + ")";
+            // Avoid showing duplicate text when label == key
+            const QString displayText =
+                (entry.label == entry.key)
+                    ? entry.label
+                    : entry.label + " (" + entry.key + ")";
 
-            // Add to combo box, storing the REAL key in item data
             ui->comboBoxLogin->addItem(displayText, entry.key);
         }
 
@@ -72,7 +74,6 @@ LoginDialog::LoginDialog(QWidget *parent)
             generateChallenge();
         }
     }
-
 
     disconnect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     disconnect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);

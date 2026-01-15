@@ -159,8 +159,8 @@ bool DatabaseUpgrader::upgrade_1_to_2(QString &error)
             return false;
         }
 
-        // Remove ALL whitespace
-        keyText.remove(QRegularExpression("\\s+"));
+        static const QRegularExpression whitespaceRe("\\s+");
+        keyText.remove(whitespaceRe);
 
         // Decode Base64 → raw hex string
         raw = QByteArray::fromBase64(keyText.toUtf8());
