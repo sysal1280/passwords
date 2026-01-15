@@ -442,7 +442,7 @@
   </action>
   <action name="actionRandom_Noise">
    <property name="text">
-    <string>Random Noise</string>
+    <string>Generate Random Noise</string>
    </property>
    <property name="shortcut">
     <string>F6</string>

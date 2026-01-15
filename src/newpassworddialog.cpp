@@ -198,7 +198,7 @@ NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     connect(optB, &QAction::triggered,
             this,
             [this]() {
-                RandomNoiseDialog::showRandomNoiseGenerator(this);
+                RandomNoiseDialog::showRandomNoiseGenerator(this, tr("Generate Random Noise"));
             });
 
     connect(ui->toolButton, &QToolButton::clicked,

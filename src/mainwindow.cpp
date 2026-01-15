@@ -490,7 +490,7 @@ MainWindow::MainWindow(QWidget *parent)
             &QAction::triggered,
             this,
             [this]() {
-                RandomNoiseDialog::showRandomNoiseGenerator(this);
+                RandomNoiseDialog::showRandomNoiseGenerator(this, ui->actionRandom_Noise->text());
             });
 
     //encrypt file
