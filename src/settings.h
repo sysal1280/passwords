@@ -17,7 +17,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
@@ -31,63 +30,77 @@
 #include <QString>
 #include <QWidget>
 
-/**
- * @brief Settings class wraps QSettings to store/retrieve application preferences.
- *
- * The settings are stored in an INI file named "passwords.conf"
- * inside the writable AppConfigLocation directory.
- */
+
 class Settings
 {
 public:
     Settings();
 
-    // Example getters/setters
-     QString configFilePath();
+    // Core configuration paths
+    QString configFilePath() const;
+    QString getDefaultDbPath(QWidget *parent) const;
+    QString getWordListFile() const;
+    QString getPathSeparator() const;
 
+    // Last used file
     void setLastUsedFile(const QString &filePath);
-     QString getLastUsedFile();
-     int getGeneratedPasswordLength();
-     void setGeneratedPasswordLength(int i);
-     QString getDefaultDbPath(QWidget* parent);
-     bool getBackupDatabase();
-     bool getKillGpgAgent(const QString &key = "KillGPGAgent");
-     bool getLoginPreference();
-     bool getAskClose();
-     void saveMainWindowState(QMainWindow *window);
-     void restoreMainWindowState(QMainWindow *window);
-     int getAutoCloseSeconds();
-     int getMaxRecentResults();
-     int getMaxPopularResults();
-     QString getPathSeparator() const;
-     bool getDragDropPrompt();
-     QString getWordListFile();
-     bool getCloseHelpServer();
-     bool getDebugMode();
-     void saveSplitterState(QSplitter *splitter, const QString &name);
-     void restoreSplitterState(QSplitter *splitter, const QString &name);
-     bool createUserDesktopFile();
-     bool verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent);
-     int getHelpPort();
-     QLineEdit::EchoMode getEchoMode();
-     int getMaxBackups();
-     bool openCategoryDblClick();
-     void deleteSection(const QString &section);
-     QString getShellCommand() const;
-     QString getShellArguments() const;
-     bool closeOnCopy();
-     void setRandomNoiseLength(int length);
-     int getRandomNoiseLength();
-     void setRandomNoiseOption(int index);
-     int getRandomNoiseOption();
+    QString getLastUsedFile() const;
+
+    // Generated password settings
+    int getGeneratedPasswordLength() const;
+    void setGeneratedPasswordLength(int i);
+
+    // Random noise settings
+    void setRandomNoiseLength(int length);
+    int getRandomNoiseLength() const;
+    void setRandomNoiseOption(int index);
+    int getRandomNoiseOption() const;
+
+    // Boolean preferences
+    bool getBackupDatabase() const;
+    bool getKillGpgAgent(const QString &key = "KillGPGAgent") const;
+    bool getLoginPreference() const;
+    bool getAskClose() const;
+    bool getDragDropPrompt() const;
+    bool getCloseHelpServer() const;
+    bool getDebugMode() const;
+    bool closeOnCopy() const;
+    bool openCategoryDblClick() const;
+
+    // Numeric preferences
+    int getAutoCloseSeconds() const;
+    int getMaxRecentResults() const;
+    int getMaxPopularResults() const;
+    int getMaxBackups() const;
+    int getHelpPort() const;
+
+    // Echo mode
+    QLineEdit::EchoMode getEchoMode() const;
+
+    // Shell command configuration
+    QString getShellCommand() const;
+    QString getShellArguments() const;
+
+    // UI state management
+    void saveMainWindowState(QMainWindow *window);
+    void restoreMainWindowState(QMainWindow *window);
+    void saveSplitterState(QSplitter *splitter, const QString &name);
+    void restoreSplitterState(QSplitter *splitter, const QString &name);
+
+    // Database-related
+    bool verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent);
+
+    // Miscellaneous
+    bool createUserDesktopFile();
+    void deleteSection(const QString &section);
 
 private:
     QString configDir;
     QString configFile;
     std::unique_ptr<QSettings> settings;
 
-     static constexpr const char* CONFIG_FILENAME = "passwords.conf";
-     static constexpr const char* WORDLIST_FILENAME = "wordlist.rcc";
+    static constexpr const char* CONFIG_FILENAME = "passwords.conf";
+    static constexpr const char* WORDLIST_FILENAME = "wordlist.rcc";
 };
 
 #endif // SETTINGS_H
