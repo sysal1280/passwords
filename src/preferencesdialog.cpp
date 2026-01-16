@@ -183,6 +183,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     ui->spinBoxAutoClose->setRange(0,600);
 
     loadSettings();
+
     connect(ui->buttonBox, &QDialogButtonBox::accepted,
             this, &PreferencesDialog::saveSettings);
     connect(ui->buttonBox, &QDialogButtonBox::clicked,
