@@ -145,6 +145,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     widgetMap.insert("Categories/DoubleClickOpen", ui->checkBoxDblClickCategories);
     widgetMap.insert("Main/ShellCommand", ui->lineEditShellProgram);
     widgetMap.insert("Main/ShellArguments", ui->lineEditShellArguments);
+    widgetMap.insert("Passwords/CloseOnCopy", ui->checkBoxCloseOnCopy);
 
     auto removeGroupBox = [this]() {
         // Write the flag immediately

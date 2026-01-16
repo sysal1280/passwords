@@ -19,6 +19,7 @@
 
 
 #include "randomnoisedialog.h"
+#include "settings.h"
 
 #include <QApplication>
 #include <QByteArray>
@@ -189,6 +190,13 @@ void showRandomNoiseGenerator(QWidget *parent, const QString &title)
 
                          if (auto *mw = qobject_cast<QMainWindow*>(p)) {
                              mw->statusBar()->showMessage("Copied to clipboard", 3000);
+                         }
+
+                         //optional close on cpy.
+                         Settings settings;
+                         if (settings.closeOnCopy())
+                         {
+                             dlg.accept();
                          }
                      });
 

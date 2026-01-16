@@ -423,7 +423,7 @@ void showPasswordGenerator(QWidget *parent,
 
     QObject::connect(copyBtn, &QPushButton::clicked,
                      &dlg,
-                     [passwordEdit, parent] {
+                     [passwordEdit, parent, &dlg] {
                          QApplication::clipboard()->setText(passwordEdit->text());
 
                          QWidget *p = parent;
@@ -432,6 +432,12 @@ void showPasswordGenerator(QWidget *parent,
 
                          if (auto *mw = qobject_cast<QMainWindow*>(p))
                              mw->statusBar()->showMessage("Copied to clipboard", 3000);
+                         //optional close on cpy.
+                         Settings settings;
+                         if (settings.closeOnCopy())
+                             {
+                             dlg.accept();
+                         }
                      });
 
     QObject::connect(inspectBtn, &QPushButton::clicked,

@@ -76,6 +76,7 @@ public:
      void deleteSection(const QString &section);
      QString getShellCommand() const;
      QString getShellArguments() const;
+     bool closeOnCopy();
 
 private:
     QString configDir;

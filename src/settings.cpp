@@ -235,6 +235,23 @@ bool Settings::getKillGpgAgent(const QString &key)
     return truthy.contains(val);
 }
 
+bool Settings::closeOnCopy()
+{
+    if (!settings)
+        return true;
+
+    settings->beginGroup("Passwords");
+    QString val = settings->value("CloseOnCopy", "no")
+                      .toString()
+                      .trimmed()
+                      .toLower();
+    settings->endGroup();
+
+    static const QSet<QString> truthy = {"1", "true", "yes", "on"};
+    return truthy.contains(val);
+}
+
+
 int Settings::getGeneratedPasswordLength()
 {
     if (!settings)
