@@ -3,7 +3,7 @@
 
   <Program>
     <Name>Passwords</Name>
-    <Version>1.2.1</Version>
+    <Version>2.0.1</Version>
     <ReleaseStatus>Freeware</ReleaseStatus>
     <License>Open Source</License>
     <LicenseText>GNU General Public License v3.0</LicenseText>
@@ -23,10 +23,10 @@
   </Company>
 
   <Download>
-    <PrimaryURL>https://github.com/sysal1280/passwords/releases/latest/download/Passwords-x86_64.exe</PrimaryURL>
+    <PrimaryURL>https://github.com/sysal1280/passwords/releases/download/2.0.1/Passwords-2.0.1_Windows-X86-64.exe</PrimaryURL>
 
     <FileInfo>
-      <FileName>Passwords-x86_64.exe</FileName>
+      <FileName>Passwords-2.0.1_Windows-X86-64.exe</FileName>
       <FileSizeBytes>57963644</FileSizeBytes>
       <SHA256>339c9b6c49ea738cb5389c1e31881529ffc02a32ec488f7ec60ba891c32ca8e9</SHA256>
       <SHA512>645fbdbb6327a7bfeb831b52e7754cc58c00e63c53fcb4147de7eb06e414979e2036383daacb3fa38ba46d4847fdba7da7861db6103f830918f0138e90bbc003</SHA512>
@@ -58,8 +58,8 @@
   </Media>
 
   <ReleaseInfo>
-    <ReleaseDate>2025-01-08</ReleaseDate>
-    <Changes>Initial PAD v4.0 entry for version 1.2.1</Changes>
+    <ReleaseDate>2025-01-16</ReleaseDate>
+    <Changes>Initial PAD v4.0 entry for version 2.0.1</Changes>
   </ReleaseInfo>
 
 </Application>
