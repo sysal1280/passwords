@@ -20,7 +20,6 @@
 
 #include "categoryproperties.h"
 #include "dataobfuscator.h"
-#include "mainwindow.h"
 #include "scopedcursor.h"
 #include "utils.h"
 
