@@ -50,6 +50,8 @@ LoginDialog::LoginDialog(QWidget *parent)
     ui->textEditChallenge->setLineWrapMode(QTextEdit::NoWrap);
     ui->textEditChallenge->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+    ui->lineEditChallengeResponse->setMaxLength(256);
+
     QPushButton *okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     okButton->setEnabled(false);
     okButton->setDefault(true);
@@ -137,6 +139,9 @@ LoginDialog::LoginDialog(QWidget *parent)
                 }
             });
 
+    connect(ui->lineEditChallengeResponse, &QLineEdit::returnPressed,
+            ui->buttonBox->button(QDialogButtonBox::Ok), &QPushButton::click);
+
     connect(ui->buttonBox->button(QDialogButtonBox::Ok), &QPushButton::clicked,
             this, [this]() {
                 tryResponse();
@@ -152,13 +157,11 @@ LoginDialog::LoginDialog(QWidget *parent)
                 okButton->setEnabled(!text.trimmed().isEmpty());
             });
 
-    // Hook up textEdit's textChanged signal
     connect(ui->textEditChallenge, &QTextEdit::textChanged,
             this, [this]() {
                 ui->textEditChallenge->selectAll();
                 ui->lineEditChallengeResponse->setFocus();
             });
-
 
     QIcon responseIcon(":/menus/glyphs/admin_panel_settings_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg");
     QAction *responseAction = ui->lineEditChallengeResponse->addAction(
