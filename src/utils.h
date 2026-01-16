@@ -141,7 +141,7 @@ inline void setupDebugWarnings(QWidget *parent, QStatusBar *statusBar)
     };
 
     QObject::connect(debugTimer, &QTimer::timeout, parent, showDebugMessage);
-    QTimer::singleShot(10000, parent, showDebugMessage);
+    QTimer::singleShot(60000, parent, showDebugMessage);
 
     // Start the 5‑minute cycle
     debugTimer->start(5 * 60 * 1000); // 5 minutes
