@@ -92,7 +92,7 @@ jobs:
           echo 'ArchitecturesAllowed=x64compatible' >> installer.iss
           echo 'ArchitecturesInstallIn64BitMode=x64compatible' >> installer.iss
           echo 'DisableProgramGroupPage=yes' >> installer.iss
-          echo 'PrivilegesRequiredOverridesAllowed=dialog' >> installer.iss
+          echo 'PrivilegesRequired=admin' >> installer.iss
           echo 'OutputBaseFilename=Passwords-x86_64-{#MyAppVersion}' >> installer.iss
           echo 'SolidCompression=yes' >> installer.iss
           echo 'WizardStyle=modern dynamic' >> installer.iss
