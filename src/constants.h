@@ -24,7 +24,7 @@
 namespace Passwords {
 inline constexpr auto Name           = "Passwords";
 inline constexpr auto Organization   = "sysal1280";
-inline constexpr auto Version        = "2.2.2";
+inline constexpr auto Version        = "2.3.0";
 inline constexpr auto Icon           = ":/password.png";
 
 inline constexpr int SBTransientMessageTime = 5000;

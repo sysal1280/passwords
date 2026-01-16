@@ -109,6 +109,44 @@ void Settings::setLastUsedFile(const QString &filePath)
     settings->sync();
 }
 
+void Settings::setRandomNoiseOption(int index)
+{
+    if (!settings)
+        return;
+
+    settings->beginGroup("Main");
+    settings->setValue("LastRandomNoise", index);
+    settings->endGroup();
+}
+
+int Settings::getRandomNoiseOption()
+{
+    if (!settings)
+        return 0;
+
+    settings->beginGroup("Main");
+    return settings->value("LastRandomNoise", 0).toInt();
+}
+
+void Settings::setRandomNoiseLength(int length)
+{
+    if (!settings)
+        return;
+
+    settings->beginGroup("Main");
+    settings->setValue("LastRandomNoiseLength", length);
+    settings->endGroup();
+}
+
+int Settings::getRandomNoiseLength()
+{
+    if (!settings)
+        return 0;
+
+    settings->beginGroup("Main");
+    return settings->value("LastRandomNoiseLength", 32).toInt();
+}
+
 QString Settings::getLastUsedFile()
 {
     if (!settings)

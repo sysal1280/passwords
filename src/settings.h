@@ -76,6 +76,10 @@ public:
      QString getShellCommand() const;
      QString getShellArguments() const;
      bool closeOnCopy();
+     void setRandomNoiseLength(int length);
+     int getRandomNoiseLength();
+     void setRandomNoiseOption(int index);
+     int getRandomNoiseOption();
 
 private:
     QString configDir;

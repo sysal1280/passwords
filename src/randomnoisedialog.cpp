@@ -118,14 +118,23 @@ void showRandomNoiseGenerator(QWidget *parent, const QString &title)
     QLabel *lenLabel = new QLabel("Length:", &dlg);
     QSpinBox *lenSpin = new QSpinBox(&dlg);
     lenSpin->setRange(4, 4096);
-    lenSpin->setValue(32);
     lenSpin->setSuffix(" bytes");
+
+    {
+        Settings settings;
+        lenSpin->setValue(settings.getRandomNoiseLength());
+    }
 
     QLabel *formatLabel = new QLabel("Format:", &dlg);
     QComboBox *formatCombo = new QComboBox(&dlg);
     formatCombo->addItem("Base64");
     formatCombo->addItem("Hex");
     formatCombo->addItem("ASCII printable");
+
+    {
+        Settings settings;
+        formatCombo->setCurrentIndex(settings.getRandomNoiseOption());
+    }
 
     controlLayout->addWidget(lenLabel);
     controlLayout->addWidget(lenSpin);
@@ -176,10 +185,20 @@ void showRandomNoiseGenerator(QWidget *parent, const QString &title)
     regenerate();
 
     QObject::connect(lenSpin, QOverload<int>::of(&QSpinBox::valueChanged),
-                     &dlg, [&](int){ regenerate(); });
+                     &dlg,
+                     [&](int value){
+                         Settings settings;
+                         settings.setRandomNoiseLength(value);
+                         regenerate();
+                     });
 
     QObject::connect(formatCombo, &QComboBox::currentIndexChanged,
-                     &dlg, [&](int){ regenerate(); });
+                     &dlg,
+                     [&](int index){
+                         Settings settings;
+                         settings.setRandomNoiseOption(index);
+                         regenerate();
+                     });
 
     QObject::connect(copyBtn, &QPushButton::clicked,
                      &dlg, [&]() {
