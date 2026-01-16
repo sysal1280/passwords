@@ -623,5 +623,5 @@ void PreferencesDialog::browseForExecutable()
         return;
 
     // Update UI
-    ui->lineEditShellProgram->setText(file);
+    ui->lineEditShellProgram->setText(QDir::toNativeSeparators(file));
 }
