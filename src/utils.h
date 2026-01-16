@@ -43,7 +43,7 @@
 #include <QElapsedTimer>
 
 
-inline QString loadWordlistResource(const QWidget *parent, const char *caller)
+inline QString loadWordlistResource(QWidget *parent, const char *caller)
 {
     Settings settings;
     QString configFile = settings.configFilePath();
@@ -53,7 +53,7 @@ inline QString loadWordlistResource(const QWidget *parent, const char *caller)
 
     if (!QFile::exists(wordListPath)) {
         qCritical().noquote() << caller << "Missing resource file:" << wordListPath;
-        QMessageBox::critical(const_cast<QWidget*>(parent),
+        QMessageBox::critical(parent,
                               QApplication::applicationName(),
                               QString("Missing resource file:\n%1").arg(wordListPath));
         return QString();
@@ -61,7 +61,7 @@ inline QString loadWordlistResource(const QWidget *parent, const char *caller)
 
     if (!QResource::registerResource(wordListPath)) {
         qCritical().noquote() << caller << "Failed to register resource:" << wordListPath;
-        QMessageBox::critical(const_cast<QWidget*>(parent),
+        QMessageBox::critical(parent,
                               QApplication::applicationName(),
                               QString("Failed to register resource:\n%1").arg(wordListPath));
         return QString();
