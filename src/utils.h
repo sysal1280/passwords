@@ -129,11 +129,11 @@ inline void setupDebugWarnings(QWidget *parent, QStatusBar *statusBar)
     QTimer *debugTimer = new QTimer(parent);
 
     // Extract the lambda so we can call it manually
-    auto showDebugMessage = []() {
+    auto showDebugMessage = [parent]() {
         QIcon beetleIcon(":/menus/glyphs/beetle_color.svg");
         QPixmap beetlePixmap = beetleIcon.pixmap(48, 48);
 
-        QMessageBox msgBox;
+        QMessageBox msgBox(parent);
         msgBox.setWindowTitle(QApplication::applicationName());
         msgBox.setText(Passwords::debugWarningMB);
         msgBox.setIconPixmap(beetlePixmap);
