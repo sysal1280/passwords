@@ -188,7 +188,6 @@ void Settings::setLastUsedFile(const QString &filePath)
     settings->beginGroup("Main");
     settings->setValue("LastDatabase", filePath);
     settings->endGroup();
-    settings->sync();
 }
 
 QString Settings::getLastUsedFile() const
@@ -505,7 +504,7 @@ QString Settings::getShellCommand() const
 
     settings->beginGroup("Main");
     QString cmd = settings->value("ShellCommand").toString();
-    settings->endGroup();   // ← important
+    settings->endGroup();
     return cmd;
 }
 
@@ -516,8 +515,7 @@ QString Settings::getShellArguments() const
 
     settings->beginGroup("Main");
     QString args = settings->value("ShellArguments").toString(); // or "ShellCommand" for your test
-    settings->endGroup();   // ← important
-    qDebug() << args;
+    settings->endGroup();
     return args;
 }
 
@@ -582,9 +580,7 @@ void Settings::restoreSplitterState(QSplitter *splitter, const QString &name)
 
 bool Settings::verifyDeleteAllowed(QSqlDatabase &db, QWidget *parent)
 {
-    /*
-     * Destructive password prompt
-     */
+    // Destructive password prompt
 
     QSqlQuery q(db);
     if (!q.exec("SELECT value FROM app_info WHERE key LIKE 'destructive_operation_password_%'")) {
@@ -697,7 +693,7 @@ bool Settings::createUserDesktopFile()
     out << content;
     outFile.close();
 
-    qDebug().noquote() << Q_FUNC_INFO << "Creating a .desktop file at" << desktopFilePath;
+    qInfo().noquote() << Q_FUNC_INFO << "Creating a .desktop file at" << desktopFilePath;
     return true;
 }
 
