@@ -258,6 +258,7 @@ QTreeWidget#treeWidget_2 {
 
 QTreeView#treeWidget_2::viewport {
     background: #ffffff;
+    border-radius: 6px;
 }
 
 /* Branch area */
