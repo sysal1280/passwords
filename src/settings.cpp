@@ -403,16 +403,6 @@ bool Settings::openCategoryDblClick()
     return truthy.contains(val);
 }
 
-void Settings::setExportedKey()
-{
-    if (!settings)
-        return;
-
-    settings->beginGroup("Main");
-    settings->setValue("AppKeyExported", true);
-    settings->endGroup();
-}
-
 void Settings::setGeneratedPasswordLength(int i)
 {
     if (!settings)

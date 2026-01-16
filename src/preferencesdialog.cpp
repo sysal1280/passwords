@@ -148,9 +148,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     widgetMap.insert("Passwords/CloseOnCopy", ui->checkBoxCloseOnCopy);
 
     auto removeGroupBox = [this]() {
-        // Write the flag immediately
-        settings.setExportedKey();
-
         // Remove the UI element after the window is fully constructed
         QTimer::singleShot(0, this, [this]() {
             ui->groupBox_10->hide();
