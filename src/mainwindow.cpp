@@ -965,6 +965,17 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    if (abortBusy)
+    {
+        QMessageBox::warning(
+            this,
+            tr("Operation in progress"),
+            tr("An operation is still running.\n%1 cannot be closed at present. Please wait..").arg(QApplication::applicationName()));
+
+        event->ignore();
+        return;
+    }
+
     if (abortingStartup) {
         event->accept();
         return;
@@ -3721,6 +3732,7 @@ void MainWindow::encryptFile()
             QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this,
             [this, process, outputFile](int exitCode, QProcess::ExitStatus status) {
+                abortBusy = false;
                 QString err = process->readAllStandardError();
                 if (status == QProcess::NormalExit && exitCode == 0) {
                     QMessageBox::information(this, ui->actionEncrypt_File->text(),
@@ -3737,6 +3749,7 @@ void MainWindow::encryptFile()
     connect(process, &QProcess::errorOccurred,
             this,
             [this, process](QProcess::ProcessError error) {
+                abortBusy = false;
                 QMessageBox::critical(
                     this,
                     tr("Error"),
@@ -3746,8 +3759,10 @@ void MainWindow::encryptFile()
                 process->deleteLater();
             });
 
+    abortBusy = true;
     process->start("gpg", args);
     if (process->state() == QProcess::NotRunning) {
+        abortBusy = false;
         QMessageBox::critical(this, ui->actionEncrypt_File->text(),
                               tr("Failed to start gpg process."));
         process->deleteLater();
@@ -3765,9 +3780,6 @@ void MainWindow::encryptFile()
     std::fill(passBytes.begin(), passBytes.end(), 0);
     std::fill(password.begin(), password.end(), QChar(0));
 }
-
-
-
 
 void MainWindow::decryptFile()
 {
@@ -3833,7 +3845,6 @@ void MainWindow::decryptFile()
     const QFileInfo fi(inputFile);
     process->setWorkingDirectory(fi.absolutePath());
 
-    // Buffers (RAII)
     auto stdoutBuffer = std::make_shared<QByteArray>();
     auto stderrBuffer = std::make_shared<QByteArray>();
 
@@ -3857,10 +3868,11 @@ void MainWindow::decryptFile()
             [this, process, inputFile, stdoutBuffer, stderrBuffer]
             (int exitCode, QProcess::ExitStatus status)
     {
+        abortBusy = false;
+
         const QString stderrText = QString::fromUtf8(*stderrBuffer);
         const bool success = (status == QProcess::NormalExit && exitCode == 0);
 
-        // Detect embedded filename
         QString embeddedOutputPath;
         {
             static const QRegularExpression re("writing to '([^']+)'");
@@ -3940,6 +3952,8 @@ void MainWindow::decryptFile()
 
     connect(process, &QProcess::errorOccurred, this,
             [this](QProcess::ProcessError) {
+                abortBusy = false;
+
                 ui->statusbar->showMessage(tr("Failed to start gpg process"), Passwords::SBTransientMessageTime);
                 QMessageBox::critical(
                     this,
@@ -3949,16 +3963,28 @@ void MainWindow::decryptFile()
             });
 
     // --- Start process ---
+    abortBusy = true;
     process->start("gpg", args);
+
+    if (process->state() == QProcess::NotRunning) {
+        abortBusy = false;
+
+        QMessageBox::critical(
+            this,
+            ui->actionDecrypt_File->text(),
+            tr("Failed to start gpg process.")
+        );
+        process->deleteLater();
+        return;
+    }
 
     // --- Send password securely via stdin ---
     QByteArray passBytes = password.toUtf8();
-    passBytes.append('\n');  // GPG expects newline
+    passBytes.append('\n');
 
     process->write(passBytes);
     process->closeWriteChannel();
 
-    // Wipe password from memory
     std::fill(passBytes.begin(), passBytes.end(), 0);
     std::fill(password.begin(), password.end(), QChar(0));
 }

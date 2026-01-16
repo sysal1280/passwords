@@ -70,6 +70,7 @@ public:
 
     bool showDebugMessages = false;
     bool abortingStartup = false;
+    bool abortBusy = false;
 
 
     QLabel *countdownLabel = nullptr;
