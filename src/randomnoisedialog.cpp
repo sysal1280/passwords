@@ -156,6 +156,8 @@ void showRandomNoiseGenerator(QWidget *parent, const QString &title)
     buttonLayout->addWidget(copyBtn);
     buttonLayout->addWidget(closeBtn);
 
+    copyBtn->setFocus();
+
     layout->addLayout(buttonLayout);
 
     auto regenerate = [&]() {

@@ -392,6 +392,8 @@ void showPasswordGenerator(QWidget *parent,
     QPushButton *copyBtn = new QPushButton("&Copy", &dlg);
     QPushButton *inspectBtn = new QPushButton("&Inspect", &dlg);
 
+    copyBtn->setFocus();
+
     controlLayout->addWidget(wordCountLabel);
     controlLayout->addWidget(wordCountSpin);
     controlLayout->addStretch();
