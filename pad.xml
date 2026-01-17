@@ -1,66 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://pad.asp-software.org/pad_v4_0.xsd">
+<XML_DIZ_INFO>
+  <MASTER_PAD_VERSION_INFO>
+    <MASTER_PAD_VERSION>3.11</MASTER_PAD_VERSION>
+    <MASTER_PAD_EDITOR>PAD V3.11</MASTER_PAD_EDITOR>
+  </MASTER_PAD_VERSION_INFO>
 
-  <Program>
-    <Name>Passwords</Name>
-    <Version>2.0.1</Version>
-    <ReleaseStatus>Freeware</ReleaseStatus>
-    <License>Open Source</License>
-    <LicenseText>GNU General Public License v3.0</LicenseText>
-    <Category>Security</Category>
-    <Subcategory>Password Management</Subcategory>
-    <ProgramType>Utility</ProgramType>
-    <Icon>https://raw.githubusercontent.com/sysal1280/passwords/main/resources/password.png</Icon>
-    <Keywords>password manager, passwords, gpg, encryption, security</Keywords>
-    <Language>English</Language>
-    <ShortDescription>A cross-platform GNU Privacy Guard based password manager built on a privacy-first, zero-knowledge design.</ShortDescription>
-    <LongDescription>Passwords is a secure, lightweight password manager that uses GNU Privacy Guard (GPG) for all encryption operations. Every secret is encrypted locally on your device using strong, open-standard cryptography. No data is uploaded, synced, or shared. The application follows a strict zero-knowledge model: only you hold the keys, and only you can decrypt your data.</LongDescription>
-  </Program>
+  <PROGRAM_INFO>
+    <PROGRAM_NAME>Passwords</PROGRAM_NAME>
+    <PROGRAM_VERSION>2.0.1</PROGRAM_VERSION>
+    <PROGRAM_RELEASE_STATUS>Freeware</PROGRAM_RELEASE_STATUS>
+    <PROGRAM_OS_SUPPORT>Windows, Linux, MacOS</PROGRAM_OS_SUPPORT>
+    <PROGRAM_TYPE>Utility</PROGRAM_TYPE>
+    <PROGRAM_CATEGORY_CLASS>Security</PROGRAM_CATEGORY_CLASS>
+    <PROGRAM_CATEGORY_SUBCLASS>Password Management</PROGRAM_CATEGORY_SUBCLASS>
+    <PROGRAM_LANGUAGE>English</PROGRAM_LANGUAGE>
+    <PROGRAM_DESCRIPTION>A cross-platform GNU Privacy Guard based password manager built on a privacy-first, zero-knowledge design.</PROGRAM_DESCRIPTION>
+    <PROGRAM_DESCRIPTION_LONG>Passwords is a secure, lightweight password manager that uses GNU Privacy Guard (GPG) for all encryption operations. Every secret is encrypted locally on your device using strong, open-standard cryptography. No data is uploaded, synced, or shared. The application follows a strict zero-knowledge model: only you hold the keys, and only you can decrypt your data.</PROGRAM_DESCRIPTION_LONG>
+    <PROGRAM_KEYWORDS>password manager, passwords, gpg, encryption, security</PROGRAM_KEYWORDS>
+    <PROGRAM_REQUIREMENTS>Requires GPG (GNU Privacy Guard) to be installed on the system.</PROGRAM_REQUIREMENTS>
+    <PROGRAM_ICON_URL>https://raw.githubusercontent.com/sysal1280/passwords/main/resources/password.png</PROGRAM_ICON_URL>
+    <PROGRAM_LICENSE>Open Source</PROGRAM_LICENSE>
+    <PROGRAM_LICENSE_TEXT>GNU General Public License v3.0</PROGRAM_LICENSE_TEXT>
+  </PROGRAM_INFO>
 
-  <Company>
-    <Name>sysal1280</Name>
-    <Website>https://github.com/sysal1280</Website>
-  </Company>
+  <COMPANY_INFO>
+    <COMPANY_NAME>sysal1280</COMPANY_NAME>
+    <COMPANY_WEBSITE_URL>https://github.com/sysal1280</COMPANY_WEBSITE_URL>
+  </COMPANY_INFO>
 
-  <Download>
-    <PrimaryURL>https://github.com/sysal1280/passwords/releases/download/2.0.1/Passwords-2.0.1_Windows-X86-64.exe</PrimaryURL>
+  <WEB_INFO>
+    <APPLICATION_URLS>
+      <APPLICATION_INFO_URL>https://github.com/sysal1280/passwords</APPLICATION_INFO_URL>
+      <APPLICATION_SUPPORT_URL>https://github.com/sysal1280/passwords/issues</APPLICATION_SUPPORT_URL>
+      <APPLICATION_INFO_URL>https://sysal1280.github.io/passwords/en/</APPLICATION_INFO_URL>
+    </APPLICATION_URLS>
+  </WEB_INFO>
 
-    <FileInfo>
-      <FileName>Passwords-2.0.1_Windows-X86-64.exe</FileName>
-      <FileSizeBytes>57963644</FileSizeBytes>
-      <SHA256>339c9b6c49ea738cb5389c1e31881529ffc02a32ec488f7ec60ba891c32ca8e9</SHA256>
-      <SHA512>645fbdbb6327a7bfeb831b52e7754cc58c00e63c53fcb4147de7eb06e414979e2036383daacb3fa38ba46d4847fdba7da7861db6103f830918f0138e90bbc003</SHA512>
-    </FileInfo>
+  <DOWNLOAD_INFO>
+    <PRIMARY_DOWNLOAD_URL>https://github.com/sysal1280/passwords/releases/download/2.3.1/Passwords_2.3.1_Windows_x86_64.exe</PRIMARY_DOWNLOAD_URL>
+    <FILE_INFO>
+      <FILE_NAME>Passwords_2.3.1_Windows_x86_64.exe</FILE_NAME>
+      <FILE_SIZE_BYTES>79270541</FILE_SIZE_BYTES>
+      <FILE_MD5>cfe656d9c459b8d5af31864516bfcfa3</FILE_MD5>
+    </FILE_INFO>
+  </DOWNLOAD_INFO>
 
-    <SupportURL>https://github.com/sysal1280/passwords/issues</SupportURL>
-    <DocumentationURL>https://sysal1280.github.io/passwords/en/</DocumentationURL>
-    <HomepageURL>https://github.com/sysal1280/passwords</HomepageURL>
-  </Download>
-
-  <SystemRequirements>
-    <OperatingSystems>
-      <OS>Windows</OS>
-      <OS>Linux</OS>
-      <OS>MacOS</OS>
-    </OperatingSystems>
-    <RequirementsText>Requires GPG (GNU Privacy Guard) to be installed on the system.</RequirementsText>
-  </SystemRequirements>
-
-  <Media>
-    <Screenshots>
-      <Screenshot>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/passwords.png</Screenshot>
-      <Screenshot>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/mainwindow.png</Screenshot>
-      <Screenshot>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/open_password.png</Screenshot>
-      <Screenshot>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/generate_password.png</Screenshot>
-      <Screenshot>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/preferences.png</Screenshot>
-      <Screenshot>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/properties.png</Screenshot>
-    </Screenshots>
-  </Media>
-
-  <ReleaseInfo>
-    <ReleaseDate>2025-01-16</ReleaseDate>
-    <Changes>Initial PAD v4.0 entry for version 2.0.1</Changes>
-  </ReleaseInfo>
-
-</Application>
+  <MEDIA_INFO>
+    <SCREENSHOTS>
+      <PROGRAM_SCREENSHOT>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/passwords.png</PROGRAM_SCREENSHOT>
+      <PROGRAM_SCREENSHOT>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/mainwindow.png</PROGRAM_SCREENSHOT>
+      <PROGRAM_SCREENSHOT>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/open_password.png</PROGRAM_SCREENSHOT>
+      <PROGRAM_SCREENSHOT>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/generate_password.png</PROGRAM_SCREENSHOT>
+      <PROGRAM_SCREENSHOT>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/preferences.png</PROGRAM_SCREENSHOT>
+      <PROGRAM_SCREENSHOT>https://raw.githubusercontent.com/sysal1280/passwords/main/screenshots/properties.png</PROGRAM_SCREENSHOT>
+    </SCREENSHOTS>
+  </MEDIA_INFO>
+</XML_DIZ_INFO>
 
