@@ -1,9 +1,0 @@
-<map id="src/watermarkedtreewidget.h" name="src/watermarkedtreewidget.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="75,5,265,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,100,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,33,85,74,82,69,150,28"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="124,79,216,104"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,31,173,65,167,65,167,31"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="241,79,339,104"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="191,28,260,69,257,74,188,33"/>
-</map>
