@@ -1,6 +1,6 @@
 \doxysection{idledetector.\+h}
 \hypertarget{idledetector_8h_source}{}\label{idledetector_8h_source}\index{src/idledetector.h@{src/idledetector.h}}
-
+\mbox{\hyperlink{idledetector_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
 \DoxyCodeLine{00002\ }
@@ -15,19 +15,19 @@
 \DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classIdleDetector}{IdleDetector}}(\textcolor{keywordtype}{int}\ idleSeconds,\ QObject\ *parent\ =\ \textcolor{keyword}{nullptr});}
 \DoxyCodeLine{00012\ }
 \DoxyCodeLine{00013\ signals:}
-\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keywordtype}{void}\ idle();}
-\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{void}\ activity();}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classIdleDetector_a2b81733bab0bf774c5dafcf3c6c8bb71}{idle}}();}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classIdleDetector_a4ab382158c5d7ca04d382e9c82948676}{activity}}();}
 \DoxyCodeLine{00016\ }
 \DoxyCodeLine{00017\ \textcolor{keyword}{protected}:}
-\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keywordtype}{bool}\ eventFilter(QObject\ *obj,\ QEvent\ *event)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classIdleDetector_ae71b7562e8d7f9fca7cf8578c7c088a2}{eventFilter}}(QObject\ *obj,\ QEvent\ *event)\ \textcolor{keyword}{override};}
 \DoxyCodeLine{00019\ }
 \DoxyCodeLine{00020\ \textcolor{keyword}{private}:}
-\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{void}\ checkIdle();}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classIdleDetector_ac470733aeb3881423083ebb396f819ee}{checkIdle}}();}
 \DoxyCodeLine{00022\ }
-\DoxyCodeLine{00023\ \ \ \ \ QElapsedTimer\ m\_timer;}
-\DoxyCodeLine{00024\ \ \ \ \ QTimer\ m\_checkTimer;}
-\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keywordtype}{int}\ m\_idleSeconds;}
-\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_isIdle\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00023\ \ \ \ \ QElapsedTimer\ \mbox{\hyperlink{classIdleDetector_a0a445f01d56cccc257bd1eadc7b901d6}{m\_timer}};}
+\DoxyCodeLine{00024\ \ \ \ \ QTimer\ \mbox{\hyperlink{classIdleDetector_ae93fc533f6fbd1082d5fedffad5a66c2}{m\_checkTimer}};}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classIdleDetector_a2fb3edaae28b3829b950b2e44dfa7daf}{m\_idleSeconds}};}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classIdleDetector_af517a0971604c2a2a2c008cd4910c55b}{m\_isIdle}}\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{00027\ \};}
 \DoxyCodeLine{00028\ }
 

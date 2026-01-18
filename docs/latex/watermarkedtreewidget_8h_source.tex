@@ -1,6 +1,6 @@
 \doxysection{watermarkedtreewidget.\+h}
 \hypertarget{watermarkedtreewidget_8h_source}{}\label{watermarkedtreewidget_8h_source}\index{src/watermarkedtreewidget.h@{src/watermarkedtreewidget.h}}
-
+\mbox{\hyperlink{watermarkedtreewidget_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{comment}{/*}}
 \DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
@@ -35,27 +35,27 @@
 \DoxyCodeLine{00037\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classWatermarkedTreeWidget}{WatermarkedTreeWidget}}(QWidget\ *parent\ =\ \textcolor{keyword}{nullptr});}
 \DoxyCodeLine{00038\ }
 \DoxyCodeLine{00039\ \ \ \ \ \textcolor{comment}{//\ Set\ or\ get\ the\ watermark\ text}}
-\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordtype}{void}\ setWatermarkText(\textcolor{keyword}{const}\ QString\ \&text);}
-\DoxyCodeLine{00041\ \ \ \ \ QString\ watermarkText()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classWatermarkedTreeWidget_a6f8a4a767660890b1923255789481fe3}{setWatermarkText}}(\textcolor{keyword}{const}\ QString\ \&text);}
+\DoxyCodeLine{00041\ \ \ \ \ QString\ \mbox{\hyperlink{classWatermarkedTreeWidget_a5aa08bc5d7dc7278b4f53b99c020f5c7}{watermarkText}}()\ \textcolor{keyword}{const};}
 \DoxyCodeLine{00042\ }
 \DoxyCodeLine{00043\ signals:}
 \DoxyCodeLine{00044\ \ \ \ \ \textcolor{comment}{//\ Emitted\ when\ a\ drop\ occurs;\ MainWindow\ can\ connect\ to\ this}}
-\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{void}\ itemDropped(QTreeWidgetItem\ *sourceItem,\ QTreeWidgetItem\ *targetItem);}
-\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordtype}{void}\ itemsDropped(\textcolor{keyword}{const}\ QList<QTreeWidgetItem*>\&\ items,\ QTreeWidgetItem\ *target);}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classWatermarkedTreeWidget_ab0853a58b76bf6c933d296961383a2b2}{itemDropped}}(QTreeWidgetItem\ *sourceItem,\ QTreeWidgetItem\ *targetItem);}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classWatermarkedTreeWidget_aaaea245cec7e6927634d300740d0ebb4}{itemsDropped}}(\textcolor{keyword}{const}\ QList<QTreeWidgetItem*>\&\ items,\ QTreeWidgetItem\ *target);}
 \DoxyCodeLine{00047\ }
 \DoxyCodeLine{00048\ }
 \DoxyCodeLine{00049\ \textcolor{keyword}{protected}:}
 \DoxyCodeLine{00050\ }
-\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{void}\ paintEvent(QPaintEvent\ *event)\ \textcolor{keyword}{override};}
-\DoxyCodeLine{00052\ \ \ \ \ QMimeData*\ mimeData(\textcolor{keyword}{const}\ QList<QTreeWidgetItem*>\ \&items)\ \textcolor{keyword}{const\ override};}
-\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{void}\ dropEvent(QDropEvent\ *event)\ \textcolor{keyword}{override};}
-\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{void}\ dragEnterEvent(QDragEnterEvent\ *event)\ \textcolor{keyword}{override};}
-\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{void}\ dragMoveEvent(QDragMoveEvent\ *event)\ \textcolor{keyword}{override};}
-\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordtype}{void}\ startDrag(Qt::DropActions\ supportedActions)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classWatermarkedTreeWidget_a452368b080f35dac18e0b611a3734ee2}{paintEvent}}(QPaintEvent\ *event)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00052\ \ \ \ \ QMimeData*\ \mbox{\hyperlink{classWatermarkedTreeWidget_a84ab266fd892f36d0d9f57511076f2a1}{mimeData}}(\textcolor{keyword}{const}\ QList<QTreeWidgetItem*>\ \&items)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classWatermarkedTreeWidget_aaf09056403472573f5e676bdc4854213}{dropEvent}}(QDropEvent\ *event)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classWatermarkedTreeWidget_a4cf2fee6cdb63a7da338c167288a5134}{dragEnterEvent}}(QDragEnterEvent\ *event)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classWatermarkedTreeWidget_a4c33c7d307b4bc3637cd8023de5a194d}{dragMoveEvent}}(QDragMoveEvent\ *event)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classWatermarkedTreeWidget_a21c27357f048fc08db48e30300d1f61e}{startDrag}}(Qt::DropActions\ supportedActions)\ \textcolor{keyword}{override};}
 \DoxyCodeLine{00057\ }
 \DoxyCodeLine{00058\ }
 \DoxyCodeLine{00059\ \textcolor{keyword}{private}:}
-\DoxyCodeLine{00060\ \ \ \ \ QString\ m\_watermarkText;}
+\DoxyCodeLine{00060\ \ \ \ \ QString\ \mbox{\hyperlink{classWatermarkedTreeWidget_a5bca67e11d2e70e3cd11fa7583315728}{m\_watermarkText}};}
 \DoxyCodeLine{00061\ \};}
 \DoxyCodeLine{00062\ }
 \DoxyCodeLine{00063\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WATERMARKEDTREEWIDGET\_H}}

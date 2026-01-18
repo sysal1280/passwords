@@ -2,7 +2,12 @@
 \hypertarget{classPreferencesDialog}{}\label{classPreferencesDialog}\index{PreferencesDialog@{PreferencesDialog}}
 
 
-Inheritance diagram for Preferences\+Dialog\+:\nopagebreak
+{\ttfamily \#include $<$preferencesdialog.\+h$>$}
+
+
+
+Inheritance diagram for Preferences\+Dialog\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11,28 +16,162 @@ Inheritance diagram for Preferences\+Dialog\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for Preferences\+Dialog\+:\nopagebreak
+Collaboration diagram for Preferences\+Dialog\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=177pt]{classPreferencesDialog__coll__graph}
+\includegraphics[width=204pt]{classPreferencesDialog__coll__graph}
 \end{center}
 \end{figure}
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{classPreferencesDialog_a7b7a1a0c977bd569fcd2e32ac95a23bc}\label{classPreferencesDialog_a7b7a1a0c977bd569fcd2e32ac95a23bc} 
-{\bfseries Preferences\+Dialog} (QWidget \texorpdfstring{$\ast$}{*}parent=nullptr)
+\mbox{\hyperlink{classPreferencesDialog_a7b7a1a0c977bd569fcd2e32ac95a23bc}{Preferences\+Dialog}} (QWidget \texorpdfstring{$\ast$}{*}parent=nullptr)
 \item 
-\Hypertarget{classPreferencesDialog_afdfea6c2cbaad1317caa9ec187eda0e5}\label{classPreferencesDialog_afdfea6c2cbaad1317caa9ec187eda0e5} 
-void {\bfseries load\+Settings} ()
+\mbox{\hyperlink{classPreferencesDialog_a0e3927d4dbbc927879b4c4906e728f2d}{\texorpdfstring{$\sim$}{\string~}\+Preferences\+Dialog}} ()
 \item 
-\Hypertarget{classPreferencesDialog_ad81737cb39f047cf6ed5606bede5cfac}\label{classPreferencesDialog_ad81737cb39f047cf6ed5606bede5cfac} 
-void {\bfseries save\+Settings} ()
+void \mbox{\hyperlink{classPreferencesDialog_afdfea6c2cbaad1317caa9ec187eda0e5}{load\+Settings}} ()
+\item 
+void \mbox{\hyperlink{classPreferencesDialog_ad81737cb39f047cf6ed5606bede5cfac}{save\+Settings}} ()
 \end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classPreferencesDialog_adb032c24ed944cf572455cdcba00309e}{restore\+Button\+Clicked}} (QAbstract\+Button \texorpdfstring{$\ast$}{*}button)
+\item 
+void \mbox{\hyperlink{classPreferencesDialog_ab9cfa04ca7e5604f5a768c9d14891e3c}{restore\+Defaults}} ()
+\item 
+void \mbox{\hyperlink{classPreferencesDialog_ae0e73ead07c52576abbf588b9bfdc076}{on\+Backup\+Check\+State\+Changed}} (int state)
+\item 
+void \mbox{\hyperlink{classPreferencesDialog_afe6f065f24fc2baeddcf0c7243fa9ab9}{open\+Backup\+Dir}} ()
+\item 
+void \mbox{\hyperlink{classPreferencesDialog_ad076d79f2798b32b8249e55ab17d1046}{restart\+Application}} ()
+\item 
+void \mbox{\hyperlink{classPreferencesDialog_a669e62aec52e796630cf1d224cf4c390}{browse\+For\+Executable}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Ui\+::\+Preferences\+Dialog \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classPreferencesDialog_ad52f597455505495a5b51c4a516e38eb}{ui}}
+\item 
+QMap$<$ QString, QWidget \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{classPreferencesDialog_ab23ce5e69b5cb7df8452074831b497ab}{widget\+Map}}
+\item 
+\mbox{\hyperlink{classSettings}{Settings}} \mbox{\hyperlink{classPreferencesDialog_ab9f52b3c5ee44302fbb1bae118391f67}{settings}}
+\item 
+bool \mbox{\hyperlink{classPreferencesDialog_a4fca96281ee718488848b4bc407aff39}{restart\+Required}} = false
+\item 
+QSet$<$ QString $>$ \mbox{\hyperlink{classPreferencesDialog_a3d215e19ecd7be38ad654c2e335b2765}{restart\+Keys}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classPreferencesDialog_a7b7a1a0c977bd569fcd2e32ac95a23bc}\label{classPreferencesDialog_a7b7a1a0c977bd569fcd2e32ac95a23bc} 
+\index{PreferencesDialog@{PreferencesDialog}!PreferencesDialog@{PreferencesDialog}}
+\index{PreferencesDialog@{PreferencesDialog}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{PreferencesDialog()}{PreferencesDialog()}}
+{\footnotesize\ttfamily Preferences\+Dialog\+::\+Preferences\+Dialog (\begin{DoxyParamCaption}\item[{QWidget \texorpdfstring{$\ast$}{*}}]{parent = {\ttfamily nullptr} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+\Hypertarget{classPreferencesDialog_a0e3927d4dbbc927879b4c4906e728f2d}\label{classPreferencesDialog_a0e3927d4dbbc927879b4c4906e728f2d} 
+\index{PreferencesDialog@{PreferencesDialog}!````~PreferencesDialog@{\texorpdfstring{$\sim$}{\string~}PreferencesDialog}}
+\index{````~PreferencesDialog@{\texorpdfstring{$\sim$}{\string~}PreferencesDialog}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}PreferencesDialog()}{\string~PreferencesDialog()}}
+{\footnotesize\ttfamily Preferences\+Dialog\+::\texorpdfstring{$\sim$}{\string~}\+Preferences\+Dialog (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classPreferencesDialog_a669e62aec52e796630cf1d224cf4c390}\label{classPreferencesDialog_a669e62aec52e796630cf1d224cf4c390} 
+\index{PreferencesDialog@{PreferencesDialog}!browseForExecutable@{browseForExecutable}}
+\index{browseForExecutable@{browseForExecutable}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{browseForExecutable()}{browseForExecutable()}}
+{\footnotesize\ttfamily void Preferences\+Dialog\+::browse\+For\+Executable (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classPreferencesDialog_afdfea6c2cbaad1317caa9ec187eda0e5}\label{classPreferencesDialog_afdfea6c2cbaad1317caa9ec187eda0e5} 
+\index{PreferencesDialog@{PreferencesDialog}!loadSettings@{loadSettings}}
+\index{loadSettings@{loadSettings}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{loadSettings()}{loadSettings()}}
+{\footnotesize\ttfamily void Preferences\+Dialog\+::load\+Settings (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{classPreferencesDialog_ae0e73ead07c52576abbf588b9bfdc076}\label{classPreferencesDialog_ae0e73ead07c52576abbf588b9bfdc076} 
+\index{PreferencesDialog@{PreferencesDialog}!onBackupCheckStateChanged@{onBackupCheckStateChanged}}
+\index{onBackupCheckStateChanged@{onBackupCheckStateChanged}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{onBackupCheckStateChanged()}{onBackupCheckStateChanged()}}
+{\footnotesize\ttfamily void Preferences\+Dialog\+::on\+Backup\+Check\+State\+Changed (\begin{DoxyParamCaption}\item[{int}]{state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classPreferencesDialog_afe6f065f24fc2baeddcf0c7243fa9ab9}\label{classPreferencesDialog_afe6f065f24fc2baeddcf0c7243fa9ab9} 
+\index{PreferencesDialog@{PreferencesDialog}!openBackupDir@{openBackupDir}}
+\index{openBackupDir@{openBackupDir}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{openBackupDir()}{openBackupDir()}}
+{\footnotesize\ttfamily void Preferences\+Dialog\+::open\+Backup\+Dir (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classPreferencesDialog_ad076d79f2798b32b8249e55ab17d1046}\label{classPreferencesDialog_ad076d79f2798b32b8249e55ab17d1046} 
+\index{PreferencesDialog@{PreferencesDialog}!restartApplication@{restartApplication}}
+\index{restartApplication@{restartApplication}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{restartApplication()}{restartApplication()}}
+{\footnotesize\ttfamily void Preferences\+Dialog\+::restart\+Application (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classPreferencesDialog_adb032c24ed944cf572455cdcba00309e}\label{classPreferencesDialog_adb032c24ed944cf572455cdcba00309e} 
+\index{PreferencesDialog@{PreferencesDialog}!restoreButtonClicked@{restoreButtonClicked}}
+\index{restoreButtonClicked@{restoreButtonClicked}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{restoreButtonClicked()}{restoreButtonClicked()}}
+{\footnotesize\ttfamily void Preferences\+Dialog\+::restore\+Button\+Clicked (\begin{DoxyParamCaption}\item[{QAbstract\+Button \texorpdfstring{$\ast$}{*}}]{button }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classPreferencesDialog_ab9cfa04ca7e5604f5a768c9d14891e3c}\label{classPreferencesDialog_ab9cfa04ca7e5604f5a768c9d14891e3c} 
+\index{PreferencesDialog@{PreferencesDialog}!restoreDefaults@{restoreDefaults}}
+\index{restoreDefaults@{restoreDefaults}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{restoreDefaults()}{restoreDefaults()}}
+{\footnotesize\ttfamily void Preferences\+Dialog\+::restore\+Defaults (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classPreferencesDialog_ad81737cb39f047cf6ed5606bede5cfac}\label{classPreferencesDialog_ad81737cb39f047cf6ed5606bede5cfac} 
+\index{PreferencesDialog@{PreferencesDialog}!saveSettings@{saveSettings}}
+\index{saveSettings@{saveSettings}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{saveSettings()}{saveSettings()}}
+{\footnotesize\ttfamily void Preferences\+Dialog\+::save\+Settings (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classPreferencesDialog_a3d215e19ecd7be38ad654c2e335b2765}\label{classPreferencesDialog_a3d215e19ecd7be38ad654c2e335b2765} 
+\index{PreferencesDialog@{PreferencesDialog}!restartKeys@{restartKeys}}
+\index{restartKeys@{restartKeys}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{restartKeys}{restartKeys}}
+{\footnotesize\ttfamily QSet$<$QString$>$ Preferences\+Dialog\+::restart\+Keys\hspace{0.3cm}{\ttfamily [private]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Categories/DoubleClickOpen"{}}\ \ \ }
+\DoxyCodeLine{\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classPreferencesDialog_a4fca96281ee718488848b4bc407aff39}\label{classPreferencesDialog_a4fca96281ee718488848b4bc407aff39} 
+\index{PreferencesDialog@{PreferencesDialog}!restartRequired@{restartRequired}}
+\index{restartRequired@{restartRequired}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{restartRequired}{restartRequired}}
+{\footnotesize\ttfamily bool Preferences\+Dialog\+::restart\+Required = false\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classPreferencesDialog_ab9f52b3c5ee44302fbb1bae118391f67}\label{classPreferencesDialog_ab9f52b3c5ee44302fbb1bae118391f67} 
+\index{PreferencesDialog@{PreferencesDialog}!settings@{settings}}
+\index{settings@{settings}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{settings}{settings}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classSettings}{Settings}} Preferences\+Dialog\+::settings\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classPreferencesDialog_ad52f597455505495a5b51c4a516e38eb}\label{classPreferencesDialog_ad52f597455505495a5b51c4a516e38eb} 
+\index{PreferencesDialog@{PreferencesDialog}!ui@{ui}}
+\index{ui@{ui}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{ui}{ui}}
+{\footnotesize\ttfamily Ui\+::\+Preferences\+Dialog\texorpdfstring{$\ast$}{*} Preferences\+Dialog\+::ui\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classPreferencesDialog_ab23ce5e69b5cb7df8452074831b497ab}\label{classPreferencesDialog_ab23ce5e69b5cb7df8452074831b497ab} 
+\index{PreferencesDialog@{PreferencesDialog}!widgetMap@{widgetMap}}
+\index{widgetMap@{widgetMap}!PreferencesDialog@{PreferencesDialog}}
+\doxysubsubsection{\texorpdfstring{widgetMap}{widgetMap}}
+{\footnotesize\ttfamily QMap$<$QString, QWidget\texorpdfstring{$\ast$}{*}$>$ Preferences\+Dialog\+::widget\+Map\hspace{0.3cm}{\ttfamily [private]}}
+
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-src/preferencesdialog.\+h\item 
-src/preferencesdialog.\+cpp\end{DoxyCompactItemize}
+src/\mbox{\hyperlink{preferencesdialog_8h}{preferencesdialog.\+h}}\item 
+src/\mbox{\hyperlink{preferencesdialog_8cpp}{preferencesdialog.\+cpp}}\end{DoxyCompactItemize}

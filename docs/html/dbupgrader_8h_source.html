@@ -82,7 +82,7 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">dbupgrader.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<a href="dbupgrader_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * passwords - A GnuPG based password manager</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> * Copyright (C) 2025  Adam.Lanzafame &lt;sysal@tuta.io&gt;</span></div>
@@ -115,29 +115,38 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <span class="keyword">explicit</span> <a class="code hl_class" href="classDatabaseUpgrader.html">DatabaseUpgrader</a>(QSqlDatabase db);</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="comment">// Returns true if DB is now at the correct schema version</span></div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordtype">bool</span> upgradeToLatest(<span class="keyword">const</span> QString &amp;expectedSignature,</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classDatabaseUpgrader.html#a0174066cc10f93456298c3f918ac4ec6">upgradeToLatest</a>(<span class="keyword">const</span> QString &amp;expectedSignature,</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>                         <span class="keyword">const</span> QString &amp;expectedSchemaVersion,</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>                         QString &amp;errorMessage);</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    QSqlDatabase m_db;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classDatabaseUpgrader.html#a549bf509c68befd9db34cd1cd3d7f5ec">   38</a></span>    QSqlDatabase <a class="code hl_variable" href="classDatabaseUpgrader.html#a549bf509c68befd9db34cd1cd3d7f5ec">m_db</a>;</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    QString readSignature();</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    QString readSchemaVersion();</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordtype">bool</span> writeSchemaVersion(<span class="keyword">const</span> QString &amp;version, <span class="keyword">const</span> QString &amp;signature);</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    QString <a class="code hl_function" href="classDatabaseUpgrader.html#a0f27258f95c97b55700a20adc2937138">readSignature</a>();</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    QString <a class="code hl_function" href="classDatabaseUpgrader.html#acc8bba3128840f7992ec4fd3c39bd6a7">readSchemaVersion</a>();</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classDatabaseUpgrader.html#a3d8b997b1d673e6d5a3f2e431c84631e">writeSchemaVersion</a>(<span class="keyword">const</span> QString &amp;version, <span class="keyword">const</span> QString &amp;signature);</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="comment">// Upgrade steps</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="keywordtype">bool</span> upgrade_1_to_2(QString &amp;error);</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordtype">bool</span> upgrade_2_to_3(QString &amp;error);</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="keywordtype">bool</span> upgrade_3_to_4(QString &amp;error);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classDatabaseUpgrader.html#a33c63ef5ff8d684ccfecb0bba65ce772">upgrade_1_to_2</a>(QString &amp;error);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classDatabaseUpgrader.html#a09bddd62ceeb4a6919df1fb49cac4c8c">upgrade_2_to_3</a>(QString &amp;error);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classDatabaseUpgrader.html#ab6c523a83c1f2d8f841934a3219a7772">upgrade_3_to_4</a>(QString &amp;error);</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="comment">// Helper to run SQL safely</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="keywordtype">bool</span> execQuery(<span class="keyword">const</span> QString &amp;sql, QString &amp;error);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classDatabaseUpgrader.html#a9f2e88201c968bf55bc6a0ed7c4468a4">execQuery</a>(<span class="keyword">const</span> QString &amp;sql, QString &amp;error);</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>};</div>
 </div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclassDatabaseUpgrader_html"><div class="ttname"><a href="classDatabaseUpgrader.html">DatabaseUpgrader</a></div><div class="ttdef"><b>Definition</b> dbupgrader.h:28</div></div>
+<div class="ttc" id="aclassDatabaseUpgrader_html_a0174066cc10f93456298c3f918ac4ec6"><div class="ttname"><a href="classDatabaseUpgrader.html#a0174066cc10f93456298c3f918ac4ec6">DatabaseUpgrader::upgradeToLatest</a></div><div class="ttdeci">bool upgradeToLatest(const QString &amp;expectedSignature, const QString &amp;expectedSchemaVersion, QString &amp;errorMessage)</div><div class="ttdef"><b>Definition</b> dbupgrader.cpp:73</div></div>
+<div class="ttc" id="aclassDatabaseUpgrader_html_a09bddd62ceeb4a6919df1fb49cac4c8c"><div class="ttname"><a href="classDatabaseUpgrader.html#a09bddd62ceeb4a6919df1fb49cac4c8c">DatabaseUpgrader::upgrade_2_to_3</a></div><div class="ttdeci">bool upgrade_2_to_3(QString &amp;error)</div><div class="ttdef"><b>Definition</b> dbupgrader.cpp:247</div></div>
+<div class="ttc" id="aclassDatabaseUpgrader_html_a0f27258f95c97b55700a20adc2937138"><div class="ttname"><a href="classDatabaseUpgrader.html#a0f27258f95c97b55700a20adc2937138">DatabaseUpgrader::readSignature</a></div><div class="ttdeci">QString readSignature()</div><div class="ttdef"><b>Definition</b> dbupgrader.cpp:37</div></div>
+<div class="ttc" id="aclassDatabaseUpgrader_html_a33c63ef5ff8d684ccfecb0bba65ce772"><div class="ttname"><a href="classDatabaseUpgrader.html#a33c63ef5ff8d684ccfecb0bba65ce772">DatabaseUpgrader::upgrade_1_to_2</a></div><div class="ttdeci">bool upgrade_1_to_2(QString &amp;error)</div><div class="ttdef"><b>Definition</b> dbupgrader.cpp:118</div></div>
+<div class="ttc" id="aclassDatabaseUpgrader_html_a3d8b997b1d673e6d5a3f2e431c84631e"><div class="ttname"><a href="classDatabaseUpgrader.html#a3d8b997b1d673e6d5a3f2e431c84631e">DatabaseUpgrader::writeSchemaVersion</a></div><div class="ttdeci">bool writeSchemaVersion(const QString &amp;version, const QString &amp;signature)</div><div class="ttdef"><b>Definition</b> dbupgrader.cpp:51</div></div>
+<div class="ttc" id="aclassDatabaseUpgrader_html_a549bf509c68befd9db34cd1cd3d7f5ec"><div class="ttname"><a href="classDatabaseUpgrader.html#a549bf509c68befd9db34cd1cd3d7f5ec">DatabaseUpgrader::m_db</a></div><div class="ttdeci">QSqlDatabase m_db</div><div class="ttdef"><b>Definition</b> dbupgrader.h:38</div></div>
+<div class="ttc" id="aclassDatabaseUpgrader_html_a9f2e88201c968bf55bc6a0ed7c4468a4"><div class="ttname"><a href="classDatabaseUpgrader.html#a9f2e88201c968bf55bc6a0ed7c4468a4">DatabaseUpgrader::execQuery</a></div><div class="ttdeci">bool execQuery(const QString &amp;sql, QString &amp;error)</div><div class="ttdef"><b>Definition</b> dbupgrader.cpp:63</div></div>
+<div class="ttc" id="aclassDatabaseUpgrader_html_ab6c523a83c1f2d8f841934a3219a7772"><div class="ttname"><a href="classDatabaseUpgrader.html#ab6c523a83c1f2d8f841934a3219a7772">DatabaseUpgrader::upgrade_3_to_4</a></div><div class="ttdeci">bool upgrade_3_to_4(QString &amp;error)</div><div class="ttdef"><b>Definition</b> dbupgrader.cpp:252</div></div>
+<div class="ttc" id="aclassDatabaseUpgrader_html_acc8bba3128840f7992ec4fd3c39bd6a7"><div class="ttname"><a href="classDatabaseUpgrader.html#acc8bba3128840f7992ec4fd3c39bd6a7">DatabaseUpgrader::readSchemaVersion</a></div><div class="ttdeci">QString readSchemaVersion()</div><div class="ttdef"><b>Definition</b> dbupgrader.cpp:44</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

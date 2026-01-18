@@ -2,7 +2,12 @@
 \hypertarget{classLoginDialog}{}\label{classLoginDialog}\index{LoginDialog@{LoginDialog}}
 
 
-Inheritance diagram for Login\+Dialog\+:\nopagebreak
+{\ttfamily \#include $<$logindialog.\+h$>$}
+
+
+
+Inheritance diagram for Login\+Dialog\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11,34 +16,126 @@ Inheritance diagram for Login\+Dialog\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for Login\+Dialog\+:\nopagebreak
+Collaboration diagram for Login\+Dialog\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=148pt]{classLoginDialog__coll__graph}
+\includegraphics[width=204pt]{classLoginDialog__coll__graph}
 \end{center}
 \end{figure}
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{classLoginDialog_a7456f32deb63b8d3fb66b76f1e97977e}\label{classLoginDialog_a7456f32deb63b8d3fb66b76f1e97977e} 
-{\bfseries Login\+Dialog} (QWidget \texorpdfstring{$\ast$}{*}parent=nullptr)
+\mbox{\hyperlink{classLoginDialog_a7456f32deb63b8d3fb66b76f1e97977e}{Login\+Dialog}} (QWidget \texorpdfstring{$\ast$}{*}parent=nullptr)
 \item 
-\Hypertarget{classLoginDialog_a7e0a3f90a432aee353707bb5c9f39af5}\label{classLoginDialog_a7e0a3f90a432aee353707bb5c9f39af5} 
-bool {\bfseries has\+Keys} () const
+\mbox{\hyperlink{classLoginDialog_aa5d012ebc424713ca0cbd82be1f81133}{\texorpdfstring{$\sim$}{\string~}\+Login\+Dialog}} ()
 \item 
-\Hypertarget{classLoginDialog_a58a2592a50e01b5fd7cd8cda5d5846af}\label{classLoginDialog_a58a2592a50e01b5fd7cd8cda5d5846af} 
-void {\bfseries show\+Event} (QShow\+Event \texorpdfstring{$\ast$}{*}event)
+bool \mbox{\hyperlink{classLoginDialog_a7e0a3f90a432aee353707bb5c9f39af5}{has\+Keys}} () const
+\item 
+void \mbox{\hyperlink{classLoginDialog_a58a2592a50e01b5fd7cd8cda5d5846af}{show\+Event}} (QShow\+Event \texorpdfstring{$\ast$}{*}event)
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{classLoginDialog_ae0d6b4f0aceca22be69c7295816c07f8}\label{classLoginDialog_ae0d6b4f0aceca22be69c7295816c07f8} 
-QMap$<$ QString, QString $>$ {\bfseries keys}
+QMap$<$ QString, QString $>$ \mbox{\hyperlink{classLoginDialog_ae0d6b4f0aceca22be69c7295816c07f8}{keys}}
 \end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classLoginDialog_a071a08c2b4314ae1429e77ca691954cf}{generate\+Challenge}} ()
+\item 
+void \mbox{\hyperlink{classLoginDialog_adca23378d86418694ec43ebca2189ba4}{try\+Response}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Ui\+::\+Login\+Dialog \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classLoginDialog_ae01e7ff215a5906e98390c4666cd6075}{ui}}
+\item 
+QByte\+Array \mbox{\hyperlink{classLoginDialog_a31560f3ff425b6f931551baf4b1c20ce}{response\+Hash}}
+\item 
+int \mbox{\hyperlink{classLoginDialog_ae1d8fda0db14cf41392b1426bbd1a26a}{error\+Count}} = 0
+\item 
+\mbox{\hyperlink{classSettings}{Settings}} \mbox{\hyperlink{classLoginDialog_ab806aada30c1c1b5e37aeab70d730b4b}{settings}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classLoginDialog_a7456f32deb63b8d3fb66b76f1e97977e}\label{classLoginDialog_a7456f32deb63b8d3fb66b76f1e97977e} 
+\index{LoginDialog@{LoginDialog}!LoginDialog@{LoginDialog}}
+\index{LoginDialog@{LoginDialog}!LoginDialog@{LoginDialog}}
+\doxysubsubsection{\texorpdfstring{LoginDialog()}{LoginDialog()}}
+{\footnotesize\ttfamily Login\+Dialog\+::\+Login\+Dialog (\begin{DoxyParamCaption}\item[{QWidget \texorpdfstring{$\ast$}{*}}]{parent = {\ttfamily nullptr} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+\Hypertarget{classLoginDialog_aa5d012ebc424713ca0cbd82be1f81133}\label{classLoginDialog_aa5d012ebc424713ca0cbd82be1f81133} 
+\index{LoginDialog@{LoginDialog}!````~LoginDialog@{\texorpdfstring{$\sim$}{\string~}LoginDialog}}
+\index{````~LoginDialog@{\texorpdfstring{$\sim$}{\string~}LoginDialog}!LoginDialog@{LoginDialog}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}LoginDialog()}{\string~LoginDialog()}}
+{\footnotesize\ttfamily Login\+Dialog\+::\texorpdfstring{$\sim$}{\string~}\+Login\+Dialog (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classLoginDialog_a071a08c2b4314ae1429e77ca691954cf}\label{classLoginDialog_a071a08c2b4314ae1429e77ca691954cf} 
+\index{LoginDialog@{LoginDialog}!generateChallenge@{generateChallenge}}
+\index{generateChallenge@{generateChallenge}!LoginDialog@{LoginDialog}}
+\doxysubsubsection{\texorpdfstring{generateChallenge()}{generateChallenge()}}
+{\footnotesize\ttfamily void Login\+Dialog\+::generate\+Challenge (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classLoginDialog_a7e0a3f90a432aee353707bb5c9f39af5}\label{classLoginDialog_a7e0a3f90a432aee353707bb5c9f39af5} 
+\index{LoginDialog@{LoginDialog}!hasKeys@{hasKeys}}
+\index{hasKeys@{hasKeys}!LoginDialog@{LoginDialog}}
+\doxysubsubsection{\texorpdfstring{hasKeys()}{hasKeys()}}
+{\footnotesize\ttfamily bool Login\+Dialog\+::has\+Keys (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\Hypertarget{classLoginDialog_a58a2592a50e01b5fd7cd8cda5d5846af}\label{classLoginDialog_a58a2592a50e01b5fd7cd8cda5d5846af} 
+\index{LoginDialog@{LoginDialog}!showEvent@{showEvent}}
+\index{showEvent@{showEvent}!LoginDialog@{LoginDialog}}
+\doxysubsubsection{\texorpdfstring{showEvent()}{showEvent()}}
+{\footnotesize\ttfamily void Login\+Dialog\+::show\+Event (\begin{DoxyParamCaption}\item[{QShow\+Event \texorpdfstring{$\ast$}{*}}]{event }\end{DoxyParamCaption})}
+
+\Hypertarget{classLoginDialog_adca23378d86418694ec43ebca2189ba4}\label{classLoginDialog_adca23378d86418694ec43ebca2189ba4} 
+\index{LoginDialog@{LoginDialog}!tryResponse@{tryResponse}}
+\index{tryResponse@{tryResponse}!LoginDialog@{LoginDialog}}
+\doxysubsubsection{\texorpdfstring{tryResponse()}{tryResponse()}}
+{\footnotesize\ttfamily void Login\+Dialog\+::try\+Response (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classLoginDialog_ae1d8fda0db14cf41392b1426bbd1a26a}\label{classLoginDialog_ae1d8fda0db14cf41392b1426bbd1a26a} 
+\index{LoginDialog@{LoginDialog}!errorCount@{errorCount}}
+\index{errorCount@{errorCount}!LoginDialog@{LoginDialog}}
+\doxysubsubsection{\texorpdfstring{errorCount}{errorCount}}
+{\footnotesize\ttfamily int Login\+Dialog\+::error\+Count = 0\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classLoginDialog_ae0d6b4f0aceca22be69c7295816c07f8}\label{classLoginDialog_ae0d6b4f0aceca22be69c7295816c07f8} 
+\index{LoginDialog@{LoginDialog}!keys@{keys}}
+\index{keys@{keys}!LoginDialog@{LoginDialog}}
+\doxysubsubsection{\texorpdfstring{keys}{keys}}
+{\footnotesize\ttfamily QMap$<$QString,QString$>$ Login\+Dialog\+::keys}
+
+\Hypertarget{classLoginDialog_a31560f3ff425b6f931551baf4b1c20ce}\label{classLoginDialog_a31560f3ff425b6f931551baf4b1c20ce} 
+\index{LoginDialog@{LoginDialog}!responseHash@{responseHash}}
+\index{responseHash@{responseHash}!LoginDialog@{LoginDialog}}
+\doxysubsubsection{\texorpdfstring{responseHash}{responseHash}}
+{\footnotesize\ttfamily QByte\+Array Login\+Dialog\+::response\+Hash\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classLoginDialog_ab806aada30c1c1b5e37aeab70d730b4b}\label{classLoginDialog_ab806aada30c1c1b5e37aeab70d730b4b} 
+\index{LoginDialog@{LoginDialog}!settings@{settings}}
+\index{settings@{settings}!LoginDialog@{LoginDialog}}
+\doxysubsubsection{\texorpdfstring{settings}{settings}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classSettings}{Settings}} Login\+Dialog\+::settings\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classLoginDialog_ae01e7ff215a5906e98390c4666cd6075}\label{classLoginDialog_ae01e7ff215a5906e98390c4666cd6075} 
+\index{LoginDialog@{LoginDialog}!ui@{ui}}
+\index{ui@{ui}!LoginDialog@{LoginDialog}}
+\doxysubsubsection{\texorpdfstring{ui}{ui}}
+{\footnotesize\ttfamily Ui\+::\+Login\+Dialog\texorpdfstring{$\ast$}{*} Login\+Dialog\+::ui\hspace{0.3cm}{\ttfamily [private]}}
+
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-src/logindialog.\+h\item 
-src/logindialog.\+cpp\end{DoxyCompactItemize}
+src/\mbox{\hyperlink{logindialog_8h}{logindialog.\+h}}\item 
+src/\mbox{\hyperlink{logindialog_8cpp}{logindialog.\+cpp}}\end{DoxyCompactItemize}

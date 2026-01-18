@@ -1,6 +1,6 @@
 \doxysection{dbupgrader.\+h}
 \hypertarget{dbupgrader_8h_source}{}\label{dbupgrader_8h_source}\index{src/dbupgrader.h@{src/dbupgrader.h}}
-
+\mbox{\hyperlink{dbupgrader_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{comment}{/*}}
 \DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
@@ -34,24 +34,24 @@
 \DoxyCodeLine{00030\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classDatabaseUpgrader}{DatabaseUpgrader}}(QSqlDatabase\ db);}
 \DoxyCodeLine{00031\ }
 \DoxyCodeLine{00032\ \ \ \ \ \textcolor{comment}{//\ Returns\ true\ if\ DB\ is\ now\ at\ the\ correct\ schema\ version}}
-\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{bool}\ upgradeToLatest(\textcolor{keyword}{const}\ QString\ \&expectedSignature,}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classDatabaseUpgrader_a0174066cc10f93456298c3f918ac4ec6}{upgradeToLatest}}(\textcolor{keyword}{const}\ QString\ \&expectedSignature,}
 \DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QString\ \&expectedSchemaVersion,}
 \DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QString\ \&errorMessage);}
 \DoxyCodeLine{00036\ }
 \DoxyCodeLine{00037\ \textcolor{keyword}{private}:}
-\DoxyCodeLine{00038\ \ \ \ \ QSqlDatabase\ m\_db;}
+\DoxyCodeLine{00038\ \ \ \ \ QSqlDatabase\ \mbox{\hyperlink{classDatabaseUpgrader_a549bf509c68befd9db34cd1cd3d7f5ec}{m\_db}};}
 \DoxyCodeLine{00039\ }
-\DoxyCodeLine{00040\ \ \ \ \ QString\ readSignature();}
-\DoxyCodeLine{00041\ \ \ \ \ QString\ readSchemaVersion();}
-\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordtype}{bool}\ writeSchemaVersion(\textcolor{keyword}{const}\ QString\ \&version,\ \textcolor{keyword}{const}\ QString\ \&signature);}
+\DoxyCodeLine{00040\ \ \ \ \ QString\ \mbox{\hyperlink{classDatabaseUpgrader_a0f27258f95c97b55700a20adc2937138}{readSignature}}();}
+\DoxyCodeLine{00041\ \ \ \ \ QString\ \mbox{\hyperlink{classDatabaseUpgrader_acc8bba3128840f7992ec4fd3c39bd6a7}{readSchemaVersion}}();}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classDatabaseUpgrader_a3d8b997b1d673e6d5a3f2e431c84631e}{writeSchemaVersion}}(\textcolor{keyword}{const}\ QString\ \&version,\ \textcolor{keyword}{const}\ QString\ \&signature);}
 \DoxyCodeLine{00043\ }
 \DoxyCodeLine{00044\ \ \ \ \ \textcolor{comment}{//\ Upgrade\ steps}}
-\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{bool}\ upgrade\_1\_to\_2(QString\ \&error);}
-\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordtype}{bool}\ upgrade\_2\_to\_3(QString\ \&error);}
-\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{bool}\ upgrade\_3\_to\_4(QString\ \&error);}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classDatabaseUpgrader_a33c63ef5ff8d684ccfecb0bba65ce772}{upgrade\_1\_to\_2}}(QString\ \&error);}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classDatabaseUpgrader_a09bddd62ceeb4a6919df1fb49cac4c8c}{upgrade\_2\_to\_3}}(QString\ \&error);}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classDatabaseUpgrader_ab6c523a83c1f2d8f841934a3219a7772}{upgrade\_3\_to\_4}}(QString\ \&error);}
 \DoxyCodeLine{00048\ }
 \DoxyCodeLine{00049\ \ \ \ \ \textcolor{comment}{//\ Helper\ to\ run\ SQL\ safely}}
-\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{bool}\ execQuery(\textcolor{keyword}{const}\ QString\ \&sql,\ QString\ \&error);}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classDatabaseUpgrader_a9f2e88201c968bf55bc6a0ed7c4468a4}{execQuery}}(\textcolor{keyword}{const}\ QString\ \&sql,\ QString\ \&error);}
 \DoxyCodeLine{00051\ \};}
 \DoxyCodeLine{00052\ }
 \DoxyCodeLine{00053\ \textcolor{preprocessor}{\#endif}}

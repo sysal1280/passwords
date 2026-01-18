@@ -72,23 +72,332 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classDatabaseUpgrader-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">DatabaseUpgrader Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p><code>#include &lt;<a class="el" href="dbupgrader_8h_source.html">dbupgrader.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:adfc0faac3a9282e7569d06f51561b54a" id="r_adfc0faac3a9282e7569d06f51561b54a"><td class="memItemLeft" align="right" valign="top"><a id="adfc0faac3a9282e7569d06f51561b54a" name="adfc0faac3a9282e7569d06f51561b54a"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>DatabaseUpgrader</b> (QSqlDatabase db)</td></tr>
+<tr class="memitem:adfc0faac3a9282e7569d06f51561b54a" id="r_adfc0faac3a9282e7569d06f51561b54a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDatabaseUpgrader.html#adfc0faac3a9282e7569d06f51561b54a">DatabaseUpgrader</a> (QSqlDatabase db)</td></tr>
 <tr class="separator:adfc0faac3a9282e7569d06f51561b54a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0174066cc10f93456298c3f918ac4ec6" id="r_a0174066cc10f93456298c3f918ac4ec6"><td class="memItemLeft" align="right" valign="top"><a id="a0174066cc10f93456298c3f918ac4ec6" name="a0174066cc10f93456298c3f918ac4ec6"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>upgradeToLatest</b> (const QString &amp;expectedSignature, const QString &amp;expectedSchemaVersion, QString &amp;errorMessage)</td></tr>
+<tr class="memitem:a0174066cc10f93456298c3f918ac4ec6" id="r_a0174066cc10f93456298c3f918ac4ec6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDatabaseUpgrader.html#a0174066cc10f93456298c3f918ac4ec6">upgradeToLatest</a> (const QString &amp;expectedSignature, const QString &amp;expectedSchemaVersion, QString &amp;errorMessage)</td></tr>
 <tr class="separator:a0174066cc10f93456298c3f918ac4ec6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a0f27258f95c97b55700a20adc2937138" id="r_a0f27258f95c97b55700a20adc2937138"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDatabaseUpgrader.html#a0f27258f95c97b55700a20adc2937138">readSignature</a> ()</td></tr>
+<tr class="separator:a0f27258f95c97b55700a20adc2937138"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc8bba3128840f7992ec4fd3c39bd6a7" id="r_acc8bba3128840f7992ec4fd3c39bd6a7"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDatabaseUpgrader.html#acc8bba3128840f7992ec4fd3c39bd6a7">readSchemaVersion</a> ()</td></tr>
+<tr class="separator:acc8bba3128840f7992ec4fd3c39bd6a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d8b997b1d673e6d5a3f2e431c84631e" id="r_a3d8b997b1d673e6d5a3f2e431c84631e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDatabaseUpgrader.html#a3d8b997b1d673e6d5a3f2e431c84631e">writeSchemaVersion</a> (const QString &amp;version, const QString &amp;signature)</td></tr>
+<tr class="separator:a3d8b997b1d673e6d5a3f2e431c84631e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33c63ef5ff8d684ccfecb0bba65ce772" id="r_a33c63ef5ff8d684ccfecb0bba65ce772"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDatabaseUpgrader.html#a33c63ef5ff8d684ccfecb0bba65ce772">upgrade_1_to_2</a> (QString &amp;error)</td></tr>
+<tr class="separator:a33c63ef5ff8d684ccfecb0bba65ce772"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09bddd62ceeb4a6919df1fb49cac4c8c" id="r_a09bddd62ceeb4a6919df1fb49cac4c8c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDatabaseUpgrader.html#a09bddd62ceeb4a6919df1fb49cac4c8c">upgrade_2_to_3</a> (QString &amp;error)</td></tr>
+<tr class="separator:a09bddd62ceeb4a6919df1fb49cac4c8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6c523a83c1f2d8f841934a3219a7772" id="r_ab6c523a83c1f2d8f841934a3219a7772"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDatabaseUpgrader.html#ab6c523a83c1f2d8f841934a3219a7772">upgrade_3_to_4</a> (QString &amp;error)</td></tr>
+<tr class="separator:ab6c523a83c1f2d8f841934a3219a7772"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f2e88201c968bf55bc6a0ed7c4468a4" id="r_a9f2e88201c968bf55bc6a0ed7c4468a4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDatabaseUpgrader.html#a9f2e88201c968bf55bc6a0ed7c4468a4">execQuery</a> (const QString &amp;sql, QString &amp;error)</td></tr>
+<tr class="separator:a9f2e88201c968bf55bc6a0ed7c4468a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a549bf509c68befd9db34cd1cd3d7f5ec" id="r_a549bf509c68befd9db34cd1cd3d7f5ec"><td class="memItemLeft" align="right" valign="top">QSqlDatabase&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDatabaseUpgrader.html#a549bf509c68befd9db34cd1cd3d7f5ec">m_db</a></td></tr>
+<tr class="separator:a549bf509c68befd9db34cd1cd3d7f5ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="adfc0faac3a9282e7569d06f51561b54a" name="adfc0faac3a9282e7569d06f51561b54a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfc0faac3a9282e7569d06f51561b54a">&#9670;&#160;</a></span>DatabaseUpgrader()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">DatabaseUpgrader::DatabaseUpgrader </td>
+          <td>(</td>
+          <td class="paramtype">QSqlDatabase&#160;</td>
+          <td class="paramname"><em>db</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a9f2e88201c968bf55bc6a0ed7c4468a4" name="a9f2e88201c968bf55bc6a0ed7c4468a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f2e88201c968bf55bc6a0ed7c4468a4">&#9670;&#160;</a></span>execQuery()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool DatabaseUpgrader::execQuery </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>sql</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString &amp;&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acc8bba3128840f7992ec4fd3c39bd6a7" name="acc8bba3128840f7992ec4fd3c39bd6a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc8bba3128840f7992ec4fd3c39bd6a7">&#9670;&#160;</a></span>readSchemaVersion()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString DatabaseUpgrader::readSchemaVersion </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0f27258f95c97b55700a20adc2937138" name="a0f27258f95c97b55700a20adc2937138"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f27258f95c97b55700a20adc2937138">&#9670;&#160;</a></span>readSignature()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString DatabaseUpgrader::readSignature </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a33c63ef5ff8d684ccfecb0bba65ce772" name="a33c63ef5ff8d684ccfecb0bba65ce772"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33c63ef5ff8d684ccfecb0bba65ce772">&#9670;&#160;</a></span>upgrade_1_to_2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool DatabaseUpgrader::upgrade_1_to_2 </td>
+          <td>(</td>
+          <td class="paramtype">QString &amp;&#160;</td>
+          <td class="paramname"><em>error</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a09bddd62ceeb4a6919df1fb49cac4c8c" name="a09bddd62ceeb4a6919df1fb49cac4c8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09bddd62ceeb4a6919df1fb49cac4c8c">&#9670;&#160;</a></span>upgrade_2_to_3()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool DatabaseUpgrader::upgrade_2_to_3 </td>
+          <td>(</td>
+          <td class="paramtype">QString &amp;&#160;</td>
+          <td class="paramname"><em>error</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab6c523a83c1f2d8f841934a3219a7772" name="ab6c523a83c1f2d8f841934a3219a7772"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6c523a83c1f2d8f841934a3219a7772">&#9670;&#160;</a></span>upgrade_3_to_4()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool DatabaseUpgrader::upgrade_3_to_4 </td>
+          <td>(</td>
+          <td class="paramtype">QString &amp;&#160;</td>
+          <td class="paramname"><em>error</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0174066cc10f93456298c3f918ac4ec6" name="a0174066cc10f93456298c3f918ac4ec6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0174066cc10f93456298c3f918ac4ec6">&#9670;&#160;</a></span>upgradeToLatest()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool DatabaseUpgrader::upgradeToLatest </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>expectedSignature</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>expectedSchemaVersion</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString &amp;&#160;</td>
+          <td class="paramname"><em>errorMessage</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3d8b997b1d673e6d5a3f2e431c84631e" name="a3d8b997b1d673e6d5a3f2e431c84631e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d8b997b1d673e6d5a3f2e431c84631e">&#9670;&#160;</a></span>writeSchemaVersion()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool DatabaseUpgrader::writeSchemaVersion </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>version</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>signature</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a549bf509c68befd9db34cd1cd3d7f5ec" name="a549bf509c68befd9db34cd1cd3d7f5ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a549bf509c68befd9db34cd1cd3d7f5ec">&#9670;&#160;</a></span>m_db</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QSqlDatabase DatabaseUpgrader::m_db</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="dbupgrader_8h_source.html">dbupgrader.h</a></li>
-<li>src/<b>dbupgrader.cpp</b></li>
+<li>src/<a class="el" href="dbupgrader_8cpp.html">dbupgrader.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

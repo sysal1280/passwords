@@ -1,6 +1,6 @@
 \doxysection{utils.\+h}
 \hypertarget{utils_8h_source}{}\label{utils_8h_source}\index{src/utils.h@{src/utils.h}}
-
+\mbox{\hyperlink{utils_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{comment}{/*}}
 \DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
@@ -25,8 +25,8 @@
 \DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ UTILS\_H}}
 \DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ UTILS\_H}}
 \DoxyCodeLine{00023\ }
-\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}settings.h"{}}}
-\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}constants.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{settings_8h}{settings.h}}"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{constants_8h}{constants.h}}"{}}}
 \DoxyCodeLine{00026\ }
 \DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <QApplication>}}
 \DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <QDialogButtonBox>}}
@@ -47,10 +47,10 @@
 \DoxyCodeLine{00043\ \textcolor{preprocessor}{\#include\ <QElapsedTimer>}}
 \DoxyCodeLine{00044\ }
 \DoxyCodeLine{00045\ }
-\DoxyCodeLine{00046\ \textcolor{keyword}{inline}\ QString\ loadWordlistResource(QWidget\ *parent,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *caller)}
+\DoxyCodeLine{00046\ \textcolor{keyword}{inline}\ QString\ \mbox{\hyperlink{utils_8h_a19d9a97a5318e2587eddc6a49096a5e6}{loadWordlistResource}}(QWidget\ *parent,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *caller)}
 \DoxyCodeLine{00047\ \{}
 \DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{classSettings}{Settings}}\ settings;}
-\DoxyCodeLine{00049\ \ \ \ \ QString\ configFile\ =\ settings.configFilePath();}
+\DoxyCodeLine{00049\ \ \ \ \ QString\ configFile\ =\ settings.\mbox{\hyperlink{classSettings_a5f462919a8f6960a1cf20caca101083c}{configFilePath}}();}
 \DoxyCodeLine{00050\ \ \ \ \ QString\ configDir\ \ =\ QFileInfo(configFile).absolutePath();}
 \DoxyCodeLine{00051\ }
 \DoxyCodeLine{00052\ \ \ \ \ QString\ wordListPath\ =\ QDir(configDir).filePath(\textcolor{stringliteral}{"{}wordlist.rcc"{}});}
@@ -75,7 +75,7 @@
 \DoxyCodeLine{00071\ \ \ \ \ \textcolor{keywordflow}{return}\ wordListPath;}
 \DoxyCodeLine{00072\ \}}
 \DoxyCodeLine{00073\ }
-\DoxyCodeLine{00074\ \textcolor{keyword}{inline}\ QString\ appKeyFilePath()}
+\DoxyCodeLine{00074\ \textcolor{keyword}{inline}\ QString\ \mbox{\hyperlink{utils_8h_afc658b033c38227f0d1ad3fb6e3c0a03}{appKeyFilePath}}()}
 \DoxyCodeLine{00075\ \{}
 \DoxyCodeLine{00076\ \ \ \ \ \textcolor{keyword}{const}\ QString\ dir\ =\ QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);}
 \DoxyCodeLine{00077\ \ \ \ \ QDir().mkpath(dir);}
@@ -83,7 +83,7 @@
 \DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordflow}{return}\ QFile::exists(path)\ ?\ path\ :\ QString();}
 \DoxyCodeLine{00080\ \}}
 \DoxyCodeLine{00081\ }
-\DoxyCodeLine{00082\ \textcolor{keyword}{inline}\ QString\ getHelpBaseUrl(\textcolor{keyword}{const}\ QString\&\ page\ =\ QString())}
+\DoxyCodeLine{00082\ \textcolor{keyword}{inline}\ QString\ \mbox{\hyperlink{utils_8h_a1c9ff2f7840a67f72601623b3e4ab992}{getHelpBaseUrl}}(\textcolor{keyword}{const}\ QString\&\ page\ =\ QString())}
 \DoxyCodeLine{00083\ \{}
 \DoxyCodeLine{00084\ \ \ \ \ QString\ lang\ =\ QLocale::system().name().left(2);}
 \DoxyCodeLine{00085\ }
@@ -93,7 +93,7 @@
 \DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ lang\ =\ \textcolor{stringliteral}{"{}en"{}};}
 \DoxyCodeLine{00090\ }
 \DoxyCodeLine{00091\ \ \ \ \ \textcolor{comment}{//\ Base:\ https://.../passwords/en/}}
-\DoxyCodeLine{00092\ \ \ \ \ QString\ base\ =\ QString(\textcolor{stringliteral}{"{}\%1\%2/"{}}).arg(Passwords::HelpBaseUrl,\ lang);}
+\DoxyCodeLine{00092\ \ \ \ \ QString\ base\ =\ QString(\textcolor{stringliteral}{"{}\%1\%2/"{}}).arg(\mbox{\hyperlink{namespacePasswords_a7dbefa12001a2c3e3859de819a35d07b}{Passwords::HelpBaseUrl}},\ lang);}
 \DoxyCodeLine{00093\ }
 \DoxyCodeLine{00094\ \ \ \ \ \textcolor{comment}{//\ If\ a\ page\ is\ provided,\ append\ it}}
 \DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordflow}{if}\ (!page.isEmpty())\ \{}
@@ -108,7 +108,7 @@
 \DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordflow}{return}\ base;}
 \DoxyCodeLine{00105\ \}}
 \DoxyCodeLine{00106\ }
-\DoxyCodeLine{00107\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ setupDebugWarnings(QWidget\ *parent,\ QStatusBar\ *statusBar)}
+\DoxyCodeLine{00107\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{utils_8h_ae5f742ff33518f8c4f8f0350043da1eb}{setupDebugWarnings}}(QWidget\ *parent,\ QStatusBar\ *statusBar)}
 \DoxyCodeLine{00108\ \{}
 \DoxyCodeLine{00109\ \textcolor{preprocessor}{\#ifdef\ APP\_DEBUG\_BUILD}}
 \DoxyCodeLine{00110\ \ \ \ \ \textcolor{comment}{//\ Permanent\ status\ bar\ warning}}
@@ -121,7 +121,7 @@
 \DoxyCodeLine{00117\ \ \ \ \ QIcon\ beetleIcon(\textcolor{stringliteral}{"{}:/menus/glyphs/beetle\_color.svg"{}});}
 \DoxyCodeLine{00118\ \ \ \ \ iconLabel-\/>setPixmap(beetleIcon.pixmap(16,\ 16));}
 \DoxyCodeLine{00119\ }
-\DoxyCodeLine{00120\ \ \ \ \ QLabel\ *textLabel\ =\ \textcolor{keyword}{new}\ QLabel(Passwords::debugWarningSB);}
+\DoxyCodeLine{00120\ \ \ \ \ QLabel\ *textLabel\ =\ \textcolor{keyword}{new}\ QLabel(\mbox{\hyperlink{namespacePasswords_afb94887c45ee9adbed2605c352cd3539}{Passwords::debugWarningSB}});}
 \DoxyCodeLine{00121\ \ \ \ \ textLabel-\/>setStyleSheet(\textcolor{stringliteral}{"{}color:\ red;\ font-\/weight:\ bold;"{}});}
 \DoxyCodeLine{00122\ }
 \DoxyCodeLine{00123\ \ \ \ \ layout-\/>addWidget(iconLabel);}
@@ -139,7 +139,7 @@
 \DoxyCodeLine{00135\ }
 \DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ QMessageBox\ msgBox(parent);}
 \DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ msgBox.setWindowTitle(QApplication::applicationName());}
-\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ msgBox.setText(Passwords::debugWarningMB);}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ msgBox.setText(\mbox{\hyperlink{namespacePasswords_abacd620228c063e1437e5498f8b2feb7}{Passwords::debugWarningMB}});}
 \DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ msgBox.setIconPixmap(beetlePixmap);}
 \DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ msgBox.exec();}
 \DoxyCodeLine{00141\ \ \ \ \ \};}
@@ -156,7 +156,7 @@
 \DoxyCodeLine{00152\ \textcolor{preprocessor}{\#endif}}
 \DoxyCodeLine{00153\ \}}
 \DoxyCodeLine{00154\ }
-\DoxyCodeLine{00155\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ manageBackups(\textcolor{keyword}{const}\ QString\ \&directory,\ \textcolor{keywordtype}{int}\ maxFiles,\ QWidget\ *parent\ =\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00155\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{utils_8h_a5c565ad489dd73d23b30f8d195d6cc74}{manageBackups}}(\textcolor{keyword}{const}\ QString\ \&directory,\ \textcolor{keywordtype}{int}\ maxFiles,\ QWidget\ *parent\ =\ \textcolor{keyword}{nullptr})}
 \DoxyCodeLine{00156\ \{}
 \DoxyCodeLine{00157\ \ \ \ \ \textcolor{keywordflow}{if}\ (maxFiles\ <=\ 0)}
 \DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
@@ -213,10 +213,10 @@
 \DoxyCodeLine{00209\ \}}
 \DoxyCodeLine{00210\ }
 \DoxyCodeLine{00211\ }
-\DoxyCodeLine{00212\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ checkOnlineHelp(std::function<\textcolor{keywordtype}{void}(\textcolor{keywordtype}{bool})>\ callback)}
+\DoxyCodeLine{00212\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{utils_8h_a55e4a6288a0f86c2f0747704a5aae165}{checkOnlineHelp}}(std::function<\textcolor{keywordtype}{void}(\textcolor{keywordtype}{bool})>\ callback)}
 \DoxyCodeLine{00213\ \{}
 \DoxyCodeLine{00214\ \ \ \ \ \textcolor{keyword}{auto}\ manager\ =\ \textcolor{keyword}{new}\ QNetworkAccessManager;}
-\DoxyCodeLine{00215\ \ \ \ \ \textcolor{keyword}{auto}\ reply\ =\ manager-\/>get(QNetworkRequest(QUrl(getHelpBaseUrl())));}
+\DoxyCodeLine{00215\ \ \ \ \ \textcolor{keyword}{auto}\ reply\ =\ manager-\/>get(QNetworkRequest(QUrl(\mbox{\hyperlink{utils_8h_a1c9ff2f7840a67f72601623b3e4ab992}{getHelpBaseUrl}}())));}
 \DoxyCodeLine{00216\ }
 \DoxyCodeLine{00217\ \ \ \ \ QObject::connect(reply,\ \&QNetworkReply::finished,\ reply,\ [reply,\ callback]()\ \{}
 \DoxyCodeLine{00218\ }
@@ -229,7 +229,7 @@
 \DoxyCodeLine{00225\ \ \ \ \ \});}
 \DoxyCodeLine{00226\ \}}
 \DoxyCodeLine{00227\ }
-\DoxyCodeLine{00228\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ localHelpAvailable()}
+\DoxyCodeLine{00228\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{utils_8h_a3cd92397a21d956097e1b7a411952aab}{localHelpAvailable}}()}
 \DoxyCodeLine{00229\ \{}
 \DoxyCodeLine{00230\ \ \ \ \ \textcolor{keyword}{const}\ QString\ appDir\ =\ QCoreApplication::applicationDirPath();}
 \DoxyCodeLine{00231\ }
@@ -241,7 +241,7 @@
 \DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ QFile::exists(rcc));}
 \DoxyCodeLine{00238\ \}}
 \DoxyCodeLine{00239\ }
-\DoxyCodeLine{00240\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ launchHelperProcess(\textcolor{keyword}{const}\ QString\ \&page)}
+\DoxyCodeLine{00240\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{utils_8h_a07132e65da59ee8eb4652750561049ca}{launchHelperProcess}}(\textcolor{keyword}{const}\ QString\ \&page)}
 \DoxyCodeLine{00241\ \{}
 \DoxyCodeLine{00242\ \ \ \ \ \mbox{\hyperlink{classSettings}{Settings}}\ settings;}
 \DoxyCodeLine{00243\ }
@@ -266,7 +266,7 @@
 \DoxyCodeLine{00262\ }
 \DoxyCodeLine{00263\ \ \ \ \ QStringList\ args;}
 \DoxyCodeLine{00264\ \ \ \ \ args\ <<\ \textcolor{stringliteral}{"{}-\/-\/webdir"{}}\ <<\ tempDir}
-\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}-\/-\/port"{}}\ \ \ <<\ QString::number(settings.getHelpPort());}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}-\/-\/port"{}}\ \ \ <<\ QString::number(settings.\mbox{\hyperlink{classSettings_ab4448d0fa56ab0d63f77f5a08ddd3eb3}{getHelpPort}}());}
 \DoxyCodeLine{00266\ }
 \DoxyCodeLine{00267\ \ \ \ \ \textcolor{keywordflow}{if}\ (!page.isEmpty())}
 \DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ args\ <<\ \textcolor{stringliteral}{"{}-\/-\/page"{}}\ <<\ page;}

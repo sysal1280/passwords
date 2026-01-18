@@ -2,7 +2,12 @@
 \hypertarget{classDbMaintenance}{}\label{classDbMaintenance}\index{DbMaintenance@{DbMaintenance}}
 
 
-Inheritance diagram for Db\+Maintenance\+:\nopagebreak
+{\ttfamily \#include $<$dbmaintenance.\+h$>$}
+
+
+
+Inheritance diagram for Db\+Maintenance\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11,7 +16,8 @@ Inheritance diagram for Db\+Maintenance\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for Db\+Maintenance\+:\nopagebreak
+Collaboration diagram for Db\+Maintenance\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -21,29 +27,138 @@ Collaboration diagram for Db\+Maintenance\+:\nopagebreak
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{classDbMaintenance_a92e62306d766e912c175876a96d066e6}\label{classDbMaintenance_a92e62306d766e912c175876a96d066e6} 
-{\bfseries Db\+Maintenance} (QSql\+Database db, QWidget \texorpdfstring{$\ast$}{*}parent=nullptr)
+\mbox{\hyperlink{classDbMaintenance_a92e62306d766e912c175876a96d066e6}{Db\+Maintenance}} (QSql\+Database db, QWidget \texorpdfstring{$\ast$}{*}parent=nullptr)
 \item 
-\Hypertarget{classDbMaintenance_a5c2a7e204ea62a37f200390ac83da4e7}\label{classDbMaintenance_a5c2a7e204ea62a37f200390ac83da4e7} 
-void {\bfseries start\+Maintenance} ()
+void \mbox{\hyperlink{classDbMaintenance_a5c2a7e204ea62a37f200390ac83da4e7}{start\+Maintenance}} ()
 \item 
-\Hypertarget{classDbMaintenance_ab0b4fbe75cc26d936f34b633643a756e}\label{classDbMaintenance_ab0b4fbe75cc26d936f34b633643a756e} 
-void {\bfseries update\+Status} (const QString \&text, int progress)
+void \mbox{\hyperlink{classDbMaintenance_ab0b4fbe75cc26d936f34b633643a756e}{update\+Status}} (const QString \&text, int progress)
 \item 
-\Hypertarget{classDbMaintenance_a348dc1f4ff7825710189d8bda8503a3f}\label{classDbMaintenance_a348dc1f4ff7825710189d8bda8503a3f} 
-void {\bfseries maintenance\+Finished} ()
+void \mbox{\hyperlink{classDbMaintenance_a348dc1f4ff7825710189d8bda8503a3f}{maintenance\+Finished}} ()
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Protected Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{classDbMaintenance_a50e2572907036c27cccd10efdadadb48}\label{classDbMaintenance_a50e2572907036c27cccd10efdadadb48} 
-void {\bfseries close\+Event} (QClose\+Event \texorpdfstring{$\ast$}{*}event) override
+void \mbox{\hyperlink{classDbMaintenance_a50e2572907036c27cccd10efdadadb48}{close\+Event}} (QClose\+Event \texorpdfstring{$\ast$}{*}event) override
 \item 
-\Hypertarget{classDbMaintenance_a09e46b087a0d93b0ec126ed77d1f5521}\label{classDbMaintenance_a09e46b087a0d93b0ec126ed77d1f5521} 
-void {\bfseries reject} () override
+void \mbox{\hyperlink{classDbMaintenance_a09e46b087a0d93b0ec126ed77d1f5521}{reject}} () override
 \end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classDbMaintenance_aa0c7c3e937d20c47c8cc4e21ea2edfb9}{run\+Maintenance}} ()
+\item 
+bool \mbox{\hyperlink{classDbMaintenance_ab394ba1b3b922991be5b1125c2581896}{run\+Query}} (const QString \&sql, QString \&error\+Out)
+\item 
+QString \mbox{\hyperlink{classDbMaintenance_a8fccf44a440d16fa2b21b627ffb4515b}{get\+Single\+Value}} (const QString \&sql, QString \&error\+Out)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+QSql\+Database \mbox{\hyperlink{classDbMaintenance_ae7f86ae46443598b86b31204c9bb89e9}{m\+\_\+db}}
+\item 
+QLabel \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c}{m\+\_\+status\+Label}}
+\item 
+QProgress\+Bar \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classDbMaintenance_a87cdeea4b00cd28fd294613fb083f357}{m\+\_\+progress}}
+\item 
+QPush\+Button \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6}{m\+\_\+start\+Btn}}
+\item 
+QPush\+Button \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classDbMaintenance_a08396cf9f94fe0fb6574df7f3d815b8d}{m\+\_\+close\+Btn}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classDbMaintenance_a92e62306d766e912c175876a96d066e6}\label{classDbMaintenance_a92e62306d766e912c175876a96d066e6} 
+\index{DbMaintenance@{DbMaintenance}!DbMaintenance@{DbMaintenance}}
+\index{DbMaintenance@{DbMaintenance}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{DbMaintenance()}{DbMaintenance()}}
+{\footnotesize\ttfamily Db\+Maintenance\+::\+Db\+Maintenance (\begin{DoxyParamCaption}\item[{QSql\+Database}]{db,  }\item[{QWidget \texorpdfstring{$\ast$}{*}}]{parent = {\ttfamily nullptr} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classDbMaintenance_a50e2572907036c27cccd10efdadadb48}\label{classDbMaintenance_a50e2572907036c27cccd10efdadadb48} 
+\index{DbMaintenance@{DbMaintenance}!closeEvent@{closeEvent}}
+\index{closeEvent@{closeEvent}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{closeEvent()}{closeEvent()}}
+{\footnotesize\ttfamily void Db\+Maintenance\+::close\+Event (\begin{DoxyParamCaption}\item[{QClose\+Event \texorpdfstring{$\ast$}{*}}]{event }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [protected]}}
+
+\Hypertarget{classDbMaintenance_a8fccf44a440d16fa2b21b627ffb4515b}\label{classDbMaintenance_a8fccf44a440d16fa2b21b627ffb4515b} 
+\index{DbMaintenance@{DbMaintenance}!getSingleValue@{getSingleValue}}
+\index{getSingleValue@{getSingleValue}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{getSingleValue()}{getSingleValue()}}
+{\footnotesize\ttfamily QString Db\+Maintenance\+::get\+Single\+Value (\begin{DoxyParamCaption}\item[{const QString \&}]{sql,  }\item[{QString \&}]{error\+Out }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+\Hypertarget{classDbMaintenance_a348dc1f4ff7825710189d8bda8503a3f}\label{classDbMaintenance_a348dc1f4ff7825710189d8bda8503a3f} 
+\index{DbMaintenance@{DbMaintenance}!maintenanceFinished@{maintenanceFinished}}
+\index{maintenanceFinished@{maintenanceFinished}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{maintenanceFinished()}{maintenanceFinished()}}
+{\footnotesize\ttfamily void Db\+Maintenance\+::maintenance\+Finished (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{classDbMaintenance_a09e46b087a0d93b0ec126ed77d1f5521}\label{classDbMaintenance_a09e46b087a0d93b0ec126ed77d1f5521} 
+\index{DbMaintenance@{DbMaintenance}!reject@{reject}}
+\index{reject@{reject}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{reject()}{reject()}}
+{\footnotesize\ttfamily void Db\+Maintenance\+::reject (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [protected]}}
+
+\Hypertarget{classDbMaintenance_aa0c7c3e937d20c47c8cc4e21ea2edfb9}\label{classDbMaintenance_aa0c7c3e937d20c47c8cc4e21ea2edfb9} 
+\index{DbMaintenance@{DbMaintenance}!runMaintenance@{runMaintenance}}
+\index{runMaintenance@{runMaintenance}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{runMaintenance()}{runMaintenance()}}
+{\footnotesize\ttfamily void Db\+Maintenance\+::run\+Maintenance (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+\Hypertarget{classDbMaintenance_ab394ba1b3b922991be5b1125c2581896}\label{classDbMaintenance_ab394ba1b3b922991be5b1125c2581896} 
+\index{DbMaintenance@{DbMaintenance}!runQuery@{runQuery}}
+\index{runQuery@{runQuery}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{runQuery()}{runQuery()}}
+{\footnotesize\ttfamily bool Db\+Maintenance\+::run\+Query (\begin{DoxyParamCaption}\item[{const QString \&}]{sql,  }\item[{QString \&}]{error\+Out }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+\Hypertarget{classDbMaintenance_a5c2a7e204ea62a37f200390ac83da4e7}\label{classDbMaintenance_a5c2a7e204ea62a37f200390ac83da4e7} 
+\index{DbMaintenance@{DbMaintenance}!startMaintenance@{startMaintenance}}
+\index{startMaintenance@{startMaintenance}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{startMaintenance()}{startMaintenance()}}
+{\footnotesize\ttfamily void Db\+Maintenance\+::start\+Maintenance (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{classDbMaintenance_ab0b4fbe75cc26d936f34b633643a756e}\label{classDbMaintenance_ab0b4fbe75cc26d936f34b633643a756e} 
+\index{DbMaintenance@{DbMaintenance}!updateStatus@{updateStatus}}
+\index{updateStatus@{updateStatus}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{updateStatus()}{updateStatus()}}
+{\footnotesize\ttfamily void Db\+Maintenance\+::update\+Status (\begin{DoxyParamCaption}\item[{const QString \&}]{text,  }\item[{int}]{progress }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classDbMaintenance_a08396cf9f94fe0fb6574df7f3d815b8d}\label{classDbMaintenance_a08396cf9f94fe0fb6574df7f3d815b8d} 
+\index{DbMaintenance@{DbMaintenance}!m\_closeBtn@{m\_closeBtn}}
+\index{m\_closeBtn@{m\_closeBtn}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{m\_closeBtn}{m\_closeBtn}}
+{\footnotesize\ttfamily QPush\+Button\texorpdfstring{$\ast$}{*} Db\+Maintenance\+::m\+\_\+close\+Btn\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classDbMaintenance_ae7f86ae46443598b86b31204c9bb89e9}\label{classDbMaintenance_ae7f86ae46443598b86b31204c9bb89e9} 
+\index{DbMaintenance@{DbMaintenance}!m\_db@{m\_db}}
+\index{m\_db@{m\_db}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{m\_db}{m\_db}}
+{\footnotesize\ttfamily QSql\+Database Db\+Maintenance\+::m\+\_\+db\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classDbMaintenance_a87cdeea4b00cd28fd294613fb083f357}\label{classDbMaintenance_a87cdeea4b00cd28fd294613fb083f357} 
+\index{DbMaintenance@{DbMaintenance}!m\_progress@{m\_progress}}
+\index{m\_progress@{m\_progress}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{m\_progress}{m\_progress}}
+{\footnotesize\ttfamily QProgress\+Bar\texorpdfstring{$\ast$}{*} Db\+Maintenance\+::m\+\_\+progress\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6}\label{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6} 
+\index{DbMaintenance@{DbMaintenance}!m\_startBtn@{m\_startBtn}}
+\index{m\_startBtn@{m\_startBtn}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{m\_startBtn}{m\_startBtn}}
+{\footnotesize\ttfamily QPush\+Button\texorpdfstring{$\ast$}{*} Db\+Maintenance\+::m\+\_\+start\+Btn\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c}\label{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c} 
+\index{DbMaintenance@{DbMaintenance}!m\_statusLabel@{m\_statusLabel}}
+\index{m\_statusLabel@{m\_statusLabel}!DbMaintenance@{DbMaintenance}}
+\doxysubsubsection{\texorpdfstring{m\_statusLabel}{m\_statusLabel}}
+{\footnotesize\ttfamily QLabel\texorpdfstring{$\ast$}{*} Db\+Maintenance\+::m\+\_\+status\+Label\hspace{0.3cm}{\ttfamily [private]}}
+
 
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-src/dbmaintenance.\+h\end{DoxyCompactItemize}
+src/\mbox{\hyperlink{dbmaintenance_8h}{dbmaintenance.\+h}}\end{DoxyCompactItemize}

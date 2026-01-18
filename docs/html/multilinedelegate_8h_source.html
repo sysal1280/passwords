@@ -82,7 +82,7 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">multilinedelegate.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<a href="multilinedelegate_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * passwords - A GnuPG based password manager</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> * Copyright (C) 2025  Adam.Lanzafame &lt;sysal@tuta.io&gt;</span></div>
@@ -115,10 +115,13 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classMultiLineDelegate.html">   30</a></span><span class="keyword">class </span><a class="code hl_class" href="classMultiLineDelegate.html">MultiLineDelegate</a> : <span class="keyword">public</span> QStyledItemDelegate {</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    Q_OBJECT</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keyword">explicit</span> <a class="code hl_class" href="classMultiLineDelegate.html">MultiLineDelegate</a>(QObject *parent = <span class="keyword">nullptr</span>)</div>
+<div class="foldopen" id="foldopen00033" data-start="{" data-end="}">
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classMultiLineDelegate.html#a9306403dfcd383c7458b328b30000420">   33</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classMultiLineDelegate.html#a9306403dfcd383c7458b328b30000420">MultiLineDelegate</a>(QObject *parent = <span class="keyword">nullptr</span>)</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        : QStyledItemDelegate(parent) {}</div>
+</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    QWidget *createEditor(QWidget *parent,</div>
+<div class="foldopen" id="foldopen00036" data-start="{" data-end="}">
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classMultiLineDelegate.html#a0a935c51a17610f3b504b5434c1c82c9">   36</a></span>    QWidget *<a class="code hl_function" href="classMultiLineDelegate.html#a0a935c51a17610f3b504b5434c1c82c9">createEditor</a>(QWidget *parent,</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                          <span class="keyword">const</span> QStyleOptionViewItem &amp;,</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>                          <span class="keyword">const</span> QModelIndex &amp;)<span class="keyword"> const override </span>{</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        QTextEdit *editor = <span class="keyword">new</span> QTextEdit(parent);</div>
@@ -151,13 +154,17 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>        <span class="keywordflow">return</span> editor;</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    }</div>
+</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordtype">void</span> setEditorData(QWidget *editor, <span class="keyword">const</span> QModelIndex &amp;index)<span class="keyword"> const override </span>{</div>
+<div class="foldopen" id="foldopen00070" data-start="{" data-end="}">
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="classMultiLineDelegate.html#ab533a77a060cc8c61830ae2c8e25ce17">   70</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classMultiLineDelegate.html#ab533a77a060cc8c61830ae2c8e25ce17">setEditorData</a>(QWidget *editor, <span class="keyword">const</span> QModelIndex &amp;index)<span class="keyword"> const override </span>{</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        QString value = index.model()-&gt;data(index, Qt::EditRole).toString();</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        <span class="keyword">static_cast&lt;</span>QTextEdit*<span class="keyword">&gt;</span>(editor)-&gt;setPlainText(value);</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    }</div>
+</div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <span class="keywordtype">void</span> setModelData(QWidget *editor, QAbstractItemModel *model,</div>
+<div class="foldopen" id="foldopen00075" data-start="{" data-end="}">
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="classMultiLineDelegate.html#a9376f2d0696f03f6b431e1bf4719e60b">   75</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classMultiLineDelegate.html#a9376f2d0696f03f6b431e1bf4719e60b">setModelData</a>(QWidget *editor, QAbstractItemModel *model,</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>                      <span class="keyword">const</span> QModelIndex &amp;index)<span class="keyword"> const override </span>{</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        QTextEdit *edit = <span class="keyword">static_cast&lt;</span>QTextEdit*<span class="keyword">&gt;</span>(editor);</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        QByteArray utf8 = edit-&gt;toPlainText().toUtf8();</div>
@@ -169,17 +176,25 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        model-&gt;setData(index, QString::fromUtf8(utf8), Qt::EditRole);</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    }</div>
+</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="keywordtype">void</span> updateEditorGeometry(QWidget *editor,</div>
+<div class="foldopen" id="foldopen00088" data-start="{" data-end="}">
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="classMultiLineDelegate.html#a9fb38c9cd4a27fec3cc6df19959757f5">   88</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classMultiLineDelegate.html#a9fb38c9cd4a27fec3cc6df19959757f5">updateEditorGeometry</a>(QWidget *editor,</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                              <span class="keyword">const</span> QStyleOptionViewItem &amp;option,</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>                              <span class="keyword">const</span> QModelIndex &amp;)<span class="keyword"> const override </span>{</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        editor-&gt;setGeometry(option.rect);</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    }</div>
+</div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>};</div>
 </div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="preprocessor">#endif </span><span class="comment">// MULTILINEDELEGATE_H</span></div>
 <div class="ttc" id="aclassMultiLineDelegate_html"><div class="ttname"><a href="classMultiLineDelegate.html">MultiLineDelegate</a></div><div class="ttdef"><b>Definition</b> multilinedelegate.h:30</div></div>
+<div class="ttc" id="aclassMultiLineDelegate_html_a0a935c51a17610f3b504b5434c1c82c9"><div class="ttname"><a href="classMultiLineDelegate.html#a0a935c51a17610f3b504b5434c1c82c9">MultiLineDelegate::createEditor</a></div><div class="ttdeci">QWidget * createEditor(QWidget *parent, const QStyleOptionViewItem &amp;, const QModelIndex &amp;) const override</div><div class="ttdef"><b>Definition</b> multilinedelegate.h:36</div></div>
+<div class="ttc" id="aclassMultiLineDelegate_html_a9306403dfcd383c7458b328b30000420"><div class="ttname"><a href="classMultiLineDelegate.html#a9306403dfcd383c7458b328b30000420">MultiLineDelegate::MultiLineDelegate</a></div><div class="ttdeci">MultiLineDelegate(QObject *parent=nullptr)</div><div class="ttdef"><b>Definition</b> multilinedelegate.h:33</div></div>
+<div class="ttc" id="aclassMultiLineDelegate_html_a9376f2d0696f03f6b431e1bf4719e60b"><div class="ttname"><a href="classMultiLineDelegate.html#a9376f2d0696f03f6b431e1bf4719e60b">MultiLineDelegate::setModelData</a></div><div class="ttdeci">void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &amp;index) const override</div><div class="ttdef"><b>Definition</b> multilinedelegate.h:75</div></div>
+<div class="ttc" id="aclassMultiLineDelegate_html_a9fb38c9cd4a27fec3cc6df19959757f5"><div class="ttname"><a href="classMultiLineDelegate.html#a9fb38c9cd4a27fec3cc6df19959757f5">MultiLineDelegate::updateEditorGeometry</a></div><div class="ttdeci">void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &amp;option, const QModelIndex &amp;) const override</div><div class="ttdef"><b>Definition</b> multilinedelegate.h:88</div></div>
+<div class="ttc" id="aclassMultiLineDelegate_html_ab533a77a060cc8c61830ae2c8e25ce17"><div class="ttname"><a href="classMultiLineDelegate.html#ab533a77a060cc8c61830ae2c8e25ce17">MultiLineDelegate::setEditorData</a></div><div class="ttdeci">void setEditorData(QWidget *editor, const QModelIndex &amp;index) const override</div><div class="ttdef"><b>Definition</b> multilinedelegate.h:70</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

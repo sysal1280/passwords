@@ -2,7 +2,12 @@
 \hypertarget{classIdleDetector}{}\label{classIdleDetector}\index{IdleDetector@{IdleDetector}}
 
 
-Inheritance diagram for Idle\+Detector\+:\nopagebreak
+{\ttfamily \#include $<$idledetector.\+h$>$}
+
+
+
+Inheritance diagram for Idle\+Detector\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11,7 +16,8 @@ Inheritance diagram for Idle\+Detector\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for Idle\+Detector\+:\nopagebreak
+Collaboration diagram for Idle\+Detector\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -21,24 +27,99 @@ Collaboration diagram for Idle\+Detector\+:\nopagebreak
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{classIdleDetector_a1adfb035cb2b15b42c3b73e1369fbcc9}\label{classIdleDetector_a1adfb035cb2b15b42c3b73e1369fbcc9} 
-{\bfseries Idle\+Detector} (int idle\+Seconds, QObject \texorpdfstring{$\ast$}{*}parent=nullptr)
+\mbox{\hyperlink{classIdleDetector_a1adfb035cb2b15b42c3b73e1369fbcc9}{Idle\+Detector}} (int idle\+Seconds, QObject \texorpdfstring{$\ast$}{*}parent=nullptr)
 \item 
-\Hypertarget{classIdleDetector_a2b81733bab0bf774c5dafcf3c6c8bb71}\label{classIdleDetector_a2b81733bab0bf774c5dafcf3c6c8bb71} 
-void {\bfseries idle} ()
+void \mbox{\hyperlink{classIdleDetector_a2b81733bab0bf774c5dafcf3c6c8bb71}{idle}} ()
 \item 
-\Hypertarget{classIdleDetector_a4ab382158c5d7ca04d382e9c82948676}\label{classIdleDetector_a4ab382158c5d7ca04d382e9c82948676} 
-void {\bfseries activity} ()
+void \mbox{\hyperlink{classIdleDetector_a4ab382158c5d7ca04d382e9c82948676}{activity}} ()
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Protected Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{classIdleDetector_ae71b7562e8d7f9fca7cf8578c7c088a2}\label{classIdleDetector_ae71b7562e8d7f9fca7cf8578c7c088a2} 
-bool {\bfseries event\+Filter} (QObject \texorpdfstring{$\ast$}{*}obj, QEvent \texorpdfstring{$\ast$}{*}event) override
+bool \mbox{\hyperlink{classIdleDetector_ae71b7562e8d7f9fca7cf8578c7c088a2}{event\+Filter}} (QObject \texorpdfstring{$\ast$}{*}obj, QEvent \texorpdfstring{$\ast$}{*}event) override
 \end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classIdleDetector_ac470733aeb3881423083ebb396f819ee}{check\+Idle}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+QElapsed\+Timer \mbox{\hyperlink{classIdleDetector_a0a445f01d56cccc257bd1eadc7b901d6}{m\+\_\+timer}}
+\item 
+QTimer \mbox{\hyperlink{classIdleDetector_ae93fc533f6fbd1082d5fedffad5a66c2}{m\+\_\+check\+Timer}}
+\item 
+int \mbox{\hyperlink{classIdleDetector_a2fb3edaae28b3829b950b2e44dfa7daf}{m\+\_\+idle\+Seconds}}
+\item 
+bool \mbox{\hyperlink{classIdleDetector_af517a0971604c2a2a2c008cd4910c55b}{m\+\_\+is\+Idle}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classIdleDetector_a1adfb035cb2b15b42c3b73e1369fbcc9}\label{classIdleDetector_a1adfb035cb2b15b42c3b73e1369fbcc9} 
+\index{IdleDetector@{IdleDetector}!IdleDetector@{IdleDetector}}
+\index{IdleDetector@{IdleDetector}!IdleDetector@{IdleDetector}}
+\doxysubsubsection{\texorpdfstring{IdleDetector()}{IdleDetector()}}
+{\footnotesize\ttfamily Idle\+Detector\+::\+Idle\+Detector (\begin{DoxyParamCaption}\item[{int}]{idle\+Seconds,  }\item[{QObject \texorpdfstring{$\ast$}{*}}]{parent = {\ttfamily nullptr} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classIdleDetector_a4ab382158c5d7ca04d382e9c82948676}\label{classIdleDetector_a4ab382158c5d7ca04d382e9c82948676} 
+\index{IdleDetector@{IdleDetector}!activity@{activity}}
+\index{activity@{activity}!IdleDetector@{IdleDetector}}
+\doxysubsubsection{\texorpdfstring{activity()}{activity()}}
+{\footnotesize\ttfamily void Idle\+Detector\+::activity (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{classIdleDetector_ac470733aeb3881423083ebb396f819ee}\label{classIdleDetector_ac470733aeb3881423083ebb396f819ee} 
+\index{IdleDetector@{IdleDetector}!checkIdle@{checkIdle}}
+\index{checkIdle@{checkIdle}!IdleDetector@{IdleDetector}}
+\doxysubsubsection{\texorpdfstring{checkIdle()}{checkIdle()}}
+{\footnotesize\ttfamily void Idle\+Detector\+::check\+Idle (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classIdleDetector_ae71b7562e8d7f9fca7cf8578c7c088a2}\label{classIdleDetector_ae71b7562e8d7f9fca7cf8578c7c088a2} 
+\index{IdleDetector@{IdleDetector}!eventFilter@{eventFilter}}
+\index{eventFilter@{eventFilter}!IdleDetector@{IdleDetector}}
+\doxysubsubsection{\texorpdfstring{eventFilter()}{eventFilter()}}
+{\footnotesize\ttfamily bool Idle\+Detector\+::event\+Filter (\begin{DoxyParamCaption}\item[{QObject \texorpdfstring{$\ast$}{*}}]{obj,  }\item[{QEvent \texorpdfstring{$\ast$}{*}}]{event }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+\Hypertarget{classIdleDetector_a2b81733bab0bf774c5dafcf3c6c8bb71}\label{classIdleDetector_a2b81733bab0bf774c5dafcf3c6c8bb71} 
+\index{IdleDetector@{IdleDetector}!idle@{idle}}
+\index{idle@{idle}!IdleDetector@{IdleDetector}}
+\doxysubsubsection{\texorpdfstring{idle()}{idle()}}
+{\footnotesize\ttfamily void Idle\+Detector\+::idle (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classIdleDetector_ae93fc533f6fbd1082d5fedffad5a66c2}\label{classIdleDetector_ae93fc533f6fbd1082d5fedffad5a66c2} 
+\index{IdleDetector@{IdleDetector}!m\_checkTimer@{m\_checkTimer}}
+\index{m\_checkTimer@{m\_checkTimer}!IdleDetector@{IdleDetector}}
+\doxysubsubsection{\texorpdfstring{m\_checkTimer}{m\_checkTimer}}
+{\footnotesize\ttfamily QTimer Idle\+Detector\+::m\+\_\+check\+Timer\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classIdleDetector_a2fb3edaae28b3829b950b2e44dfa7daf}\label{classIdleDetector_a2fb3edaae28b3829b950b2e44dfa7daf} 
+\index{IdleDetector@{IdleDetector}!m\_idleSeconds@{m\_idleSeconds}}
+\index{m\_idleSeconds@{m\_idleSeconds}!IdleDetector@{IdleDetector}}
+\doxysubsubsection{\texorpdfstring{m\_idleSeconds}{m\_idleSeconds}}
+{\footnotesize\ttfamily int Idle\+Detector\+::m\+\_\+idle\+Seconds\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classIdleDetector_af517a0971604c2a2a2c008cd4910c55b}\label{classIdleDetector_af517a0971604c2a2a2c008cd4910c55b} 
+\index{IdleDetector@{IdleDetector}!m\_isIdle@{m\_isIdle}}
+\index{m\_isIdle@{m\_isIdle}!IdleDetector@{IdleDetector}}
+\doxysubsubsection{\texorpdfstring{m\_isIdle}{m\_isIdle}}
+{\footnotesize\ttfamily bool Idle\+Detector\+::m\+\_\+is\+Idle = false\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classIdleDetector_a0a445f01d56cccc257bd1eadc7b901d6}\label{classIdleDetector_a0a445f01d56cccc257bd1eadc7b901d6} 
+\index{IdleDetector@{IdleDetector}!m\_timer@{m\_timer}}
+\index{m\_timer@{m\_timer}!IdleDetector@{IdleDetector}}
+\doxysubsubsection{\texorpdfstring{m\_timer}{m\_timer}}
+{\footnotesize\ttfamily QElapsed\+Timer Idle\+Detector\+::m\+\_\+timer\hspace{0.3cm}{\ttfamily [private]}}
+
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-src/idledetector.\+h\item 
-src/idledetector.\+cpp\end{DoxyCompactItemize}
+src/\mbox{\hyperlink{idledetector_8h}{idledetector.\+h}}\item 
+src/\mbox{\hyperlink{idledetector_8cpp}{idledetector.\+cpp}}\end{DoxyCompactItemize}

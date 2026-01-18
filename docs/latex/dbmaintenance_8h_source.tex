@@ -1,6 +1,6 @@
 \doxysection{dbmaintenance.\+h}
 \hypertarget{dbmaintenance_8h_source}{}\label{dbmaintenance_8h_source}\index{src/dbmaintenance.h@{src/dbmaintenance.h}}
-
+\mbox{\hyperlink{dbmaintenance_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{comment}{/*}}
 \DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
@@ -25,7 +25,7 @@
 \DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ DBMAINTENANCE\_H}}
 \DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ DBMAINTENANCE\_H}}
 \DoxyCodeLine{00023\ }
-\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}scopedcursor.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scopedcursor_8h}{scopedcursor.h}}"{}}}
 \DoxyCodeLine{00025\ }
 \DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <QDialog>}}
 \DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <QLabel>}}
@@ -45,13 +45,13 @@
 \DoxyCodeLine{00041\ \ \ \ \ Q\_OBJECT}
 \DoxyCodeLine{00042\ }
 \DoxyCodeLine{00043\ \textcolor{keyword}{public}:}
-\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classDbMaintenance}{DbMaintenance}}(QSqlDatabase\ db,\ QWidget\ *parent\ =\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classDbMaintenance_a92e62306d766e912c175876a96d066e6}{DbMaintenance}}(QSqlDatabase\ db,\ QWidget\ *parent\ =\ \textcolor{keyword}{nullptr})}
 \DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ :\ QDialog(parent)}
-\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ ,\ m\_db(std::move(db))}
-\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ ,\ m\_statusLabel(\textcolor{keyword}{nullptr})}
-\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ ,\ m\_progress(\textcolor{keyword}{nullptr})}
-\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ ,\ m\_startBtn(\textcolor{keyword}{nullptr})}
-\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ ,\ m\_closeBtn(\textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classDbMaintenance_ae7f86ae46443598b86b31204c9bb89e9}{m\_db}}(std::move(db))}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c}{m\_statusLabel}}(nullptr)}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classDbMaintenance_a87cdeea4b00cd28fd294613fb083f357}{m\_progress}}(nullptr)}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6}{m\_startBtn}}(nullptr)}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classDbMaintenance_a08396cf9f94fe0fb6574df7f3d815b8d}{m\_closeBtn}}(nullptr)}
 \DoxyCodeLine{00051\ \ \ \ \ \{}
 \DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ setWindowTitle(\textcolor{stringliteral}{"{}Database\ Maintenance"{}});}
 \DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ setModal(\textcolor{keyword}{true});}
@@ -61,37 +61,37 @@
 \DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ layout-\/>setContentsMargins(12,\ 12,\ 12,\ 12);}
 \DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ layout-\/>setSpacing(8);}
 \DoxyCodeLine{00059\ }
-\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ m\_statusLabel\ =\ \textcolor{keyword}{new}\ QLabel(\textcolor{stringliteral}{"{}Ready\ to\ begin\ maintenance."{}},\ \textcolor{keyword}{this});}
-\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ m\_statusLabel-\/>setAlignment(Qt::AlignCenter);}
-\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ m\_statusLabel-\/>setStyleSheet(\textcolor{stringliteral}{"{}font-\/size:\ 13px;"{}});}
-\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ layout-\/>addWidget(m\_statusLabel);}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c}{m\_statusLabel}}\ =\ \textcolor{keyword}{new}\ QLabel(\textcolor{stringliteral}{"{}Ready\ to\ begin\ maintenance."{}},\ \textcolor{keyword}{this});}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c}{m\_statusLabel}}-\/>setAlignment(Qt::AlignCenter);}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c}{m\_statusLabel}}-\/>setStyleSheet(\textcolor{stringliteral}{"{}font-\/size:\ 13px;"{}});}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ layout-\/>addWidget(\mbox{\hyperlink{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c}{m\_statusLabel}});}
 \DoxyCodeLine{00064\ }
-\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ m\_progress\ =\ \textcolor{keyword}{new}\ QProgressBar(\textcolor{keyword}{this});}
-\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ m\_progress-\/>setRange(0,\ 6);}
-\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ m\_progress-\/>setValue(0);}
-\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ m\_progress-\/>setFixedHeight(18);}
-\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ layout-\/>addWidget(m\_progress);}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a87cdeea4b00cd28fd294613fb083f357}{m\_progress}}\ =\ \textcolor{keyword}{new}\ QProgressBar(\textcolor{keyword}{this});}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a87cdeea4b00cd28fd294613fb083f357}{m\_progress}}-\/>setRange(0,\ 6);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a87cdeea4b00cd28fd294613fb083f357}{m\_progress}}-\/>setValue(0);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a87cdeea4b00cd28fd294613fb083f357}{m\_progress}}-\/>setFixedHeight(18);}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ layout-\/>addWidget(\mbox{\hyperlink{classDbMaintenance_a87cdeea4b00cd28fd294613fb083f357}{m\_progress}});}
 \DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ layout-\/>addSpacing(20);}
 \DoxyCodeLine{00071\ }
 \DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *buttonBox\ =\ \textcolor{keyword}{new}\ QDialogButtonBox(\textcolor{keyword}{this});}
 \DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ buttonBox-\/>setStandardButtons(QDialogButtonBox::Close);}
 \DoxyCodeLine{00074\ }
-\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ m\_startBtn\ =\ buttonBox-\/>addButton(\textcolor{stringliteral}{"{}Start"{}},\ QDialogButtonBox::ActionRole);}
-\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ m\_closeBtn\ =\ buttonBox-\/>button(QDialogButtonBox::Close);}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6}{m\_startBtn}}\ =\ buttonBox-\/>addButton(\textcolor{stringliteral}{"{}Start"{}},\ QDialogButtonBox::ActionRole);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a08396cf9f94fe0fb6574df7f3d815b8d}{m\_closeBtn}}\ =\ buttonBox-\/>button(QDialogButtonBox::Close);}
 \DoxyCodeLine{00077\ }
 \DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ layout-\/>addWidget(buttonBox);}
 \DoxyCodeLine{00079\ }
-\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ connect(m\_startBtn,\ \&QPushButton::clicked,}
-\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},\ \&DbMaintenance::startMaintenance);}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ connect(\mbox{\hyperlink{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6}{m\_startBtn}},\ \&QPushButton::clicked,}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},\ \&\mbox{\hyperlink{classDbMaintenance_a5c2a7e204ea62a37f200390ac83da4e7}{DbMaintenance::startMaintenance}});}
 \DoxyCodeLine{00082\ }
-\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ connect(m\_closeBtn,\ \&QPushButton::clicked,}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ connect(\mbox{\hyperlink{classDbMaintenance_a08396cf9f94fe0fb6574df7f3d815b8d}{m\_closeBtn}},\ \&QPushButton::clicked,}
 \DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},\ \&QDialog::close);}
 \DoxyCodeLine{00085\ \ \ \ \ \}}
 \DoxyCodeLine{00086\ }
 \DoxyCodeLine{00087\ \textcolor{keyword}{protected}:}
-\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordtype}{void}\ closeEvent(QCloseEvent\ *event)\textcolor{keyword}{\ override}}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classDbMaintenance_a50e2572907036c27cccd10efdadadb48}{closeEvent}}(QCloseEvent\ *event)\textcolor{keyword}{\ override}}
 \DoxyCodeLine{00089\ \textcolor{keyword}{\ \ \ \ }\{}
-\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_startBtn-\/>isEnabled())\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6}{m\_startBtn}}-\/>isEnabled())\ \{}
 \DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ QMessageBox::warning(\textcolor{keyword}{this},\ \textcolor{stringliteral}{"{}Maintenance"{}},}
 \DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Maintenance\ in\ progress.\ Please\ wait..."{}});}
 \DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{event}-\/>ignore();}
@@ -100,9 +100,9 @@
 \DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ QDialog::closeEvent(event);}
 \DoxyCodeLine{00097\ \ \ \ \ \}}
 \DoxyCodeLine{00098\ }
-\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordtype}{void}\ reject()\textcolor{keyword}{\ override}}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classDbMaintenance_a09e46b087a0d93b0ec126ed77d1f5521}{reject}}()\textcolor{keyword}{\ override}}
 \DoxyCodeLine{00100\ \textcolor{keyword}{\ \ \ \ }\{}
-\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_startBtn-\/>isEnabled())\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6}{m\_startBtn}}-\/>isEnabled())\ \{}
 \DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ QMessageBox::warning(\textcolor{keyword}{this},\ \textcolor{stringliteral}{"{}Maintenance"{}},}
 \DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Maintenance\ in\ progress.\ Please\ wait..."{}});}
 \DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
@@ -112,40 +112,40 @@
 \DoxyCodeLine{00108\ \ \ \ \ \}}
 \DoxyCodeLine{00109\ }
 \DoxyCodeLine{00110\ \textcolor{keyword}{private}\ slots:}
-\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordtype}{void}\ startMaintenance()}
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classDbMaintenance_a5c2a7e204ea62a37f200390ac83da4e7}{startMaintenance}}()}
 \DoxyCodeLine{00112\ \ \ \ \ \{}
-\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ m\_startBtn-\/>setEnabled(\textcolor{keyword}{false});}
-\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ m\_statusLabel-\/>setText(\textcolor{stringliteral}{"{}Starting\ maintenance..."{}});}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6}{m\_startBtn}}-\/>setEnabled(\textcolor{keyword}{false});}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c}{m\_statusLabel}}-\/>setText(\textcolor{stringliteral}{"{}Starting\ maintenance..."{}});}
 \DoxyCodeLine{00115\ }
 \DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ QThread::create\ returns\ a\ heap\ object;\ we\ tie\ its\ lifetime\ to\ this\ dialog.}}
 \DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ QThread\ *thread\ =\ QThread::create([\textcolor{keyword}{this}]()\ \{}
-\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ runMaintenance();}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_aa0c7c3e937d20c47c8cc4e21ea2edfb9}{runMaintenance}}();}
 \DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \});}
 \DoxyCodeLine{00120\ }
 \DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ thread-\/>setObjectName(\textcolor{stringliteral}{"{}DbMaintenanceThread"{}});}
 \DoxyCodeLine{00122\ }
 \DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ connect(thread,\ \&QThread::finished,}
-\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},\ \&DbMaintenance::maintenanceFinished);}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},\ \&\mbox{\hyperlink{classDbMaintenance_a348dc1f4ff7825710189d8bda8503a3f}{DbMaintenance::maintenanceFinished}});}
 \DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ connect(thread,\ \&QThread::finished,}
 \DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ thread,\ \&QObject::deleteLater);}
 \DoxyCodeLine{00127\ }
 \DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ thread-\/>start();}
 \DoxyCodeLine{00129\ \ \ \ \ \}}
 \DoxyCodeLine{00130\ }
-\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keywordtype}{void}\ updateStatus(\textcolor{keyword}{const}\ QString\ \&text,\ \textcolor{keywordtype}{int}\ progress)}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classDbMaintenance_ab0b4fbe75cc26d936f34b633643a756e}{updateStatus}}(\textcolor{keyword}{const}\ QString\ \&text,\ \textcolor{keywordtype}{int}\ progress)}
 \DoxyCodeLine{00132\ \ \ \ \ \{}
-\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ m\_statusLabel-\/>setText(text);}
-\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ m\_progress-\/>setValue(progress);}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c}{m\_statusLabel}}-\/>setText(text);}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a87cdeea4b00cd28fd294613fb083f357}{m\_progress}}-\/>setValue(progress);}
 \DoxyCodeLine{00135\ \ \ \ \ \}}
 \DoxyCodeLine{00136\ }
-\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordtype}{void}\ maintenanceFinished()}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classDbMaintenance_a348dc1f4ff7825710189d8bda8503a3f}{maintenanceFinished}}()}
 \DoxyCodeLine{00138\ \ \ \ \ \{}
-\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ m\_statusLabel-\/>setText(\textcolor{stringliteral}{"{}Maintenance\ complete."{}});}
-\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ m\_startBtn-\/>setEnabled(\textcolor{keyword}{true});}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c}{m\_statusLabel}}-\/>setText(\textcolor{stringliteral}{"{}Maintenance\ complete."{}});}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6}{m\_startBtn}}-\/>setEnabled(\textcolor{keyword}{true});}
 \DoxyCodeLine{00141\ \ \ \ \ \}}
 \DoxyCodeLine{00142\ }
 \DoxyCodeLine{00143\ \textcolor{keyword}{private}:}
-\DoxyCodeLine{00144\ \ \ \ \ \textcolor{keywordtype}{void}\ runMaintenance()}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classDbMaintenance_aa0c7c3e937d20c47c8cc4e21ea2edfb9}{runMaintenance}}()}
 \DoxyCodeLine{00145\ \ \ \ \ \{}
 \DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classScopedCursor}{ScopedCursor}}\ wait(Qt::WaitCursor);}
 \DoxyCodeLine{00147\ }
@@ -168,7 +168,7 @@
 \DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{keyword}{this},\ step,\ error]()\ \{}
 \DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QMessageBox::critical(\textcolor{keyword}{this},\ \textcolor{stringliteral}{"{}Maintenance\ Error"{}},}
 \DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ step\ +\ \textcolor{stringliteral}{"{}\ failed:\(\backslash\)n"{}}\ +\ error);}
-\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_startBtn-\/>setEnabled(\textcolor{keyword}{true});}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6}{m\_startBtn}}-\/>setEnabled(\textcolor{keyword}{true});}
 \DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
 \DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Qt::QueuedConnection);}
 \DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \};}
@@ -176,42 +176,42 @@
 \DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ QString\ err;}
 \DoxyCodeLine{00173\ }
 \DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ post(\textcolor{stringliteral}{"{}Running\ integrity\ check..."{}},\ 1);}
-\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!runQuery(\textcolor{stringliteral}{"{}PRAGMA\ integrity\_check;"{}},\ err))\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classDbMaintenance_ab394ba1b3b922991be5b1125c2581896}{runQuery}}(\textcolor{stringliteral}{"{}PRAGMA\ integrity\_check;"{}},\ err))\ \{}
 \DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ fail(\textcolor{stringliteral}{"{}Integrity\ check"{}},\ err,\ 1);}
 \DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ pause();}
 \DoxyCodeLine{00180\ }
 \DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ post(\textcolor{stringliteral}{"{}Running\ quick\ check..."{}},\ 2);}
-\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!runQuery(\textcolor{stringliteral}{"{}PRAGMA\ quick\_check;"{}},\ err))\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classDbMaintenance_ab394ba1b3b922991be5b1125c2581896}{runQuery}}(\textcolor{stringliteral}{"{}PRAGMA\ quick\_check;"{}},\ err))\ \{}
 \DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ fail(\textcolor{stringliteral}{"{}Quick\ check"{}},\ err,\ 2);}
 \DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ pause();}
 \DoxyCodeLine{00187\ }
 \DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ post(\textcolor{stringliteral}{"{}Analyzing\ database..."{}},\ 3);}
-\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!runQuery(\textcolor{stringliteral}{"{}ANALYZE;"{}},\ err))\ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classDbMaintenance_ab394ba1b3b922991be5b1125c2581896}{runQuery}}(\textcolor{stringliteral}{"{}ANALYZE;"{}},\ err))\ \{}
 \DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ fail(\textcolor{stringliteral}{"{}Analyze"{}},\ err,\ 3);}
 \DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ pause();}
 \DoxyCodeLine{00194\ }
 \DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ post(\textcolor{stringliteral}{"{}Reindexing..."{}},\ 4);}
-\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!runQuery(\textcolor{stringliteral}{"{}REINDEX;"{}},\ err))\ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classDbMaintenance_ab394ba1b3b922991be5b1125c2581896}{runQuery}}(\textcolor{stringliteral}{"{}REINDEX;"{}},\ err))\ \{}
 \DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ fail(\textcolor{stringliteral}{"{}Reindex"{}},\ err,\ 4);}
 \DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ pause();}
 \DoxyCodeLine{00201\ }
 \DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ post(\textcolor{stringliteral}{"{}Checking\ WAL\ mode..."{}},\ 5);}
-\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QString\ mode\ =\ getSingleValue(\textcolor{stringliteral}{"{}PRAGMA\ journal\_mode;"{}},\ err);}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QString\ mode\ =\ \mbox{\hyperlink{classDbMaintenance_a8fccf44a440d16fa2b21b627ffb4515b}{getSingleValue}}(\textcolor{stringliteral}{"{}PRAGMA\ journal\_mode;"{}},\ err);}
 \DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode.isEmpty()\ \&\&\ !err.isEmpty())\ \{}
 \DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ fail(\textcolor{stringliteral}{"{}Check\ WAL\ mode"{}},\ err,\ 5);}
 \DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00208\ }
 \DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode.toLower()\ ==\ \textcolor{stringliteral}{"{}wal"{}})\ \{}
-\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!runQuery(\textcolor{stringliteral}{"{}PRAGMA\ wal\_checkpoint(FULL);"{}},\ err))\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classDbMaintenance_ab394ba1b3b922991be5b1125c2581896}{runQuery}}(\textcolor{stringliteral}{"{}PRAGMA\ wal\_checkpoint(FULL);"{}},\ err))\ \{}
 \DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fail(\textcolor{stringliteral}{"{}WAL\ checkpoint"{}},\ err,\ 5);}
 \DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
@@ -219,16 +219,16 @@
 \DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ pause();}
 \DoxyCodeLine{00216\ }
 \DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ post(\textcolor{stringliteral}{"{}Vacuuming..."{}},\ 6);}
-\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!runQuery(\textcolor{stringliteral}{"{}VACUUM;"{}},\ err))\ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classDbMaintenance_ab394ba1b3b922991be5b1125c2581896}{runQuery}}(\textcolor{stringliteral}{"{}VACUUM;"{}},\ err))\ \{}
 \DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ fail(\textcolor{stringliteral}{"{}Vacuum"{}},\ err,\ 6);}
 \DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ pause();}
 \DoxyCodeLine{00223\ \ \ \ \ \}}
 \DoxyCodeLine{00224\ }
-\DoxyCodeLine{00225\ \ \ \ \ \textcolor{keywordtype}{bool}\ runQuery(\textcolor{keyword}{const}\ QString\ \&sql,\ QString\ \&errorOut)}
+\DoxyCodeLine{00225\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classDbMaintenance_ab394ba1b3b922991be5b1125c2581896}{runQuery}}(\textcolor{keyword}{const}\ QString\ \&sql,\ QString\ \&errorOut)}
 \DoxyCodeLine{00226\ \ \ \ \ \{}
-\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ QSqlQuery\ q(m\_db);}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ QSqlQuery\ q(\mbox{\hyperlink{classDbMaintenance_ae7f86ae46443598b86b31204c9bb89e9}{m\_db}});}
 \DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!q.exec(sql))\ \{}
 \DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ errorOut\ =\ q.lastError().text();}
 \DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
@@ -236,9 +236,9 @@
 \DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
 \DoxyCodeLine{00233\ \ \ \ \ \}}
 \DoxyCodeLine{00234\ }
-\DoxyCodeLine{00235\ \ \ \ \ QString\ getSingleValue(\textcolor{keyword}{const}\ QString\ \&sql,\ QString\ \&errorOut)}
+\DoxyCodeLine{00235\ \ \ \ \ QString\ \mbox{\hyperlink{classDbMaintenance_a8fccf44a440d16fa2b21b627ffb4515b}{getSingleValue}}(\textcolor{keyword}{const}\ QString\ \&sql,\ QString\ \&errorOut)}
 \DoxyCodeLine{00236\ \ \ \ \ \{}
-\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ QSqlQuery\ q(m\_db);}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ QSqlQuery\ q(\mbox{\hyperlink{classDbMaintenance_ae7f86ae46443598b86b31204c9bb89e9}{m\_db}});}
 \DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!q.exec(sql))\ \{}
 \DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ errorOut\ =\ q.lastError().text();}
 \DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ QString();}
@@ -249,11 +249,11 @@
 \DoxyCodeLine{00245\ \ \ \ \ \}}
 \DoxyCodeLine{00246\ }
 \DoxyCodeLine{00247\ \textcolor{keyword}{private}:}
-\DoxyCodeLine{00248\ \ \ \ \ QSqlDatabase\ \ m\_db;}
-\DoxyCodeLine{00249\ \ \ \ \ QLabel\ \ \ \ \ \ \ *m\_statusLabel;}
-\DoxyCodeLine{00250\ \ \ \ \ QProgressBar\ *m\_progress;}
-\DoxyCodeLine{00251\ \ \ \ \ QPushButton\ \ *m\_startBtn;}
-\DoxyCodeLine{00252\ \ \ \ \ QPushButton\ \ *m\_closeBtn;}
+\DoxyCodeLine{00248\ \ \ \ \ QSqlDatabase\ \ \mbox{\hyperlink{classDbMaintenance_ae7f86ae46443598b86b31204c9bb89e9}{m\_db}};}
+\DoxyCodeLine{00249\ \ \ \ \ QLabel\ \ \ \ \ \ \ *\mbox{\hyperlink{classDbMaintenance_a1bf93d6c5c76edd967d404cb13c4087c}{m\_statusLabel}};}
+\DoxyCodeLine{00250\ \ \ \ \ QProgressBar\ *\mbox{\hyperlink{classDbMaintenance_a87cdeea4b00cd28fd294613fb083f357}{m\_progress}};}
+\DoxyCodeLine{00251\ \ \ \ \ QPushButton\ \ *\mbox{\hyperlink{classDbMaintenance_a77fe6f52c5e74098c039d233a15ce1d6}{m\_startBtn}};}
+\DoxyCodeLine{00252\ \ \ \ \ QPushButton\ \ *\mbox{\hyperlink{classDbMaintenance_a08396cf9f94fe0fb6574df7f3d815b8d}{m\_closeBtn}};}
 \DoxyCodeLine{00253\ \};}
 \DoxyCodeLine{00254\ }
 \DoxyCodeLine{00255\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ DBMAINTENANCE\_H}}

@@ -1,6 +1,6 @@
 \doxysection{multilinedelegate.\+h}
 \hypertarget{multilinedelegate_8h_source}{}\label{multilinedelegate_8h_source}\index{src/multilinedelegate.h@{src/multilinedelegate.h}}
-
+\mbox{\hyperlink{multilinedelegate_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{comment}{/*}}
 \DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
@@ -34,10 +34,10 @@
 \DoxyCodeLine{00030\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classMultiLineDelegate}{MultiLineDelegate}}\ :\ \textcolor{keyword}{public}\ QStyledItemDelegate\ \{}
 \DoxyCodeLine{00031\ \ \ \ \ Q\_OBJECT}
 \DoxyCodeLine{00032\ \textcolor{keyword}{public}:}
-\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classMultiLineDelegate}{MultiLineDelegate}}(QObject\ *parent\ =\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classMultiLineDelegate_a9306403dfcd383c7458b328b30000420}{MultiLineDelegate}}(QObject\ *parent\ =\ \textcolor{keyword}{nullptr})}
 \DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ :\ QStyledItemDelegate(parent)\ \{\}}
 \DoxyCodeLine{00035\ }
-\DoxyCodeLine{00036\ \ \ \ \ QWidget\ *createEditor(QWidget\ *parent,}
+\DoxyCodeLine{00036\ \ \ \ \ QWidget\ *\mbox{\hyperlink{classMultiLineDelegate_a0a935c51a17610f3b504b5434c1c82c9}{createEditor}}(QWidget\ *parent,}
 \DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QStyleOptionViewItem\ \&,}
 \DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QModelIndex\ \&)\textcolor{keyword}{\ const\ override\ }\{}
 \DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ QTextEdit\ *editor\ =\ \textcolor{keyword}{new}\ QTextEdit(parent);}
@@ -71,12 +71,12 @@
 \DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ editor;}
 \DoxyCodeLine{00068\ \ \ \ \ \}}
 \DoxyCodeLine{00069\ }
-\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordtype}{void}\ setEditorData(QWidget\ *editor,\ \textcolor{keyword}{const}\ QModelIndex\ \&index)\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classMultiLineDelegate_ab533a77a060cc8c61830ae2c8e25ce17}{setEditorData}}(QWidget\ *editor,\ \textcolor{keyword}{const}\ QModelIndex\ \&index)\textcolor{keyword}{\ const\ override\ }\{}
 \DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ QString\ value\ =\ index.model()-\/>data(index,\ Qt::EditRole).toString();}
 \DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}QTextEdit*\textcolor{keyword}{>}(editor)-\/>setPlainText(value);}
 \DoxyCodeLine{00073\ \ \ \ \ \}}
 \DoxyCodeLine{00074\ }
-\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordtype}{void}\ setModelData(QWidget\ *editor,\ QAbstractItemModel\ *model,}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classMultiLineDelegate_a9376f2d0696f03f6b431e1bf4719e60b}{setModelData}}(QWidget\ *editor,\ QAbstractItemModel\ *model,}
 \DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QModelIndex\ \&index)\textcolor{keyword}{\ const\ override\ }\{}
 \DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ QTextEdit\ *edit\ =\ \textcolor{keyword}{static\_cast<}QTextEdit*\textcolor{keyword}{>}(editor);}
 \DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ QByteArray\ utf8\ =\ edit-\/>toPlainText().toUtf8();}
@@ -89,7 +89,7 @@
 \DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ model-\/>setData(index,\ QString::fromUtf8(utf8),\ Qt::EditRole);}
 \DoxyCodeLine{00086\ \ \ \ \ \}}
 \DoxyCodeLine{00087\ }
-\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordtype}{void}\ updateEditorGeometry(QWidget\ *editor,}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classMultiLineDelegate_a9fb38c9cd4a27fec3cc6df19959757f5}{updateEditorGeometry}}(QWidget\ *editor,}
 \DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QStyleOptionViewItem\ \&option,}
 \DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QModelIndex\ \&)\textcolor{keyword}{\ const\ override\ }\{}
 \DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ editor-\/>setGeometry(option.rect);}

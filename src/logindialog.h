@@ -22,7 +22,6 @@
 #define LOGINDIALOG_H
 
 #include "settings.h"
-#include "mainwindow.h"
 
 #include <QAbstractButton>
 #include <QDialog>

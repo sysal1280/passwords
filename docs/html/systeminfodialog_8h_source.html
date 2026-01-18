@@ -82,7 +82,7 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">systeminfodialog.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<a href="systeminfodialog_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * passwords - A GnuPG based password manager</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> * Copyright (C) 2025  Adam.Lanzafame &lt;sysal@tuta.io&gt;</span></div>
@@ -106,9 +106,9 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#ifndef SYSTEMINFODIALOG_H</span></div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#define SYSTEMINFODIALOG_H</span></div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &quot;scopedcursor.h&quot;</span></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &quot;settings.h&quot;</span></div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#include &quot;dbutils.h&quot;</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &quot;<a class="code" href="scopedcursor_8h.html">scopedcursor.h</a>&quot;</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &quot;<a class="code" href="settings_8h.html">settings.h</a>&quot;</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#include &quot;<a class="code" href="dbutils_8h.html">dbutils.h</a>&quot;</span></div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="preprocessor">#include &quot;gitversion.h&quot;</span></div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">#include &quot;quuid.h&quot;</span></div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
@@ -133,7 +133,8 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>{</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    Q_OBJECT</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keyword">explicit</span> <a class="code hl_class" href="classSystemInfoDialog.html">SystemInfoDialog</a>(QWidget *parent = <span class="keyword">nullptr</span>)</div>
+<div class="foldopen" id="foldopen00051" data-start="{" data-end="}">
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="classSystemInfoDialog.html#a7cd2a2630463e9d7e0963a51bb715951">   51</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classSystemInfoDialog.html#a7cd2a2630463e9d7e0963a51bb715951">SystemInfoDialog</a>(QWidget *parent = <span class="keyword">nullptr</span>)</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        : QDialog(parent)</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    {</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        <a class="code hl_class" href="classScopedCursor.html">ScopedCursor</a> wait(Qt::WaitCursor);</div>
@@ -142,8 +143,8 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        resize(700, 500);</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <span class="keyword">auto</span> *mainLayout = <span class="keyword">new</span> QVBoxLayout(<span class="keyword">this</span>);</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        textEdit = <span class="keyword">new</span> QPlainTextEdit(<span class="keyword">this</span>);</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        textEdit-&gt;setReadOnly(<span class="keyword">true</span>);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        <a class="code hl_variable" href="classSystemInfoDialog.html#a9ae060a29d7de7d3a3e19bf1d3b0c0e8">textEdit</a> = <span class="keyword">new</span> QPlainTextEdit(<span class="keyword">this</span>);</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <a class="code hl_variable" href="classSystemInfoDialog.html#a9ae060a29d7de7d3a3e19bf1d3b0c0e8">textEdit</a>-&gt;setReadOnly(<span class="keyword">true</span>);</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        <span class="comment">// Buttons row</span></div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        <span class="keyword">auto</span> *buttonLayout = <span class="keyword">new</span> QHBoxLayout;</div>
@@ -161,7 +162,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>                    QString text;</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>                    <span class="comment">// Copy selected text if present</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>                    <span class="keyword">const</span> QString selected = textEdit-&gt;textCursor().selectedText();</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>                    <span class="keyword">const</span> QString selected = <a class="code hl_variable" href="classSystemInfoDialog.html#a9ae060a29d7de7d3a3e19bf1d3b0c0e8">textEdit</a>-&gt;textCursor().selectedText();</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>                    <span class="keywordflow">if</span> (!selected.isEmpty()) {</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>                        text = selected;</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>                    } <span class="keywordflow">else</span> {</div>
@@ -173,17 +174,19 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>                    }</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                });</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        mainLayout-&gt;addWidget(textEdit);</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        mainLayout-&gt;addWidget(<a class="code hl_variable" href="classSystemInfoDialog.html#a9ae060a29d7de7d3a3e19bf1d3b0c0e8">textEdit</a>);</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        mainLayout-&gt;addLayout(buttonLayout);</div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        textEdit-&gt;setPlainText(collectSystemInfo());</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        <a class="code hl_variable" href="classSystemInfoDialog.html#a9ae060a29d7de7d3a3e19bf1d3b0c0e8">textEdit</a>-&gt;setPlainText(<a class="code hl_function" href="classSystemInfoDialog.html#a70c9334374887f316a70d88532a44382">collectSystemInfo</a>());</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    }</div>
+</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    QPlainTextEdit *textEdit;</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <a class="code hl_class" href="classSettings.html">Settings</a> settings;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno"><a class="line" href="classSystemInfoDialog.html#a9ae060a29d7de7d3a3e19bf1d3b0c0e8">   98</a></span>    QPlainTextEdit *<a class="code hl_variable" href="classSystemInfoDialog.html#a9ae060a29d7de7d3a3e19bf1d3b0c0e8">textEdit</a>;</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno"><a class="line" href="classSystemInfoDialog.html#ac0de1ee9f453a40c2075ceaed165a5e3">   99</a></span>    <a class="code hl_class" href="classSettings.html">Settings</a> <a class="code hl_variable" href="classSystemInfoDialog.html#ac0de1ee9f453a40c2075ceaed165a5e3">settings</a>;</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    QString collectSystemInfo()</div>
+<div class="foldopen" id="foldopen00101" data-start="{" data-end="}">
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno"><a class="line" href="classSystemInfoDialog.html#a70c9334374887f316a70d88532a44382">  101</a></span>    QString <a class="code hl_function" href="classSystemInfoDialog.html#a70c9334374887f316a70d88532a44382">collectSystemInfo</a>()</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    {</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        QString report;</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
@@ -288,7 +291,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>        report += QString(tr(<span class="stringliteral">&quot;  Configuration file: %1\n&quot;</span></div>
 <div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>                             <span class="stringliteral">&quot;  Database file: %2\n&quot;</span></div>
 <div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>                             <span class="stringliteral">&quot;  Executable file: %3\n&quot;</span>))</div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>                      .arg(QDir::toNativeSeparators(settings.configFilePath()),</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>                      .arg(QDir::toNativeSeparators(<a class="code hl_variable" href="classSystemInfoDialog.html#ac0de1ee9f453a40c2075ceaed165a5e3">settings</a>.<a class="code hl_function" href="classSettings.html#a5f462919a8f6960a1cf20caca101083c">configFilePath</a>()),</div>
 <div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>                           QDir::toNativeSeparators(qApp-&gt;property(<span class="stringliteral">&quot;dbFile&quot;</span>).toString()),</div>
 <div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>                           QDir::toNativeSeparators(QCoreApplication::applicationFilePath()));</div>
 <div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span> </div>
@@ -303,9 +306,9 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span> </div>
 <div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>            <span class="keywordflow">if</span> (!db.open()) {</div>
 <div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>                report +=tr(<span class="stringliteral">&quot;  Unknown\n&quot;</span>);</div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>                showDbNotOpenError(<span class="keyword">this</span>, db, Q_FUNC_INFO);</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>                <a class="code hl_function" href="dbutils_8h.html#af8cec9658a538918943ad545e05a1a92">showDbNotOpenError</a>(<span class="keyword">this</span>, db, Q_FUNC_INFO);</div>
 <div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>                <span class="keywordflow">if</span> (isKeyExported(<span class="keyword">this</span>, db)) {</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>                <span class="keywordflow">if</span> (<a class="code hl_function" href="dbutils_8h.html#a7c01faf38fea0e64ee17cbded0cce18c">isKeyExported</a>(<span class="keyword">this</span>, db)) {</div>
 <div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>                    report += tr(<span class="stringliteral">&quot;  Sourced externally (exported)\n&quot;</span>);</div>
 <div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>                } <span class="keywordflow">else</span> {</div>
 <div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>                    report += tr(<span class="stringliteral">&quot;  Present in the database\n&quot;</span>);</div>
@@ -357,13 +360,24 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span> </div>
 <div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>        <span class="keywordflow">return</span> report;</div>
 <div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    }</div>
+</div>
 <div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>};</div>
 </div>
 <div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span> </div>
 <div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><span class="preprocessor">#endif </span><span class="comment">// SYSTEMINFODIALOG_H</span></div>
 <div class="ttc" id="aclassScopedCursor_html"><div class="ttname"><a href="classScopedCursor.html">ScopedCursor</a></div><div class="ttdef"><b>Definition</b> scopedcursor.h:25</div></div>
 <div class="ttc" id="aclassSettings_html"><div class="ttname"><a href="classSettings.html">Settings</a></div><div class="ttdef"><b>Definition</b> settings.h:35</div></div>
+<div class="ttc" id="aclassSettings_html_a5f462919a8f6960a1cf20caca101083c"><div class="ttname"><a href="classSettings.html#a5f462919a8f6960a1cf20caca101083c">Settings::configFilePath</a></div><div class="ttdeci">QString configFilePath() const</div><div class="ttdef"><b>Definition</b> settings.cpp:93</div></div>
 <div class="ttc" id="aclassSystemInfoDialog_html"><div class="ttname"><a href="classSystemInfoDialog.html">SystemInfoDialog</a></div><div class="ttdef"><b>Definition</b> systeminfodialog.h:48</div></div>
+<div class="ttc" id="aclassSystemInfoDialog_html_a70c9334374887f316a70d88532a44382"><div class="ttname"><a href="classSystemInfoDialog.html#a70c9334374887f316a70d88532a44382">SystemInfoDialog::collectSystemInfo</a></div><div class="ttdeci">QString collectSystemInfo()</div><div class="ttdef"><b>Definition</b> systeminfodialog.h:101</div></div>
+<div class="ttc" id="aclassSystemInfoDialog_html_a7cd2a2630463e9d7e0963a51bb715951"><div class="ttname"><a href="classSystemInfoDialog.html#a7cd2a2630463e9d7e0963a51bb715951">SystemInfoDialog::SystemInfoDialog</a></div><div class="ttdeci">SystemInfoDialog(QWidget *parent=nullptr)</div><div class="ttdef"><b>Definition</b> systeminfodialog.h:51</div></div>
+<div class="ttc" id="aclassSystemInfoDialog_html_a9ae060a29d7de7d3a3e19bf1d3b0c0e8"><div class="ttname"><a href="classSystemInfoDialog.html#a9ae060a29d7de7d3a3e19bf1d3b0c0e8">SystemInfoDialog::textEdit</a></div><div class="ttdeci">QPlainTextEdit * textEdit</div><div class="ttdef"><b>Definition</b> systeminfodialog.h:98</div></div>
+<div class="ttc" id="aclassSystemInfoDialog_html_ac0de1ee9f453a40c2075ceaed165a5e3"><div class="ttname"><a href="classSystemInfoDialog.html#ac0de1ee9f453a40c2075ceaed165a5e3">SystemInfoDialog::settings</a></div><div class="ttdeci">Settings settings</div><div class="ttdef"><b>Definition</b> systeminfodialog.h:99</div></div>
+<div class="ttc" id="adbutils_8h_html"><div class="ttname"><a href="dbutils_8h.html">dbutils.h</a></div></div>
+<div class="ttc" id="adbutils_8h_html_a7c01faf38fea0e64ee17cbded0cce18c"><div class="ttname"><a href="dbutils_8h.html#a7c01faf38fea0e64ee17cbded0cce18c">isKeyExported</a></div><div class="ttdeci">bool isKeyExported(const QWidget *parent, const QSqlDatabase &amp;db)</div><div class="ttdef"><b>Definition</b> dbutils.h:91</div></div>
+<div class="ttc" id="adbutils_8h_html_af8cec9658a538918943ad545e05a1a92"><div class="ttname"><a href="dbutils_8h.html#af8cec9658a538918943ad545e05a1a92">showDbNotOpenError</a></div><div class="ttdeci">void showDbNotOpenError(const QWidget *parent, const QSqlDatabase &amp;db, const char *caller)</div><div class="ttdef"><b>Definition</b> dbutils.h:36</div></div>
+<div class="ttc" id="ascopedcursor_8h_html"><div class="ttname"><a href="scopedcursor_8h.html">scopedcursor.h</a></div></div>
+<div class="ttc" id="asettings_8h_html"><div class="ttname"><a href="settings_8h.html">settings.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

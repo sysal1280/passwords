@@ -1,5 +1,7 @@
 <map id="CategoryProperties" name="CategoryProperties">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,140,104"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="38,5,107,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,44,75,79,70,79,70,44"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="29,93,163,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,75,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,41,90,91,86,94,53,44"/>
+<area shape="rect" id="Node000003" href="$structCategoryNode.html" title=" " alt="" coords="99,5,205,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="139,44,106,94,102,91,135,41"/>
 </map>

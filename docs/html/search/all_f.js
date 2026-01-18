@@ -1,4 +1,31 @@
 var searchData=
 [
-  ['vulnerability_0',['Reporting a Vulnerability',['../md_SECURITY.html',1,'']]]
+  ['randomexistingcategoryid_0',['randomExistingCategoryId',['../classTestLoader.html#aea038ccb5f999d6674ecd7659d6dd1a7',1,'TestLoader']]],
+  ['randomnoisedialog_1',['RandomNoiseDialog',['../namespaceRandomNoiseDialog.html',1,'']]],
+  ['randomnoisedialog_2ecpp_2',['randomnoisedialog.cpp',['../randomnoisedialog_8cpp.html',1,'']]],
+  ['randomnoisedialog_2eh_3',['randomnoisedialog.h',['../randomnoisedialog_8h.html',1,'']]],
+  ['randomseparator_4',['randomSeparator',['../classpasswordGenerator.html#ad2993307c28e8987036c668147ab9cd0',1,'passwordGenerator']]],
+  ['randomstring_5',['randomString',['../classTestLoader.html#afe7a89a9c6d994e5afce99e54f212edb',1,'TestLoader']]],
+  ['randomtextwithspaces_6',['randomTextWithSpaces',['../classTestLoader.html#ade20bef2e62e11f048962adc0042f75f',1,'TestLoader']]],
+  ['readme_2emd_7',['README.md',['../README_8md.html',1,'']]],
+  ['readschemaversion_8',['readSchemaVersion',['../classDatabaseUpgrader.html#acc8bba3128840f7992ec4fd3c39bd6a7',1,'DatabaseUpgrader']]],
+  ['readsignature_9',['readSignature',['../classDatabaseUpgrader.html#a0f27258f95c97b55700a20adc2937138',1,'DatabaseUpgrader']]],
+  ['recognition_10',['Rewards &amp; Recognition',['../md_SECURITY.html#autotoc_md9',1,'']]],
+  ['recognition_20strong_11',['&lt;strong&gt;Public Recognition&lt;/strong&gt;',['../md_SECURITY.html#autotoc_md11',1,'']]],
+  ['reject_12',['reject',['../classDbMaintenance.html#a09e46b087a0d93b0ec126ed77d1f5521',1,'DbMaintenance::reject()'],['../classTestLoaderDialog.html#aee158f0971198f3b451d221aa4c8873d',1,'TestLoaderDialog::reject()']]],
+  ['renamecategory_13',['renameCategory',['../classMainWindow.html#a08024f9476c63568149580a0826c837c',1,'MainWindow']]],
+  ['reporting_20a_20vulnerability_14',['Reporting a Vulnerability',['../md_SECURITY.html',1,'']]],
+  ['responsehash_15',['responseHash',['../classLoginDialog.html#a31560f3ff425b6f931551baf4b1c20ce',1,'LoginDialog']]],
+  ['restartapplication_16',['restartApplication',['../classPreferencesDialog.html#ad076d79f2798b32b8249e55ab17d1046',1,'PreferencesDialog']]],
+  ['restartkeys_17',['restartKeys',['../classPreferencesDialog.html#a3d215e19ecd7be38ad654c2e335b2765',1,'PreferencesDialog']]],
+  ['restartrequired_18',['restartRequired',['../classPreferencesDialog.html#a4fca96281ee718488848b4bc407aff39',1,'PreferencesDialog']]],
+  ['restorebuttonclicked_19',['restoreButtonClicked',['../classPreferencesDialog.html#adb032c24ed944cf572455cdcba00309e',1,'PreferencesDialog']]],
+  ['restoredefaults_20',['restoreDefaults',['../classPreferencesDialog.html#ab9cfa04ca7e5604f5a768c9d14891e3c',1,'PreferencesDialog']]],
+  ['restoremainwindowstate_21',['restoreMainWindowState',['../classSettings.html#ad33c1bb5f3d78d5ed7f39a95d46b5499',1,'Settings']]],
+  ['restoresplitterstate_22',['restoreSplitterState',['../classSettings.html#a0d029dcc52a580e2c39e4e1e598bab0b',1,'Settings']]],
+  ['rewards_20recognition_23',['Rewards &amp; Recognition',['../md_SECURITY.html#autotoc_md9',1,'']]],
+  ['root_24',['root',['../classCategoryProperties.html#a52725edc9be821606714dc0e7f509f66',1,'CategoryProperties']]],
+  ['runbutton_25',['runButton',['../classTestLoaderDialog.html#a5ac0898e3ecf3437897356b3b184b707',1,'TestLoaderDialog']]],
+  ['runmaintenance_26',['runMaintenance',['../classDbMaintenance.html#aa0c7c3e937d20c47c8cc4e21ea2edfb9',1,'DbMaintenance']]],
+  ['runquery_27',['runQuery',['../classDbMaintenance.html#ab394ba1b3b922991be5b1125c2581896',1,'DbMaintenance']]]
 ];

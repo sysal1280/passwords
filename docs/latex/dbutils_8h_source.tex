@@ -1,6 +1,6 @@
 \doxysection{dbutils.\+h}
 \hypertarget{dbutils_8h_source}{}\label{dbutils_8h_source}\index{src/dbutils.h@{src/dbutils.h}}
-
+\mbox{\hyperlink{dbutils_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{comment}{/*}}
 \DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
@@ -25,8 +25,8 @@
 \DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ DBUTILS\_H}}
 \DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ DBUTILS\_H}}
 \DoxyCodeLine{00023\ }
-\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}dataobfuscator.h"{}}}
-\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}keyentry.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{dataobfuscator_8h}{dataobfuscator.h}}"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{keyentry_8h}{keyentry.h}}"{}}}
 \DoxyCodeLine{00026\ }
 \DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <QApplication>}}
 \DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <QList>}}
@@ -37,7 +37,7 @@
 \DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ <quuid.h>}}
 \DoxyCodeLine{00034\ }
 \DoxyCodeLine{00035\ }
-\DoxyCodeLine{00036\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ showDbNotOpenError(\textcolor{keyword}{const}\ QWidget\ *parent,}
+\DoxyCodeLine{00036\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{dbutils_8h_af8cec9658a538918943ad545e05a1a92}{showDbNotOpenError}}(\textcolor{keyword}{const}\ QWidget\ *parent,}
 \DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QSqlDatabase\ \&db,}
 \DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *caller)}
 \DoxyCodeLine{00039\ \{}
@@ -54,7 +54,7 @@
 \DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ );}
 \DoxyCodeLine{00051\ \}}
 \DoxyCodeLine{00052\ }
-\DoxyCodeLine{00053\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ showQueryError(\textcolor{keyword}{const}\ QWidget\ *parent,}
+\DoxyCodeLine{00053\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{dbutils_8h_ac6630ceda77413bc098344e22e90b467}{showQueryError}}(\textcolor{keyword}{const}\ QWidget\ *parent,}
 \DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QSqlQuery\ \&query,}
 \DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *caller)}
 \DoxyCodeLine{00056\ \{}
@@ -74,7 +74,7 @@
 \DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ );}
 \DoxyCodeLine{00071\ \}}
 \DoxyCodeLine{00072\ }
-\DoxyCodeLine{00073\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ showTransactionError(\textcolor{keyword}{const}\ QWidget\ *parent,}
+\DoxyCodeLine{00073\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{dbutils_8h_a0b62a7a528314e95a66d6b7efc819aa5}{showTransactionError}}(\textcolor{keyword}{const}\ QWidget\ *parent,}
 \DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QSqlDatabase\ \&db,}
 \DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *caller)}
 \DoxyCodeLine{00076\ \{}
@@ -92,14 +92,14 @@
 \DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ );}
 \DoxyCodeLine{00089\ \}}
 \DoxyCodeLine{00090\ }
-\DoxyCodeLine{00091\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ isKeyExported(\textcolor{keyword}{const}\ QWidget\ *parent,\ \textcolor{keyword}{const}\ QSqlDatabase\ \&db)}
+\DoxyCodeLine{00091\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{dbutils_8h_a7c01faf38fea0e64ee17cbded0cce18c}{isKeyExported}}(\textcolor{keyword}{const}\ QWidget\ *parent,\ \textcolor{keyword}{const}\ QSqlDatabase\ \&db)}
 \DoxyCodeLine{00092\ \{}
 \DoxyCodeLine{00093\ \ \ \ \ QSqlQuery\ query(db);}
 \DoxyCodeLine{00094\ \ \ \ \ query.setForwardOnly(\textcolor{keyword}{true});}
 \DoxyCodeLine{00095\ \ \ \ \ query.prepare(\textcolor{stringliteral}{"{}SELECT\ value\ FROM\ app\_info\ WHERE\ key\ =\ 'app\_key'"{}});}
 \DoxyCodeLine{00096\ }
 \DoxyCodeLine{00097\ \ \ \ \ \textcolor{keywordflow}{if}\ (!query.exec())\ \{}
-\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ showQueryError(parent,\ query,\ Q\_FUNC\_INFO);}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{dbutils_8h_ac6630ceda77413bc098344e22e90b467}{showQueryError}}(parent,\ query,\ Q\_FUNC\_INFO);}
 \DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
 \DoxyCodeLine{00100\ \ \ \ \ \}}
 \DoxyCodeLine{00101\ }
@@ -111,9 +111,9 @@
 \DoxyCodeLine{00107\ \}}
 \DoxyCodeLine{00108\ }
 \DoxyCodeLine{00109\ }
-\DoxyCodeLine{00110\ \textcolor{keyword}{namespace\ }DbUtils\ \{}
+\DoxyCodeLine{00110\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceDbUtils}{DbUtils}}\ \{}
 \DoxyCodeLine{00111\ }
-\DoxyCodeLine{00112\ \textcolor{keyword}{inline}\ QList<KeyEntry>\ fetchKeys(QWidget\ *errorParent)}
+\DoxyCodeLine{00112\ \textcolor{keyword}{inline}\ QList<KeyEntry>\ \mbox{\hyperlink{namespaceDbUtils_a969b28067c2bf31cceb2d12d4ab15e91}{fetchKeys}}(QWidget\ *errorParent)}
 \DoxyCodeLine{00113\ \{}
 \DoxyCodeLine{00114\ \ \ \ \ QString\ connName\ =\ QUuid::createUuid().toString(QUuid::WithoutBraces);}
 \DoxyCodeLine{00115\ \ \ \ \ QList<KeyEntry>\ keys;}
@@ -131,12 +131,12 @@
 \DoxyCodeLine{00127\ }
 \DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (query.next())\ \{}
 \DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structKeyEntry}{KeyEntry}}\ entry;}
-\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry.id\ \ \ \ =\ query.value(0).toInt();}
-\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry.label\ =\ DataObfuscator::deobfuscate(}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry.\mbox{\hyperlink{structKeyEntry_ad574c108ab91287f6a61adff9a9dbc3c}{id}}\ \ \ \ =\ query.value(0).toInt();}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry.\mbox{\hyperlink{structKeyEntry_aef27eb5d56b1da142f9145f715ca4675}{label}}\ =\ \mbox{\hyperlink{classDataObfuscator_af467f8177c5fdc21e9efafbe564699cd}{DataObfuscator::deobfuscate}}(}
 \DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ query.value(1).toString(),}
 \DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ qApp-\/>property(\textcolor{stringliteral}{"{}appKey"{}}).toByteArray()}
 \DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
-\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry.key\ \ \ =\ DataObfuscator::deobfuscate(}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry.\mbox{\hyperlink{structKeyEntry_a118e538d0d936b2a98fc0bd8eef2c4d8}{key}}\ \ \ =\ \mbox{\hyperlink{classDataObfuscator_af467f8177c5fdc21e9efafbe564699cd}{DataObfuscator::deobfuscate}}(}
 \DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ query.value(2).toString(),}
 \DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ qApp-\/>property(\textcolor{stringliteral}{"{}appKey"{}}).toByteArray()}
 \DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
@@ -144,11 +144,11 @@
 \DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00141\ }
 \DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ showQueryError(errorParent,\ query,\ Q\_FUNC\_INFO);}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{dbutils_8h_ac6630ceda77413bc098344e22e90b467}{showQueryError}}(errorParent,\ query,\ Q\_FUNC\_INFO);}
 \DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00145\ }
 \DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ showDbNotOpenError(errorParent,\ db,\ Q\_FUNC\_INFO);}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{dbutils_8h_af8cec9658a538918943ad545e05a1a92}{showDbNotOpenError}}(errorParent,\ db,\ Q\_FUNC\_INFO);}
 \DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00149\ \ \ \ \ \}}
 \DoxyCodeLine{00150\ }

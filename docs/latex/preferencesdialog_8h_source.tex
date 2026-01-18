@@ -1,6 +1,6 @@
 \doxysection{preferencesdialog.\+h}
 \hypertarget{preferencesdialog_8h_source}{}\label{preferencesdialog_8h_source}\index{src/preferencesdialog.h@{src/preferencesdialog.h}}
-
+\mbox{\hyperlink{preferencesdialog_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{comment}{/*}}
 \DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
@@ -25,13 +25,13 @@
 \DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ PREFERENCESDIALOG\_H}}
 \DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ PREFERENCESDIALOG\_H}}
 \DoxyCodeLine{00023\ }
-\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}settings.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{settings_8h}{settings.h}}"{}}}
 \DoxyCodeLine{00025\ }
 \DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <QAbstractButton>}}
 \DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <QDialog>}}
 \DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <QMap>}}
 \DoxyCodeLine{00029\ }
-\DoxyCodeLine{00030\ \textcolor{keyword}{namespace\ }Ui\ \{}
+\DoxyCodeLine{00030\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceUi}{Ui}}\ \{}
 \DoxyCodeLine{00031\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classPreferencesDialog}{PreferencesDialog}};}
 \DoxyCodeLine{00032\ \}}
 \DoxyCodeLine{00033\ }
@@ -41,26 +41,26 @@
 \DoxyCodeLine{00037\ }
 \DoxyCodeLine{00038\ \textcolor{keyword}{public}:}
 \DoxyCodeLine{00039\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classPreferencesDialog}{PreferencesDialog}}(QWidget\ *parent\ =\ \textcolor{keyword}{nullptr});}
-\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{classPreferencesDialog}{\string~PreferencesDialog}}();}
-\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordtype}{void}\ loadSettings();}
-\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordtype}{void}\ saveSettings();}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{classPreferencesDialog_a0e3927d4dbbc927879b4c4906e728f2d}{\string~PreferencesDialog}}();}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classPreferencesDialog_afdfea6c2cbaad1317caa9ec187eda0e5}{loadSettings}}();}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classPreferencesDialog_ad81737cb39f047cf6ed5606bede5cfac}{saveSettings}}();}
 \DoxyCodeLine{00043\ }
 \DoxyCodeLine{00044\ \textcolor{keyword}{private}\ slots:}
 \DoxyCodeLine{00045\ }
 \DoxyCodeLine{00046\ \textcolor{keyword}{private}:}
-\DoxyCodeLine{00047\ \ \ \ \ Ui::PreferencesDialog\ *ui;}
-\DoxyCodeLine{00048\ \ \ \ \ QMap<QString,\ QWidget*>\ widgetMap;}
+\DoxyCodeLine{00047\ \ \ \ \ Ui::PreferencesDialog\ *\mbox{\hyperlink{classPreferencesDialog_ad52f597455505495a5b51c4a516e38eb}{ui}};}
+\DoxyCodeLine{00048\ \ \ \ \ QMap<QString,\ QWidget*>\ \mbox{\hyperlink{classPreferencesDialog_ab23ce5e69b5cb7df8452074831b497ab}{widgetMap}};}
 \DoxyCodeLine{00049\ \ \ \ \ \textcolor{comment}{//void\ resizeEvent(QResizeEvent\ *event);}}
-\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{void}\ restoreButtonClicked(QAbstractButton\ *button);}
-\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{void}\ restoreDefaults();}
-\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordtype}{void}\ onBackupCheckStateChanged(\textcolor{keywordtype}{int}\ state);}
-\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{void}\ openBackupDir();}
-\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{void}\ restartApplication();}
-\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{void}\ browseForExecutable();}
-\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{classSettings}{Settings}}\ settings;}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classPreferencesDialog_adb032c24ed944cf572455cdcba00309e}{restoreButtonClicked}}(QAbstractButton\ *button);}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classPreferencesDialog_ab9cfa04ca7e5604f5a768c9d14891e3c}{restoreDefaults}}();}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classPreferencesDialog_ae0e73ead07c52576abbf588b9bfdc076}{onBackupCheckStateChanged}}(\textcolor{keywordtype}{int}\ state);}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classPreferencesDialog_afe6f065f24fc2baeddcf0c7243fa9ab9}{openBackupDir}}();}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classPreferencesDialog_ad076d79f2798b32b8249e55ab17d1046}{restartApplication}}();}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classPreferencesDialog_a669e62aec52e796630cf1d224cf4c390}{browseForExecutable}}();}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{classSettings}{Settings}}\ \mbox{\hyperlink{classPreferencesDialog_ab9f52b3c5ee44302fbb1bae118391f67}{settings}};}
 \DoxyCodeLine{00057\ }
-\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordtype}{bool}\ restartRequired\ =\ \textcolor{keyword}{false};}
-\DoxyCodeLine{00059\ \ \ \ \ QSet<QString>\ restartKeys\ =\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classPreferencesDialog_a4fca96281ee718488848b4bc407aff39}{restartRequired}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00059\ \ \ \ \ QSet<QString>\ \mbox{\hyperlink{classPreferencesDialog_a3d215e19ecd7be38ad654c2e335b2765}{restartKeys}}\ =\ \{}
 \DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Categories/DoubleClickOpen"{}}\ \ \ \textcolor{comment}{//\ setting\ which\ applied\ net\ restart}}
 \DoxyCodeLine{00061\ \ \ \ \ \};}
 \DoxyCodeLine{00062\ }

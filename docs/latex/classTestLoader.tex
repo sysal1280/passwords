@@ -2,7 +2,12 @@
 \hypertarget{classTestLoader}{}\label{classTestLoader}\index{TestLoader@{TestLoader}}
 
 
-Inheritance diagram for Test\+Loader\+:\nopagebreak
+{\ttfamily \#include $<$testloader.\+h$>$}
+
+
+
+Inheritance diagram for Test\+Loader\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11,7 +16,8 @@ Inheritance diagram for Test\+Loader\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for Test\+Loader\+:\nopagebreak
+Collaboration diagram for Test\+Loader\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -21,27 +27,144 @@ Collaboration diagram for Test\+Loader\+:\nopagebreak
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{classTestLoader_aa38e0d19b67ce935ea59e025c0f46ea5}\label{classTestLoader_aa38e0d19b67ce935ea59e025c0f46ea5} 
-{\bfseries Test\+Loader} (const QString \&db\+File, const QByte\+Array \&app\+Key, QObject \texorpdfstring{$\ast$}{*}parent=nullptr)
+\mbox{\hyperlink{classTestLoader_aa38e0d19b67ce935ea59e025c0f46ea5}{Test\+Loader}} (const QString \&\mbox{\hyperlink{classTestLoader_a2ee1cd920e820d09f21f7fd32654de27}{db\+File}}, const QByte\+Array \&\mbox{\hyperlink{classTestLoader_a4ee9ddbdf6232adfa1d1e1a7ea621fb2}{app\+Key}}, QObject \texorpdfstring{$\ast$}{*}parent=nullptr)
 \item 
-\Hypertarget{classTestLoader_a2a64134058a775a1ef6579eca5c5b819}\label{classTestLoader_a2a64134058a775a1ef6579eca5c5b819} 
-bool {\bfseries generate\+Categories} (int count, int max\+Depth=3)
+bool \mbox{\hyperlink{classTestLoader_a2a64134058a775a1ef6579eca5c5b819}{generate\+Categories}} (int count, int max\+Depth=3)
 \item 
-\Hypertarget{classTestLoader_aaef829ecbe419651b52cb57f0a348e3e}\label{classTestLoader_aaef829ecbe419651b52cb57f0a348e3e} 
-bool {\bfseries generate\+Applications} (int count)
+bool \mbox{\hyperlink{classTestLoader_aaef829ecbe419651b52cb57f0a348e3e}{generate\+Applications}} (int count)
 \item 
-\Hypertarget{classTestLoader_af88838ecb93b8fdaa023b411de641dc4}\label{classTestLoader_af88838ecb93b8fdaa023b411de641dc4} 
-QString {\bfseries get\+Random\+Gpg\+Key} (const QString \&db\+File, const QByte\+Array \&app\+Key)
+QString \mbox{\hyperlink{classTestLoader_af88838ecb93b8fdaa023b411de641dc4}{get\+Random\+Gpg\+Key}} (const QString \&\mbox{\hyperlink{classTestLoader_a2ee1cd920e820d09f21f7fd32654de27}{db\+File}}, const QByte\+Array \&\mbox{\hyperlink{classTestLoader_a4ee9ddbdf6232adfa1d1e1a7ea621fb2}{app\+Key}})
 \item 
-\Hypertarget{classTestLoader_a3c7a0540bcf95477fc84b5ea6f1dc886}\label{classTestLoader_a3c7a0540bcf95477fc84b5ea6f1dc886} 
-void {\bfseries show\+Dialog} (QWidget \texorpdfstring{$\ast$}{*}parent=nullptr)
+void \mbox{\hyperlink{classTestLoader_a3c7a0540bcf95477fc84b5ea6f1dc886}{show\+Dialog}} (QWidget \texorpdfstring{$\ast$}{*}parent=nullptr)
 \item 
-\Hypertarget{classTestLoader_ab879e43df183569eb0baa65064ccda3b}\label{classTestLoader_ab879e43df183569eb0baa65064ccda3b} 
-void {\bfseries progress} (int value)
+void \mbox{\hyperlink{classTestLoader_ab879e43df183569eb0baa65064ccda3b}{progress}} (int value)
 \end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classTestLoader_aef76d344123c09220a1dcbf0c7e3914a}{open\+Db}} (QSql\+Database \&db, QString \&conn\+Name)
+\item 
+void \mbox{\hyperlink{classTestLoader_aeebd665e8145f39c300f8a7da9ccaacf}{close\+Db}} (const QString \&conn\+Name)
+\item 
+int \mbox{\hyperlink{classTestLoader_aea038ccb5f999d6674ecd7659d6dd1a7}{random\+Existing\+Category\+Id}} (QSql\+Database \&db)
+\item 
+QString \mbox{\hyperlink{classTestLoader_ade20bef2e62e11f048962adc0042f75f}{random\+Text\+With\+Spaces}} (int min\+Len, int max\+Len)
+\item 
+QString \mbox{\hyperlink{classTestLoader_afe7a89a9c6d994e5afce99e54f212edb}{random\+String}} (int length)
+\item 
+QString \mbox{\hyperlink{classTestLoader_a31b541e9aa7413d87c6149b0b60201db}{fake\+Json}} ()
+\item 
+QByte\+Array \mbox{\hyperlink{classTestLoader_a6dfb34f547fcd0c0d94c6de8956e0874}{encrypt\+With\+Gpg}} (const QString\+List \&recipients, const QString \&json)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+QString \mbox{\hyperlink{classTestLoader_a2ee1cd920e820d09f21f7fd32654de27}{db\+File}}
+\item 
+QByte\+Array \mbox{\hyperlink{classTestLoader_a4ee9ddbdf6232adfa1d1e1a7ea621fb2}{app\+Key}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classTestLoader_aa38e0d19b67ce935ea59e025c0f46ea5}\label{classTestLoader_aa38e0d19b67ce935ea59e025c0f46ea5} 
+\index{TestLoader@{TestLoader}!TestLoader@{TestLoader}}
+\index{TestLoader@{TestLoader}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{TestLoader()}{TestLoader()}}
+{\footnotesize\ttfamily Test\+Loader\+::\+Test\+Loader (\begin{DoxyParamCaption}\item[{const QString \&}]{db\+File,  }\item[{const QByte\+Array \&}]{app\+Key,  }\item[{QObject \texorpdfstring{$\ast$}{*}}]{parent = {\ttfamily nullptr} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classTestLoader_aeebd665e8145f39c300f8a7da9ccaacf}\label{classTestLoader_aeebd665e8145f39c300f8a7da9ccaacf} 
+\index{TestLoader@{TestLoader}!closeDb@{closeDb}}
+\index{closeDb@{closeDb}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{closeDb()}{closeDb()}}
+{\footnotesize\ttfamily void Test\+Loader\+::close\+Db (\begin{DoxyParamCaption}\item[{const QString \&}]{conn\+Name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classTestLoader_a6dfb34f547fcd0c0d94c6de8956e0874}\label{classTestLoader_a6dfb34f547fcd0c0d94c6de8956e0874} 
+\index{TestLoader@{TestLoader}!encryptWithGpg@{encryptWithGpg}}
+\index{encryptWithGpg@{encryptWithGpg}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{encryptWithGpg()}{encryptWithGpg()}}
+{\footnotesize\ttfamily QByte\+Array Test\+Loader\+::encrypt\+With\+Gpg (\begin{DoxyParamCaption}\item[{const QString\+List \&}]{recipients,  }\item[{const QString \&}]{json }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classTestLoader_a31b541e9aa7413d87c6149b0b60201db}\label{classTestLoader_a31b541e9aa7413d87c6149b0b60201db} 
+\index{TestLoader@{TestLoader}!fakeJson@{fakeJson}}
+\index{fakeJson@{fakeJson}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{fakeJson()}{fakeJson()}}
+{\footnotesize\ttfamily QString Test\+Loader\+::fake\+Json (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classTestLoader_aaef829ecbe419651b52cb57f0a348e3e}\label{classTestLoader_aaef829ecbe419651b52cb57f0a348e3e} 
+\index{TestLoader@{TestLoader}!generateApplications@{generateApplications}}
+\index{generateApplications@{generateApplications}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{generateApplications()}{generateApplications()}}
+{\footnotesize\ttfamily bool Test\+Loader\+::generate\+Applications (\begin{DoxyParamCaption}\item[{int}]{count }\end{DoxyParamCaption})}
+
+\Hypertarget{classTestLoader_a2a64134058a775a1ef6579eca5c5b819}\label{classTestLoader_a2a64134058a775a1ef6579eca5c5b819} 
+\index{TestLoader@{TestLoader}!generateCategories@{generateCategories}}
+\index{generateCategories@{generateCategories}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{generateCategories()}{generateCategories()}}
+{\footnotesize\ttfamily bool Test\+Loader\+::generate\+Categories (\begin{DoxyParamCaption}\item[{int}]{count,  }\item[{int}]{max\+Depth = {\ttfamily 3} }\end{DoxyParamCaption})}
+
+\Hypertarget{classTestLoader_af88838ecb93b8fdaa023b411de641dc4}\label{classTestLoader_af88838ecb93b8fdaa023b411de641dc4} 
+\index{TestLoader@{TestLoader}!getRandomGpgKey@{getRandomGpgKey}}
+\index{getRandomGpgKey@{getRandomGpgKey}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{getRandomGpgKey()}{getRandomGpgKey()}}
+{\footnotesize\ttfamily QString Test\+Loader\+::get\+Random\+Gpg\+Key (\begin{DoxyParamCaption}\item[{const QString \&}]{db\+File,  }\item[{const QByte\+Array \&}]{app\+Key }\end{DoxyParamCaption})}
+
+\Hypertarget{classTestLoader_aef76d344123c09220a1dcbf0c7e3914a}\label{classTestLoader_aef76d344123c09220a1dcbf0c7e3914a} 
+\index{TestLoader@{TestLoader}!openDb@{openDb}}
+\index{openDb@{openDb}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{openDb()}{openDb()}}
+{\footnotesize\ttfamily bool Test\+Loader\+::open\+Db (\begin{DoxyParamCaption}\item[{QSql\+Database \&}]{db,  }\item[{QString \&}]{conn\+Name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classTestLoader_ab879e43df183569eb0baa65064ccda3b}\label{classTestLoader_ab879e43df183569eb0baa65064ccda3b} 
+\index{TestLoader@{TestLoader}!progress@{progress}}
+\index{progress@{progress}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{progress()}{progress()}}
+{\footnotesize\ttfamily void Test\+Loader\+::progress (\begin{DoxyParamCaption}\item[{int}]{value }\end{DoxyParamCaption})}
+
+\Hypertarget{classTestLoader_aea038ccb5f999d6674ecd7659d6dd1a7}\label{classTestLoader_aea038ccb5f999d6674ecd7659d6dd1a7} 
+\index{TestLoader@{TestLoader}!randomExistingCategoryId@{randomExistingCategoryId}}
+\index{randomExistingCategoryId@{randomExistingCategoryId}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{randomExistingCategoryId()}{randomExistingCategoryId()}}
+{\footnotesize\ttfamily int Test\+Loader\+::random\+Existing\+Category\+Id (\begin{DoxyParamCaption}\item[{QSql\+Database \&}]{db }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classTestLoader_afe7a89a9c6d994e5afce99e54f212edb}\label{classTestLoader_afe7a89a9c6d994e5afce99e54f212edb} 
+\index{TestLoader@{TestLoader}!randomString@{randomString}}
+\index{randomString@{randomString}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{randomString()}{randomString()}}
+{\footnotesize\ttfamily QString Test\+Loader\+::random\+String (\begin{DoxyParamCaption}\item[{int}]{length }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classTestLoader_ade20bef2e62e11f048962adc0042f75f}\label{classTestLoader_ade20bef2e62e11f048962adc0042f75f} 
+\index{TestLoader@{TestLoader}!randomTextWithSpaces@{randomTextWithSpaces}}
+\index{randomTextWithSpaces@{randomTextWithSpaces}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{randomTextWithSpaces()}{randomTextWithSpaces()}}
+{\footnotesize\ttfamily QString Test\+Loader\+::random\+Text\+With\+Spaces (\begin{DoxyParamCaption}\item[{int}]{min\+Len,  }\item[{int}]{max\+Len }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classTestLoader_a3c7a0540bcf95477fc84b5ea6f1dc886}\label{classTestLoader_a3c7a0540bcf95477fc84b5ea6f1dc886} 
+\index{TestLoader@{TestLoader}!showDialog@{showDialog}}
+\index{showDialog@{showDialog}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{showDialog()}{showDialog()}}
+{\footnotesize\ttfamily void Test\+Loader\+::show\+Dialog (\begin{DoxyParamCaption}\item[{QWidget \texorpdfstring{$\ast$}{*}}]{parent = {\ttfamily nullptr} }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classTestLoader_a4ee9ddbdf6232adfa1d1e1a7ea621fb2}\label{classTestLoader_a4ee9ddbdf6232adfa1d1e1a7ea621fb2} 
+\index{TestLoader@{TestLoader}!appKey@{appKey}}
+\index{appKey@{appKey}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{appKey}{appKey}}
+{\footnotesize\ttfamily QByte\+Array Test\+Loader\+::app\+Key\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{classTestLoader_a2ee1cd920e820d09f21f7fd32654de27}\label{classTestLoader_a2ee1cd920e820d09f21f7fd32654de27} 
+\index{TestLoader@{TestLoader}!dbFile@{dbFile}}
+\index{dbFile@{dbFile}!TestLoader@{TestLoader}}
+\doxysubsubsection{\texorpdfstring{dbFile}{dbFile}}
+{\footnotesize\ttfamily QString Test\+Loader\+::db\+File\hspace{0.3cm}{\ttfamily [private]}}
+
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-src/testloader.\+h\item 
-src/testloader.\+cpp\end{DoxyCompactItemize}
+src/\mbox{\hyperlink{testloader_8h}{testloader.\+h}}\item 
+src/\mbox{\hyperlink{testloader_8cpp}{testloader.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,32 @@
+<map id="src/keyentry.h" name="src/keyentry.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="797,5,899,31"/>
+<area shape="rect" id="Node000002" href="$dbutils_8h.html" title=" " alt="" coords="301,79,395,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="783,31,395,86,395,81,782,26"/>
+<area shape="rect" id="Node000008" href="$mainwindow_8h.html" title=" " alt="" coords="785,79,911,104"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="851,44,851,79,845,79,845,44"/>
+<area shape="rect" id="Node000012" href="$newpassworddialog_8h.html" title=" " alt="" coords="1147,79,1317,104"/>
+<area shape="poly" id="edge15_Node000001_Node000012" title=" " alt="" coords="913,29,1171,76,1170,81,912,34"/>
+<area shape="rect" id="Node000003" href="$logindialog_8cpp.html" title=" " alt="" coords="5,152,136,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="291,110,116,154,115,149,289,105"/>
+<area shape="rect" id="Node000004" href="$mainwindow_8cpp.html" title=" " alt="" coords="667,225,805,251"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="289,107,248,119,212,135,201,144,194,154,194,164,201,175,223,187,266,197,392,214,539,225,666,231,666,237,539,230,392,219,265,202,221,192,197,179,189,165,189,152,197,140,210,130,246,114,287,102"/>
+<area shape="rect" id="Node000005" href="$preferencesdialog_8cpp.html" title=" " alt="" coords="528,152,699,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="405,105,571,149,570,154,403,110"/>
+<area shape="rect" id="Node000006" href="$settings_8cpp.html" title=" " alt="" coords="211,152,325,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="327,115,283,154,279,150,323,111"/>
+<area shape="rect" id="Node000007" href="$systeminfodialog_8h.html" title=" " alt="" coords="350,152,503,177"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="373,111,416,150,412,154,369,115"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="490,178,687,223,685,228,489,183"/>
+<area shape="poly" id="edge13_Node000008_Node000004" title=" " alt="" coords="812,113,786,131,763,154,753,172,746,191,740,226,734,225,741,190,748,169,759,150,783,126,809,108"/>
+<area shape="poly" id="edge14_Node000008_Node000005" title=" " alt="" coords="798,110,652,154,651,149,797,105"/>
+<area shape="rect" id="Node000009" href="$encryptfiledialog_8h.html" title=" " alt="" coords="773,152,923,177"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="851,118,851,152,845,152,845,118"/>
+<area shape="rect" id="Node000010" href="$gpgcheck_8cpp.html" title=" " alt="" coords="947,152,1072,177"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="887,107,984,149,982,154,885,112"/>
+<area shape="rect" id="Node000011" href="$main_8cpp.html" title=" " alt="" coords="1097,152,1194,177"/>
+<area shape="poly" id="edge12_Node000008_Node000011" title=" " alt="" coords="910,105,1098,149,1097,154,908,110"/>
+<area shape="poly" id="edge10_Node000009_Node000004" title=" " alt="" coords="820,187,756,227,753,223,817,183"/>
+<area shape="poly" id="edge16_Node000012_Node000004" title=" " alt="" coords="1234,118,1226,150,1219,166,1207,179,1177,196,1135,210,1027,228,909,237,806,239,806,234,908,231,1026,222,1134,205,1175,192,1204,175,1214,163,1221,148,1228,117"/>
+<area shape="rect" id="Node000013" href="$newpassworddialog_8cpp.html" title=" " alt="" coords="1270,152,1453,177"/>
+<area shape="poly" id="edge17_Node000012_Node000013" title=" " alt="" coords="1266,108,1341,149,1339,154,1264,113"/>
+</map>

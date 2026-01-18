@@ -1,6 +1,6 @@
 \doxysection{gpgcheck.\+h}
 \hypertarget{gpgcheck_8h_source}{}\label{gpgcheck_8h_source}\index{src/gpgcheck.h@{src/gpgcheck.h}}
-
+\mbox{\hyperlink{gpgcheck_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{comment}{/*}}
 \DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
@@ -27,20 +27,20 @@
 \DoxyCodeLine{00023\ }
 \DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ <QWidget>}}
 \DoxyCodeLine{00025\ }
-\DoxyCodeLine{00026\ \textcolor{keyword}{enum\ class}\ GpgKeyType\ \{}
-\DoxyCodeLine{00027\ \ \ \ \ Public,}
-\DoxyCodeLine{00028\ \ \ \ \ Secret}
+\DoxyCodeLine{00026\ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{gpgcheck_8h_a35b1fc33f8274197e77909996c2c1b4e}{GpgKeyType}}\ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{gpgcheck_8h_a35b1fc33f8274197e77909996c2c1b4ea3d067bedfe2f4677470dd6ccf64d05ed}{Public}},}
+\DoxyCodeLine{00028\ \ \ \ \ \mbox{\hyperlink{gpgcheck_8h_a35b1fc33f8274197e77909996c2c1b4ea1e6947ac7fb3a9529a9726eb692c8cc5}{Secret}}}
 \DoxyCodeLine{00029\ \};}
 \DoxyCodeLine{00030\ }
-\DoxyCodeLine{00031\ \textcolor{keywordtype}{void}\ checkGpgKeys(QWidget*\ parent\ =\ \textcolor{keyword}{nullptr});}
-\DoxyCodeLine{00032\ \textcolor{keywordtype}{bool}\ isToolAvailable(\textcolor{keyword}{const}\ QString\ \&toolName);}
-\DoxyCodeLine{00033\ \textcolor{keywordtype}{bool}\ isStrong(\textcolor{keyword}{const}\ QString\ \&str);}
-\DoxyCodeLine{00034\ \textcolor{keywordtype}{bool}\ hasUltimateTrust(\textcolor{keyword}{const}\ QString\ \&keyId);}
-\DoxyCodeLine{00035\ \textcolor{keywordtype}{bool}\ warnAndContinue();}
-\DoxyCodeLine{00036\ \textcolor{keywordtype}{bool}\ warmupGpg(\textcolor{keyword}{const}\ QString\ \&recipientKey,\ QWidget\ *parent);}
+\DoxyCodeLine{00031\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gpgcheck_8h_ae8d7f5d496bc8cb4ec60ddd208a34a2a}{checkGpgKeys}}(QWidget*\ parent\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00032\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{gpgcheck_8h_a06afb7440e1b189a136881f19ae4571e}{isToolAvailable}}(\textcolor{keyword}{const}\ QString\ \&toolName);}
+\DoxyCodeLine{00033\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{gpgcheck_8h_ad2cb030065366a8a2d89cac7a5864232}{isStrong}}(\textcolor{keyword}{const}\ QString\ \&str);}
+\DoxyCodeLine{00034\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{gpgcheck_8h_a30deb3b4917d48703aa29478252414de}{hasUltimateTrust}}(\textcolor{keyword}{const}\ QString\ \&keyId);}
+\DoxyCodeLine{00035\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{gpgcheck_8h_a86c9527d92cd204d8e4ca99f49052021}{warnAndContinue}}();}
+\DoxyCodeLine{00036\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{gpgcheck_8h_a387e0a6e03ba63c352089c670fe9bfac}{warmupGpg}}(\textcolor{keyword}{const}\ QString\ \&recipientKey,\ QWidget\ *parent);}
 \DoxyCodeLine{00037\ \textcolor{keyword}{static}\ QStringList\ checkKeysWithGpg(\textcolor{keyword}{const}\ QStringList\ \&keys);}
-\DoxyCodeLine{00038\ \textcolor{keywordtype}{void}\ showGpgKeyListDialog(GpgKeyType\ type,\ \textcolor{keyword}{const}\ QString\ \&userName,\ QWidget\ *parent\ =\ \textcolor{keyword}{nullptr});}
-\DoxyCodeLine{00039\ \textcolor{keywordtype}{void}\ createGpgEncryptionKeyAsync(}
+\DoxyCodeLine{00038\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gpgcheck_8h_ab5402f37e3db4db753467770285a37e2}{showGpgKeyListDialog}}(\mbox{\hyperlink{gpgcheck_8h_a35b1fc33f8274197e77909996c2c1b4e}{GpgKeyType}}\ type,\ \textcolor{keyword}{const}\ QString\ \&userName,\ QWidget\ *parent\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00039\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gpgcheck_8h_a5d95d00051c31dd260ca7905bde18204}{createGpgEncryptionKeyAsync}}(}
 \DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{const}\ QString\ \&name,}
 \DoxyCodeLine{00041\ \ \ \ \ QWidget\ *parent,}
 \DoxyCodeLine{00042\ \ \ \ \ std::function<\textcolor{keywordtype}{void}(\textcolor{keywordtype}{bool})>\ done}

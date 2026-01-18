@@ -82,7 +82,7 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">preferencesdialog.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<a href="preferencesdialog_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * passwords - A GnuPG based password manager</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> * Copyright (C) 2025  Adam.Lanzafame &lt;sysal@tuta.io&gt;</span></div>
@@ -105,13 +105,13 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#ifndef PREFERENCESDIALOG_H</span></div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#define PREFERENCESDIALOG_H</span></div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &quot;settings.h&quot;</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &quot;<a class="code" href="settings_8h.html">settings.h</a>&quot;</span></div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &lt;QAbstractButton&gt;</span></div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#include &lt;QDialog&gt;</span></div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="preprocessor">#include &lt;QMap&gt;</span></div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keyword">namespace </span>Ui {</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceUi.html">Ui</a> {</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keyword">class </span><a class="code hl_class" href="classPreferencesDialog.html">PreferencesDialog</a>;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>}</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
@@ -122,28 +122,30 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="keyword">public</span>:</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="keyword">explicit</span> <a class="code hl_class" href="classPreferencesDialog.html">PreferencesDialog</a>(QWidget *parent = <span class="keyword">nullptr</span>);</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <a class="code hl_class" href="classPreferencesDialog.html">~PreferencesDialog</a>();</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keywordtype">void</span> loadSettings();</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordtype">void</span> saveSettings();</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <a class="code hl_function" href="classPreferencesDialog.html#a0e3927d4dbbc927879b4c4906e728f2d">~PreferencesDialog</a>();</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPreferencesDialog.html#afdfea6c2cbaad1317caa9ec187eda0e5">loadSettings</a>();</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPreferencesDialog.html#ad81737cb39f047cf6ed5606bede5cfac">saveSettings</a>();</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="keyword">private</span> slots:</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    Ui::PreferencesDialog *ui;</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    QMap&lt;QString, QWidget*&gt; widgetMap;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="classPreferencesDialog.html#ad52f597455505495a5b51c4a516e38eb">   47</a></span>    Ui::PreferencesDialog *<a class="code hl_variable" href="classPreferencesDialog.html#ad52f597455505495a5b51c4a516e38eb">ui</a>;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classPreferencesDialog.html#ab23ce5e69b5cb7df8452074831b497ab">   48</a></span>    QMap&lt;QString, QWidget*&gt; <a class="code hl_variable" href="classPreferencesDialog.html#ab23ce5e69b5cb7df8452074831b497ab">widgetMap</a>;</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="comment">//void resizeEvent(QResizeEvent *event);</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="keywordtype">void</span> restoreButtonClicked(QAbstractButton *button);</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordtype">void</span> restoreDefaults();</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="keywordtype">void</span> onBackupCheckStateChanged(<span class="keywordtype">int</span> state);</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keywordtype">void</span> openBackupDir();</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keywordtype">void</span> restartApplication();</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordtype">void</span> browseForExecutable();</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <a class="code hl_class" href="classSettings.html">Settings</a> settings;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPreferencesDialog.html#adb032c24ed944cf572455cdcba00309e">restoreButtonClicked</a>(QAbstractButton *button);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPreferencesDialog.html#ab9cfa04ca7e5604f5a768c9d14891e3c">restoreDefaults</a>();</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPreferencesDialog.html#ae0e73ead07c52576abbf588b9bfdc076">onBackupCheckStateChanged</a>(<span class="keywordtype">int</span> state);</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPreferencesDialog.html#afe6f065f24fc2baeddcf0c7243fa9ab9">openBackupDir</a>();</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPreferencesDialog.html#ad076d79f2798b32b8249e55ab17d1046">restartApplication</a>();</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPreferencesDialog.html#a669e62aec52e796630cf1d224cf4c390">browseForExecutable</a>();</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="classPreferencesDialog.html#ab9f52b3c5ee44302fbb1bae118391f67">   56</a></span>    <a class="code hl_class" href="classSettings.html">Settings</a> <a class="code hl_variable" href="classPreferencesDialog.html#ab9f52b3c5ee44302fbb1bae118391f67">settings</a>;</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keywordtype">bool</span> restartRequired = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    QSet&lt;QString&gt; restartKeys = {</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="classPreferencesDialog.html#a4fca96281ee718488848b4bc407aff39">   58</a></span>    <span class="keywordtype">bool</span> <a class="code hl_variable" href="classPreferencesDialog.html#a4fca96281ee718488848b4bc407aff39">restartRequired</a> = <span class="keyword">false</span>;</div>
+<div class="foldopen" id="foldopen00059" data-start="{" data-end="};">
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="classPreferencesDialog.html#a3d215e19ecd7be38ad654c2e335b2765">   59</a></span>    QSet&lt;QString&gt; <a class="code hl_variable" href="classPreferencesDialog.html#a3d215e19ecd7be38ad654c2e335b2765">restartKeys</a> = {</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        <span class="stringliteral">&quot;Categories/DoubleClickOpen&quot;</span>   <span class="comment">// setting which applied net restart</span></div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    };</div>
+</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>};</div>
@@ -151,7 +153,23 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">#endif </span><span class="comment">// PREFERENCESDIALOG_H</span></div>
 <div class="ttc" id="aclassPreferencesDialog_html"><div class="ttname"><a href="classPreferencesDialog.html">PreferencesDialog</a></div><div class="ttdef"><b>Definition</b> preferencesdialog.h:35</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_a0e3927d4dbbc927879b4c4906e728f2d"><div class="ttname"><a href="classPreferencesDialog.html#a0e3927d4dbbc927879b4c4906e728f2d">PreferencesDialog::~PreferencesDialog</a></div><div class="ttdeci">~PreferencesDialog()</div><div class="ttdef"><b>Definition</b> preferencesdialog.cpp:386</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_a3d215e19ecd7be38ad654c2e335b2765"><div class="ttname"><a href="classPreferencesDialog.html#a3d215e19ecd7be38ad654c2e335b2765">PreferencesDialog::restartKeys</a></div><div class="ttdeci">QSet&lt; QString &gt; restartKeys</div><div class="ttdef"><b>Definition</b> preferencesdialog.h:59</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_a4fca96281ee718488848b4bc407aff39"><div class="ttname"><a href="classPreferencesDialog.html#a4fca96281ee718488848b4bc407aff39">PreferencesDialog::restartRequired</a></div><div class="ttdeci">bool restartRequired</div><div class="ttdef"><b>Definition</b> preferencesdialog.h:58</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_a669e62aec52e796630cf1d224cf4c390"><div class="ttname"><a href="classPreferencesDialog.html#a669e62aec52e796630cf1d224cf4c390">PreferencesDialog::browseForExecutable</a></div><div class="ttdeci">void browseForExecutable()</div><div class="ttdef"><b>Definition</b> preferencesdialog.cpp:600</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_ab23ce5e69b5cb7df8452074831b497ab"><div class="ttname"><a href="classPreferencesDialog.html#ab23ce5e69b5cb7df8452074831b497ab">PreferencesDialog::widgetMap</a></div><div class="ttdeci">QMap&lt; QString, QWidget * &gt; widgetMap</div><div class="ttdef"><b>Definition</b> preferencesdialog.h:48</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_ab9cfa04ca7e5604f5a768c9d14891e3c"><div class="ttname"><a href="classPreferencesDialog.html#ab9cfa04ca7e5604f5a768c9d14891e3c">PreferencesDialog::restoreDefaults</a></div><div class="ttdeci">void restoreDefaults()</div><div class="ttdef"><b>Definition</b> preferencesdialog.cpp:318</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_ab9f52b3c5ee44302fbb1bae118391f67"><div class="ttname"><a href="classPreferencesDialog.html#ab9f52b3c5ee44302fbb1bae118391f67">PreferencesDialog::settings</a></div><div class="ttdeci">Settings settings</div><div class="ttdef"><b>Definition</b> preferencesdialog.h:56</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_ad076d79f2798b32b8249e55ab17d1046"><div class="ttname"><a href="classPreferencesDialog.html#ad076d79f2798b32b8249e55ab17d1046">PreferencesDialog::restartApplication</a></div><div class="ttdeci">void restartApplication()</div><div class="ttdef"><b>Definition</b> preferencesdialog.cpp:543</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_ad52f597455505495a5b51c4a516e38eb"><div class="ttname"><a href="classPreferencesDialog.html#ad52f597455505495a5b51c4a516e38eb">PreferencesDialog::ui</a></div><div class="ttdeci">Ui::PreferencesDialog * ui</div><div class="ttdef"><b>Definition</b> preferencesdialog.h:47</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_ad81737cb39f047cf6ed5606bede5cfac"><div class="ttname"><a href="classPreferencesDialog.html#ad81737cb39f047cf6ed5606bede5cfac">PreferencesDialog::saveSettings</a></div><div class="ttdeci">void saveSettings()</div><div class="ttdef"><b>Definition</b> preferencesdialog.cpp:456</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_adb032c24ed944cf572455cdcba00309e"><div class="ttname"><a href="classPreferencesDialog.html#adb032c24ed944cf572455cdcba00309e">PreferencesDialog::restoreButtonClicked</a></div><div class="ttdeci">void restoreButtonClicked(QAbstractButton *button)</div><div class="ttdef"><b>Definition</b> preferencesdialog.cpp:310</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_ae0e73ead07c52576abbf588b9bfdc076"><div class="ttname"><a href="classPreferencesDialog.html#ae0e73ead07c52576abbf588b9bfdc076">PreferencesDialog::onBackupCheckStateChanged</a></div><div class="ttdeci">void onBackupCheckStateChanged(int state)</div><div class="ttdef"><b>Definition</b> preferencesdialog.cpp:568</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_afdfea6c2cbaad1317caa9ec187eda0e5"><div class="ttname"><a href="classPreferencesDialog.html#afdfea6c2cbaad1317caa9ec187eda0e5">PreferencesDialog::loadSettings</a></div><div class="ttdeci">void loadSettings()</div><div class="ttdef"><b>Definition</b> preferencesdialog.cpp:415</div></div>
+<div class="ttc" id="aclassPreferencesDialog_html_afe6f065f24fc2baeddcf0c7243fa9ab9"><div class="ttname"><a href="classPreferencesDialog.html#afe6f065f24fc2baeddcf0c7243fa9ab9">PreferencesDialog::openBackupDir</a></div><div class="ttdeci">void openBackupDir()</div><div class="ttdef"><b>Definition</b> preferencesdialog.cpp:391</div></div>
 <div class="ttc" id="aclassSettings_html"><div class="ttname"><a href="classSettings.html">Settings</a></div><div class="ttdef"><b>Definition</b> settings.h:35</div></div>
+<div class="ttc" id="anamespaceUi_html"><div class="ttname"><a href="namespaceUi.html">Ui</a></div><div class="ttdef"><b>Definition</b> logindialog.h:30</div></div>
+<div class="ttc" id="asettings_8h_html"><div class="ttname"><a href="settings_8h.html">settings.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

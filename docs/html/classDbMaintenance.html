@@ -73,10 +73,14 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classDbMaintenance-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">DbMaintenance Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p><code>#include &lt;<a class="el" href="dbmaintenance_8h_source.html">dbmaintenance.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for DbMaintenance:</div>
 <div class="dyncontent">
@@ -100,28 +104,427 @@ Collaboration diagram for DbMaintenance:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a92e62306d766e912c175876a96d066e6" id="r_a92e62306d766e912c175876a96d066e6"><td class="memItemLeft" align="right" valign="top"><a id="a92e62306d766e912c175876a96d066e6" name="a92e62306d766e912c175876a96d066e6"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>DbMaintenance</b> (QSqlDatabase db, QWidget *parent=nullptr)</td></tr>
+<tr class="memitem:a92e62306d766e912c175876a96d066e6" id="r_a92e62306d766e912c175876a96d066e6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#a92e62306d766e912c175876a96d066e6">DbMaintenance</a> (QSqlDatabase db, QWidget *parent=nullptr)</td></tr>
 <tr class="separator:a92e62306d766e912c175876a96d066e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c2a7e204ea62a37f200390ac83da4e7" id="r_a5c2a7e204ea62a37f200390ac83da4e7"><td class="memItemLeft" align="right" valign="top"><a id="a5c2a7e204ea62a37f200390ac83da4e7" name="a5c2a7e204ea62a37f200390ac83da4e7"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>startMaintenance</b> ()</td></tr>
+<tr class="memitem:a5c2a7e204ea62a37f200390ac83da4e7" id="r_a5c2a7e204ea62a37f200390ac83da4e7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#a5c2a7e204ea62a37f200390ac83da4e7">startMaintenance</a> ()</td></tr>
 <tr class="separator:a5c2a7e204ea62a37f200390ac83da4e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0b4fbe75cc26d936f34b633643a756e" id="r_ab0b4fbe75cc26d936f34b633643a756e"><td class="memItemLeft" align="right" valign="top"><a id="ab0b4fbe75cc26d936f34b633643a756e" name="ab0b4fbe75cc26d936f34b633643a756e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>updateStatus</b> (const QString &amp;text, int progress)</td></tr>
+<tr class="memitem:ab0b4fbe75cc26d936f34b633643a756e" id="r_ab0b4fbe75cc26d936f34b633643a756e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#ab0b4fbe75cc26d936f34b633643a756e">updateStatus</a> (const QString &amp;text, int progress)</td></tr>
 <tr class="separator:ab0b4fbe75cc26d936f34b633643a756e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a348dc1f4ff7825710189d8bda8503a3f" id="r_a348dc1f4ff7825710189d8bda8503a3f"><td class="memItemLeft" align="right" valign="top"><a id="a348dc1f4ff7825710189d8bda8503a3f" name="a348dc1f4ff7825710189d8bda8503a3f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>maintenanceFinished</b> ()</td></tr>
+<tr class="memitem:a348dc1f4ff7825710189d8bda8503a3f" id="r_a348dc1f4ff7825710189d8bda8503a3f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#a348dc1f4ff7825710189d8bda8503a3f">maintenanceFinished</a> ()</td></tr>
 <tr class="separator:a348dc1f4ff7825710189d8bda8503a3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a50e2572907036c27cccd10efdadadb48" id="r_a50e2572907036c27cccd10efdadadb48"><td class="memItemLeft" align="right" valign="top"><a id="a50e2572907036c27cccd10efdadadb48" name="a50e2572907036c27cccd10efdadadb48"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>closeEvent</b> (QCloseEvent *event) override</td></tr>
+<tr class="memitem:a50e2572907036c27cccd10efdadadb48" id="r_a50e2572907036c27cccd10efdadadb48"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#a50e2572907036c27cccd10efdadadb48">closeEvent</a> (QCloseEvent *event) override</td></tr>
 <tr class="separator:a50e2572907036c27cccd10efdadadb48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09e46b087a0d93b0ec126ed77d1f5521" id="r_a09e46b087a0d93b0ec126ed77d1f5521"><td class="memItemLeft" align="right" valign="top"><a id="a09e46b087a0d93b0ec126ed77d1f5521" name="a09e46b087a0d93b0ec126ed77d1f5521"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>reject</b> () override</td></tr>
+<tr class="memitem:a09e46b087a0d93b0ec126ed77d1f5521" id="r_a09e46b087a0d93b0ec126ed77d1f5521"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#a09e46b087a0d93b0ec126ed77d1f5521">reject</a> () override</td></tr>
 <tr class="separator:a09e46b087a0d93b0ec126ed77d1f5521"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:aa0c7c3e937d20c47c8cc4e21ea2edfb9" id="r_aa0c7c3e937d20c47c8cc4e21ea2edfb9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#aa0c7c3e937d20c47c8cc4e21ea2edfb9">runMaintenance</a> ()</td></tr>
+<tr class="separator:aa0c7c3e937d20c47c8cc4e21ea2edfb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab394ba1b3b922991be5b1125c2581896" id="r_ab394ba1b3b922991be5b1125c2581896"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#ab394ba1b3b922991be5b1125c2581896">runQuery</a> (const QString &amp;sql, QString &amp;errorOut)</td></tr>
+<tr class="separator:ab394ba1b3b922991be5b1125c2581896"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fccf44a440d16fa2b21b627ffb4515b" id="r_a8fccf44a440d16fa2b21b627ffb4515b"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#a8fccf44a440d16fa2b21b627ffb4515b">getSingleValue</a> (const QString &amp;sql, QString &amp;errorOut)</td></tr>
+<tr class="separator:a8fccf44a440d16fa2b21b627ffb4515b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:ae7f86ae46443598b86b31204c9bb89e9" id="r_ae7f86ae46443598b86b31204c9bb89e9"><td class="memItemLeft" align="right" valign="top">QSqlDatabase&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#ae7f86ae46443598b86b31204c9bb89e9">m_db</a></td></tr>
+<tr class="separator:ae7f86ae46443598b86b31204c9bb89e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1bf93d6c5c76edd967d404cb13c4087c" id="r_a1bf93d6c5c76edd967d404cb13c4087c"><td class="memItemLeft" align="right" valign="top">QLabel *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#a1bf93d6c5c76edd967d404cb13c4087c">m_statusLabel</a></td></tr>
+<tr class="separator:a1bf93d6c5c76edd967d404cb13c4087c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87cdeea4b00cd28fd294613fb083f357" id="r_a87cdeea4b00cd28fd294613fb083f357"><td class="memItemLeft" align="right" valign="top">QProgressBar *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#a87cdeea4b00cd28fd294613fb083f357">m_progress</a></td></tr>
+<tr class="separator:a87cdeea4b00cd28fd294613fb083f357"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77fe6f52c5e74098c039d233a15ce1d6" id="r_a77fe6f52c5e74098c039d233a15ce1d6"><td class="memItemLeft" align="right" valign="top">QPushButton *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#a77fe6f52c5e74098c039d233a15ce1d6">m_startBtn</a></td></tr>
+<tr class="separator:a77fe6f52c5e74098c039d233a15ce1d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08396cf9f94fe0fb6574df7f3d815b8d" id="r_a08396cf9f94fe0fb6574df7f3d815b8d"><td class="memItemLeft" align="right" valign="top">QPushButton *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDbMaintenance.html#a08396cf9f94fe0fb6574df7f3d815b8d">m_closeBtn</a></td></tr>
+<tr class="separator:a08396cf9f94fe0fb6574df7f3d815b8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a92e62306d766e912c175876a96d066e6" name="a92e62306d766e912c175876a96d066e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92e62306d766e912c175876a96d066e6">&#9670;&#160;</a></span>DbMaintenance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">DbMaintenance::DbMaintenance </td>
+          <td>(</td>
+          <td class="paramtype">QSqlDatabase&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QWidget *&#160;</td>
+          <td class="paramname"><em>parent</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a50e2572907036c27cccd10efdadadb48" name="a50e2572907036c27cccd10efdadadb48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50e2572907036c27cccd10efdadadb48">&#9670;&#160;</a></span>closeEvent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void DbMaintenance::closeEvent </td>
+          <td>(</td>
+          <td class="paramtype">QCloseEvent *&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8fccf44a440d16fa2b21b627ffb4515b" name="a8fccf44a440d16fa2b21b627ffb4515b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fccf44a440d16fa2b21b627ffb4515b">&#9670;&#160;</a></span>getSingleValue()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString DbMaintenance::getSingleValue </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>sql</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString &amp;&#160;</td>
+          <td class="paramname"><em>errorOut</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a348dc1f4ff7825710189d8bda8503a3f" name="a348dc1f4ff7825710189d8bda8503a3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a348dc1f4ff7825710189d8bda8503a3f">&#9670;&#160;</a></span>maintenanceFinished()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void DbMaintenance::maintenanceFinished </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a09e46b087a0d93b0ec126ed77d1f5521" name="a09e46b087a0d93b0ec126ed77d1f5521"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09e46b087a0d93b0ec126ed77d1f5521">&#9670;&#160;</a></span>reject()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void DbMaintenance::reject </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa0c7c3e937d20c47c8cc4e21ea2edfb9" name="aa0c7c3e937d20c47c8cc4e21ea2edfb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0c7c3e937d20c47c8cc4e21ea2edfb9">&#9670;&#160;</a></span>runMaintenance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void DbMaintenance::runMaintenance </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab394ba1b3b922991be5b1125c2581896" name="ab394ba1b3b922991be5b1125c2581896"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab394ba1b3b922991be5b1125c2581896">&#9670;&#160;</a></span>runQuery()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool DbMaintenance::runQuery </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>sql</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString &amp;&#160;</td>
+          <td class="paramname"><em>errorOut</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5c2a7e204ea62a37f200390ac83da4e7" name="a5c2a7e204ea62a37f200390ac83da4e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c2a7e204ea62a37f200390ac83da4e7">&#9670;&#160;</a></span>startMaintenance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void DbMaintenance::startMaintenance </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab0b4fbe75cc26d936f34b633643a756e" name="ab0b4fbe75cc26d936f34b633643a756e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0b4fbe75cc26d936f34b633643a756e">&#9670;&#160;</a></span>updateStatus()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void DbMaintenance::updateStatus </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>text</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>progress</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a08396cf9f94fe0fb6574df7f3d815b8d" name="a08396cf9f94fe0fb6574df7f3d815b8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08396cf9f94fe0fb6574df7f3d815b8d">&#9670;&#160;</a></span>m_closeBtn</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QPushButton* DbMaintenance::m_closeBtn</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae7f86ae46443598b86b31204c9bb89e9" name="ae7f86ae46443598b86b31204c9bb89e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7f86ae46443598b86b31204c9bb89e9">&#9670;&#160;</a></span>m_db</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QSqlDatabase DbMaintenance::m_db</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a87cdeea4b00cd28fd294613fb083f357" name="a87cdeea4b00cd28fd294613fb083f357"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87cdeea4b00cd28fd294613fb083f357">&#9670;&#160;</a></span>m_progress</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QProgressBar* DbMaintenance::m_progress</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a77fe6f52c5e74098c039d233a15ce1d6" name="a77fe6f52c5e74098c039d233a15ce1d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77fe6f52c5e74098c039d233a15ce1d6">&#9670;&#160;</a></span>m_startBtn</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QPushButton* DbMaintenance::m_startBtn</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1bf93d6c5c76edd967d404cb13c4087c" name="a1bf93d6c5c76edd967d404cb13c4087c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1bf93d6c5c76edd967d404cb13c4087c">&#9670;&#160;</a></span>m_statusLabel</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QLabel* DbMaintenance::m_statusLabel</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/<a class="el" href="dbmaintenance_8h_source.html">dbmaintenance.h</a></li>
 </ul>

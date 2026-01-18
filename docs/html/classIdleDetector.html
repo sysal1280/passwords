@@ -73,10 +73,14 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classIdleDetector-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">IdleDetector Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p><code>#include &lt;<a class="el" href="idledetector_8h_source.html">idledetector.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for IdleDetector:</div>
 <div class="dyncontent">
@@ -100,25 +104,259 @@ Collaboration diagram for IdleDetector:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1adfb035cb2b15b42c3b73e1369fbcc9" id="r_a1adfb035cb2b15b42c3b73e1369fbcc9"><td class="memItemLeft" align="right" valign="top"><a id="a1adfb035cb2b15b42c3b73e1369fbcc9" name="a1adfb035cb2b15b42c3b73e1369fbcc9"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>IdleDetector</b> (int idleSeconds, QObject *parent=nullptr)</td></tr>
+<tr class="memitem:a1adfb035cb2b15b42c3b73e1369fbcc9" id="r_a1adfb035cb2b15b42c3b73e1369fbcc9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIdleDetector.html#a1adfb035cb2b15b42c3b73e1369fbcc9">IdleDetector</a> (int idleSeconds, QObject *parent=nullptr)</td></tr>
 <tr class="separator:a1adfb035cb2b15b42c3b73e1369fbcc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b81733bab0bf774c5dafcf3c6c8bb71" id="r_a2b81733bab0bf774c5dafcf3c6c8bb71"><td class="memItemLeft" align="right" valign="top"><a id="a2b81733bab0bf774c5dafcf3c6c8bb71" name="a2b81733bab0bf774c5dafcf3c6c8bb71"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>idle</b> ()</td></tr>
+<tr class="memitem:a2b81733bab0bf774c5dafcf3c6c8bb71" id="r_a2b81733bab0bf774c5dafcf3c6c8bb71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIdleDetector.html#a2b81733bab0bf774c5dafcf3c6c8bb71">idle</a> ()</td></tr>
 <tr class="separator:a2b81733bab0bf774c5dafcf3c6c8bb71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ab382158c5d7ca04d382e9c82948676" id="r_a4ab382158c5d7ca04d382e9c82948676"><td class="memItemLeft" align="right" valign="top"><a id="a4ab382158c5d7ca04d382e9c82948676" name="a4ab382158c5d7ca04d382e9c82948676"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>activity</b> ()</td></tr>
+<tr class="memitem:a4ab382158c5d7ca04d382e9c82948676" id="r_a4ab382158c5d7ca04d382e9c82948676"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIdleDetector.html#a4ab382158c5d7ca04d382e9c82948676">activity</a> ()</td></tr>
 <tr class="separator:a4ab382158c5d7ca04d382e9c82948676"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:ae71b7562e8d7f9fca7cf8578c7c088a2" id="r_ae71b7562e8d7f9fca7cf8578c7c088a2"><td class="memItemLeft" align="right" valign="top"><a id="ae71b7562e8d7f9fca7cf8578c7c088a2" name="ae71b7562e8d7f9fca7cf8578c7c088a2"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>eventFilter</b> (QObject *obj, QEvent *event) override</td></tr>
+<tr class="memitem:ae71b7562e8d7f9fca7cf8578c7c088a2" id="r_ae71b7562e8d7f9fca7cf8578c7c088a2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIdleDetector.html#ae71b7562e8d7f9fca7cf8578c7c088a2">eventFilter</a> (QObject *obj, QEvent *event) override</td></tr>
 <tr class="separator:ae71b7562e8d7f9fca7cf8578c7c088a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:ac470733aeb3881423083ebb396f819ee" id="r_ac470733aeb3881423083ebb396f819ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIdleDetector.html#ac470733aeb3881423083ebb396f819ee">checkIdle</a> ()</td></tr>
+<tr class="separator:ac470733aeb3881423083ebb396f819ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a0a445f01d56cccc257bd1eadc7b901d6" id="r_a0a445f01d56cccc257bd1eadc7b901d6"><td class="memItemLeft" align="right" valign="top">QElapsedTimer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIdleDetector.html#a0a445f01d56cccc257bd1eadc7b901d6">m_timer</a></td></tr>
+<tr class="separator:a0a445f01d56cccc257bd1eadc7b901d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae93fc533f6fbd1082d5fedffad5a66c2" id="r_ae93fc533f6fbd1082d5fedffad5a66c2"><td class="memItemLeft" align="right" valign="top">QTimer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIdleDetector.html#ae93fc533f6fbd1082d5fedffad5a66c2">m_checkTimer</a></td></tr>
+<tr class="separator:ae93fc533f6fbd1082d5fedffad5a66c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fb3edaae28b3829b950b2e44dfa7daf" id="r_a2fb3edaae28b3829b950b2e44dfa7daf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIdleDetector.html#a2fb3edaae28b3829b950b2e44dfa7daf">m_idleSeconds</a></td></tr>
+<tr class="separator:a2fb3edaae28b3829b950b2e44dfa7daf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af517a0971604c2a2a2c008cd4910c55b" id="r_af517a0971604c2a2a2c008cd4910c55b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIdleDetector.html#af517a0971604c2a2a2c008cd4910c55b">m_isIdle</a> = false</td></tr>
+<tr class="separator:af517a0971604c2a2a2c008cd4910c55b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a1adfb035cb2b15b42c3b73e1369fbcc9" name="a1adfb035cb2b15b42c3b73e1369fbcc9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1adfb035cb2b15b42c3b73e1369fbcc9">&#9670;&#160;</a></span>IdleDetector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">IdleDetector::IdleDetector </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>idleSeconds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QObject *&#160;</td>
+          <td class="paramname"><em>parent</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a4ab382158c5d7ca04d382e9c82948676" name="a4ab382158c5d7ca04d382e9c82948676"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ab382158c5d7ca04d382e9c82948676">&#9670;&#160;</a></span>activity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IdleDetector::activity </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac470733aeb3881423083ebb396f819ee" name="ac470733aeb3881423083ebb396f819ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac470733aeb3881423083ebb396f819ee">&#9670;&#160;</a></span>checkIdle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IdleDetector::checkIdle </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae71b7562e8d7f9fca7cf8578c7c088a2" name="ae71b7562e8d7f9fca7cf8578c7c088a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae71b7562e8d7f9fca7cf8578c7c088a2">&#9670;&#160;</a></span>eventFilter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IdleDetector::eventFilter </td>
+          <td>(</td>
+          <td class="paramtype">QObject *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QEvent *&#160;</td>
+          <td class="paramname"><em>event</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2b81733bab0bf774c5dafcf3c6c8bb71" name="a2b81733bab0bf774c5dafcf3c6c8bb71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b81733bab0bf774c5dafcf3c6c8bb71">&#9670;&#160;</a></span>idle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IdleDetector::idle </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="ae93fc533f6fbd1082d5fedffad5a66c2" name="ae93fc533f6fbd1082d5fedffad5a66c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae93fc533f6fbd1082d5fedffad5a66c2">&#9670;&#160;</a></span>m_checkTimer</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QTimer IdleDetector::m_checkTimer</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2fb3edaae28b3829b950b2e44dfa7daf" name="a2fb3edaae28b3829b950b2e44dfa7daf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2fb3edaae28b3829b950b2e44dfa7daf">&#9670;&#160;</a></span>m_idleSeconds</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int IdleDetector::m_idleSeconds</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af517a0971604c2a2a2c008cd4910c55b" name="af517a0971604c2a2a2c008cd4910c55b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af517a0971604c2a2a2c008cd4910c55b">&#9670;&#160;</a></span>m_isIdle</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IdleDetector::m_isIdle = false</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0a445f01d56cccc257bd1eadc7b901d6" name="a0a445f01d56cccc257bd1eadc7b901d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a445f01d56cccc257bd1eadc7b901d6">&#9670;&#160;</a></span>m_timer</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QElapsedTimer IdleDetector::m_timer</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="idledetector_8h_source.html">idledetector.h</a></li>
-<li>src/<b>idledetector.cpp</b></li>
+<li>src/<a class="el" href="idledetector_8cpp.html">idledetector.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

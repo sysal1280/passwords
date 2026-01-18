@@ -1,0 +1,13 @@
+<map id="src/multilinedelegate.h" name="src/multilinedelegate.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="281,5,433,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,113,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="310,33,121,78,120,73,308,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="138,79,285,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="334,33,248,75,246,70,332,28"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="309,79,405,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="359,31,359,65,354,65,354,31"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="429,79,509,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="376,28,440,69,437,73,373,33"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="533,79,599,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="391,28,521,72,519,77,389,33"/>
+</map>
