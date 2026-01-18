@@ -1,0 +1,283 @@
+\doxysection{systeminfodialog.\+h}
+\hypertarget{systeminfodialog_8h_source}{}\label{systeminfodialog_8h_source}\index{src/systeminfodialog.h@{src/systeminfodialog.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Copyright\ (C)\ 2025\ \ Adam.Lanzafame\ <sysal@tuta.io>}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ This\ program\ is\ free\ software:\ you\ can\ redistribute\ it\ and/or\ modify}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ it\ under\ the\ terms\ of\ the\ GNU\ General\ Public\ License\ as\ published\ by}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ the\ Free\ Software\ Foundation,\ either\ version\ 3\ of\ the\ License,\ or}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ (at\ your\ option)\ any\ later\ version.}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ This\ program\ is\ distributed\ in\ the\ hope\ that\ it\ will\ be\ useful,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ but\ WITHOUT\ ANY\ WARRANTY;\ without\ even\ the\ implied\ warranty\ of}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ MERCHANTABILITY\ or\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE.\ \ See\ the}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ GNU\ General\ Public\ License\ for\ more\ details.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ You\ should\ have\ received\ a\ copy\ of\ the\ GNU\ General\ Public\ License}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ along\ with\ this\ program.\ \ If\ not,\ see\ <https://www.gnu.org/licenses/>.}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{comment}{//\ systeminfodialog.h}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#ifndef\ SYSTEMINFODIALOG\_H}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ SYSTEMINFODIALOG\_H}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}scopedcursor.h"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}settings.h"{}}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}dbutils.h"{}}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ "{}gitversion.h"{}}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ "{}quuid.h"{}}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ <QApplication>}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#include\ <QClipboard>}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ <QDir>}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ <QFile>}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ <QHBoxLayout>}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ <QLibraryInfo>}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ <QPlainTextEdit>}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ <QProcess>}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#include\ <QProcessEnvironment>}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#include\ <QPushButton>}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#include\ <QStandardPaths>}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#include\ <QSysInfo>}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#include\ <QTextStream>}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#include\ <QVBoxLayout>}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#include\ <QDialog>}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classSystemInfoDialog}{SystemInfoDialog}}\ :\ \textcolor{keyword}{public}\ QDialog}
+\DoxyCodeLine{00048\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ Q\_OBJECT}
+\DoxyCodeLine{00050\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classSystemInfoDialog}{SystemInfoDialog}}(QWidget\ *parent\ =\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ :\ QDialog(parent)}
+\DoxyCodeLine{00053\ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classScopedCursor}{ScopedCursor}}\ wait(Qt::WaitCursor);}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ setWindowTitle(\textcolor{stringliteral}{"{}System\ Information"{}});}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ resize(700,\ 500);}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *mainLayout\ =\ \textcolor{keyword}{new}\ QVBoxLayout(\textcolor{keyword}{this});}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ textEdit\ =\ \textcolor{keyword}{new}\ QPlainTextEdit(\textcolor{keyword}{this});}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ textEdit-\/>setReadOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Buttons\ row}}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *buttonLayout\ =\ \textcolor{keyword}{new}\ QHBoxLayout;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *copyBtn\ =\ \textcolor{keyword}{new}\ QPushButton(\textcolor{stringliteral}{"{}Copy\ to\ Clipboard"{}},\ \textcolor{keyword}{this});}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *closeBtn\ =\ \textcolor{keyword}{new}\ QPushButton(\textcolor{stringliteral}{"{}Close"{}},\ \textcolor{keyword}{this});}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ buttonLayout-\/>addStretch();\ \textcolor{comment}{//\ push\ buttons\ to\ the\ right}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ buttonLayout-\/>addWidget(copyBtn);}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ buttonLayout-\/>addWidget(closeBtn);}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ connect(closeBtn,\ \&QPushButton::clicked,\ \textcolor{keyword}{this},\ \&QDialog::accept);}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ connect(copyBtn,\ \&QPushButton::clicked,\ \textcolor{keyword}{this},}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{keyword}{this}]()\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QString\ text;}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Copy\ selected\ text\ if\ present}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QString\ selected\ =\ textEdit-\/>textCursor().selectedText();}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!selected.isEmpty())\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text\ =\ selected;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text\ =\ textEdit-\/>toPlainText();}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (!text.isEmpty())\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QGuiApplication::clipboard()-\/>setText(text);}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ mainLayout-\/>addWidget(textEdit);}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ mainLayout-\/>addLayout(buttonLayout);}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ textEdit-\/>setPlainText(collectSystemInfo());}
+\DoxyCodeLine{00095\ \ \ \ \ \}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00098\ \ \ \ \ QPlainTextEdit\ *textEdit;}
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{classSettings}{Settings}}\ settings;}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ QString\ collectSystemInfo()}
+\DoxyCodeLine{00102\ \ \ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ QString\ report;}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Qt\ version}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ report\ +=\ QString(tr(\textcolor{stringliteral}{"{}Qt\ Version:\ \%1\(\backslash\)n"{}})).arg(qVersion());}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ OS\ info}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ report\ +=\ QString(tr(\textcolor{stringliteral}{"{}OS:\ \%1\(\backslash\)n"{}})).arg(QSysInfo::prettyProductName());}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ report\ +=\ QString(tr(\textcolor{stringliteral}{"{}Kernel:\ \%1\ \%2\(\backslash\)n"{}}))}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(QSysInfo::kernelType(),\ QSysInfo::kernelVersion());}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Architecture}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ report\ +=\ QString(tr(\textcolor{stringliteral}{"{}Architecture:\ \%1\(\backslash\)n"{}}))}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(QSysInfo::currentCpuArchitecture());}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Compiler}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ QString\ compiler;}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\#if\ defined(\_\_clang\_\_)}}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ compiler\ =\ QString(\textcolor{stringliteral}{"{}Clang\ \%1.\%2.\%3"{}})}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(\_\_clang\_major\_\_)}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(\_\_clang\_minor\_\_)}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(\_\_clang\_patchlevel\_\_);}
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\#elif\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ compiler\ =\ QString(\textcolor{stringliteral}{"{}GCC\ \%1.\%2.\%3"{}})}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(\_\_GNUC\_\_)}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(\_\_GNUC\_MINOR\_\_)}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(\_\_GNUC\_PATCHLEVEL\_\_);}
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\#elif\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ compiler\ =\ QString(\textcolor{stringliteral}{"{}MSVC\ \%1"{}}).arg(\_MSC\_VER);}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ compiler\ =\ \textcolor{stringliteral}{"{}Unknown\ compiler"{}};}
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ report\ +=\ QString(\textcolor{stringliteral}{"{}Compiler:\ \%1\(\backslash\)n\(\backslash\)n"{}}).arg(compiler);}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Version\ +\ git\ metadata}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ QString\ version\ =\ QCoreApplication::applicationVersion();}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\#ifdef\ APP\_DEBUG\_BUILD}}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ version\ +=\ \textcolor{stringliteral}{"{}-\/debug"{}};}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\#ifdef\ APP\_RELEASE\_BUILD}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ version\ +=\ \textcolor{stringliteral}{"{}-\/release"{}};}
+\DoxyCodeLine{00149\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ QStringList\ git;}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!QString(GIT\_COMMIT\_HASH).isEmpty())\ git\ <<\ GIT\_COMMIT\_HASH;}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!QString(GIT\_BRANCH).isEmpty())\ \ \ \ \ \ git\ <<\ GIT\_BRANCH;}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!QString(GIT\_DIRTY).isEmpty())\ \ \ \ \ \ \ git\ <<\ GIT\_DIRTY;}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!git.isEmpty())}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ version\ +=\ \textcolor{stringliteral}{"{}+"{}}\ +\ git.join(\textcolor{stringliteral}{"{}."{}});}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ version\ +=\ QString(\textcolor{stringliteral}{"{}\ (\%1)"{}}).arg(BUILD\_TIMESTAMP);}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ QString(\textcolor{stringliteral}{"{}Application\ Version:\ \%1\(\backslash\)n\(\backslash\)n"{}}).arg(version);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Environment\ variables}}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ report\ +=\ tr(\textcolor{stringliteral}{"{}Environment:\(\backslash\)n"{}});}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ env\ =\ QProcessEnvironment::systemEnvironment();}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QStringList\ keys\ =\ env.keys();}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ QString\ \&key\ :\ keys)\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ QString(\textcolor{stringliteral}{"{}\ \ \%1=\(\backslash\)"{}\%2\(\backslash\)"{}\(\backslash\)n"{}}).arg(key,\ env.value(key));}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Library\ paths}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ report\ +=\ tr(\textcolor{stringliteral}{"{}\(\backslash\)nLibrary\ info:\(\backslash\)n"{}});}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ report\ +=\ QString(\textcolor{stringliteral}{"{}\ \ PrefixPath:\ \%1\(\backslash\)n"{}})}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(QDir::toNativeSeparators(QLibraryInfo::path(QLibraryInfo::PrefixPath)));}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ report\ +=\ QString(\textcolor{stringliteral}{"{}\ \ PluginsPath:\ \%1\(\backslash\)n"{}})}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(QDir::toNativeSeparators(QLibraryInfo::path(QLibraryInfo::PluginsPath)));}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ report\ +=\ QString(\textcolor{stringliteral}{"{}\ \ TranslationsPath:\ \%1\(\backslash\)n"{}})}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(QDir::toNativeSeparators(QLibraryInfo::path(QLibraryInfo::TranslationsPath)));}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Standard\ paths}}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ report\ +=\ tr(\textcolor{stringliteral}{"{}\(\backslash\)nStandard\ paths:\(\backslash\)n"{}});}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ locations\ =\ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ QStandardPaths::DesktopLocation,}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ QStandardPaths::DocumentsLocation,}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ QStandardPaths::DownloadLocation,}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ QStandardPaths::MusicLocation,}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ QStandardPaths::PicturesLocation,}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ QStandardPaths::MoviesLocation,}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ QStandardPaths::HomeLocation,}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ QStandardPaths::TempLocation}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ loc\ :\ locations)\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ QStringList\ paths\ =\ QStandardPaths::standardLocations(loc);}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (QString\ \&p\ :\ paths)}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ p\ =\ QDir::toNativeSeparators(p);}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ QString(\textcolor{stringliteral}{"{}\ \ \%1:\ \%2\(\backslash\)n"{}})}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(QStandardPaths::displayName(loc),}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ paths.join(\textcolor{stringliteral}{"{},\ "{}}));}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Locations\ of\ program,\ conf\ and\ database}}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ report\ +=\ QString(tr(\textcolor{stringliteral}{"{}\ \ Configuration\ file:\ \%1\(\backslash\)n"{}}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ Database\ file:\ \%2\(\backslash\)n"{}}}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ Executable\ file:\ \%3\(\backslash\)n"{}}))}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .arg(QDir::toNativeSeparators(settings.configFilePath()),}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QDir::toNativeSeparators(qApp-\/>property(\textcolor{stringliteral}{"{}dbFile"{}}).toString()),}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QDir::toNativeSeparators(QCoreApplication::applicationFilePath()));}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ AppKey\ source}}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ report\ +=\ tr(\textcolor{stringliteral}{"{}\(\backslash\)nAppKey:\(\backslash\)n"{}});}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QString\ connectionName\ =\ QUuid::createUuid().toString(QUuid::WithoutBraces);}
+\DoxyCodeLine{00214\ }
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ QSqlDatabase\ db\ =\ QSqlDatabase::addDatabase(\textcolor{stringliteral}{"{}QSQLITE"{}},\ connectionName);}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ db.setDatabaseName(qApp-\/>property(\textcolor{stringliteral}{"{}dbFile"{}}).toString());}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!db.open())\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=tr(\textcolor{stringliteral}{"{}\ \ Unknown\(\backslash\)n"{}});}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ showDbNotOpenError(\textcolor{keyword}{this},\ db,\ Q\_FUNC\_INFO);}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isKeyExported(\textcolor{keyword}{this},\ db))\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ tr(\textcolor{stringliteral}{"{}\ \ Sourced\ externally\ (exported)\(\backslash\)n"{}});}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ tr(\textcolor{stringliteral}{"{}\ \ Present\ in\ the\ database\(\backslash\)n"{}});}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ QSqlDatabase::removeDatabase(connectionName);}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ GPG\ info}}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ QString\ gpgPath\ =\ QStandardPaths::findExecutable(\textcolor{stringliteral}{"{}gpg"{}});}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!gpgPath.isEmpty())\ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ QString(tr(\textcolor{stringliteral}{"{}\(\backslash\)nGPG\ Path:\ \%1\(\backslash\)n"{}})).arg(QDir::toNativeSeparators(gpgPath));}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ QProcess\ proc;}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ proc.start(gpgPath,\ \{\textcolor{stringliteral}{"{}-\/-\/version"{}}\});}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ proc.waitForFinished(2000);}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ QString\ gpgOutput\ =\ proc.readAllStandardOutput();}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!gpgOutput.isEmpty())\ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ tr(\textcolor{stringliteral}{"{}GPG\ Version\ and\ Defaults:\(\backslash\)n"{}});}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ gpgOutput\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Optional:\ extract\ default\ cipher/hash\ lines}}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QStringList\ lines\ =\ gpgOutput.split(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ QString\ \&line\ :\ std::as\_const(lines))\ \{}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (line.startsWith(\textcolor{stringliteral}{"{}Default"{}}))\ \{}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ \textcolor{stringliteral}{"{}\ \ "{}}\ +\ line\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ tr(\textcolor{stringliteral}{"{}\(\backslash\)nGPG\ not\ found\ in\ PATH.\(\backslash\)n"{}});}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00258\ }
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Show\ gpg.conf\ contents}}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ QString\ gpgConfPath\ =\ QDir::toNativeSeparators(QDir::homePath()\ +\ \textcolor{stringliteral}{"{}/.gnupg/gpg.conf"{}});}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ QFile\ confFile(gpgConfPath);}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (confFile.exists()\ \&\&\ confFile.open(QIODevice::ReadOnly\ |\ QIODevice::Text))\ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ QString(tr(\textcolor{stringliteral}{"{}User\ GPG\ configuration\ (\%1):\(\backslash\)n"{}})).arg(gpgConfPath);}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ QTextStream\ in(\&confFile);}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!in.atEnd())\ \{}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QString\ line\ =\ in.readLine();}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ \textcolor{stringliteral}{"{}\ \ "{}}\ +\ line\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ report\ +=\ QString(tr(\textcolor{stringliteral}{"{}No\ gpg.conf\ found\ at\ \%1\(\backslash\)n"{}})).arg(gpgConfPath);}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00272\ }
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ report;}
+\DoxyCodeLine{00274\ \ \ \ \ \}}
+\DoxyCodeLine{00275\ \};}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ SYSTEMINFODIALOG\_H}}
+
+\end{DoxyCode}

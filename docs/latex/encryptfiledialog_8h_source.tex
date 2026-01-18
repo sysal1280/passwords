@@ -1,0 +1,322 @@
+\doxysection{encryptfiledialog.\+h}
+\hypertarget{encryptfiledialog_8h_source}{}\label{encryptfiledialog_8h_source}\index{src/encryptfiledialog.h@{src/encryptfiledialog.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Copyright\ (C)\ 2025\ \ Adam.Lanzafame\ <sysal@tuta.io>}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ This\ program\ is\ free\ software:\ you\ can\ redistribute\ it\ and/or\ modify}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ it\ under\ the\ terms\ of\ the\ GNU\ General\ Public\ License\ as\ published\ by}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ the\ Free\ Software\ Foundation,\ either\ version\ 3\ of\ the\ License,\ or}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ (at\ your\ option)\ any\ later\ version.}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ This\ program\ is\ distributed\ in\ the\ hope\ that\ it\ will\ be\ useful,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ but\ WITHOUT\ ANY\ WARRANTY;\ without\ even\ the\ implied\ warranty\ of}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ MERCHANTABILITY\ or\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE.\ \ See\ the}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ GNU\ General\ Public\ License\ for\ more\ details.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ You\ should\ have\ received\ a\ copy\ of\ the\ GNU\ General\ Public\ License}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ along\ with\ this\ program.\ \ If\ not,\ see\ <https://www.gnu.org/licenses/>.}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ ENCRYPTFILEDIALOG\_H}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ ENCRYPTFILEDIALOG\_H}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}constants.h"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}gpgcheck.h"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}passworddialog.h"{}}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}randomnoisedialog.h"{}}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ "{}settings.h"{}}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ "{}utils.h"{}}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ <mainwindow.h>}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ <QCheckBox>}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ <QDesktopServices>}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ <QDialog>}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ <QDialogButtonBox>}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ <QFileDialog>}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ <QFormLayout>}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#include\ <QHBoxLayout>}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#include\ <QLabel>}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#include\ <QLineEdit>}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#include\ <QMenu>}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#include\ <QMessageBox>}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#include\ <QObject>}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#include\ <QPushButton>}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#include\ <QToolButton>}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#include\ <QVBoxLayout>}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classEncryptFileDialog}{EncryptFileDialog}}\ :\ \textcolor{keyword}{public}\ QDialog}
+\DoxyCodeLine{00051\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ Q\_OBJECT}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classEncryptFileDialog}{EncryptFileDialog}}(QWidget\ *parent\ =\ \textcolor{keyword}{nullptr},\ QString\ windowTitle\ =\ \textcolor{stringliteral}{"{}"{}})}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ :\ QDialog(parent)}
+\DoxyCodeLine{00057\ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ setWindowTitle(windowTitle);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *mainLayout\ =\ \textcolor{keyword}{new}\ QVBoxLayout(\textcolor{keyword}{this});}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/\ Form\ layout\ for\ aligned\ fields\ -\/-\/-\/}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *form\ =\ \textcolor{keyword}{new}\ QFormLayout();}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ form-\/>setLabelAlignment(Qt::AlignLeft\ |\ Qt::AlignVCenter);}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Input\ file\ row}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *inputRow\ =\ \textcolor{keyword}{new}\ QWidget(\textcolor{keyword}{this});}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *inputLayout\ =\ \textcolor{keyword}{new}\ QHBoxLayout(inputRow);}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ inputLayout-\/>setContentsMargins(0,\ 0,\ 0,\ 0);}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ m\_inputEdit\ =\ \textcolor{keyword}{new}\ QLineEdit(\textcolor{keyword}{this});}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ m\_inputEdit-\/>setReadOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *browseBtn\ =\ \textcolor{keyword}{new}\ QPushButton(tr(\textcolor{stringliteral}{"{}Browse..."{}}),\ \textcolor{keyword}{this});}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ inputLayout-\/>addWidget(m\_inputEdit);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ inputLayout-\/>addWidget(browseBtn);}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ form-\/>addRow(tr(\textcolor{stringliteral}{"{}Input\ file:"{}}),\ inputRow);}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Output\ file\ row}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ m\_outputEdit\ =\ \textcolor{keyword}{new}\ QLineEdit(\textcolor{keyword}{this});}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ m\_outputEdit-\/>setReadOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ form-\/>addRow(tr(\textcolor{stringliteral}{"{}Output\ file:"{}}),\ m\_outputEdit);}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Password\ rows}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ m\_passEdit\ =\ \textcolor{keyword}{new}\ QLineEdit(\textcolor{keyword}{this});}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ m\_passConfirmEdit\ =\ \textcolor{keyword}{new}\ QLineEdit(\textcolor{keyword}{this});}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ m\_passEdit-\/>setEchoMode(settings.getEchoMode());}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ m\_passEdit-\/>setPlaceholderText(tr(\textcolor{stringliteral}{"{}password"{}}));}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ m\_passConfirmEdit-\/>setEchoMode(settings.getEchoMode());}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ m\_passConfirmEdit-\/>setPlaceholderText(tr(\textcolor{stringliteral}{"{}confirm\ password"{}}));}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Password\ row\ with\ Generate/Noise\ toolbutton}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *passRow\ =\ \textcolor{keyword}{new}\ QWidget(\textcolor{keyword}{this});}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *passLayout\ =\ \textcolor{keyword}{new}\ QHBoxLayout(passRow);}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ passLayout-\/>setContentsMargins(0,\ 0,\ 0,\ 0);}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ passLayout-\/>addWidget(m\_passEdit);}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ passLayout-\/>addWidget(m\_passConfirmEdit);}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/\ QToolButton\ for\ Generate\ Password\ /\ Random\ Noise\ -\/-\/-\/}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ QToolButton\ *toolBtn\ =\ \textcolor{keyword}{new}\ QToolButton(\textcolor{keyword}{this});}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ toolBtn-\/>setText(tr(\textcolor{stringliteral}{"{}Generate"{}}));}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ toolBtn-\/>setPopupMode(QToolButton::MenuButtonPopup);}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ QMenu\ *menu\ =\ \textcolor{keyword}{new}\ QMenu(toolBtn);}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ QAction\ *optA\ =\ menu-\/>addAction(QIcon(\textcolor{stringliteral}{"{}:/menus/glyphs/password\_24dp\_1F1F1F\_FILL0\_wght400\_GRAD0\_opsz24.svg"{}}),\ tr(\textcolor{stringliteral}{"{}Generate\ Password"{}}));}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ optA-\/>setShortcut(QKeySequence(Qt::Key\_F5));}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ QAction\ *optB\ =\ menu-\/>addAction(QIcon(\textcolor{stringliteral}{"{}:/menus/glyphs/grain\_24dp\_1F1F1F\_FILL0\_wght400\_GRAD0\_opsz24.svg"{}}),\ tr(\textcolor{stringliteral}{"{}Random\ Noise"{}}));}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ optB-\/>setShortcut(QKeySequence(Qt::Key\_F6));}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ toolBtn-\/>setMenu(menu);}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ passLayout-\/>addWidget(toolBtn);}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ form-\/>addRow(tr(\textcolor{stringliteral}{"{}Password:"{}}),\ passRow);}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/\ Connect\ default\ click\ (Generate\ Password)\ -\/-\/-\/}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ connect(toolBtn,\ \&QToolButton::clicked,\ \textcolor{keyword}{this},\ [\textcolor{keyword}{this}]()\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ PasswordDialog::showPasswordGenerator(}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tr(\textcolor{stringliteral}{"{}Generate\ Password"{}}),}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/\ Connect\ menu\ option\ A\ -\/-\/-\/}}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ connect(optA,\ \&QAction::triggered,\ \textcolor{keyword}{this},\ [\textcolor{keyword}{this}]()\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ PasswordDialog::showPasswordGenerator(}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tr(\textcolor{stringliteral}{"{}Generate\ Password"{}}),}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/\ Connect\ menu\ option\ B\ -\/-\/-\/}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ connect(optB,\ \&QAction::triggered,\ \textcolor{keyword}{this},\ [\textcolor{keyword}{this}]()\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ RandomNoiseDialog::showRandomNoiseGenerator(\textcolor{keyword}{this});}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ASCII\ armor\ checkbox}}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ m\_asciiCheck\ =\ \textcolor{keyword}{new}\ QCheckBox(\textcolor{keyword}{this});}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ m\_asciiCheck-\/>setChecked(\textcolor{keyword}{false});}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ form-\/>addRow(tr(\textcolor{stringliteral}{"{}ASCII\ armor:"{}}),\ m\_asciiCheck);}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ connect(m\_asciiCheck,\ \&QCheckBox::toggled,}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},\ \&EncryptFileDialog::onAsciiToggled);}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ mainLayout-\/>addLayout(form);}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/\ Buttons\ (OK,\ Cancel,\ Help)\ -\/-\/-\/}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *btnBox\ =\ \textcolor{keyword}{new}\ QDialogButtonBox(}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ QDialogButtonBox::Ok\ |}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QDialogButtonBox::Cancel\ |}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QDialogButtonBox::Help,}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ Qt::Horizontal,}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this}}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ mainLayout-\/>addWidget(btnBox);}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Connections}}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ connect(browseBtn,\ \&QPushButton::clicked,}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},\ \&EncryptFileDialog::onBrowse);}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ connect(btnBox,\ \&QDialogButtonBox::accepted,}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},\ \&EncryptFileDialog::validateAndAccept);}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ connect(btnBox,\ \&QDialogButtonBox::rejected,}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},\ \&QDialog::reject);}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/\ Help\ button\ connection\ -\/-\/-\/}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ connect(btnBox-\/>button(QDialogButtonBox::Help),}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&QPushButton::clicked,}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{keyword}{this}]()\ \{}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ checkOnlineHelp([this](bool\ reachable)\ \{}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (reachable)\ \{}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QDesktopServices::openUrl(}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QUrl(getHelpBaseUrl(\textcolor{stringliteral}{"{}encrypt-\/file"{}}))}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ else\ if\ (localHelpAvailable())\ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ launchHelperProcess(\textcolor{stringliteral}{"{}encrypt-\/file"{}});}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ else\ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ QMessageBox::warning(}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this,}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tr(\textcolor{stringliteral}{"{}Help\ Error"{}}),}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tr(\textcolor{stringliteral}{"{}Local\ help\ is\ not\ installed\ and\ online\ help\ is\ unreachable."{}})}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Resize\ relative\ to\ parent}}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (parent)\ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ w\ =\ parent-\/>width()\ *\ 3\ /\ 4;}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ setFixedSize(w,\ sizeHint().height()+20);}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00201\ \ \ \ \ \}}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \ \ \ \ QString\ inputFile()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ m\_inputEdit-\/>text();\ \}}
+\DoxyCodeLine{00204\ \ \ \ \ QString\ outputFile()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ m\_outputEdit-\/>text();\ \}}
+\DoxyCodeLine{00205\ \ \ \ \ QString\ password()\textcolor{keyword}{\ \ const\ }\{\ \textcolor{keywordflow}{return}\ m\_passEdit-\/>text();\ \}}
+\DoxyCodeLine{00206\ \ \ \ \ \textcolor{keywordtype}{bool}\ asciiArmor()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ m\_asciiCheck-\/>isChecked();\ \}}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \textcolor{keyword}{private}\ slots:}
+\DoxyCodeLine{00209\ \ \ \ \ \textcolor{keywordtype}{void}\ onBrowse()}
+\DoxyCodeLine{00210\ \ \ \ \ \{}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ QString\ file\ =\ QFileDialog::getOpenFileName(}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ tr(\textcolor{stringliteral}{"{}Select\ File\ to\ Encrypt"{}}),}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ QString(),}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ tr(\textcolor{stringliteral}{"{}All\ Files\ (*)"{}})}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (file.isEmpty())}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ m\_inputEdit-\/>setText(file);}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Auto-\/suggest\ output\ file}}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_outputEdit-\/>text().isEmpty()\ ||}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ m\_outputEdit-\/>text()\ ==\ m\_lastSuggestedOutput)\ \{}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ QString\ suggested\ =\ file\ +\ (m\_asciiCheck-\/>isChecked()\ ?\ \textcolor{stringliteral}{"{}.asc"{}}\ :\ \textcolor{stringliteral}{"{}.gpg"{}});}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ m\_outputEdit-\/>setText(suggested);}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ m\_lastSuggestedOutput\ =\ suggested;}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00230\ \ \ \ \ \}}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \ \textcolor{keywordtype}{void}\ validateAndAccept()}
+\DoxyCodeLine{00233\ \ \ \ \ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ QString\ in\ \ =\ m\_inputEdit-\/>text().trimmed();}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ QString\ out\ =\ m\_outputEdit-\/>text().trimmed();}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ QString\ p1\ \ =\ m\_passEdit-\/>text();}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ QString\ p2\ \ =\ m\_passConfirmEdit-\/>text();}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in.isEmpty())\ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ QMessageBox::warning(\textcolor{keyword}{this},\ tr(\textcolor{stringliteral}{"{}Missing\ Input"{}}),}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tr(\textcolor{stringliteral}{"{}Please\ select\ an\ input\ file."{}}));}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!QFileInfo::exists(in))\ \{}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ QMessageBox::warning(\textcolor{keyword}{this},\ tr(\textcolor{stringliteral}{"{}Invalid\ Input"{}}),}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tr(\textcolor{stringliteral}{"{}The\ selected\ input\ file\ does\ not\ exist."{}}));}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (out.isEmpty())\ \{}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ QMessageBox::warning(\textcolor{keyword}{this},\ tr(\textcolor{stringliteral}{"{}Missing\ Output"{}}),}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tr(\textcolor{stringliteral}{"{}Please\ specify\ an\ output\ file."{}}));}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00256\ }
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (p1.isEmpty())\ \{}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ QMessageBox::warning(\textcolor{keyword}{this},\ tr(\textcolor{stringliteral}{"{}No\ Password"{}}),}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tr(\textcolor{stringliteral}{"{}You\ must\ enter\ a\ password."{}}));}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00262\ }
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (p1\ !=\ p2)\ \{}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ QMessageBox::warning(\textcolor{keyword}{this},\ tr(\textcolor{stringliteral}{"{}Password\ Mismatch"{}}),}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tr(\textcolor{stringliteral}{"{}The\ passwords\ do\ not\ match.\ Please\ re-\/enter\ them."{}}));}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ m\_passEdit-\/>clear();}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ m\_passConfirmEdit-\/>clear();}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ m\_passEdit-\/>setFocus();}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isStrong(p1))}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!warnAndContinue())}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00277\ }
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ accept();}
+\DoxyCodeLine{00279\ \ \ \ \ \}}
+\DoxyCodeLine{00280\ }
+\DoxyCodeLine{00281\ \ \ \ \ \textcolor{keywordtype}{void}\ onAsciiToggled(\textcolor{keywordtype}{bool}\ checked)}
+\DoxyCodeLine{00282\ \ \ \ \ \{}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ QString\ inFile\ =\ m\_inputEdit-\/>text().trimmed();}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (inFile.isEmpty())}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00286\ }
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ QString\ currentOut\ =\ m\_outputEdit-\/>text().trimmed();}
+\DoxyCodeLine{00288\ }
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Strip\ any\ existing\ .gpg\ or\ .asc\ extension}}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ QString\ base\ =\ currentOut;}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (base.endsWith(\textcolor{stringliteral}{"{}.gpg"{}},\ Qt::CaseInsensitive))}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ base.chop(4);}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (base.endsWith(\textcolor{stringliteral}{"{}.asc"{}},\ Qt::CaseInsensitive))}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ base.chop(4);}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (base\ ==\ m\_lastSuggestedOutput)\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ fallback\ to\ input\ file\ if\ output\ was\ auto-\/suggested}}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ base\ =\ inFile;}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00299\ }
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ QString\ suggested\ =\ base\ +\ (checked\ ?\ \textcolor{stringliteral}{"{}.asc"{}}\ :\ \textcolor{stringliteral}{"{}.gpg"{}});}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ m\_outputEdit-\/>setText(suggested);}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ m\_lastSuggestedOutput\ =\ suggested;}
+\DoxyCodeLine{00303\ \ \ \ \ \}}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00307\ \ \ \ \ QLineEdit\ *m\_inputEdit\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00308\ \ \ \ \ QLineEdit\ *m\_outputEdit\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00309\ \ \ \ \ QLineEdit\ *m\_passEdit\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00310\ \ \ \ \ QLineEdit\ *m\_passConfirmEdit\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00311\ \ \ \ \ QCheckBox\ *m\_asciiCheck\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00312\ \ \ \ \ QString\ m\_lastSuggestedOutput;}
+\DoxyCodeLine{00313\ \ \ \ \ \mbox{\hyperlink{classSettings}{Settings}}\ settings;}
+\DoxyCodeLine{00314\ \};}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ENCRYPTFILEDIALOG\_H}}
+
+\end{DoxyCode}

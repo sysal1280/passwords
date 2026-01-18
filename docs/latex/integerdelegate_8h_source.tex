@@ -1,0 +1,60 @@
+\doxysection{integerdelegate.\+h}
+\hypertarget{integerdelegate_8h_source}{}\label{integerdelegate_8h_source}\index{src/integerdelegate.h@{src/integerdelegate.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Copyright\ (C)\ 2025\ \ Adam.Lanzafame\ <sysal@tuta.io>}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ This\ program\ is\ free\ software:\ you\ can\ redistribute\ it\ and/or\ modify}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ it\ under\ the\ terms\ of\ the\ GNU\ General\ Public\ License\ as\ published\ by}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ the\ Free\ Software\ Foundation,\ either\ version\ 3\ of\ the\ License,\ or}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ (at\ your\ option)\ any\ later\ version.}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ This\ program\ is\ distributed\ in\ the\ hope\ that\ it\ will\ be\ useful,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ but\ WITHOUT\ ANY\ WARRANTY;\ without\ even\ the\ implied\ warranty\ of}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ MERCHANTABILITY\ or\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE.\ \ See\ the}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ GNU\ General\ Public\ License\ for\ more\ details.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ You\ should\ have\ received\ a\ copy\ of\ the\ GNU\ General\ Public\ License}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ along\ with\ this\ program.\ \ If\ not,\ see\ <https://www.gnu.org/licenses/>.}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ INTEGERDELEGATE\_H}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ INTEGERDELEGATE\_H}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ <QSpinBox>}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ <QStyledItemDelegate>}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classIntegerDelegate}{IntegerDelegate}}\ :\ \textcolor{keyword}{public}\ QStyledItemDelegate\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ Q\_OBJECT}
+\DoxyCodeLine{00029\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classIntegerDelegate}{IntegerDelegate}}(QObject\ *parent\ =\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ :\ QStyledItemDelegate(parent)\ \{\}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ QWidget\ *createEditor(QWidget\ *parent,}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QStyleOptionViewItem\ \&,}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QModelIndex\ \&)\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ QSpinBox\ *editor\ =\ \textcolor{keyword}{new}\ QSpinBox(parent);}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ editor-\/>setMinimum(0);\ \ \ \ \ \ \textcolor{comment}{//\ adjust\ as\ needed}}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ editor-\/>setMaximum(999999);\ \textcolor{comment}{//\ adjust\ as\ needed}}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ editor;}
+\DoxyCodeLine{00040\ \ \ \ \ \}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordtype}{void}\ setEditorData(QWidget\ *editor,\ \textcolor{keyword}{const}\ QModelIndex\ \&index)\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ value\ =\ index.model()-\/>data(index,\ Qt::EditRole).toInt();}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}QSpinBox*\textcolor{keyword}{>}(editor)-\/>setValue(value);}
+\DoxyCodeLine{00045\ \ \ \ \ \}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{void}\ setModelData(QWidget\ *editor,\ QAbstractItemModel\ *model,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QModelIndex\ \&index)\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ value\ =\ \textcolor{keyword}{static\_cast<}QSpinBox*\textcolor{keyword}{>}(editor)-\/>value();}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ model-\/>setData(index,\ value,\ Qt::EditRole);}
+\DoxyCodeLine{00051\ \ \ \ \ \}}
+\DoxyCodeLine{00052\ \};}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ INTEGERDELEGATE\_H}}
+
+\end{DoxyCode}

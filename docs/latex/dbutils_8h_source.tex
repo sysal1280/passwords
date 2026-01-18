@@ -1,0 +1,163 @@
+\doxysection{dbutils.\+h}
+\hypertarget{dbutils_8h_source}{}\label{dbutils_8h_source}\index{src/dbutils.h@{src/dbutils.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Copyright\ (C)\ 2025\ \ Adam.Lanzafame\ <sysal@tuta.io>}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ This\ program\ is\ free\ software:\ you\ can\ redistribute\ it\ and/or\ modify}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ it\ under\ the\ terms\ of\ the\ GNU\ General\ Public\ License\ as\ published\ by}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ the\ Free\ Software\ Foundation,\ either\ version\ 3\ of\ the\ License,\ or}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ (at\ your\ option)\ any\ later\ version.}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ This\ program\ is\ distributed\ in\ the\ hope\ that\ it\ will\ be\ useful,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ but\ WITHOUT\ ANY\ WARRANTY;\ without\ even\ the\ implied\ warranty\ of}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ MERCHANTABILITY\ or\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE.\ \ See\ the}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ GNU\ General\ Public\ License\ for\ more\ details.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ You\ should\ have\ received\ a\ copy\ of\ the\ GNU\ General\ Public\ License}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ along\ with\ this\ program.\ \ If\ not,\ see\ <https://www.gnu.org/licenses/>.}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ DBUTILS\_H}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ DBUTILS\_H}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}dataobfuscator.h"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}keyentry.h"{}}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <QApplication>}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <QList>}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ <QMessageBox>}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ <QSqlDatabase>}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ <QSqlError>}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#include\ <QSqlQuery>}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ <quuid.h>}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ showDbNotOpenError(\textcolor{keyword}{const}\ QWidget\ *parent,}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QSqlDatabase\ \&db,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *caller)}
+\DoxyCodeLine{00039\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ QApplication::restoreOverrideCursor();}
+\DoxyCodeLine{00041\ \ \ \ \ qCritical().noquote()}
+\DoxyCodeLine{00042\ \ \ \ \ <<\ caller}
+\DoxyCodeLine{00043\ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Database\ not\ opened."{}}}
+\DoxyCodeLine{00044\ \ \ \ \ <<\ db.lastError().text();}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ QMessageBox::critical(}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const\_cast<}QWidget*\textcolor{keyword}{>}(parent),}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ QCoreApplication::applicationName(),}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}No\ database\ open."{}}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00051\ \}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ showQueryError(\textcolor{keyword}{const}\ QWidget\ *parent,}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QSqlQuery\ \&query,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *caller)}
+\DoxyCodeLine{00056\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ QApplication::restoreOverrideCursor();}
+\DoxyCodeLine{00058\ \ \ \ \ qCritical().noquote()}
+\DoxyCodeLine{00059\ \ \ \ \ <<\ caller}
+\DoxyCodeLine{00060\ \ \ \ \ <<\ \textcolor{stringliteral}{"{}SQL\ query\ failed:"{}}}
+\DoxyCodeLine{00061\ \ \ \ \ <<\ query.lastError().text()}
+\DoxyCodeLine{00062\ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nQuery\ text:"{}}}
+\DoxyCodeLine{00063\ \ \ \ \ <<\ query.lastQuery();}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ QMessageBox::critical(}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const\_cast<}QWidget*\textcolor{keyword}{>}(parent),}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ QCoreApplication::applicationName(),}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ QString(\textcolor{stringliteral}{"{}A\ database\ query\ failed.\(\backslash\)n\%1"{}})}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ .arg(query.lastError().text())}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00071\ \}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ showTransactionError(\textcolor{keyword}{const}\ QWidget\ *parent,}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QSqlDatabase\ \&db,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *caller)}
+\DoxyCodeLine{00076\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ QApplication::restoreOverrideCursor();}
+\DoxyCodeLine{00078\ \ \ \ \ qCritical().noquote()}
+\DoxyCodeLine{00079\ \ \ \ \ <<\ caller}
+\DoxyCodeLine{00080\ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Failed\ to\ start\ or\ commit\ transaction:"{}}}
+\DoxyCodeLine{00081\ \ \ \ \ <<\ db.lastError().text();}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ QMessageBox::critical(}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const\_cast<}QWidget*\textcolor{keyword}{>}(parent),}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ QCoreApplication::applicationName(),}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ QString(\textcolor{stringliteral}{"{}A\ database\ transaction\ failed.\(\backslash\)n\%1"{}})}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ .arg(db.lastError().text())}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00089\ \}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ isKeyExported(\textcolor{keyword}{const}\ QWidget\ *parent,\ \textcolor{keyword}{const}\ QSqlDatabase\ \&db)}
+\DoxyCodeLine{00092\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ QSqlQuery\ query(db);}
+\DoxyCodeLine{00094\ \ \ \ \ query.setForwardOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{00095\ \ \ \ \ query.prepare(\textcolor{stringliteral}{"{}SELECT\ value\ FROM\ app\_info\ WHERE\ key\ =\ 'app\_key'"{}});}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keywordflow}{if}\ (!query.exec())\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ showQueryError(parent,\ query,\ Q\_FUNC\_INFO);}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00100\ \ \ \ \ \}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keywordflow}{if}\ (!query.first())}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keyword}{const}\ QString\ value\ =\ query.value(0).toString().trimmed().toLower();}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{keywordflow}{return}\ (value\ ==\ \textcolor{stringliteral}{"{}exported"{}});}
+\DoxyCodeLine{00107\ \}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \textcolor{keyword}{namespace\ }DbUtils\ \{}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \textcolor{keyword}{inline}\ QList<KeyEntry>\ fetchKeys(QWidget\ *errorParent)}
+\DoxyCodeLine{00113\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ QString\ connName\ =\ QUuid::createUuid().toString(QUuid::WithoutBraces);}
+\DoxyCodeLine{00115\ \ \ \ \ QList<KeyEntry>\ keys;}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ QSqlDatabase\ db\ =\ QSqlDatabase::addDatabase(\textcolor{stringliteral}{"{}QSQLITE"{}},\ connName);}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ db.setDatabaseName(qApp-\/>property(\textcolor{stringliteral}{"{}dbFile"{}}).toString());}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (db.open())\ \{}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ QSqlQuery\ query(db);}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ query.setForwardOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (query.exec(\textcolor{stringliteral}{"{}SELECT\ id,\ label,\ key\ FROM\ keys"{}}))\ \{}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (query.next())\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structKeyEntry}{KeyEntry}}\ entry;}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry.id\ \ \ \ =\ query.value(0).toInt();}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry.label\ =\ DataObfuscator::deobfuscate(}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ query.value(1).toString(),}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ qApp-\/>property(\textcolor{stringliteral}{"{}appKey"{}}).toByteArray()}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry.key\ \ \ =\ DataObfuscator::deobfuscate(}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ query.value(2).toString(),}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ qApp-\/>property(\textcolor{stringliteral}{"{}appKey"{}}).toByteArray()}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ keys.append(entry);}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ showQueryError(errorParent,\ query,\ Q\_FUNC\_INFO);}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ showDbNotOpenError(errorParent,\ db,\ Q\_FUNC\_INFO);}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00149\ \ \ \ \ \}}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ QSqlDatabase::removeDatabase(connName);}
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keywordflow}{return}\ keys;}
+\DoxyCodeLine{00153\ \}}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ \}\ \textcolor{comment}{//\ namespace\ DbUtils}}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ DBUTILS\_H}}
+
+\end{DoxyCode}

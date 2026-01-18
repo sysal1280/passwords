@@ -1,0 +1,156 @@
+\doxysection{Main\+Window Class Reference}
+\hypertarget{classMainWindow}{}\label{classMainWindow}\index{MainWindow@{MainWindow}}
+
+
+Inheritance diagram for Main\+Window\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=160pt]{classMainWindow__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Main\+Window\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=160pt]{classMainWindow__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classMainWindow_a996c5a2b6f77944776856f08ec30858d}\label{classMainWindow_a996c5a2b6f77944776856f08ec30858d} 
+{\bfseries Main\+Window} (QWidget \texorpdfstring{$\ast$}{*}parent=nullptr)
+\item 
+\Hypertarget{classMainWindow_a493562124eb745628e7ff38fd5c88db8}\label{classMainWindow_a493562124eb745628e7ff38fd5c88db8} 
+bool {\bfseries init\+Db} ()
+\item 
+\Hypertarget{classMainWindow_a1bc20cb7d0feea5b0f813aec2ef3a094}\label{classMainWindow_a1bc20cb7d0feea5b0f813aec2ef3a094} 
+bool {\bfseries open\+Database} (const QString \&file\+Name=QString())
+\item 
+\Hypertarget{classMainWindow_a1f3dfa2542c2188ef5ca67a5228d6893}\label{classMainWindow_a1f3dfa2542c2188ef5ca67a5228d6893} 
+void {\bfseries launch\+Helper\+Process} (const QString \&page)
+\item 
+\Hypertarget{classMainWindow_accac5ab6dbd58cc15cd0aa93a5c3bcc5}\label{classMainWindow_accac5ab6dbd58cc15cd0aa93a5c3bcc5} 
+int {\bfseries count\+Exported\+Without\+Edits} ()
+\item 
+\Hypertarget{classMainWindow_a9d8ea3de30f6abcd12bb31baf9a3e7b9}\label{classMainWindow_a9d8ea3de30f6abcd12bb31baf9a3e7b9} 
+void {\bfseries load\+Categories} ()
+\item 
+\Hypertarget{classMainWindow_afaa409d88355d0a407bfd513d0f2c42b}\label{classMainWindow_afaa409d88355d0a407bfd513d0f2c42b} 
+void {\bfseries clear\+Scroll\+Area} ()
+\item 
+\Hypertarget{classMainWindow_a6fb97c6050d9e6dcc4b7f2e51826bf12}\label{classMainWindow_a6fb97c6050d9e6dcc4b7f2e51826bf12} 
+void {\bfseries update\+Fields} ()
+\item 
+\Hypertarget{classMainWindow_a6a3676628393a6aa30a17283fed0bcf5}\label{classMainWindow_a6a3676628393a6aa30a17283fed0bcf5} 
+void {\bfseries update\+Countdown} ()
+\item 
+\Hypertarget{classMainWindow_a1da0022e0952cff9cd71726cdf70a9aa}\label{classMainWindow_a1da0022e0952cff9cd71726cdf70a9aa} 
+void {\bfseries populate\+Bookmarks\+Menu} ()
+\item 
+\Hypertarget{classMainWindow_a653598135a43636309761f141907b642}\label{classMainWindow_a653598135a43636309761f141907b642} 
+void {\bfseries search} (const QString \&text)
+\item 
+\Hypertarget{classMainWindow_a33a7a614acf897a862a3fe0a4dd98972}\label{classMainWindow_a33a7a614acf897a862a3fe0a4dd98972} 
+void {\bfseries search} (int app\+Id)
+\item 
+\Hypertarget{classMainWindow_aa7c39582723dfc976061f22f1641ca55}\label{classMainWindow_aa7c39582723dfc976061f22f1641ca55} 
+void {\bfseries search\+Popular} ()
+\item 
+\Hypertarget{classMainWindow_aa2b89738c1265d1ae8ab568e989a21d0}\label{classMainWindow_aa2b89738c1265d1ae8ab568e989a21d0} 
+void {\bfseries search\+Recent} ()
+\item 
+\Hypertarget{classMainWindow_a671e7e5b0a3a7a3fb1cf44c5c8377952}\label{classMainWindow_a671e7e5b0a3a7a3fb1cf44c5c8377952} 
+void {\bfseries init} ()
+\item 
+bool \mbox{\hyperlink{classMainWindow_a79e938d48ecb2b48789737741a18cdca}{kill\+Gpg\+Agent}} ()
+\begin{DoxyCompactList}\small\item\em Attempts to terminate any running GPG agent instance. \end{DoxyCompactList}\item 
+\Hypertarget{classMainWindow_a09026c92ec1ac96c415fbf3cbad21405}\label{classMainWindow_a09026c92ec1ac96c415fbf3cbad21405} 
+void {\bfseries setup\+Aligned\+Timer} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classMainWindow_afd7c03c76485139bff09abe2b134d203}\label{classMainWindow_afd7c03c76485139bff09abe2b134d203} 
+static QByte\+Array {\bfseries base32\+Decode} (const QString \&base32)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classMainWindow_a898b67827c6cce8017f39157be449a6c}\label{classMainWindow_a898b67827c6cce8017f39157be449a6c} 
+QString {\bfseries user\+Name}
+\item 
+\Hypertarget{classMainWindow_a842684cf354e3242d3f1e0cb990b6885}\label{classMainWindow_a842684cf354e3242d3f1e0cb990b6885} 
+QByte\+Array {\bfseries app\+Key} = "{}"{}
+\item 
+\Hypertarget{classMainWindow_a85919270e0cc46298869d96025d20692}\label{classMainWindow_a85919270e0cc46298869d96025d20692} 
+int {\bfseries opened\+Credential\+ID} = -\/1
+\item 
+\Hypertarget{classMainWindow_a8cfe74e650681e3e33a0b3569dc2098c}\label{classMainWindow_a8cfe74e650681e3e33a0b3569dc2098c} 
+bool {\bfseries show\+Debug\+Messages} = false
+\item 
+\Hypertarget{classMainWindow_af157f7f96eb035055fe0752e92a41ad2}\label{classMainWindow_af157f7f96eb035055fe0752e92a41ad2} 
+bool {\bfseries aborting\+Startup} = false
+\item 
+\Hypertarget{classMainWindow_ac1735ef27783e9f78f0cfedcf8f06636}\label{classMainWindow_ac1735ef27783e9f78f0cfedcf8f06636} 
+bool {\bfseries abort\+Busy} = false
+\item 
+\Hypertarget{classMainWindow_a6b994f6d4198205dea56a888d0965a23}\label{classMainWindow_a6b994f6d4198205dea56a888d0965a23} 
+QLabel \texorpdfstring{$\ast$}{*} {\bfseries countdown\+Label} = nullptr
+\item 
+\Hypertarget{classMainWindow_a577011c5f3b943b989941b82cde9b360}\label{classMainWindow_a577011c5f3b943b989941b82cde9b360} 
+QProgress\+Bar \texorpdfstring{$\ast$}{*} {\bfseries countdown\+Progress} = nullptr
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classMainWindow_a8ce66a0e838ac0d1fdbcccbd8dd16f94}\label{classMainWindow_a8ce66a0e838ac0d1fdbcccbd8dd16f94} 
+static constexpr const char \texorpdfstring{$\ast$}{*} {\bfseries APP\+\_\+\+SIGNATURE} = "{}Myrtaceae"{}
+\item 
+\Hypertarget{classMainWindow_a372d1057c9c898ef0db14fa1d956deed}\label{classMainWindow_a372d1057c9c898ef0db14fa1d956deed} 
+static constexpr const char \texorpdfstring{$\ast$}{*} {\bfseries SCHEMA\+\_\+\+VERSION} = "{}2"{}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classMainWindow_a05fb9d72c044aa3bb7d187b994704e2f}\label{classMainWindow_a05fb9d72c044aa3bb7d187b994704e2f} 
+void {\bfseries close\+Event} (QClose\+Event \texorpdfstring{$\ast$}{*}event) override
+\item 
+\Hypertarget{classMainWindow_a55ae3e0d4303334ccabae0a5050cfd88}\label{classMainWindow_a55ae3e0d4303334ccabae0a5050cfd88} 
+void {\bfseries key\+Press\+Event} (QKey\+Event \texorpdfstring{$\ast$}{*}event) override
+\item 
+\Hypertarget{classMainWindow_a3febb9ef08a8e0f7fc00848ea540a899}\label{classMainWindow_a3febb9ef08a8e0f7fc00848ea540a899} 
+void {\bfseries show\+Event} (QShow\+Event \texorpdfstring{$\ast$}{*}event) override
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classMainWindow_a79e938d48ecb2b48789737741a18cdca}\label{classMainWindow_a79e938d48ecb2b48789737741a18cdca} 
+\index{MainWindow@{MainWindow}!killGpgAgent@{killGpgAgent}}
+\index{killGpgAgent@{killGpgAgent}!MainWindow@{MainWindow}}
+\doxysubsubsection{\texorpdfstring{killGpgAgent()}{killGpgAgent()}}
+{\footnotesize\ttfamily bool Main\+Window\+::kill\+Gpg\+Agent (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Attempts to terminate any running GPG agent instance. 
+
+This function invokes the {\ttfamily gpgconf} utility with the {\ttfamily --kill gpg-\/agent} command to stop the GPG agent process. It waits for the command to start and finish within reasonable timeouts, and logs diagnostic information using Qt\textquotesingle{}s logging facilities.
+
+The function returns {\ttfamily true} if the {\ttfamily gpgconf} process starts successfully, finishes normally, and exits with a zero exit code. If the process fails to start, times out, or exits with an error, the function returns {\ttfamily false}.
+
+\begin{DoxyNote}{Note}
+Any output or error text produced by {\ttfamily gpgconf} is written to the debug log for troubleshooting.
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} if the GPG agent was successfully terminated or was not running; otherwise {\ttfamily false}. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/mainwindow.\+h\item 
+src/mainwindow.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,112 @@
+\doxysection{settings.\+h}
+\hypertarget{settings_8h_source}{}\label{settings_8h_source}\index{src/settings.h@{src/settings.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Copyright\ (C)\ 2025\ \ Adam.Lanzafame\ <sysal@tuta.io>}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ This\ program\ is\ free\ software:\ you\ can\ redistribute\ it\ and/or\ modify}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ it\ under\ the\ terms\ of\ the\ GNU\ General\ Public\ License\ as\ published\ by}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ the\ Free\ Software\ Foundation,\ either\ version\ 3\ of\ the\ License,\ or}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ (at\ your\ option)\ any\ later\ version.}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ This\ program\ is\ distributed\ in\ the\ hope\ that\ it\ will\ be\ useful,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ but\ WITHOUT\ ANY\ WARRANTY;\ without\ even\ the\ implied\ warranty\ of}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ MERCHANTABILITY\ or\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE.\ \ See\ the}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ GNU\ General\ Public\ License\ for\ more\ details.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ You\ should\ have\ received\ a\ copy\ of\ the\ GNU\ General\ Public\ License}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ along\ with\ this\ program.\ \ If\ not,\ see\ <https://www.gnu.org/licenses/>.}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#ifndef\ SETTINGS\_H}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ SETTINGS\_H}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ <QDir>}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ <QLineEdit>}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ <QMainWindow>}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <QSettings>}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <QSplitter>}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <QSqlDatabase>}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ <QStandardPaths>}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ <QString>}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ <QWidget>}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classSettings}{Settings}}}
+\DoxyCodeLine{00035\ \{}
+\DoxyCodeLine{00036\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{classSettings}{Settings}}();}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{comment}{//\ Core\ configuration\ paths}}
+\DoxyCodeLine{00040\ \ \ \ \ QString\ configFilePath()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00041\ \ \ \ \ QString\ getDefaultDbPath(QWidget\ *parent)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00042\ \ \ \ \ QString\ getWordListFile()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00043\ \ \ \ \ QString\ getPathSeparator()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{comment}{//\ Last\ used\ file}}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordtype}{void}\ setLastUsedFile(\textcolor{keyword}{const}\ QString\ \&filePath);}
+\DoxyCodeLine{00047\ \ \ \ \ QString\ getLastUsedFile()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{comment}{//\ Generated\ password\ settings}}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{int}\ getGeneratedPasswordLength()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{void}\ setGeneratedPasswordLength(\textcolor{keywordtype}{int}\ i);}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{comment}{//\ Random\ noise\ settings}}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{void}\ setRandomNoiseLength(\textcolor{keywordtype}{int}\ length);}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{int}\ getRandomNoiseLength()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordtype}{void}\ setRandomNoiseOption(\textcolor{keywordtype}{int}\ index);}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{int}\ getRandomNoiseOption()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{comment}{//\ Boolean\ preferences}}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordtype}{bool}\ getBackupDatabase()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordtype}{bool}\ getKillGpgAgent(\textcolor{keyword}{const}\ QString\ \&key\ =\ \textcolor{stringliteral}{"{}KillGPGAgent"{}})\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordtype}{bool}\ getLoginPreference()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordtype}{bool}\ getAskClose()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordtype}{bool}\ getDragDropPrompt()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordtype}{bool}\ getCloseHelpServer()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordtype}{bool}\ getDebugMode()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordtype}{bool}\ closeOnCopy()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordtype}{bool}\ openCategoryDblClick()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{comment}{//\ Numeric\ preferences}}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keywordtype}{int}\ getAutoCloseSeconds()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordtype}{int}\ getMaxRecentResults()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordtype}{int}\ getMaxPopularResults()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordtype}{int}\ getMaxBackups()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordtype}{int}\ getHelpPort()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{comment}{//\ Echo\ mode}}
+\DoxyCodeLine{00078\ \ \ \ \ QLineEdit::EchoMode\ getEchoMode()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{comment}{//\ Shell\ command\ configuration}}
+\DoxyCodeLine{00081\ \ \ \ \ QString\ getShellCommand()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00082\ \ \ \ \ QString\ getShellArguments()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{comment}{//\ UI\ state\ management}}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordtype}{void}\ saveMainWindowState(QMainWindow\ *window);}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordtype}{void}\ restoreMainWindowState(QMainWindow\ *window);}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keywordtype}{void}\ saveSplitterState(QSplitter\ *splitter,\ \textcolor{keyword}{const}\ QString\ \&name);}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordtype}{void}\ restoreSplitterState(QSplitter\ *splitter,\ \textcolor{keyword}{const}\ QString\ \&name);}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{comment}{//\ Database-\/related}}
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{keywordtype}{bool}\ verifyDeleteAllowed(QSqlDatabase\ \&db,\ QWidget\ *parent);}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{comment}{//\ Miscellaneous}}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordtype}{bool}\ createUserDesktopFile();}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordtype}{void}\ deleteSection(\textcolor{keyword}{const}\ QString\ \&section);}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00098\ \ \ \ \ QString\ configDir;}
+\DoxyCodeLine{00099\ \ \ \ \ QString\ configFile;}
+\DoxyCodeLine{00100\ \ \ \ \ std::unique\_ptr<QSettings>\ settings;}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ CONFIG\_FILENAME\ =\ \textcolor{stringliteral}{"{}passwords.conf"{}};}
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ WORDLIST\_FILENAME\ =\ \textcolor{stringliteral}{"{}wordlist.rcc"{}};}
+\DoxyCodeLine{00104\ \};}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ SETTINGS\_H}}
+
+\end{DoxyCode}

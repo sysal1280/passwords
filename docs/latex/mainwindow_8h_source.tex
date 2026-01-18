@@ -1,0 +1,206 @@
+\doxysection{mainwindow.\+h}
+\hypertarget{mainwindow_8h_source}{}\label{mainwindow_8h_source}\index{src/mainwindow.h@{src/mainwindow.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Copyright\ (C)\ 2025\ \ Adam.Lanzafame\ <sysal@tuta.io>}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ This\ program\ is\ free\ software:\ you\ can\ redistribute\ it\ and/or\ modify}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ it\ under\ the\ terms\ of\ the\ GNU\ General\ Public\ License\ as\ published\ by}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ the\ Free\ Software\ Foundation,\ either\ version\ 3\ of\ the\ License,\ or}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ (at\ your\ option)\ any\ later\ version.}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ This\ program\ is\ distributed\ in\ the\ hope\ that\ it\ will\ be\ useful,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ but\ WITHOUT\ ANY\ WARRANTY;\ without\ even\ the\ implied\ warranty\ of}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ MERCHANTABILITY\ or\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE.\ \ See\ the}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ GNU\ General\ Public\ License\ for\ more\ details.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ You\ should\ have\ received\ a\ copy\ of\ the\ GNU\ General\ Public\ License}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ along\ with\ this\ program.\ \ If\ not,\ see\ <https://www.gnu.org/licenses/>.}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ MAINWINDOW\_H}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ MAINWINDOW\_H}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}keyentry.h"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}settings.h"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <QDateTime>}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <QIcon>}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <QLabel>}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ <QMainWindow>}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ <QMap>}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ <QProcess>}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#include\ <QProgressBar>}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ <QSplitter>}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ <QString>}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ <QSqlDatabase>}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ <QTimer>}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ <QTreeWidget>}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ <QTreeWidgetItem>}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{keyword}{namespace\ }Ui\ \{}
+\DoxyCodeLine{00041\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classMainWindow}{MainWindow}};}
+\DoxyCodeLine{00042\ \}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ Simple\ struct\ for\ search\ results}}
+\DoxyCodeLine{00045\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structSearchResult}{SearchResult}}\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordtype}{int}\ id;}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{int}\ categoryId;}
+\DoxyCodeLine{00048\ \ \ \ \ QString\ appName;}
+\DoxyCodeLine{00049\ \ \ \ \ QString\ description;}
+\DoxyCodeLine{00050\ \ \ \ \ QString\ categoryName;}
+\DoxyCodeLine{00051\ \};}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classMainWindow}{MainWindow}}\ :\ \textcolor{keyword}{public}\ QMainWindow\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ Q\_OBJECT}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classMainWindow}{MainWindow}}(QWidget\ *parent\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{classMainWindow}{\string~MainWindow}}();}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{comment}{//\ Application\ signature\ and\ schema\ version}}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ APP\_SIGNATURE\ \ \ =\ \textcolor{stringliteral}{"{}Myrtaceae"{}};}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ SCHEMA\_VERSION\ =\ \textcolor{stringliteral}{"{}2"{}};}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{comment}{//\ Utility\ functions}}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keyword}{static}\ QByteArray\ base32Decode(\textcolor{keyword}{const}\ QString\ \&base32);}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ QString\ userName;}
+\DoxyCodeLine{00068\ \ \ \ \ QByteArray\ appKey\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordtype}{int}\ openedCredentialID\ =\ -\/1;}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keywordtype}{bool}\ showDebugMessages\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordtype}{bool}\ abortingStartup\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordtype}{bool}\ abortBusy\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ QLabel\ *countdownLabel\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00077\ \ \ \ \ QProgressBar\ *countdownProgress\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{comment}{//\ Public\ methods}}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordtype}{bool}\ initDb();}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keywordtype}{bool}\ openDatabase(\textcolor{keyword}{const}\ QString\ \&fileName\ =\ QString());}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keywordtype}{void}\ launchHelperProcess(\textcolor{keyword}{const}\ QString\ \&page);}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keywordtype}{int}\ countExportedWithoutEdits();}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordtype}{void}\ closeEvent(QCloseEvent\ *event)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keywordtype}{void}\ keyPressEvent(QKeyEvent\ *event)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordtype}{void}\ showEvent(QShowEvent\ *event)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{keyword}{private}\ slots:}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{comment}{//\ Other\ slots}}
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keywordtype}{void}\ loadCategories();}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordtype}{void}\ clearScrollArea();}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordtype}{void}\ updateFields();}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordtype}{void}\ updateCountdown();}
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keywordtype}{void}\ populateBookmarksMenu();}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordtype}{void}\ search(\textcolor{keyword}{const}\ QString\ \&text);}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordtype}{void}\ search(\textcolor{keywordtype}{int}\ appId);}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keywordtype}{void}\ searchPopular();}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordtype}{void}\ searchRecent();}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keywordtype}{void}\ init();}
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classMainWindow_a79e938d48ecb2b48789737741a18cdca}{killGpgAgent}}();}
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordtype}{void}\ setupAlignedTimer();}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00107\ \ \ \ \ Ui::MainWindow\ *ui\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keywordtype}{bool}\ firstShow\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{comment}{//\ Crypto\ helpers}}
+\DoxyCodeLine{00112\ \ \ \ \ QByteArray\ intToBytes(quint64\ counter);}
+\DoxyCodeLine{00113\ \ \ \ \ QByteArray\ hmacSha1(\textcolor{keyword}{const}\ QByteArray\ \&key,\ \textcolor{keyword}{const}\ QByteArray\ \&message);}
+\DoxyCodeLine{00114\ \ \ \ \ QString\ generateTOTP(\textcolor{keyword}{const}\ QByteArray\ \&secret,\ \textcolor{keywordtype}{int}\ digits\ =\ 6,\ \textcolor{keywordtype}{int}\ step\ =\ 30);}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{comment}{//\ UI\ helpers}}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{comment}{//void\ setActionIcon(QAction\ *action,\ const\ QString\ \&iconPath);}}
+\DoxyCodeLine{00118\ \ \ \ \ QTreeWidgetItem*\ findCategoryItemRecursive(QTreeWidgetItem\ *item,\ \textcolor{keywordtype}{int}\ categoryId);}
+\DoxyCodeLine{00119\ \ \ \ \ QString\ buildItemPath(QTreeWidgetItem\ *item)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00120\ \ \ \ \ QString\ getItemPath(QTreeWidgetItem\ *item,\ \textcolor{keywordtype}{int}\ column\ =\ 0);}
+\DoxyCodeLine{00121\ \ \ \ \ QString\ buildCategoryPath(\textcolor{keywordtype}{int}\ categoryId,\ \textcolor{keyword}{const}\ QString\ \&appKey,\ QSqlDatabase\ \&db);}
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{keywordtype}{void}\ moveCategory(QTreeWidgetItem\ *sourceItem,\ QTreeWidgetItem\ *targetItem,\ \textcolor{keywordtype}{bool}\ skipPrompt);}
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{keywordtype}{void}\ moveCategories(\textcolor{keyword}{const}\ QList<QTreeWidgetItem*>\ \&items,\ QTreeWidgetItem\ *targetItem);}
+\DoxyCodeLine{00124\ \ \ \ \ \textcolor{keywordtype}{void}\ selectInTreeWidgets(\textcolor{keywordtype}{int}\ categoryId,\ \textcolor{keywordtype}{int}\ appId);}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{comment}{//\ Tree\ persistence}}
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{keywordtype}{void}\ saveTreeToDb(QTreeWidget*\ tree,\ QSqlDatabase\&\ db);}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordtype}{void}\ saveItemToDb(QTreeWidgetItem*\ item,\ QSqlDatabase\&\ db,\ \textcolor{keyword}{const}\ QVariant\&\ parentId);}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{comment}{//\ Item\ creation}}
+\DoxyCodeLine{00131\ \ \ \ \ QTreeWidgetItem*\ makeItemFromApplication(QSqlQuery\&\ query);}
+\DoxyCodeLine{00132\ \ \ \ \ QTreeWidgetItem*\ makeItemFromNote(QSqlQuery\&\ query);}
+\DoxyCodeLine{00133\ \ \ \ \ QTreeWidgetItem*\ makeItemFromFile(QSqlQuery\&\ query);}
+\DoxyCodeLine{00134\ \ \ \ \ QTreeWidgetItem*\ makeItemFromCredit(QSqlQuery\&\ query);}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{comment}{//\ JSON\ population}}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordtype}{void}\ populateFromJsonApplication(\textcolor{keyword}{const}\ QByteArray\ \&jsonData,\ Ui::MainWindow\ *ui);}
+\DoxyCodeLine{00138\ \ \ \ \ QString\ shortenUrlForDisplay(\textcolor{keyword}{const}\ QString\&\ url,\ \textcolor{keywordtype}{int}\ maxLen\ =\ 55);}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keywordtype}{void}\ createCategory(\textcolor{keyword}{const}\ QString\&\ categoryName\ =\ QString());}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keywordtype}{void}\ importApplicationsFromFile(\textcolor{keyword}{const}\ QString\ \&filePath);}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordtype}{void}\ renameCategory();}
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{comment}{//QString\ appKeyFilePath()\ const;}}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ QByteArray\ loadOrCreateAppKey();}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordtype}{void}\ checkGpgKeys();}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordtype}{void}\ initDbMetadata();}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{keywordtype}{void}\ openCategory(QTreeWidgetItem\ *item,\ \textcolor{keywordtype}{int}\ column);}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordtype}{void}\ openCategoryFromCurrent(QTreeWidgetItem*\ current,\ QTreeWidgetItem*);}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keywordtype}{void}\ setBookmark(\textcolor{keywordtype}{bool}\ checked);}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \ \ QString\ formatOtp(\textcolor{keyword}{const}\ QString\&\ otp);}
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{keywordtype}{void}\ moveCategoryWrapper(QTreeWidgetItem\ *sourceItem,\ QTreeWidgetItem\ *targetItem);}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keywordtype}{void}\ wipeFile(\textcolor{keyword}{const}\ QString\ \&path,\ \textcolor{keywordtype}{int}\ passes\ =\ 2);}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \ \ \textcolor{keywordtype}{void}\ newPassword();}
+\DoxyCodeLine{00161\ \ \ \ \ \textcolor{keywordtype}{void}\ openPassword(QTreeWidgetItem\ *item);}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keywordtype}{void}\ editPassword(QTreeWidgetItem\ *item);}
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{keywordtype}{void}\ exportPassword(QTreeWidgetItem\ *item);}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{keywordtype}{void}\ showAuditLog(QTreeWidgetItem\ *item);}
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{keywordtype}{void}\ deleteCategory(QTreeWidgetItem\ *item);}
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{keywordtype}{void}\ addSearchTerms(QTreeWidgetItem\ *item);}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordtype}{void}\ keyList();}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keywordtype}{void}\ deletePassword(QTreeWidgetItem\ *item);}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordtype}{void}\ encryptMessage();}
+\DoxyCodeLine{00170\ \ \ \ \ \textcolor{keywordtype}{void}\ decryptMessage();}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordtype}{void}\ encryptFile();}
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{keywordtype}{void}\ decryptFile();}
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{keywordtype}{void}\ exportedWithoutEdits();}
+\DoxyCodeLine{00174\ \ \ \ \ \textcolor{keywordtype}{void}\ insertAuditRow(\textcolor{keywordtype}{int}\ applicationId,\ \textcolor{keyword}{const}\ QString\ \&user,\ \textcolor{keyword}{const}\ QString\ \&host,\ \textcolor{keyword}{const}\ QString\ \&action);}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{keywordtype}{void}\ NotChangedSince(\textcolor{keyword}{const}\ QDateTime\ \&cutoff);}
+\DoxyCodeLine{00176\ \ \ \ \ \textcolor{keywordtype}{void}\ showPasswordsContextMenu(\textcolor{keyword}{const}\ QPoint\ \&pos);}
+\DoxyCodeLine{00177\ \ \ \ \ \textcolor{keywordtype}{bool}\ tryOpenPasswordPath(\textcolor{keyword}{const}\ QString\ \&path);}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \ \ \textcolor{keywordtype}{void}\ decryptWithGpg(}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ QByteArray\ \&encrypted,}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ std::function<\textcolor{keywordtype}{void}(\textcolor{keyword}{const}\ QByteArray\&)>\ onSuccess,}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ std::function<\textcolor{keywordtype}{void}(\textcolor{keyword}{const}\ QString\&)>\ onMissingKey,}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ std::function<\textcolor{keywordtype}{void}(\textcolor{keyword}{const}\ QString\&)>\ onFailure}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \textcolor{comment}{//\ Members}}
+\DoxyCodeLine{00187\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ QMap<QString,\ QString>\ headerMap;}
+\DoxyCodeLine{00188\ \ \ \ \ QSplitter\ *vSplitter\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00189\ \ \ \ \ QSplitter\ *hSplitter\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00190\ \ \ \ \ QTimer\ *autoCloseTimer\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00191\ \ \ \ \ QTimer\ *countdownTimer\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00192\ \ \ \ \ QTimer\ *alignedTimer\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00193\ \ \ \ \ QIcon\ closedIcon;}
+\DoxyCodeLine{00194\ \ \ \ \ QIcon\ openIcon;}
+\DoxyCodeLine{00195\ \ \ \ \ QProcess\ *helperProcess\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \ \ \mbox{\hyperlink{classSettings}{Settings}}\ settings;}
+\DoxyCodeLine{00198\ \};}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ MAINWINDOW\_H}}
+
+\end{DoxyCode}

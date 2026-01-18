@@ -2090,6 +2090,27 @@ updateFields();
 ui->scrollArea->blockSignals(false);
 }
 
+
+/*!
+ * \brief Attempts to terminate any running GPG agent instance.
+ *
+ * This function invokes the \c gpgconf utility with the
+ * <tt>--kill gpg-agent</tt> command to stop the GPG agent process.
+ * It waits for the command to start and finish within reasonable
+ * timeouts, and logs diagnostic information using Qt's logging
+ * facilities.
+ *
+ * The function returns \c true if the \c gpgconf process starts
+ * successfully, finishes normally, and exits with a zero exit code.
+ * If the process fails to start, times out, or exits with an error,
+ * the function returns \c false.
+ *
+ * \note Any output or error text produced by \c gpgconf is written
+ *       to the debug log for troubleshooting.
+ *
+ * \return \c true if the GPG agent was successfully terminated or
+ *         was not running; otherwise \c false.
+ */
 bool MainWindow::killGpgAgent()
 {
     QProcess process;

@@ -1,0 +1,85 @@
+\doxysection{categoryproperties.\+h}
+\hypertarget{categoryproperties_8h_source}{}\label{categoryproperties_8h_source}\index{src/categoryproperties.h@{src/categoryproperties.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Copyright\ (C)\ 2025\ \ Adam.Lanzafame\ <sysal@tuta.io>}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ This\ program\ is\ free\ software:\ you\ can\ redistribute\ it\ and/or\ modify}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ it\ under\ the\ terms\ of\ the\ GNU\ General\ Public\ License\ as\ published\ by}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ the\ Free\ Software\ Foundation,\ either\ version\ 3\ of\ the\ License,\ or}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ (at\ your\ option)\ any\ later\ version.}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ This\ program\ is\ distributed\ in\ the\ hope\ that\ it\ will\ be\ useful,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ but\ WITHOUT\ ANY\ WARRANTY;\ without\ even\ the\ implied\ warranty\ of}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ MERCHANTABILITY\ or\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE.\ \ See\ the}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ GNU\ General\ Public\ License\ for\ more\ details.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ You\ should\ have\ received\ a\ copy\ of\ the\ GNU\ General\ Public\ License}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ along\ with\ this\ program.\ \ If\ not,\ see\ <https://www.gnu.org/licenses/>.}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ CATEGORYPROPERTIES\_H}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ CATEGORYPROPERTIES\_H}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ <QChartView>}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ <QDialog>}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <QDialogButtonBox>}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <QList>}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <QMap>}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ <QSqlDatabase>}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ <QTableWidget>}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ QT\_BEGIN\_NAMESPACE}
+\DoxyCodeLine{00033\ \textcolor{keyword}{class\ }QPieSeries;}
+\DoxyCodeLine{00034\ QT\_END\_NAMESPACE}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structCategoryNode}{CategoryNode}}\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id}\ =\ 0;}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordtype}{int}\ parentId\ =\ 0;}
+\DoxyCodeLine{00039\ \ \ \ \ QString\ name;}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordtype}{int}\ directCount\ =\ 0;}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordtype}{int}\ totalCount\ =\ 0;}
+\DoxyCodeLine{00042\ \ \ \ \ QList<CategoryNode*>\ children;}
+\DoxyCodeLine{00043\ \};}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classCategoryProperties}{CategoryProperties}}\ :\ \textcolor{keyword}{public}\ QDialog}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ Q\_OBJECT}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classCategoryProperties}{CategoryProperties}}(\textcolor{keywordtype}{int}\ selectedCategoryId,\ QWidget*\ parent\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{classCategoryProperties}{\string~CategoryProperties}}();}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{bool}\ loadDatabase();}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{void}\ loadCategories();}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordtype}{void}\ loadApplicationCounts();}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{int}\ computeTotals(\mbox{\hyperlink{structCategoryNode}{CategoryNode}}*\ node);}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordtype}{void}\ collectAll(\mbox{\hyperlink{structCategoryNode}{CategoryNode}}*\ node,\ QList<CategoryNode*>\&\ out);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordtype}{void}\ buildPieChart();}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordtype}{void}\ buildTable();}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordtype}{void}\ adjustTableHeightForVisibleRows(\textcolor{keywordtype}{int}\ visibleRows);}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{keyword}{private}\ slots:}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordtype}{void}\ onHelpRequested();}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordtype}{int}\ selectedId\ =\ 0;}
+\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{structCategoryNode}{CategoryNode}}*\ root\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ QMap<int,\ CategoryNode*>\ nodes;}
+\DoxyCodeLine{00072\ \ \ \ \ QSqlDatabase\ db;}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ QChartView*\ chartView\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00075\ \ \ \ \ QTableWidget*\ tableWidget\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00076\ \ \ \ \ QDialogButtonBox*\ buttonBox\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00077\ \};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ CATEGORYPROPERTIES\_H}}
+
+\end{DoxyCode}

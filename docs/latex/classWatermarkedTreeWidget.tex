@@ -1,0 +1,84 @@
+\doxysection{Watermarked\+Tree\+Widget Class Reference}
+\hypertarget{classWatermarkedTreeWidget}{}\label{classWatermarkedTreeWidget}\index{WatermarkedTreeWidget@{WatermarkedTreeWidget}}
+
+
+A custom QTree\+Widget that\+:  
+
+
+
+
+{\ttfamily \#include $<$watermarkedtreewidget.\+h$>$}
+
+
+
+Inheritance diagram for Watermarked\+Tree\+Widget\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classWatermarkedTreeWidget__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Watermarked\+Tree\+Widget\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classWatermarkedTreeWidget__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classWatermarkedTreeWidget_aaf7e159616dcbc0568e25b370e5cac46}\label{classWatermarkedTreeWidget_aaf7e159616dcbc0568e25b370e5cac46} 
+{\bfseries Watermarked\+Tree\+Widget} (QWidget \texorpdfstring{$\ast$}{*}parent=nullptr)
+\item 
+\Hypertarget{classWatermarkedTreeWidget_a6f8a4a767660890b1923255789481fe3}\label{classWatermarkedTreeWidget_a6f8a4a767660890b1923255789481fe3} 
+void {\bfseries set\+Watermark\+Text} (const QString \&text)
+\item 
+\Hypertarget{classWatermarkedTreeWidget_a5aa08bc5d7dc7278b4f53b99c020f5c7}\label{classWatermarkedTreeWidget_a5aa08bc5d7dc7278b4f53b99c020f5c7} 
+QString {\bfseries watermark\+Text} () const
+\item 
+\Hypertarget{classWatermarkedTreeWidget_ab0853a58b76bf6c933d296961383a2b2}\label{classWatermarkedTreeWidget_ab0853a58b76bf6c933d296961383a2b2} 
+void {\bfseries item\+Dropped} (QTree\+Widget\+Item \texorpdfstring{$\ast$}{*}source\+Item, QTree\+Widget\+Item \texorpdfstring{$\ast$}{*}target\+Item)
+\item 
+\Hypertarget{classWatermarkedTreeWidget_aaaea245cec7e6927634d300740d0ebb4}\label{classWatermarkedTreeWidget_aaaea245cec7e6927634d300740d0ebb4} 
+void {\bfseries items\+Dropped} (const QList$<$ QTree\+Widget\+Item \texorpdfstring{$\ast$}{*} $>$ \&items, QTree\+Widget\+Item \texorpdfstring{$\ast$}{*}target)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classWatermarkedTreeWidget_a452368b080f35dac18e0b611a3734ee2}\label{classWatermarkedTreeWidget_a452368b080f35dac18e0b611a3734ee2} 
+void {\bfseries paint\+Event} (QPaint\+Event \texorpdfstring{$\ast$}{*}event) override
+\item 
+\Hypertarget{classWatermarkedTreeWidget_a84ab266fd892f36d0d9f57511076f2a1}\label{classWatermarkedTreeWidget_a84ab266fd892f36d0d9f57511076f2a1} 
+QMime\+Data \texorpdfstring{$\ast$}{*} {\bfseries mime\+Data} (const QList$<$ QTree\+Widget\+Item \texorpdfstring{$\ast$}{*} $>$ \&items) const override
+\item 
+\Hypertarget{classWatermarkedTreeWidget_aaf09056403472573f5e676bdc4854213}\label{classWatermarkedTreeWidget_aaf09056403472573f5e676bdc4854213} 
+void {\bfseries drop\+Event} (QDrop\+Event \texorpdfstring{$\ast$}{*}event) override
+\item 
+\Hypertarget{classWatermarkedTreeWidget_a4cf2fee6cdb63a7da338c167288a5134}\label{classWatermarkedTreeWidget_a4cf2fee6cdb63a7da338c167288a5134} 
+void {\bfseries drag\+Enter\+Event} (QDrag\+Enter\+Event \texorpdfstring{$\ast$}{*}event) override
+\item 
+\Hypertarget{classWatermarkedTreeWidget_a4c33c7d307b4bc3637cd8023de5a194d}\label{classWatermarkedTreeWidget_a4c33c7d307b4bc3637cd8023de5a194d} 
+void {\bfseries drag\+Move\+Event} (QDrag\+Move\+Event \texorpdfstring{$\ast$}{*}event) override
+\item 
+\Hypertarget{classWatermarkedTreeWidget_a21c27357f048fc08db48e30300d1f61e}\label{classWatermarkedTreeWidget_a21c27357f048fc08db48e30300d1f61e} 
+void {\bfseries start\+Drag} (Qt\+::\+Drop\+Actions supported\+Actions) override
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A custom QTree\+Widget that\+: 
+
+
+\begin{DoxyItemize}
+\item paints a watermark when empty
+\item supports drag and drop
+\item emits a signal when an item is dropped so \doxylink{classMainWindow}{Main\+Window} can handle the logic 
+\end{DoxyItemize}
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/watermarkedtreewidget.\+h\item 
+src/watermarkedtreewidget.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,72 @@
+\doxysection{preferencesdialog.\+h}
+\hypertarget{preferencesdialog_8h_source}{}\label{preferencesdialog_8h_source}\index{src/preferencesdialog.h@{src/preferencesdialog.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ passwords\ -\/\ A\ GnuPG\ based\ password\ manager}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Copyright\ (C)\ 2025\ \ Adam.Lanzafame\ <sysal@tuta.io>}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ This\ program\ is\ free\ software:\ you\ can\ redistribute\ it\ and/or\ modify}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ it\ under\ the\ terms\ of\ the\ GNU\ General\ Public\ License\ as\ published\ by}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ the\ Free\ Software\ Foundation,\ either\ version\ 3\ of\ the\ License,\ or}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ (at\ your\ option)\ any\ later\ version.}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ This\ program\ is\ distributed\ in\ the\ hope\ that\ it\ will\ be\ useful,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ but\ WITHOUT\ ANY\ WARRANTY;\ without\ even\ the\ implied\ warranty\ of}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ MERCHANTABILITY\ or\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE.\ \ See\ the}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ GNU\ General\ Public\ License\ for\ more\ details.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ You\ should\ have\ received\ a\ copy\ of\ the\ GNU\ General\ Public\ License}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ along\ with\ this\ program.\ \ If\ not,\ see\ <https://www.gnu.org/licenses/>.}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ PREFERENCESDIALOG\_H}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ PREFERENCESDIALOG\_H}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}settings.h"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <QAbstractButton>}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <QDialog>}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <QMap>}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{keyword}{namespace\ }Ui\ \{}
+\DoxyCodeLine{00031\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classPreferencesDialog}{PreferencesDialog}};}
+\DoxyCodeLine{00032\ \}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classPreferencesDialog}{PreferencesDialog}}\ :\ \textcolor{keyword}{public}\ QDialog}
+\DoxyCodeLine{00035\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ Q\_OBJECT}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classPreferencesDialog}{PreferencesDialog}}(QWidget\ *parent\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{classPreferencesDialog}{\string~PreferencesDialog}}();}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordtype}{void}\ loadSettings();}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordtype}{void}\ saveSettings();}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{keyword}{private}\ slots:}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00047\ \ \ \ \ Ui::PreferencesDialog\ *ui;}
+\DoxyCodeLine{00048\ \ \ \ \ QMap<QString,\ QWidget*>\ widgetMap;}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{comment}{//void\ resizeEvent(QResizeEvent\ *event);}}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{void}\ restoreButtonClicked(QAbstractButton\ *button);}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{void}\ restoreDefaults();}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordtype}{void}\ onBackupCheckStateChanged(\textcolor{keywordtype}{int}\ state);}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{void}\ openBackupDir();}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{void}\ restartApplication();}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{void}\ browseForExecutable();}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{classSettings}{Settings}}\ settings;}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordtype}{bool}\ restartRequired\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00059\ \ \ \ \ QSet<QString>\ restartKeys\ =\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Categories/DoubleClickOpen"{}}\ \ \ \textcolor{comment}{//\ setting\ which\ applied\ net\ restart}}
+\DoxyCodeLine{00061\ \ \ \ \ \};}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \};}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ PREFERENCESDIALOG\_H}}
+
+\end{DoxyCode}

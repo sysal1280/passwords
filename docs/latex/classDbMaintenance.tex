@@ -1,0 +1,49 @@
+\doxysection{Db\+Maintenance Class Reference}
+\hypertarget{classDbMaintenance}{}\label{classDbMaintenance}\index{DbMaintenance@{DbMaintenance}}
+
+
+Inheritance diagram for Db\+Maintenance\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=165pt]{classDbMaintenance__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Db\+Maintenance\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=165pt]{classDbMaintenance__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classDbMaintenance_a92e62306d766e912c175876a96d066e6}\label{classDbMaintenance_a92e62306d766e912c175876a96d066e6} 
+{\bfseries Db\+Maintenance} (QSql\+Database db, QWidget \texorpdfstring{$\ast$}{*}parent=nullptr)
+\item 
+\Hypertarget{classDbMaintenance_a5c2a7e204ea62a37f200390ac83da4e7}\label{classDbMaintenance_a5c2a7e204ea62a37f200390ac83da4e7} 
+void {\bfseries start\+Maintenance} ()
+\item 
+\Hypertarget{classDbMaintenance_ab0b4fbe75cc26d936f34b633643a756e}\label{classDbMaintenance_ab0b4fbe75cc26d936f34b633643a756e} 
+void {\bfseries update\+Status} (const QString \&text, int progress)
+\item 
+\Hypertarget{classDbMaintenance_a348dc1f4ff7825710189d8bda8503a3f}\label{classDbMaintenance_a348dc1f4ff7825710189d8bda8503a3f} 
+void {\bfseries maintenance\+Finished} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classDbMaintenance_a50e2572907036c27cccd10efdadadb48}\label{classDbMaintenance_a50e2572907036c27cccd10efdadadb48} 
+void {\bfseries close\+Event} (QClose\+Event \texorpdfstring{$\ast$}{*}event) override
+\item 
+\Hypertarget{classDbMaintenance_a09e46b087a0d93b0ec126ed77d1f5521}\label{classDbMaintenance_a09e46b087a0d93b0ec126ed77d1f5521} 
+void {\bfseries reject} () override
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/dbmaintenance.\+h\end{DoxyCompactItemize}
