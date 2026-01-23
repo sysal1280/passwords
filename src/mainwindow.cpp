@@ -268,7 +268,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionDelete_Password->setStatusTip(tr("Delete the selected password permanently"));
     ui->actionBookmark->setStatusTip(tr("Add or remove this password from your bookmarks"));
     ui->actionAudit_Log->setStatusTip(tr("View the full activity history for this password"));
-    ui->actionCopy_Password_Path->setStatusTip(tr("Copy the full path of the selected entry"));
+    ui->actionCopy_Password_Path->setStatusTip(tr("Copy the full path of the selected password"));
 
 
     // OTP countdown widgets (progress bar + label)
