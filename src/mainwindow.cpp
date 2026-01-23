@@ -1672,6 +1672,20 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     icon->setContextMenu(trayMenu);
     icon->show();
 
+    connect(icon, &QSystemTrayIcon::activated,
+            this, [this](QSystemTrayIcon::ActivationReason reason) {
+        QApplication::restoreOverrideCursor();
+        if (reason == QSystemTrayIcon::Trigger || reason == QSystemTrayIcon::DoubleClick) {
+            if (this->isMinimized()) {
+                this->setWindowState(this->windowState() & ~Qt::WindowMinimized);
+                this->show();
+            }
+            this->raise();
+            this->activateWindow();
+            QApplication::restoreOverrideCursor();
+        }
+    });
+
     // Ensure scrollArea has a widget
     if (!ui->scrollArea->widget()) {
         QWidget *container = new QWidget;
