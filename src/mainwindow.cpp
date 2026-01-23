@@ -1663,7 +1663,7 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
 
 void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui)
 {
-    //ScopedCursor wait(Qt::WaitCursor);
+    ScopedCursor wait(Qt::WaitCursor);
     ui->scrollArea->blockSignals(true);
 
     trayMenu = new QMenu(this);
@@ -1671,16 +1671,6 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     icon->setIcon(QIcon(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
     icon->setContextMenu(trayMenu);
     icon->show();
-
-    connect(icon, &QSystemTrayIcon::activated, this,
-        [this](QSystemTrayIcon::ActivationReason reason) {
-            if (reason == QSystemTrayIcon::DoubleClick) {
-                if (isVisible())
-                    hide();
-                else
-                    showNormal();
-            }
-        });
 
     // Ensure scrollArea has a widget
     if (!ui->scrollArea->widget()) {
