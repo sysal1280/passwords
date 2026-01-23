@@ -81,6 +81,7 @@
 #include <QSplitter>
 #include <QStandardPaths>
 #include <QSysInfo>
+#include <QSystemTrayIcon>
 #include <QTableWidget>
 #include <QTextEdit>
 #include <QToolButton>
@@ -109,8 +110,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     startDebuggerMonitor(this, 7000);
 
-    qDebug() << "Size uncompressed" << QString("Adam Lanzafame").toUtf8().size();
-    qDebug() << "Size Compressed" << qCompress(QString("Adam Lanzafame").toUtf8(),9).size();
 
 #ifdef Q_OS_WIN
     userName = QString::fromLocal8Bit(qgetenv("USERNAME"));
@@ -1459,6 +1458,16 @@ void MainWindow::clearScrollArea()
         alignedTimer = nullptr;
     }
 
+    if (icon) {
+        delete icon;
+        icon = nullptr;
+    }
+
+    if (trayMenu) {
+        delete trayMenu;
+        trayMenu = nullptr;
+    }
+
     countdownLabel->setVisible(false);
     countdownProgress->setVisible(false);
 
@@ -1654,9 +1663,24 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
 
 void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::MainWindow *ui)
 {
+    //ScopedCursor wait(Qt::WaitCursor);
+    ui->scrollArea->blockSignals(true);
 
-ScopedCursor wait(Qt::WaitCursor);
-ui->scrollArea->blockSignals(true);
+    trayMenu = new QMenu(this);
+    icon = new QSystemTrayIcon(this);
+    icon->setIcon(QIcon(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
+    icon->setContextMenu(trayMenu);
+    icon->show();
+
+    connect(icon, &QSystemTrayIcon::activated, this,
+        [this](QSystemTrayIcon::ActivationReason reason) {
+            if (reason == QSystemTrayIcon::DoubleClick) {
+                if (isVisible())
+                    hide();
+                else
+                    showNormal();
+            }
+        });
 
     // Ensure scrollArea has a widget
     if (!ui->scrollArea->widget()) {
@@ -1716,6 +1740,13 @@ ui->scrollArea->blockSignals(true);
         labelText = "(No name)"; // nothing to show
     }
 
+    icon->setToolTip(name);
+
+    QAction *header = new QAction(name, trayMenu);
+    header->setEnabled(false);   // disable interaction
+    trayMenu->addAction(header);
+    trayMenu->addSeparator();
+
     int row = 0;
 
     QLabel* fullWidthLabelName = new QLabel(labelText);
@@ -1750,6 +1781,26 @@ ui->scrollArea->blockSignals(true);
         QString otp      = credObj.value("secretOtpCode").toString();
         int otpLength    = credObj.value("length").toInt(6);
         qDebug() << "length " << otpLength;
+
+
+        // --- ADD THESE LINES ---
+        QMenu *credMenu = trayMenu->addMenu(username.isEmpty() ? "Credential" : username);
+
+        QAction *copyUser = credMenu->addAction("Copy Username");
+        QAction *copyPass = credMenu->addAction("Copy Password");
+        QAction *copyOtp  = credMenu->addAction("Copy OTP");
+
+        connect(copyUser, &QAction::triggered, this, [this, username]() {
+            QGuiApplication::clipboard()->setText(username);
+        });
+
+        connect(copyPass, &QAction::triggered, this, [this, password]() {
+            QGuiApplication::clipboard()->setText(password);
+        });
+
+
+        trayMenu->addSeparator();
+        // --- END ADDITIONS ---
 
         //
         // Username
@@ -1871,6 +1922,12 @@ ui->scrollArea->blockSignals(true);
                         Passwords::SBTransientMessageTime
                     );
                 });
+
+        connect(copyOtp, &QAction::triggered, this, [this, otpEdit]() {
+            QString code = otpEdit->text().remove("-");
+            QGuiApplication::clipboard()->setText(code);
+        });
+
 
         //
         // Compact two-row layout for this credential

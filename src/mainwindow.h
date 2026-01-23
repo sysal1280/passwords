@@ -32,6 +32,7 @@
 #include <QProgressBar>
 #include <QSplitter>
 #include <QString>
+#include <QSystemTrayIcon>
 #include <QSqlDatabase>
 #include <QTimer>
 #include <QTreeWidget>
@@ -75,6 +76,8 @@ public:
 
     QLabel *countdownLabel = nullptr;
     QProgressBar *countdownProgress = nullptr;
+    QSystemTrayIcon *icon = nullptr;
+    QMenu *trayMenu = nullptr;
 
     // Public methods
     bool initDb();
