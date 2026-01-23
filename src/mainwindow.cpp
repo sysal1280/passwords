@@ -1666,24 +1666,20 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     ScopedCursor wait(Qt::WaitCursor);
     ui->scrollArea->blockSignals(true);
 
-    trayMenu = new QMenu(this);
-    icon = new QSystemTrayIcon(this);
+    icon = new QSystemTrayIcon(nullptr);
+    trayMenu = new QMenu(nullptr);
     icon->setIcon(QIcon(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
     icon->setContextMenu(trayMenu);
     icon->show();
 
     connect(icon, &QSystemTrayIcon::activated,
-            this, [this](QSystemTrayIcon::ActivationReason reason) {
-        QApplication::restoreOverrideCursor();
-        if (reason == QSystemTrayIcon::Trigger || reason == QSystemTrayIcon::DoubleClick) {
-            if (this->isMinimized()) {
-                this->setWindowState(this->windowState() & ~Qt::WindowMinimized);
-                this->show();
-            }
+            [this](QSystemTrayIcon::ActivationReason reason) {
+        if (reason != QSystemTrayIcon::Context) {
+            this->show();
             this->raise();
             this->activateWindow();
-            QApplication::restoreOverrideCursor();
         }
+        QApplication::restoreOverrideCursor();
     });
 
     // Ensure scrollArea has a widget
@@ -1747,6 +1743,7 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     icon->setToolTip(name);
 
     QAction *header = new QAction(name, trayMenu);
+    header->setIcon(QIcon(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
     header->setEnabled(false);   // disable interaction
     trayMenu->addAction(header);
     trayMenu->addSeparator();
