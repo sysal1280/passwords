@@ -1737,14 +1737,12 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     } else if (!description.isEmpty()) {
         labelText = description;
     } else {
-        labelText = "(No name)"; // nothing to show
+        labelText = tr("(No name)"); // nothing to show
     }
 
     icon->setToolTip(name);
-
     QAction *header = new QAction(name, trayMenu);
-    header->setIcon(QIcon(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
-    header->setEnabled(false);   // disable interaction
+    header->setEnabled(false);
     trayMenu->addAction(header);
     trayMenu->addSeparator();
 
