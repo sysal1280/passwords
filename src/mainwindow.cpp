@@ -33,6 +33,7 @@
 #include "debugutils.h"
 #include "droplabel.h"
 #include "encryptfiledialog.h"
+#include "favicon.h"
 #include "gpgcheck.h"
 #include "newpassworddialog.h"
 #include "passworddialog.h"
@@ -109,7 +110,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     startDebuggerMonitor(this, 7000);
-
 
 #ifdef Q_OS_WIN
     userName = QString::fromLocal8Bit(qgetenv("USERNAME"));
@@ -825,9 +825,16 @@ MainWindow::MainWindow(QWidget *parent)
             });
 
     connect(ui->treeWidget_2,
-            &QTreeWidget::itemActivated,
+            &QTreeWidget::itemDoubleClicked,
             this,
-            &MainWindow::openPassword);
+            [this](QTreeWidgetItem*, int) {
+                QTimer::singleShot(0, this, [this] {
+                    if (auto *item = ui->treeWidget_2->currentItem()) {
+                        openPassword(item);
+                    }
+                });
+            });
+
 
     connect(ui->actionRecent, &QAction::triggered, this, [this] {
         ScopedCursor wait(Qt::WaitCursor);
@@ -1471,17 +1478,14 @@ void MainWindow::clearScrollArea()
     countdownLabel->setVisible(false);
     countdownProgress->setVisible(false);
 
-    // ❗ Always create a fresh container
     QWidget *container = new QWidget;
     ui->scrollArea->setWidget(container);
     ui->scrollArea->setWidgetResizable(true);
 
-    // Create a fresh layout
     QGridLayout *gridLayout = new QGridLayout(container);
     gridLayout->setContentsMargins(12, 12, 12, 12);
     gridLayout->setSpacing(8);
 
-    // Add DropLabel
     DropLabel *imageLabel = new DropLabel(container);
     imageLabel->setPixmap(QPixmap(":/place.png"));
     imageLabel->setScaledContents(true);
@@ -1489,22 +1493,55 @@ void MainWindow::clearScrollArea()
 
     gridLayout->addWidget(imageLabel, 0, 0, Qt::AlignCenter);
 
+    // NEW: don’t trust the raw QTreeWidgetItem* long-term
     connect(imageLabel, &DropLabel::itemDropped,
             this, [this](QTreeWidgetItem *item) {
                 if (!item) return;
-                if (settings.getKillGpgAgent()) {
-                    killGpgAgent();
-                }
-                openPassword(item);
+
+                // Capture a stable identifier immediately
+                const int id = item->data(0, Qt::UserRole).toInt();
+
+                // Defer the actual open to after DnD finishes
+                QMetaObject::invokeMethod(
+                    this,
+                    [this, id]() {
+                        // Re-find the item safely
+                        QTreeWidgetItem *found = nullptr;
+
+                        // Simple linear search over treeWidget_2
+                        for (int i = 0; i < ui->treeWidget_2->topLevelItemCount(); ++i) {
+                            QTreeWidgetItem *it = ui->treeWidget_2->topLevelItem(i);
+                            if (it->data(0, Qt::UserRole).toInt() == id) {
+                                found = it;
+                                break;
+                            }
+                        }
+
+                        if (!found)
+                            return;
+
+                        if (settings.getKillGpgAgent()) {
+                            killGpgAgent();
+                        }
+                        openPassword(found);
+                    },
+                    Qt::QueuedConnection
+                );
             });
 
     openedCredentialID = -1;
 }
 
+
+
 void MainWindow::openPassword(QTreeWidgetItem *item)
 {
+    static int counter = 0;
+    qDebug() << "openPassword call #" << ++counter << "item =" << item;
+
     if (!item)
         return;
+
 
     qDebug() << "openPassword called with item =" << item;
 
@@ -1518,6 +1555,11 @@ void MainWindow::openPassword(QTreeWidgetItem *item)
     if (openedCredentialID == parentId) {
         clearScrollArea();
         return;
+    }
+
+    if (item)
+    {
+    clearScrollArea();
     }
 
     // Use RAII cursor instead of manual set/restore + processEvents
@@ -1670,7 +1712,6 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     trayMenu = new QMenu(nullptr);
     icon->setIcon(QIcon(":/menus/glyphs/password_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"));
     icon->setContextMenu(trayMenu);
-    icon->show();
 
     connect(icon, &QSystemTrayIcon::activated,
             [this](QSystemTrayIcon::ActivationReason reason) {
@@ -1754,8 +1795,9 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
     row++;
 
     // Add a full-width label in the next row for url (optional)
+    QString url = "";
     if (root.contains("url")) {
-        QString url = root.value("url").toString().trimmed();
+        url = root.value("url").toString().trimmed();
 
         if (!url.isEmpty()) {
             QLabel* fullWidthLabel_url = new QLabel(
@@ -1772,6 +1814,22 @@ void MainWindow::populateFromJsonApplication(const QByteArray &jsonData, Ui::Mai
             row++;
         }
     }
+
+    auto *fav = new Favicon(url, this);
+
+    connect(fav, &Favicon::faviconReady, this,
+            [this, fav](const QIcon &icon) {
+
+                if (!this->icon) {
+                    fav->deleteLater();
+                    return;
+                }
+
+                this->icon->setIcon(icon);
+                this->icon->show();
+                fav->deleteLater();
+            });
+
 
     for (const QJsonValue &val : std::as_const(credentials)) {
         QJsonObject credObj = val.toObject();

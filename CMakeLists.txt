@@ -88,7 +88,7 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/ui)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools Sql Network Charts Concurrent)
+find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools Sql Network Charts Concurrent Svg)
 
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS "src/*.cpp" "src/*.h")
 file(GLOB_RECURSE UI_FILES CONFIGURE_DEPENDS "ui/*.ui")
@@ -143,7 +143,7 @@ target_compile_definitions(password PRIVATE
 )
 
 target_link_libraries(password PRIVATE
-    Qt6::Widgets Qt6::Sql Qt6::Network Qt6::Charts Qt6::Concurrent
+    Qt6::Widgets Qt6::Sql Qt6::Network Qt6::Charts Qt6::Concurrent Qt6::Svg
 )
 
 target_include_directories(password PRIVATE src ui ${CMAKE_BINARY_DIR})

@@ -20,9 +20,9 @@
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
 #include "keyentry.h"
 #include "settings.h"
+#include "favicon.h"
 #include <QDateTime>
 #include <QIcon>
 #include <QLabel>
@@ -37,6 +37,7 @@
 #include <QTimer>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include "droplabel.h"
 
 namespace Ui {
 class MainWindow;
@@ -73,11 +74,12 @@ public:
     bool abortingStartup = false;
     bool abortBusy = false;
 
-
     QLabel *countdownLabel = nullptr;
     QProgressBar *countdownProgress = nullptr;
     QSystemTrayIcon *icon = nullptr;
     QMenu *trayMenu = nullptr;
+    Favicon *currentFav = nullptr;
+
 
     // Public methods
     bool initDb();
